@@ -1,0 +1,118 @@
+<mat-toolbar style="height:40px;" fxLayout="row" style="text-align:center;">
+    <a mat-button mat-icon-button routerLink="/">
+        <mat-icon>dashboard</mat-icon>
+    </a>
+    <button mat-button [matMenuTriggerFor]="sale">受注伝票</button>
+    <mat-menu #sale="matMenu">
+        <a mat-menu-item routerLink="/frmsales">受注伝票</a>
+        <a mat-menu-item>受注履歴</a>
+    </mat-menu>
+    <button mat-button [matMenuTriggerFor]="cust">顧客関連</button>
+    <mat-menu #cust="matMenu">
+        <a mat-menu-item routerLink="/mstmember">顧客マスタ</a>
+        <a mat-menu-item>掛率表</a>
+        <a mat-menu-item>ＤＭ抽出</a>
+        <a mat-menu-item>ＤＭリスト</a>
+    </mat-menu>    
+    <button mat-button [matMenuTriggerFor]="depo">売上入金</button>
+    <mat-menu #depo="matMenu">
+        <a mat-menu-item>入金伝票</a>
+        <a mat-menu-item>一括入金処理</a>
+        <a mat-menu-item>代引データ読込</a>
+        <a mat-menu-item>掛売請求</a>
+        <a mat-menu-item>掛売入金</a>
+        <a mat-menu-item>請求予定一覧表</a>
+        <a mat-menu-item>請求書出力</a>
+        <a mat-menu-item>未入金一覧表</a>
+        <a mat-menu-item>ＮＰ状況確認</a>
+        <a mat-menu-item>ＮＰデータ編集</a>
+    </mat-menu>
+    <button mat-button [matMenuTriggerFor]="prin">印刷関連</button>
+    <mat-menu #prin="matMenu">
+        <a mat-menu-item>納品書出力</a>
+        <a mat-menu-item>送り状印刷</a>
+        <a mat-menu-item>売上一覧表</a>
+        <a mat-menu-item>商品別集計表</a>
+        <a mat-menu-item>伝票ﾌﾘｰ別集計表</a>
+        <a mat-menu-item>顧客ﾌﾘｰ別集計表</a>
+        <a mat-menu-item>顧客別商品集計表</a>
+        <a mat-menu-item>商品別順位表</a>
+        <a mat-menu-item>顧客別順位表</a>
+        <a mat-menu-item>顧客別売上一覧表</a>
+        <a mat-menu-item>ファイル出力</a>
+    </mat-menu>
+    <button mat-button [matMenuTriggerFor]="zaik">在庫関連</button>
+    <mat-menu #zaik="matMenu">
+        <a mat-menu-item>在庫確認表</a>
+        <a mat-menu-item>商品台帳</a>
+        <a mat-menu-item>入荷伝票</a>
+        <a mat-menu-item>移動伝票</a>
+        <a mat-menu-item>展開伝票</a>
+        <a mat-menu-item>破棄伝票</a>
+        <a mat-menu-item>棚卸処理</a>
+        <a mat-menu-item>在庫一覧表</a>
+        <a mat-menu-item>移動伝票一覧表</a>
+        <a mat-menu-item>展開伝票一覧表</a>
+        <a mat-menu-item>破棄伝票一覧表</a>
+        <a mat-menu-item>確保割れ在庫一覧表</a>
+        <a mat-menu-item>移動伝票納品書</a>
+        <a mat-menu-item>受注在庫集計表</a>
+        <a mat-menu-item>受注残確認表</a>
+    </mat-menu>
+    <button mat-button [matMenuTriggerFor]="siir">仕入関連</button>
+    <mat-menu #siir="matMenu">
+        <a mat-menu-item>発注伝票</a>
+        <a mat-menu-item>仕入伝票</a>
+        <a mat-menu-item>発注履歴</a>
+        <a mat-menu-item>仕入一覧表</a>
+    </mat-menu>
+    <button mat-button [matMenuTriggerFor]="mast">各マスタ</button>
+    <mat-menu #mast="matMenu">
+        <a mat-menu-item routerLink="/mstgoods">商品マスタ</a>
+        <a mat-menu-item>仕入先マスタ</a>
+        <a mat-menu-item>伝票マスタ</a>
+        <a mat-menu-item>倉庫マスタ</a>
+        <a mat-menu-item>担当者マスタ</a>
+        <a mat-menu-item>分類マスタ</a>
+    </mat-menu>
+    <button mat-button [matMenuTriggerFor]="syst">システム</button>
+    <mat-menu #syst="matMenu">
+        <a mat-menu-item>受注テキスト読込</a>
+        <a mat-menu-item>マスタデータ読込</a>
+        <a mat-menu-item>入金テキスト読込</a>
+        <a mat-menu-item>稼働日カレンダ</a>
+        <a mat-menu-item>作業ログ</a>
+    </mat-menu>
+    <button mat-button [matMenuTriggerFor]="menu">
+        <mat-icon>settings</mat-icon>設定
+    </button>
+    <mat-menu #menu="matMenu">
+        <form class="menu-form">  
+            <a mat-menu-item href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EVW5l6FhMOdGuKCnCSPdEnoBSebtCJmimXB7VJSd0kpQYw?e=8aM7JA" target="_blank">
+                <mat-icon>list_alt</mat-icon>改善要望Excel
+            </a>
+            <button mat-menu-item [matMenuTriggerFor]="colormenu"><mat-icon>palette</mat-icon>テーマカラー</button>
+            <mat-menu #colormenu="matMenu">
+                <button mat-menu-item (click)="setColor('indigo-pink')">indigo-pink</button>
+                <button mat-menu-item (click)="setColor('deeppurple-amber')">deeppurple-amber</button>
+                <button mat-menu-item (click)="setColor('pink-bluegrey')">pink-bluegrey</button>
+                <button mat-menu-item (click)="setColor('purple-green')">purple-green</button>
+            </mat-menu>
+            <button mat-menu-item (click)="usrsrv.logout();">
+                <mat-icon>exit_to_app</mat-icon>
+                <span>ログアウト</span>
+            </button>
+            <mat-card fxLayout="column">            
+                <mat-form-field>
+                    <mat-label>会社</mat-label>
+                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.system.name}}">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>ユーザ名</mat-label>
+                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.userInfo.nickname}}：{{usrsrv.userInfo.name}}">
+                </mat-form-field>
+            </mat-card>
+        </form>
+    </mat-menu>
+</mat-toolbar>
+
