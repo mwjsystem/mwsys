@@ -1,0 +1,18 @@
+<form fxLayout="row wrap" fxLayoutAlign="space-around center" fxLayoutGap="5px">
+  <mat-form-field style="width:10em">
+    <mat-label>登録日時</mat-label>
+    <input matInput [value]="usrsrv.tmstmp.created_at | date:'yyyy/MM/dd HH:mm'" disabled>
+  </mat-form-field>
+  <mat-form-field style="width:5em">
+    <mat-label>登録者</mat-label>
+    <input matInput [value]="usrsrv.tmstmp.created_by" disabled>
+  </mat-form-field> 
+  <mat-form-field style="width:10em">
+    <mat-label>更新日時</mat-label>
+    <input matInput [value]="usrsrv.tmstmp.updated_at | date:'yyyy/MM/dd HH:mm'" disabled>
+  </mat-form-field>
+  <mat-form-field style="width:5em">
+    <mat-label>更新者</mat-label>
+    <input matInput [value]="usrsrv.tmstmp.updated_by" disabled>
+  </mat-form-field>
+</form>

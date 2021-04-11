@@ -4,10 +4,11 @@ import { NgModule, LOCALE_ID } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { CommonModule, registerLocaleData } from '@angular/common';
 import localeJa from '@angular/common/locales/ja';
-import { FlexLayoutModule } from '@angular/flex-layout';
+// import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+// import { FlexLayoutModule } from '@angular/flex-layout';
 import { MaterialModule } from './material.module';
 import { AuthModule } from '@auth0/auth0-angular';
 import { HttpClientModule } from '@angular/common/http';
@@ -34,9 +35,9 @@ import { LoginComponent } from './login/login.component';
       redirectUri: `${window.location.origin}`
     }),
     BrowserAnimationsModule,
-    FormsModule,
-    FlexLayoutModule,
-    ReactiveFormsModule,
+    // FormsModule,
+    // FlexLayoutModule,
+    // ReactiveFormsModule,
     GraphQLModule,
     ToastrModule.forRoot(),
     MaterialModule,

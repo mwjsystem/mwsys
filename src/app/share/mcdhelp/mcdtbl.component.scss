@@ -1,0 +1,15 @@
+mat-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding-top: 20px;
+  }
+  
+  .mat-cell, .mat-footer-cell, .mat-header-cell{
+      padding: 5px;
+  }
+
+  .mat-table {
+    overflow-x: scroll;
+    display: table;
+  }

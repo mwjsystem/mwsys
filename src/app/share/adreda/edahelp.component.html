@@ -1,0 +1,7 @@
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">別納先枝番検索</h1>
+<mat-dialog-content>
+  <app-edatbl (seteda)="sel_eda($event)"></app-edatbl>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button class="mat-raised-button"(click)="close()">Cancel</button>
+</mat-dialog-actions>

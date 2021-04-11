@@ -14,7 +14,7 @@ declare namespace mwI {
     nadr:number;
     souko:string;
     tcode:number;
-    bunsyo:number;
+    bunsho:number;
     dbikou:string;
     nbikou:string;
     obikou:string;
@@ -73,6 +73,7 @@ declare namespace mwI {
     gcode:string;
     gtext:string;
     suu:number;
+    iriunit:string;
     teika:number;
     tanka:number;
     money:number;
@@ -93,7 +94,7 @@ declare namespace mwI {
     gcode:string;
     gkbn:number;
     siire:string;
-    subname:string;
+    gtext:string;
     irisu:number;
     iriunit:string;
     max:number;

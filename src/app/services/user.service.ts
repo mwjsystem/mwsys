@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { Apollo } from 'apollo-angular';
-import * as Query from './queries.usr';
 import { AbstractControl } from '@angular/forms';
+import gql from 'graphql-tag';
 
 export class TmStmp {
   created_at: Date;
@@ -31,15 +31,22 @@ export class UserService {
   compid:number;
   tmstmp:TmStmp=new TmStmp();
   system:System=new System();
-  bunsho: mwI.Bunsho[]=[];
   
   constructor(public auth: AuthService,
               private apollo: Apollo) {
-    this.auth.user$.subscribe(user => {
+      const GetMast = gql`
+      query get_system($id: smallint!){
+        mssystem(where: {id: {_eq: $id}}) {
+          name
+          subname
+          maxmcd
+        }
+      }`;
+      this.auth.user$.subscribe(user => {
       this.userInfo = user;
       this.compid=this.userInfo['https://userids'][0];
       this.apollo.watchQuery<any>({
-        query: Query.GetMast4, 
+        query: GetMast, 
           variables: { 
             id : this.compid
           },
@@ -56,21 +63,6 @@ export class UserService {
   logout(): void {
     // Call this to log the user out of the application
     this.auth.logout({ returnTo: window.location.origin });
-  }
-
-  get_bunsho():void {
-    this.apollo.watchQuery<any>({
-      query: Query.GetMast1, 
-        variables: { 
-          id : this.compid
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        this.bunsho=data.msbunsho;
-      },(error) => {
-        console.log('error query get_bunsho', error);
-      });
   }
 
   editFrmval(frm:AbstractControl,fld:string):any{
@@ -106,5 +98,29 @@ export class UserService {
     this.tmstmp.updated_at = obj.updated_at;
     this.tmstmp.updated_by = obj.updated_by;
   }
+
+  formatDate(date):string {
+    let lcdate:Date = new Date(date);
+    const y = lcdate.getFullYear();
+    const m = ('00' + (lcdate.getMonth()+1)).slice(-2);
+    const d = ('00' + lcdate.getDate()).slice(-2);
+    return (y + '-' + m + '-' + d);
+  }
+
+  convUpper(value):string {
+    // 全角は半角にして、大文字に変換
+    const val = value.toUpperCase().replace(/[^A-ZＡ-Ｚ0-9０-９－-]/g, '').replace(/[０-９Ａ-Ｚ－]/g, function(s) {
+      return String.fromCharCode(s.charCodeAt(0) - 65248);})
+    return val;
+  }
+
+  // convNumber(value):any {
+  //   const conv = value.replace(/[^0-9０-９]/g, '').replace(/[０-９]/g, function(s) {
+  //     return String.fromCharCode(s.charCodeAt(0) - 65248);
+  //   });   //数字のみ抽出
+  //   return conv;
+    
+  // }
+
 }
 

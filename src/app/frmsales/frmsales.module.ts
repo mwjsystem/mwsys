@@ -1,0 +1,27 @@
+import { NgModule, LOCALE_ID } from '@angular/core';
+import { CommonModule, registerLocaleData } from '@angular/common';
+import { CoreModule } from './../core/core.module';
+import localeJa from '@angular/common/locales/ja';
+
+import { FrmsalesRoutingModule } from './frmsales-routing.module';
+import { FrmsalesComponent } from './frmsales.component';
+import { JmeitblComponent } from './jmeitbl.component';
+import { JdatePipe } from '../pipes/jdate.pipe';
+import { BeforeunloadGuard } from './../beforeunload.guard';
+
+registerLocaleData(localeJa);
+
+@NgModule({
+  declarations: [
+    FrmsalesComponent,
+    JmeitblComponent,
+    JdatePipe
+  ],
+  imports: [
+    CommonModule,
+    CoreModule,
+    FrmsalesRoutingModule
+  ],
+  providers: [BeforeunloadGuard ,{ provide: LOCALE_ID, useValue: 'ja-JP' }],
+})
+export class FrmsalesModule { }

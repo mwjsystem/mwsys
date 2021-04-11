@@ -133,7 +133,7 @@ declare namespace mwI {
     iriunit:string;
     tkbn:number;
     zkbn:number;
-    subname:string;
+    gtext:string;
     max:number;
     send:string;
     order:boolean;

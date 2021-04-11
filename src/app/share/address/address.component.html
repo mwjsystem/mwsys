@@ -1,0 +1,62 @@
+<form formGroupName="{{formName}}" ngNativeValidate ybAddress fxLayout="row wrap" div fxLayoutGap="7px">
+    <mat-form-field>
+        <mat-label>郵便番号(ハイフンなし)</mat-label>
+        <input tabIndex="101" matInput formControlName="zip" ybPostalCode required size="7" maxlength="7">
+        <!-- <button mat-button matSuffix mat-stroked-button aria-label="get" (click)="address.complete()">
+            住所補完
+        </button> -->
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>都道府県</mat-label>
+        <input tabIndex="102" matInput formControlName="region" ybRegion required>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>市区町村</mat-label>
+        <input tabIndex="103" matInput formControlName="local" ybLocality required>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>町名・番地</mat-label>
+        <input tabIndex="104" matInput formControlName="street" ybStreet required>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>マンション・ビル名</mat-label>
+        <input tabIndex="105"  matInput formControlName="extend" ybExtended>
+    </mat-form-field>
+    <mat-form-field *ngIf="formName !== 'addr0'">
+        <mat-label>道場名</mat-label>
+        <input tabIndex="106"  matInput formControlName="extend2">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>電話番号</mat-label>
+        <input tabIndex="107" matInput formControlName="tel">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>電話番号2</mat-label>
+        <input tabIndex="109" matInput formControlName="tel2">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>電話番号3</mat-label>
+        <input tabIndex="110" matInput formControlName="tel3">
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>FAX番号</mat-label>
+        <input tabIndex="108" matInput formControlName="fax">
+    </mat-form-field>
+    <mat-form-field style="width:20em" *ngIf="formName !== 'addr0'">
+        <mat-label>住所宛名</mat-label>
+        <input tabIndex="111" matInput formControlName="adrname" required>
+    </mat-form-field>
+    <mat-checkbox formControlName="del">削除済</mat-checkbox>
+    <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;">
+        <mat-label>納品先備考</mat-label>
+        <textarea matInput formControlName="adrbikou" matTextareaAutosize></textarea>
+    </mat-form-field>
+    <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;">
+        <mat-label>納品先社内向け備考</mat-label>
+        <textarea matInput formControlName="adrinbikou" matTextareaAutosize></textarea>
+    </mat-form-field>
+    <mat-form-field style="width:100%;">
+        <mat-label>送り状備考</mat-label>
+        <textarea matInput formControlName="adrokrbko" matTextareaAutosize></textarea>
+    </mat-form-field>
+</form>

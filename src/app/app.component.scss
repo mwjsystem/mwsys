@@ -1,0 +1,43 @@
+::ng-deep.mat-form-field.frm-fld-in-bar {
+    .mat-form-field-wrapper {
+        padding-bottom: 0;
+    }
+    .mat-form-field-underline {
+        bottom: 0;
+    }
+}
+.RouterOutlet {
+    padding-top: 35px;
+}
+mat-toolbar {
+    position: fixed;
+    z-index: 100; 
+}
+mat-toolbar + *{
+    padding-top: 70px;    
+}
+mat-form-field {
+    height: 3em;
+    font-size: 1em;
+    padding-left: .4em;
+  }
+
+.nmtxt {
+  padding-bottom: 5px;
+  margin-right: 7px; 
+  width: 15em;
+}  
+
+.ybtxt {
+  padding-bottom: 5px;
+  margin-right: 7px; 
+}  
+
+.i_num {
+  text-align: right;
+  margin:0px;
+}
+
+mat-card-header {
+  padding-bottom: 1em;
+}
