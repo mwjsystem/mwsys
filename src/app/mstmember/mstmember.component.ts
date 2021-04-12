@@ -51,7 +51,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
               private toastr: ToastrService,
               private zone: NgZone) {
       zone.onMicrotaskEmpty.subscribe(() => { console.log('mstmember detect change'); });
-      this.title.setTitle('顧客マスタ(MwjSystem)');
+      this.title.setTitle('顧客マスタ(MWSystem)');
   }
 
   ngOnInit(): void {
@@ -65,7 +65,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       okuri: new FormControl(''),
       mtax: new FormControl('', Validators.required),
       daibunrui: new FormControl(''),
-      bumon: new FormControl(''),
+      chubunrui: new FormControl(''),
       shobunrui: new FormControl(''),
       tcode1: new FormControl('', Validators.required),
       tcode2: new FormControl('', Validators.required),

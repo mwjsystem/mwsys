@@ -239,6 +239,45 @@
       </div>
     </mat-card-content>
   </mat-card>
+  <mat-expansion-panel>        
+    <mat-expansion-panel-header>
+      追加情報
+    </mat-expansion-panel-header>
+    <div fxLayout="column">
+      <mat-form-field style="width:8em">
+        <mat-label>大分類</mat-label>
+        <mat-select #msel7 formControlName="daibunrui" (keyup.enter)="msel7.close()">
+          <mat-option *ngFor="let sval of bunsrv.daib" [value]="sval.value">
+            {{sval.viewval}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field style="width:8em">
+        <mat-label>中分類</mat-label>
+        <mat-select #msel8 formControlName="bumon" (keyup.enter)="msel8.close()">
+          <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
+            {{sval.viewval}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field style="width:8em">
+        <mat-label>小分類</mat-label>
+        <mat-select #msel9 formControlName="shobunrui" (keyup.enter)="msel9.close()">
+          <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
+            {{sval.viewval}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field style="width:8em">
+        <mat-label>営業担当</mat-label>
+        <mat-select #msel10 formControlName="tcode1" (keyup.enter)="msel10.close()" required>
+          <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+            {{sval.viewval}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </mat-expansion-panel>    
   <mat-card>     
     <mat-card-header  fxLafxLayout="row wrap" fxLayoutGap="5px">
         <mat-card-title>

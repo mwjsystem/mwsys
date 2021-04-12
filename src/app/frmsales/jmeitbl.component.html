@@ -85,7 +85,7 @@
       <th mat-header-cell *matHeaderCellDef>税区分</th>
       <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
       <mat-form-field style="width:4em;">
-        <mat-select #msel2 [tabIndex]="(i + 1) * 100 + 5" formControlName="taxkbn" required (keyup.enter)="msel2.close()">
+        <mat-select #msel2 formControlName="taxkbn" required (keyup.enter)="msel2.close()">
           <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
@@ -182,7 +182,7 @@
       <th mat-header-cell *matHeaderCellDef>消費税率</th>
       <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
       <mat-form-field style="width:4em;">
-        <mat-select #msel3 [tabIndex]="(i + 1) * 100 + 7" formControlName="taxrate" required (keyup.enter)="msel3.close()" class="i_num">
+        <mat-select #msel3 formControlName="taxrate" required (keyup.enter)="msel3.close()" class="i_num">
           <mat-option *ngFor="let sval of bunsrv.taxrt" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>

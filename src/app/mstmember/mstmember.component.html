@@ -111,7 +111,7 @@
         </mat-select>
       </mat-form-field>
       <mat-form-field style="width:8em">
-        <mat-label>部門</mat-label>
+        <mat-label>中分類</mat-label>
         <mat-select #msel6 tabIndex="9" formControlName="bumon" (keyup.enter)="msel6.close()">
           <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
             {{sval.viewval}}

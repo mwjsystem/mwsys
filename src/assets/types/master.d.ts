@@ -95,7 +95,7 @@ declare namespace mwI {
     del:boolean;
     sptnkbn:string;
     daibunuri:string;
-    bumon:string;
+    chubunrui:string;
     shobunrui:string;
     created_at:Date;
     updated_at:Date;

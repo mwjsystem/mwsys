@@ -67,7 +67,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     del
     sptnkbn
     daibunrui
-    bumon
+    chubunrui
     created_at
     updated_at
     lday

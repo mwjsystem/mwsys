@@ -9,7 +9,7 @@ import { Title } from '@angular/platform-browser';
 export class HomeComponent implements OnInit {
   // userInfo: {[key: string]: any} = {};
   constructor(private title: Title) { 
-    this.title.setTitle('ホーム(MwjSystem)');
+    this.title.setTitle('ホーム(MWSystem)');
   }
 
   ngOnInit(): void {

@@ -61,7 +61,7 @@ export class FrmsalesComponent implements OnInit {
               private cdRef:ChangeDetectorRef,
               private zone: NgZone) { 
     zone.onMicrotaskEmpty.subscribe(() => { console.log('frmsales detect change'); });
-    title.setTitle('受注伝票(MwjSystem)');               
+    title.setTitle('受注伝票(MWSystem)');               
   }
 
   ngOnInit(): void {
@@ -91,6 +91,10 @@ export class FrmsalesComponent implements OnInit {
       nbikou: new FormControl(''),
       obikou: new FormControl(''),
       inbikou: new FormControl(''),
+      daibunrui: new FormControl(''),
+      chubunrui: new FormControl(''),
+      shobunrui: new FormControl(''),
+      tcode1: new FormControl(''),
       gtotal: new FormControl(''),
       souryou: new FormControl(''),
       tesuu: new FormControl(''),
