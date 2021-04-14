@@ -57,9 +57,9 @@ query get_member($id: smallint!,$mcode:Int!) {
     sime
     site
     inday
-    icode
+    scode
     pay
-    okuri
+    hcode
     mtax
     sscode
     tcode1
@@ -68,6 +68,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     sptnkbn
     daibunrui
     chubunrui
+    shobunrui
     created_at
     updated_at
     lday

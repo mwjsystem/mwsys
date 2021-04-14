@@ -31,7 +31,6 @@ declare namespace mwI {
     ttotal:number;
     tax:number;
     syoukei:number;
-    tyousei:number;
     total:number;
     okurinusi:string;
     skbn:string;
@@ -54,7 +53,7 @@ declare namespace mwI {
     jcode:string;
     pcode:string;
     daibunrui:string;
-    bumon :string;
+    chubunrui:string;
     shobunrui:string;
     tcode1 :string;
     del:boolean;

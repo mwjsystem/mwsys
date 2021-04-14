@@ -62,7 +62,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       kana: new FormControl('', Validators.required),
       tankakbn: new FormControl('', Validators.required),
       pay: new FormControl(''),
-      okuri: new FormControl(''),
+      hcode: new FormControl(''),
       mtax: new FormControl('', Validators.required),
       daibunrui: new FormControl(''),
       chubunrui: new FormControl(''),
@@ -82,7 +82,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       sime: new FormControl(''),
       site: new FormControl(''),
       inday: new FormControl(''),
-      icode: new FormControl(''),  
+      scode: new FormControl(''),  
       sscode: new FormControl('', Validators.required),    
     }));
     this.form.addControl('mail', new FormGroup({
@@ -311,11 +311,11 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       sime: this.usrsrv.editFrmval(this.form.get('kake'),'sime'),
       site: this.usrsrv.editFrmval(this.form.get('kake'),'site'),
       inday: this.usrsrv.editFrmval(this.form.get('kake'),'inday'),
-      icode: this.usrsrv.editFrmval(this.form.get('kake'),'icode'),
+      scode: this.usrsrv.editFrmval(this.form.get('kake'),'scode'),
       bikou: this.usrsrv.editFrmval(this.form.get('base'),'bikou'),
       inbikou: this.usrsrv.editFrmval(this.form.get('base'),'inbikou'),
       pay: this.usrsrv.editFrmval(this.form.get('base'),'pay'),
-      okuri: this.usrsrv.editFrmval(this.form.get('base'),'okuri'),
+      hcode: this.usrsrv.editFrmval(this.form.get('base'),'hcode'),
       mtax: this.usrsrv.editFrmval(this.form.get('base'),'mtax'),
       sscode: this.usrsrv.editFrmval(this.form.get('base'),'sscode'),
       daibunrui: this.usrsrv.editFrmval(this.form.get('base'),'daibunrui'),
@@ -369,8 +369,8 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
           if (!member.sscode) {
             member.sscode = this.mcd;
           }
-          if (!member.icode) {
-            member.icode = this.mcd;
+          if (!member.scode) {
+            member.scode = this.mcd;
           }
           member.created_at = new Date();
           member.created_by = this.usrsrv.userInfo.nickname;

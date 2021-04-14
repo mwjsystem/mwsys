@@ -1,96 +1,6 @@
 import gql from 'graphql-tag';
 
-export const GetMast2 = gql`
-query get_okuri($id: smallint!) {
-  mshokuri(where: {id: {_eq: $id}}) {
-    code
-    name
-    htype
-    binshu
-    mtchaku
-    daibiki
-    scode
-    csvimp
-    cuscode
-    order 
-    hscode
-    onmin
-    onmax
-  }
-}`;
-
-export const GetMast3 = gql`
-query get_haisou($id: smallint!) {
-  mshaisou(where: {id: {_eq: $id}}) {
-    code
-    name
-    url
-  }
-}`;
-
-export const GetMast4 = gql`
-query get_hktime($id: smallint!){
-  mshktime(where: {id: {_eq: $id}}) {
-    hscode
-    code
-    name
-    bunrui  
-  }
-}`;
-export const GetMast5 = gql`
-query get_mcode($id: smallint!,$maxmcd: Int){
-  msmember_aggregate(where: {id: {_eq: $id}, mcode: {_lt: $maxmcd}}) {
-    aggregate {
-      max {
-        mcode
-      }
-    }
-  }
-}`;
-export const GetMast6 = gql`
-query get_eda($id: smallint!,$mcode: Int!){
-  msmadr_aggregate(where: {id: {_eq: $id}, mcode: {_eq: $mcode}}) {
-    aggregate {
-      max {
-        eda
-      }
-    }
-  }
-}`;
-export const GetMast7 = gql`
-query get_souko($id: smallint!) {
-  mssouko(where: {id: {_eq: $id}},order_by: {sort: asc}) {
-    code
-    subname
-  }
-}`;
-export const GetMast8 = gql`
-query get_goods($id: smallint!,$day: date!) {
-  msgoods(where: {id: {_eq: $id}}) {
-    msggroup {
-      gkbn
-      siire
-    }
-    gcode
-    subname
-    irisu
-    iriunit
-    koguchi
-    max
-    order
-    send
-    skbn
-    zkbn
-    msgtankas_aggregate(where: {day: {_lt: $day}}) {
-      aggregate {
-        max {
-          day
-        }
-      }
-    }
-  }
-}`;
-export const GetMast9 = gql`
+export const GetGood = gql`
 query get_good($id: smallint!,$gds:String!,$day: date!) {
   msgoods_by_pk(gcode: $gds, id: $id){
     msggroup {
@@ -116,7 +26,61 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     }
   }
 }`;
-
+export const GetMember = gql`
+query get_member($id: smallint!,$mcode:Int!) {
+  msmember_by_pk(id: $id, mcode:$mcode) {
+    mcode
+    sei
+    mei
+    tankakbn
+    torikbn
+    scode
+    pay
+    hcode
+    mtax
+    sscode
+    tcode1
+    tcode2
+    del
+    sptnkbn
+    daibunrui
+    chubunrui
+    shobunrui
+    ntype
+    tntype
+    msmadrs(where: {eda: {_eq: 0}}) {
+      adrname
+      adrbikou
+      adrinbikou
+      adrokrbko
+      del
+    }    
+  }
+}`;
+export const GetMadr = gql`
+query get_member($id: smallint!,$mcode:Int!) {
+  msmember_by_pk(id: $id, mcode:$mcode) {
+    mcode
+    msmadrs(order_by: {eda: asc}) {
+      eda
+      zip
+      region
+      local
+      street
+      extend
+      tel
+      fax
+      tel2
+      tel3
+      extend2
+      adrname
+      adrbikou
+      adrinbikou
+      adrokrbko
+      del
+    }    
+  }
+}`;
 
 export const GetJyuden = gql`
 query get_jyuden($id: smallint!,$dno: Int!) {
@@ -150,7 +114,6 @@ query get_jyuden($id: smallint!,$dno: Int!) {
     ttotal
     tax
     syoukei
-    tyousei
     total
     okurinusi
     skbn
@@ -169,9 +132,9 @@ query get_jyuden($id: smallint!,$dno: Int!) {
     mcode
     scode
     jcode
-    pcode
+    pay
     daibunrui
-    bumon
+    chubunrui
     shobunrui
     tcode1
     del

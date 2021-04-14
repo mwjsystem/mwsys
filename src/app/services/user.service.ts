@@ -29,6 +29,7 @@ export class System {
 export class UserService {
   userInfo: {[key: string]: any} = {};
   compid:number;
+  staff:mwI.Staff;
   tmstmp:TmStmp=new TmStmp();
   system:System=new System();
   
@@ -42,8 +43,17 @@ export class UserService {
           maxmcd
         }
       }`;
+      const GetMast2 = gql`
+      query get_staff($id: smallint!, $mail: String!) {
+        msstaff(where: {id: {_eq: $id}, mail: {_eq: $mail}}) {
+          code
+          sei
+          mei
+        }
+      }`;
       this.auth.user$.subscribe(user => {
       this.userInfo = user;
+      // console.log(this.userInfo);
       this.compid=this.userInfo['https://userids'][0];
       this.apollo.watchQuery<any>({
         query: GetMast, 
@@ -57,6 +67,19 @@ export class UserService {
         },(error) => {
           console.log('error query get_system', error);
         });
+      this.apollo.watchQuery<any>({
+        query: GetMast2, 
+          variables: { 
+            id : this.compid,
+            mail : this.userInfo.email
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          this.staff=data.msstaff[0];
+        },(error) => {
+          console.log('error query get_system', error);
+        });  
     })
    }
 
@@ -100,7 +123,12 @@ export class UserService {
   }
 
   formatDate(date):string {
-    let lcdate:Date = new Date(date);
+    let lcdate:Date;
+    if (date !=null ){
+      lcdate = new Date(date);
+    }else{
+      lcdate = new Date();
+    }
     const y = lcdate.getFullYear();
     const m = ('00' + (lcdate.getMonth()+1)).slice(-2);
     const d = ('00' + lcdate.getDate()).slice(-2);

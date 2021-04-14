@@ -64,6 +64,7 @@ export class JmeitblComponent implements OnInit {
     for (let i=0;i<rows;i++){
       this.frmArr.push(this.createRow(i+1));
     }
+    this.refresh();
   }  
 
   updateRow(i:number,jyumei:mwI.Jyumei){
@@ -124,7 +125,7 @@ export class JmeitblComponent implements OnInit {
     let val:string =this.usrsrv.convUpper(value);
     this.frmArr.controls[i].get('gcode').setValue(val);
     this.apollo.watchQuery<any>({
-      query: Query.GetMast9, 
+      query: Query.GetGood, 
         variables: { 
           id : this.usrsrv.compid,           
           gds: val,

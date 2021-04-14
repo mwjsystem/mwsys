@@ -83,13 +83,13 @@ declare namespace mwI {
     sime:number;
     site:string;
     inday:number;
-    icode:string;
+    scode:number;
     bikou:string;
     inbikou:string;
     pay:string;
-    okuri:string;
+    hcode:string;
     mtax:string;
-    sscode:string;
+    sscode:number;
     tcode1:string;
     tcode2:string;
     del:boolean;
@@ -167,7 +167,8 @@ declare namespace mwI {
   }
   interface Staff {
     code:number;
-    name:string;
     mail:string;
+    sei:string;
+    mei:string;
   }
 }

@@ -14,7 +14,7 @@
       </button>
       <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
         <mat-label>受注伝票番号</mat-label>
-        <input matInput [ngModel]="denno" (ngModelChange)="denno=$event" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()"
+        <input matInput [ngModel]="denno" tabIndex="1" (ngModelChange)="denno=$event" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()"
         (blur)="refresh()" [ngModelOptions]="{standalone: true}">
         <button mat-button mat-icon-button matSuffix (click)="dennoHelp()" [style.display]="mode==3 ? 'inline-block' : 'none'">
           <mat-icon>find_replace</mat-icon>
@@ -243,39 +243,62 @@
     <mat-expansion-panel-header>
       追加情報
     </mat-expansion-panel-header>
-    <div fxLayout="column">
-      <mat-form-field style="width:8em">
-        <mat-label>大分類</mat-label>
-        <mat-select #msel7 formControlName="daibunrui" (keyup.enter)="msel7.close()">
-          <mat-option *ngFor="let sval of bunsrv.daib" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>中分類</mat-label>
-        <mat-select #msel8 formControlName="bumon" (keyup.enter)="msel8.close()">
-          <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>小分類</mat-label>
-        <mat-select #msel9 formControlName="shobunrui" (keyup.enter)="msel9.close()">
-          <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>営業担当</mat-label>
-        <mat-select #msel10 formControlName="tcode1" (keyup.enter)="msel10.close()" required>
-          <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+    <div fxLayout="row wrap">
+      <div fxLayout="column">
+        <div class="mat-form-field mat-form-field-infix">
+          <mat-checkbox formControlName="torikbn">掛請求</mat-checkbox>
+        </div>
+        <mat-form-field>
+          <mat-label>受注先伝票番号</mat-label>
+          <input matInput formControlName="cusden">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>代引き金額</mat-label>
+          <input matInput formControlName="daibiki">
+        </mat-form-field>
+        <mat-form-field style="width:5em">
+          <mat-label>顧客税区分</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div fxLayout="column">
+        <mat-form-field style="width:10em">
+          <mat-label>大分類</mat-label>
+          <mat-select formControlName="daibunrui" required>
+            <mat-option *ngFor="let sval of bunsrv.daib" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:10em">
+          <mat-label>中分類</mat-label>
+          <mat-select formControlName="chubunrui" required>
+            <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:10em">
+          <mat-label>小分類</mat-label>
+          <mat-select formControlName="shobunrui" required>
+            <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:10em">
+          <mat-label>営業担当</mat-label>
+          <mat-select formControlName="tcode1" required>
+            <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
     </div>
   </mat-expansion-panel>    
   <mat-card>     
@@ -300,15 +323,11 @@
           <input matInput [value]="form.value.nebiki | number" class="i_num" disabled>
         </mat-form-field>
         <mat-form-field style="width:6em;">
-          <mat-label>消費税</mat-label>
-          <input matInput [value]="form.value.taxtotal | number" class="i_num" disabled>
-        </mat-form-field>
-        <mat-form-field style="width:6em;">
           <mat-label>小計</mat-label>
           <input matInput [value]="form.value.syoukei | number" class="i_num" disabled>
         </mat-form-field>
         <mat-form-field style="width:6em;">
-          <mat-label>調整額</mat-label>
+          <mat-label>消費税</mat-label>
           <input matInput [value]="form.value.taxtotal | number" class="i_num" disabled>
         </mat-form-field>
         <mat-form-field style="width:6em;">

@@ -17,8 +17,9 @@ export class StaffService {
     query get_staff($id: smallint!){
       msstaff(where: {id: {_eq: $id}}) {
         code
-        name
         mail
+        sei
+        mei
       }
     }`;
     this.apollo.watchQuery<any>({
@@ -30,7 +31,7 @@ export class StaffService {
       .valueChanges
       .subscribe(({ data }) => {
         data.msstaff.forEach(e => {
-          this.tcds.push({value:e.code,viewval:e.name});
+          this.tcds.push({value:e.code,viewval:e.sei + (e.mei ?? "")}); //e.meiがnull等の時は、''を結合
         });
       },(error) => {
         console.log('error query get_staff', error);
