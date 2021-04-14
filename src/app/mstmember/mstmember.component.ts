@@ -94,7 +94,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     }));
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('mcd') === null){
-        this.mcd = '読込中です！';
+        // this.mcd = '読込中です！';
       }else{
         //１件分だけ先に読込
         this.mcd = params.get('mcd');
@@ -152,29 +152,29 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     this.elementRef.nativeElement.querySelector('button').focus();
   }
 
-  setNext(){
-    if( this.checkMcode(this.mcd) ){
-      let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == this.mcd);
-      if(i > -1 && i < this.memsrv.membs.length){
-        this.mcd = this.memsrv.membs[i+1].mcode;
-      } else {
-        this.mcd = this.memsrv.membs[0].mcode;  
-      }
-      this.refresh();
-    }
-  }
+  // setNext(){
+  //   if( this.checkMcode(this.mcd) ){
+  //     let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == this.mcd);
+  //     if(i > -1 && i < this.memsrv.membs.length){
+  //       this.mcd = this.memsrv.membs[i+1].mcode;
+  //     } else {
+  //       this.mcd = this.memsrv.membs[0].mcode;  
+  //     }
+  //     this.refresh();
+  //   }
+  // }
 
-  setPrev(){
-    if( this.checkMcode(this.mcd) ){
-      let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == this.mcd);
-      if(i > 0 ){
-        this.mcd = this.memsrv.membs[i-1].mcode;
-      } else {
-        this.mcd = this.memsrv.membs[0].mcode;  
-      }
-      this.refresh();
-    }
-  }
+  // setPrev(){
+  //   if( this.checkMcode(this.mcd) ){
+  //     let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == this.mcd);
+  //     if(i > 0 ){
+  //       this.mcd = this.memsrv.membs[i-1].mcode;
+  //     } else {
+  //       this.mcd = this.memsrv.membs[0].mcode;  
+  //     }
+  //     this.refresh();
+  //   }
+  // }
 
   refresh():void {
     if( this.checkMcode(this.mcd) ){

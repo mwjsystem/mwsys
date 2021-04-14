@@ -16,12 +16,12 @@
         <mat-label>顧客コード</mat-label>
         <input matInput [(ngModel)]="mcd" numInput (keyup.enter)="onEnter()"
          (keydown.f4)="mcdHelp()" (blur)="refresh()" [ngModelOptions]="{standalone: true}">
-        <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode==3">
+        <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode==3">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
         <button mat-button mat-icon-button matSuffix (click)="setPrev()" *ngIf="mode==3">
           <mat-icon>keyboard_arrow_down</mat-icon>
-        </button>
+        </button> -->
         <button mat-button mat-icon-button matSuffix (click)="mcdHelp()" *ngIf="mode==3">
           <mat-icon>find_replace</mat-icon>
         </button>

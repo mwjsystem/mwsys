@@ -1,5 +1,6 @@
 <div class="mat-elevation-z8">
     <mat-toolbar fxLayoutGap="5px">
+      <button class="mat-raised-button"(click)="filterMcd()">検索</button>
       <mat-form-field>
         <mat-label>顧客名(姓、名)</mat-label>
         <input matInput (input)="fname=$event.target.value">
@@ -20,12 +21,10 @@
         <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
         <input matInput type="number" (input)="ftel=$event.target.value">
       </mat-form-field>
-      <button class="mat-raised-button"(click)="filterMcd()">検索</button>
       <mat-paginator #paginators
           [length]="dataSource?.data.length"
           [pageIndex]="0"
-          [pageSize]="10"
-          [pageSizeOptions]="[10, 25, 50, 100, 250, 1000]">
+          [pageSizeOptions]="[20, 50, 100, 250, 1000]">
       </mat-paginator>
     </mat-toolbar>
     <table mat-table [dataSource]="dataSource" aria-label="Elements">
