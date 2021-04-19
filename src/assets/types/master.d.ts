@@ -86,7 +86,7 @@ declare namespace mwI {
     scode:number;
     bikou:string;
     inbikou:string;
-    pay:string;
+    pcode:string;
     hcode:string;
     mtax:string;
     sscode:number;

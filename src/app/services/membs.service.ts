@@ -12,7 +12,7 @@ export class MembsService {
   constructor(private usrsrv: UserService,
               private apollo: Apollo) { }
 
-  get_members():void {
+  get_members():Promise<Boolean> {
     const GetMast = gql`
     query get_members($id: smallint!) {
       msmember(where: {id: {_eq: $id}}, order_by: {mcode: asc}) {
@@ -22,18 +22,20 @@ export class MembsService {
         del
       }
     }`;
-
-    this.apollo.watchQuery<any>({
-      query: GetMast, 
-        variables: { 
-          id : this.usrsrv.compid
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        this.membs=data.msmember;
-      },(error) => {
-        console.log('error query get_members', error);
-      });
+    return new Promise<Boolean>(resolve => {
+      this.apollo.watchQuery<any>({
+        query: GetMast, 
+          variables: { 
+            id : this.usrsrv.compid
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          this.membs=data.msmember;
+          resolve(true);
+        },(error) => {
+          console.log('error query get_members', error);
+        });
+    });  
   }
 }

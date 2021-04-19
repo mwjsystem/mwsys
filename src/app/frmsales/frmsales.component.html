@@ -14,7 +14,7 @@
       </button>
       <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
         <mat-label>受注伝票番号</mat-label>
-        <input matInput [ngModel]="denno" tabIndex="1" (ngModelChange)="denno=$event" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()"
+        <input matInput [(ngModel)]="denno" tabIndex="1" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()" maxlength="10"
         (blur)="refresh()" [ngModelOptions]="{standalone: true}">
         <button mat-button mat-icon-button matSuffix (click)="dennoHelp()" [style.display]="mode==3 ? 'inline-block' : 'none'">
           <mat-icon>find_replace</mat-icon>
@@ -26,8 +26,9 @@
       <button mat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'">
         <mat-icon>local_shipping</mat-icon>出荷指示
       </button>
-      <button mat-button (click)="refresh()">
-        <mat-icon>autorenew</mat-icon>再表示
+      <a id="csv-donwload" data-type="text/csv"></a>
+      <button mat-button (click)="download_csv('KEEP')">
+        <mat-icon>description</mat-icon>帳票
       </button>
       <button mat-button><a mat-button href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5" target="_blank">
         <mat-icon>help</mat-icon>ヘルプ
@@ -256,9 +257,9 @@
           <mat-label>代引き金額</mat-label>
           <input matInput formControlName="daibiki">
         </mat-form-field>
-        <mat-form-field style="width:5em">
+        <mat-form-field style="width:8em">
           <mat-label>顧客税区分</mat-label>
-          <mat-select>
+          <mat-select [value]="jmisrv.mtax" disabled>
             <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -298,6 +299,40 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
+      </div>
+      <div fxLayout="column">
+        <mat-form-field style="width:10em">
+          <mat-label>顧客単価区分</mat-label>
+          <mat-select [value]="jmisrv.tankakbn" disabled>
+            <mat-option *ngFor="let sval of bunsrv.tanka" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:10em">
+          <mat-label>特別単価区分</mat-label>
+          <mat-select [value]="jmisrv.sptnkbn" disabled>
+            <mat-option *ngFor="let sval of bunsrv.sptnk" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:10em">
+          <mat-label>納品書タイプ</mat-label>
+          <mat-select [value]="jmisrv.ntype" disabled>
+            <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
+              {{sval.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:10em">
+          <mat-label>直送納品書Type</mat-label>
+          <mat-select  [value]="jmisrv.tntype" disabled>
+            <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
+              {{sval.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field> 
       </div>
     </div>
   </mat-expansion-panel>    

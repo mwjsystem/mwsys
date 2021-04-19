@@ -14,7 +14,7 @@
       </button>
       <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
         <mat-label>顧客コード</mat-label>
-        <input matInput [(ngModel)]="mcd" numInput (keyup.enter)="onEnter()"
+        <input matInput [(ngModel)]="mcd" (keyup.enter)="refresh()" maxlength="12"
          (keydown.f4)="mcdHelp()" (blur)="refresh()" [ngModelOptions]="{standalone: true}">
         <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode==3">
           <mat-icon>keyboard_arrow_up</mat-icon>
@@ -88,7 +88,7 @@
       </mat-form-field>
       <mat-form-field style="width:8em">
         <mat-label>入金予定初期値</mat-label>
-        <mat-select #msel3 tabIndex="6" formControlName="pay" (keyup.enter)="msel3.close()">
+        <mat-select #msel3 tabIndex="6" formControlName="pcode" (keyup.enter)="msel3.close()">
           <mat-option *ngFor="let sval of bunsrv.pay" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>

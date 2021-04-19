@@ -35,7 +35,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     tankakbn
     torikbn
     scode
-    pay
+    pcode
     hcode
     mtax
     sscode
@@ -79,6 +79,17 @@ query get_member($id: smallint!,$mcode:Int!) {
       adrokrbko
       del
     }    
+  }
+}`;
+
+export const GetMast1 = gql`
+query get_denno($id: smallint!,$maxdno: Int){
+  trjyuden_aggregate(where: {id: {_eq: $id}, denno: {_lt: $maxdno}}) {
+    aggregate {
+      max {
+        denno
+      }
+    }
   }
 }`;
 
@@ -132,7 +143,7 @@ query get_jyuden($id: smallint!,$dno: Int!) {
     mcode
     scode
     jcode
-    pay
+    pcode
     daibunrui
     chubunrui
     shobunrui

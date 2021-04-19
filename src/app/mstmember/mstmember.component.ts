@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewEncapsulation, ElementRef, ViewChildren, QueryList, HostListener, ChangeDetectionStrategy, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, ViewChildren, QueryList, HostListener, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 
 import { Title } from '@angular/platform-browser';
@@ -38,7 +38,6 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
               private fb: FormBuilder,
               private title: Title,
               private route: ActivatedRoute,
-              private elementRef: ElementRef,
               private dialog: MatDialog,
               public mcdsrv: McdService,
               public edasrv: EdaService,
@@ -49,6 +48,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
               public memsrv: MembsService,
               private apollo: Apollo,
               private toastr: ToastrService,
+              private cdRef:ChangeDetectorRef,
               private zone: NgZone) {
       zone.onMicrotaskEmpty.subscribe(() => { console.log('mstmember detect change'); });
       this.title.setTitle('顧客マスタ(MWSystem)');
@@ -61,7 +61,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       mei: new FormControl(''),
       kana: new FormControl('', Validators.required),
       tankakbn: new FormControl('', Validators.required),
-      pay: new FormControl(''),
+      pcode: new FormControl(''),
       hcode: new FormControl(''),
       mtax: new FormControl('', Validators.required),
       daibunrui: new FormControl(''),
@@ -131,50 +131,24 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     }
   }
   mcdHelp(): void {
+    
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width  = '100vw';
     dialogConfig.height = '98%';
     dialogConfig.panelClass= 'full-screen-modal';
     let dialogRef = this.dialog.open(McdhelpComponent, dialogConfig);
     
+    this.cdRef.detach();
     dialogRef.afterClosed().subscribe(
       data=>{
-          if(typeof data != 'undefined'){
-            this.mcd = data.mcode;
-          }
-          this.refresh();
+        this.cdRef.reattach();
+        if(typeof data != 'undefined'){
+          this.mcd = data.mcode;
+        }
+        this.refresh();
       }
     );
   }
-
-  onEnter(): void {
-    // 顧客コードでEnter押下時、カーソルを外し、blurイベントを発火
-    this.elementRef.nativeElement.querySelector('button').focus();
-  }
-
-  // setNext(){
-  //   if( this.checkMcode(this.mcd) ){
-  //     let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == this.mcd);
-  //     if(i > -1 && i < this.memsrv.membs.length){
-  //       this.mcd = this.memsrv.membs[i+1].mcode;
-  //     } else {
-  //       this.mcd = this.memsrv.membs[0].mcode;  
-  //     }
-  //     this.refresh();
-  //   }
-  // }
-
-  // setPrev(){
-  //   if( this.checkMcode(this.mcd) ){
-  //     let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == this.mcd);
-  //     if(i > 0 ){
-  //       this.mcd = this.memsrv.membs[i-1].mcode;
-  //     } else {
-  //       this.mcd = this.memsrv.membs[0].mcode;  
-  //     }
-  //     this.refresh();
-  //   }
-  // }
 
   refresh():void {
     if( this.checkMcode(this.mcd) ){
@@ -188,18 +162,24 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   }
 
   checkMcode(mcode:number|string):boolean {
-    let flg:boolean; 
-    let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == mcode);
-    if( i > -1 ){
-      flg = true;
-    } else {
-      if( mcode.toString().indexOf('未登録') == -1 && mcode.toString().indexOf('読込') == -1 && mcode !== '' ){
-        this.mcd = mcode + '　未登録';
+    let flg:boolean;
+    if (mcode != null){
+      let lcmcode = this.usrsrv.convNumber(mcode);
+      let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == lcmcode);
+      if( i > -1 ){
+        this.mcd = lcmcode;
+        flg = true;
+      } else {
+        if( mcode.toString().indexOf('未登録') == -1 && mcode.toString().indexOf('読込') == -1 && mcode !== '' ){
+          this.mcd = lcmcode + '　未登録';
+        }
+        this.form.reset();
+        history.replaceState('','','./mstmember'); 
+        flg = false;       
       }
-      this.form.reset();
-      history.replaceState('','','./mstmember'); 
-      flg = false;       
-    }
+    }else{  
+      flg=false;
+    } 
     return flg;
   }
 
@@ -267,7 +247,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
 
   test(value){
     this.toastr.info('機能作成中');
-    console.log(this.form);
+    console.log(this.mcd);
   }
 
   modeToCre():void {
@@ -314,7 +294,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       scode: this.usrsrv.editFrmval(this.form.get('kake'),'scode'),
       bikou: this.usrsrv.editFrmval(this.form.get('base'),'bikou'),
       inbikou: this.usrsrv.editFrmval(this.form.get('base'),'inbikou'),
-      pay: this.usrsrv.editFrmval(this.form.get('base'),'pay'),
+      pcode: this.usrsrv.editFrmval(this.form.get('base'),'pcode'),
       hcode: this.usrsrv.editFrmval(this.form.get('base'),'hcode'),
       mtax: this.usrsrv.editFrmval(this.form.get('base'),'mtax'),
       sscode: this.usrsrv.editFrmval(this.form.get('base'),'sscode'),

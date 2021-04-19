@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef } from "@angular/material/dialog";
 import { Mcd,McdService } from './mcd.service';
 
 @Component({
   selector: 'app-mcdhelp',
   templateUrl: './mcdhelp.component.html',
-  styleUrls: ['./mcdhelp.component.scss']
+  styleUrls: ['./mcdhelp.component.scss'],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class McdhelpComponent implements OnInit {
 
@@ -18,10 +19,12 @@ export class McdhelpComponent implements OnInit {
 
   sel_mcd(selected:Mcd ) {
     // console.log("select",selected);
+    this.mcdsrv.mcds=[];
     this.dialogRef.close(selected);
   }
 
   close() {
+    this.mcdsrv.mcds=[];
     this.dialogRef.close();
   }
 

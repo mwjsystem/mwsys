@@ -58,7 +58,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     site
     inday
     scode
-    pay
+    pcode
     hcode
     mtax
     sscode

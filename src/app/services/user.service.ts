@@ -17,6 +17,7 @@ export class System {
   name:string;
   subname:string;
   maxmcd:string;
+  maxdno:number;
   constructor(init?:Partial<System>) {
     Object.assign(this, init);
   } 
@@ -41,6 +42,7 @@ export class UserService {
           name
           subname
           maxmcd
+          maxdno
         }
       }`;
       const GetMast2 = gql`
@@ -133,6 +135,18 @@ export class UserService {
     const m = ('00' + (lcdate.getMonth()+1)).slice(-2);
     const d = ('00' + lcdate.getDate()).slice(-2);
     return (y + '-' + m + '-' + d);
+  }
+  convNumber(value:string|number):number{
+    let ret:number;
+    if(typeof value === 'string'){
+      const val = value?.replace(/[^0-9０-９]/g, '').replace(/[０-９]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) - 65248);
+      });   //数字のみ抽出して半角に変換
+      ret = Number(val); 
+    } else{
+      ret = value;
+    }
+    return ret;
   }
 
   convUpper(value):string {

@@ -17,6 +17,7 @@ import { SoukoService } from './../services/souko.service';
 import { McdService } from './../share/mcdhelp/mcd.service';
 import { MembsService } from './../services/membs.service';
 import { GoodsService } from './../services/goods.service';
+import { DownloadService } from './../services/download.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { EdaService } from './../share/adreda/eda.service';
 import { AdredaComponent } from './../share/adreda/adreda.component';
@@ -36,7 +37,7 @@ export class FrmsalesComponent implements OnInit {
   hktval: mwI.Sval[]=[];
   mcdtxt:string;
   scdtxt:string;
-  ncdtxt:string;
+  ncdtxt:string;  
   rows: FormArray = this.fb.array([]);
   gdsttl:number=0;
   constructor(public usrsrv: UserService,
@@ -55,6 +56,7 @@ export class FrmsalesComponent implements OnInit {
               public soksrv: SoukoService,
               public gdssrv: GoodsService,
               public jmisrv:JyumeiService,
+              private dwlsrv:DownloadService,
               private apollo: Apollo,
               private toastr: ToastrService,
               private cdRef:ChangeDetectorRef,
@@ -106,8 +108,11 @@ export class FrmsalesComponent implements OnInit {
       total: new FormControl(''),
       mtbl: this.rows 
     });
-    
-    this.memsrv.get_members();
+    this.memsrv.get_members().then(result => {
+      this.setMcdtxt();
+      this.setScdtxt();
+      this.setNcdtxt();      
+    });
     this.bnssrv.get_bunsho();
     this.okrsrv.get_haisou();
     this.okrsrv.get_hokuri();
@@ -118,6 +123,7 @@ export class FrmsalesComponent implements OnInit {
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('denno') !== null){
         this.denno = +params.get('denno');
+        // console.log(this.denno);
         this.get_jyuden(this.denno);
       }
       if (params.get('mode') === null){
@@ -161,17 +167,25 @@ export class FrmsalesComponent implements OnInit {
     }
   }
 
+  download_csv(format:string){
+    console.log(this.form);
+    this.dwlsrv.dl_csv(this.form.getRawValue(),this.denno + format + ".csv");
+    this.dwlsrv.dl_kick(this.form.getRawValue(),this.denno + format + ".csv",format,this.elementRef);
+  }
+
   test(value){
     this.toastr.info(this.form.value.yday);
   }
 
   refresh():void {
-    if (this.denno > 0){
+    if (this.denno !=null ){
+      this.denno=this.usrsrv.convNumber(this.denno);
       this.get_jyuden(this.denno);
     }
+    
     // console.log(this.jmisrv.jyumei);
   }  
-  
+
   get frmArr():FormArray {    
     return this.form.get('mtbl') as FormArray;
   }  
@@ -226,11 +240,11 @@ export class FrmsalesComponent implements OnInit {
         this.jmeitbl.set_jyumei();
         this.usrsrv.setTmstmp(jyuden);
         this.denno=denno;
+        // console.log(this.form.getRawValue().mcode);
+        this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
         this.setMcdtxt();
         this.setScdtxt();
         this.setNcdtxt();
-        this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
-
         if(this.mode==3){
           this.form.disable();
           // console.log('refresh disable');
@@ -270,10 +284,16 @@ export class FrmsalesComponent implements OnInit {
 
   }
   changeMcd(){
-    let mcd:number=this.form.value.mcode;
+    let lcmcode;
+    if (this.form.value.mcode != null){
+      lcmcode = this.usrsrv.convNumber(this.form.value.mcode);
+    }else{
+      lcmcode = ""; 
+    }
+    this.form.get('mcode').setValue(lcmcode);
     this.setMcdtxt();
-    this.form.get('scode').setValue(mcd);
-    this.form.get('ncode').setValue(mcd);
+    this.form.get('scode').setValue(lcmcode);
+    this.form.get('ncode').setValue(lcmcode);
     // this.form.get('nadr').setValue(0);
     this.setScdtxt();
     this.setNcdtxt();
@@ -332,6 +352,11 @@ export class FrmsalesComponent implements OnInit {
         this.form.get('dbikou').setValue(member.msmadrs[0].adrinbikou);
         this.form.get('inbikou').setValue(member.msmadrs[0].adrinbikou);
         this.form.get('obikou').setValue(member.msmadrs[0].adrokrbko);
+        this.jmisrv.mtax=member.mtax;
+        this.jmisrv.tankakbn=member.tankakbn;
+        this.jmisrv.sptnkbn=member.sptnkbn;
+        this.jmisrv.ntype=member.ntype;
+        this.jmisrv.tntype=member.tntype;
 
       }
     },(error) => {
@@ -409,8 +434,6 @@ export class FrmsalesComponent implements OnInit {
       // if( mcode.toString().indexOf('未登録') == -1 && mcode.toString().indexOf('読込') == -1 && mcode !== '' ){
       //   this.mcd = mcode + '　未登録';
       // }
-      this.form.reset();
-      history.replaceState('','','./frmsales'); 
       flg = false;       
     }
     return flg;
@@ -448,6 +471,13 @@ export class FrmsalesComponent implements OnInit {
   }
 
   save():void {
+
+    
+
+
+
+
+
     
   }  
   

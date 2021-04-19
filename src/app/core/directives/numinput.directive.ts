@@ -30,7 +30,7 @@ export class NuminputDirective {
 
     const conv = value.replace(/[^0-9０-９]/g, '').replace(/[０-９]/g, function(s) {
         return String.fromCharCode(s.charCodeAt(0) - 65248);
-    });   //数字のみ抽出
+    });   //数字のみ抽出して半角に変換
 
 
     this.value = conv;

@@ -6,6 +6,11 @@ import { Subject } from 'rxjs';
 })
 export class JyumeiService {
   public jyumei: mwI.Jyumei[]=[];
+  public mtax:string;
+  public tankakbn:string;
+  public sptnkbn:string;
+  public ntype:number;
+  public tntype:number;
   public subject = new Subject<mwI.Jyumei[]>();
   public observe = this.subject.asObservable();
   constructor() { }

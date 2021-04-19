@@ -23,7 +23,7 @@ declare namespace mwI {
     okurino:string;
     cusden:string;
     inbikou:string;
-    cusdaib:number;
+    daibiki:number;
     gtotal:number;
     souryou:number;
     tesuu:number;
@@ -80,6 +80,8 @@ declare namespace mwI {
     mbikou:string;
     genka:number;
     spec:string;
+    zaiko:number;
+    jyuzan:number;
     tintanka:number;
     touttanka:number;
     taxtanka:number;
