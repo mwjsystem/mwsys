@@ -181,7 +181,7 @@ export class FrmsalesComponent implements OnInit {
     head['adrname'] = this.edasrv.get_name(+this.form.getRawValue().nadr);
     head['tcdnm0'] = this.stfsrv.get_name(+this.form.getRawValue().tcode);
     head['tcdnm1'] = this.stfsrv.get_name(+this.form.getRawValue().tcode1);
-    head['tcd0'] = this.stfsrv.tcode;
+    head['tcd0'] = this.form.getRawValue().tcode;
     // console.log(head);
     this.dwlsrv.dl_csv(head,this.denno + format + ".csv");
     this.dwlsrv.dl_kick(this.form.getRawValue().mtbl,this.denno + format + "2.csv",this.usrsrv.system.urischema + format + "_" + this.denno,this.elementRef);
