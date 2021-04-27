@@ -22,7 +22,13 @@ export class FrmkeepComponent implements OnInit {
     }); 
   }
 
-  test(){
+  confKeep(){
+    
     console.log(this.denno);
+
+
+
+
+
   }
 }
