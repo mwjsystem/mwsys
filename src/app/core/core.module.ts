@@ -8,6 +8,7 @@ import { MaterialModule } from '../material.module';
 import { RouterModule } from '@angular/router';
 import { TabDirective } from './../share/tabidx/tab.directive';
 import { NuminputDirective } from './directives/numinput.directive';
+import { QRCodeModule } from 'angular2-qrcode';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { NuminputDirective } from './directives/numinput.directive';
     FormsModule,
     FlexLayoutModule,
     ReactiveFormsModule,
+    QRCodeModule 
   ]
 })
 export class CoreModule { }

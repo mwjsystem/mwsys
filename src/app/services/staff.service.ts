@@ -9,6 +9,7 @@ import { UserService } from './user.service';
 export class StaffService {
 
   public tcds: mwI.Sval[]=[];
+  public stfs: mwI.Staff[]=[];
   constructor(private usrsrv: UserService,
               private apollo: Apollo) { }
 
@@ -30,12 +31,17 @@ export class StaffService {
       })
       .valueChanges
       .subscribe(({ data }) => {
+        this.stfs=data.msstaff;
         data.msstaff.forEach(e => {
           this.tcds.push({value:e.code,viewval:e.sei + (e.mei ?? "")}); //e.meiがnull等の時は、''を結合
         });
       },(error) => {
         console.log('error query get_staff', error);
       });
-  }                
+  }  
+  get_name(code:number):string{
+    const i:number= this.stfs.findIndex(obj => obj.code == code);
+    return this.stfs[i].sei;
+  }              
   
 }

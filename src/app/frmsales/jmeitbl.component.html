@@ -97,7 +97,7 @@
       <th mat-header-cell *matHeaderCellDef>特殊在庫</th>
       <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
       <mat-form-field>
-        <input matInput formControlName="spec">
+        <input matInput [value]="frmArr.getRawValue()[i]['spec']" disabled>
       </mat-form-field>
       </td>
     </ng-container>

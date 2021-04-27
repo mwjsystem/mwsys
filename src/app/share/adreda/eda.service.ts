@@ -24,4 +24,14 @@ export class EdaService {
   public subject = new Subject<Edahlp[]>();
   public observe = this.subject.asObservable();
   constructor() { }
+  
+  get_name(eda:number):string{
+    let ret:string="";
+    const i:number= this.adrs.findIndex(obj => obj.eda == eda);
+    if(i>1){
+      ret = this.adrs[i].adrname;
+    } 
+    return ret;
+  }
+
 }

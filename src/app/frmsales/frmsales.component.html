@@ -27,9 +27,16 @@
         <mat-icon>local_shipping</mat-icon>出荷指示
       </button>
       <a id="csv-donwload" data-type="text/csv"></a>
-      <button mat-button (click)="download_csv('KEEP')">
-        <mat-icon>description</mat-icon>帳票
-      </button>
+      <button mat-button  [matMenuTriggerFor]="papermenu"><mat-icon>description</mat-icon>帳票</button>
+      <mat-menu #papermenu="matMenu">
+        <button mat-menu-item (click)="download_csv('KEEP')">見積書</button>
+        <button mat-menu-item (click)="download_csv('KEEP')">キープ表</button>
+        <button mat-menu-item (click)="download_csv('KEEP')">受注票</button>
+        <button mat-menu-item (click)="download_csv('KEEP')">納品書</button>
+        <button mat-menu-item (click)="download_csv('KEEP')">請求書</button>
+        <button mat-menu-item (click)="download_csv('KEEP')">領収書</button>
+      </mat-menu>
+
       <button mat-button><a mat-button href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5" target="_blank">
         <mat-icon>help</mat-icon>ヘルプ
       </a></button>
@@ -41,7 +48,25 @@
       <mat-card-title>
           基本情報
       </mat-card-title>
-      <app-tmstmp></app-tmstmp>
+      <!-- <app-tmstmp></app-tmstmp> -->
+      <form fxLayout="row wrap" fxLayoutAlign="space-around center" fxLayoutGap="5px">
+        <mat-form-field style="width:10em">
+          <mat-label>登録日時</mat-label>
+          <input matInput [value]="usrsrv.tmstmp.created_at | date:'yyyy/MM/dd HH:mm'" disabled>
+        </mat-form-field>
+        <mat-form-field style="width:5em">
+          <mat-label>登録者</mat-label>
+          <input matInput [value]="usrsrv.tmstmp.created_by" disabled>
+        </mat-form-field> 
+        <mat-form-field style="width:10em">
+          <mat-label>更新日時</mat-label>
+          <input matInput [value]="usrsrv.tmstmp.updated_at | date:'yyyy/MM/dd HH:mm'" disabled>
+        </mat-form-field>
+        <mat-form-field style="width:5em">
+          <mat-label>更新者</mat-label>
+          <input matInput [value]="usrsrv.tmstmp.updated_by" disabled>
+        </mat-form-field>
+      </form>
     </mat-card-header>
     <mat-card-content fxLayout="row wrap">
       <div fxLayout="column">
@@ -334,6 +359,7 @@
           </mat-select>
         </mat-form-field> 
       </div>
+      <qr-code [value]="qrurl" [size]="110"></qr-code>
     </div>
   </mat-expansion-panel>    
   <mat-card>     

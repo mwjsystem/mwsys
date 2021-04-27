@@ -9,7 +9,8 @@ const routes: Routes = [
   { path: '', loadChildren: () => import('./home/home.module').then(m => m.HomeModule),  canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'mstmember', loadChildren: () => import('./mstmember/mstmember.module').then(m => m.MstmemberModule),  canActivate: [AuthGuard] },
-  { path: 'frmsales', loadChildren: () => import('./frmsales/frmsales.module').then(m => m.FrmsalesModule),  canActivate: [AuthGuard] }
+  { path: 'frmsales', loadChildren: () => import('./frmsales/frmsales.module').then(m => m.FrmsalesModule),  canActivate: [AuthGuard] },
+  { path: 'frmkeep', loadChildren: () => import('./frmkeep/frmkeep.module').then(m => m.FrmkeepModule),  canActivate: [AuthGuard] }
 ];
 
 @NgModule({

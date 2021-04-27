@@ -39,6 +39,8 @@ export class FrmsalesComponent implements OnInit {
   scdtxt:string;
   ncdtxt:string;  
   rows: FormArray = this.fb.array([]);
+  qrurl:string;
+  getden:number;
   gdsttl:number=0;
   constructor(public usrsrv: UserService,
               private fb: FormBuilder,
@@ -61,7 +63,9 @@ export class FrmsalesComponent implements OnInit {
               private toastr: ToastrService,
               private cdRef:ChangeDetectorRef,
               private zone: NgZone) { 
-    zone.onMicrotaskEmpty.subscribe(() => { console.log('frmsales detect change'); });
+    zone.onMicrotaskEmpty.subscribe(() => { 
+      // console.log('frmsales detect change'); 
+    });
     title.setTitle('受注伝票(MWSystem)');               
   }
 
@@ -134,9 +138,9 @@ export class FrmsalesComponent implements OnInit {
     }); 
   }
   ngAfterViewInit(): void{
-    setTimeout(() => {
-      this.refresh();
-    });
+    // setTimeout(() => {
+    //   this.refresh();
+    // });
   }
 
   ngAfterViewChecked(): void {
@@ -168,13 +172,29 @@ export class FrmsalesComponent implements OnInit {
   }
 
   download_csv(format:string){
-    console.log(this.form);
-    this.dwlsrv.dl_csv(this.form.getRawValue(),this.denno + format + ".csv");
-    this.dwlsrv.dl_kick(this.form.getRawValue(),this.denno + format + ".csv",format,this.elementRef);
+    // console.log(this.form.getRawValue());
+    
+    this.qrurl="http://mwsys.herokuapp.com/" + format + "/" + this.denno;
+
+    let head = this.usrsrv.pickObj(this.form.getRawValue(),['yday','mcode','ncode','nadr']);
+    head['mcdtxt'] = this.mcdtxt;
+    head['adrname'] = this.edasrv.get_name(+this.form.getRawValue().nadr);
+    head['tcdnm0'] = this.stfsrv.get_name(+this.form.getRawValue().tcode);
+    head['tcdnm1'] = this.stfsrv.get_name(+this.form.getRawValue().tcode1);
+    head['tcd0'] = this.stfsrv.get_name(+this.form.getRawValue().tcode);
+    // console.log(head);
+    this.dwlsrv.dl_csv(head,this.denno + format + ".csv");
+    this.dwlsrv.dl_kick(this.form.getRawValue().mtbl,this.denno + format + "2.csv",this.usrsrv.system.urischema + format + "_" + this.denno,this.elementRef);
+    this.dwlsrv.dl_img(this.denno + format + ".png",this.elementRef);
   }
 
   test(value){
     this.toastr.info(this.form.value.yday);
+    // this.usrsrv.getNumber('denno',2).subscribe(value => {
+    //   console.log(value);
+    // });
+    console.log(this.usrsrv);
+
   }
 
   refresh():void {
@@ -235,7 +255,7 @@ export class FrmsalesComponent implements OnInit {
         // this.form.get('nadr').setValue(+jyuden.nadr);
         // console.log(this.form.value.bunsyo,jyuden.bunsyo);
         this.jmisrv.jyumei=data.trjyuden_by_pk.trjyumeis;
-        // console.log(this.jmisrv.jyumei,data.trjyuden_by_pk);
+        // console.log(jyuden);
         // this.jmisrv.subject.next();
         this.jmeitbl.set_jyumei();
         this.usrsrv.setTmstmp(jyuden);
@@ -374,10 +394,10 @@ export class FrmsalesComponent implements OnInit {
     })
     .valueChanges
     .subscribe(({ data }) => {
-      if (data.msmember_by_pk == null){
+      if (data.msmadr.length == 0){
 
       } else {
-        let msmadrs:mwI.Adrs[]=data.msmember_by_pk.msmadrs;
+        let msmadrs:mwI.Adrs[]=data.msmadr;
         this.edasrv.mcode = mcode ;
         this.edasrv.edas=[];
         this.edasrv.adrs=[];

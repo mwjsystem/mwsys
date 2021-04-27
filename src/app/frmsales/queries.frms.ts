@@ -59,27 +59,24 @@ query get_member($id: smallint!,$mcode:Int!) {
 }`;
 export const GetMadr = gql`
 query get_member($id: smallint!,$mcode:Int!) {
-  msmember_by_pk(id: $id, mcode:$mcode) {
-    mcode
-    msmadrs(order_by: {eda: asc}) {
-      eda
-      zip
-      region
-      local
-      street
-      extend
-      tel
-      fax
-      tel2
-      tel3
-      extend2
-      adrname
-      adrbikou
-      adrinbikou
-      adrokrbko
-      del
-    }    
-  }
+  msmadr(where: {id: {_eq: $id,}, mcode: {_eq: $mcode}}, order_by: {eda: asc}) {
+    eda
+    zip
+    region
+    local
+    street
+    extend
+    tel
+    fax
+    tel2
+    tel3
+    extend2
+    adrname
+    adrbikou
+    adrinbikou
+    adrokrbko
+    del
+  } 
 }`;
 
 export const GetMast1 = gql`

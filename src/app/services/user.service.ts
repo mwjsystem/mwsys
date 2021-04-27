@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { Apollo } from 'apollo-angular';
 import { AbstractControl } from '@angular/forms';
+import { Observable } from 'rxjs';
 import gql from 'graphql-tag';
 
 export class TmStmp {
@@ -18,6 +19,7 @@ export class System {
   subname:string;
   maxmcd:string;
   maxdno:number;
+  urischema:string;
   constructor(init?:Partial<System>) {
     Object.assign(this, init);
   } 
@@ -43,6 +45,7 @@ export class UserService {
           subname
           maxmcd
           maxdno
+          urischema
         }
       }`;
       const GetMast2 = gql`
@@ -90,6 +93,36 @@ export class UserService {
     this.auth.logout({ returnTo: window.location.origin });
   }
 
+  getNumber(type:string,inc:number):Observable<number>{
+    const UpdateNumber = gql`
+    mutation getNextnum($id: smallint!, $typ: String!, $inc: bigint!) {
+      update_trnumber(where: {id: {_eq: $id}, type: {_eq: $typ}}, _inc: {curnum: $inc}) {
+        returning {
+          curnum
+        }
+      }
+    }`;
+    let observable:Observable<number> = new Observable<number>(observer => {
+      this.apollo.mutate<any>({
+      mutation: UpdateNumber,
+      variables: {
+        id: this.compid,
+        typ: type,
+        inc: inc
+      },
+      }).subscribe(({ data }) => {
+        console.log(data.update_trnumber.returning[0].curnum,data.update_trnumber.returning[0])
+        observer.next(data.update_trnumber.returning[0].curnum);
+      },(error) => {
+        // this.toastr.error('採番エラー','採番タイプ' + type + 'の採番ができませんでした',
+        //                     {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+        console.log('error mutation getNextnum', error);
+        observer.next(-1);
+      });
+    });
+    return observable;
+  }
+
   editFrmval(frm:AbstractControl,fld:string):any{
     let val:any;  
     if(frm.value[fld]==""){
@@ -122,6 +155,7 @@ export class UserService {
     this.tmstmp.created_by = obj.created_by;
     this.tmstmp.updated_at = obj.updated_at;
     this.tmstmp.updated_by = obj.updated_by;
+    // console.log(obj,this.tmstmp);
   }
 
   formatDate(date):string {
@@ -156,6 +190,11 @@ export class UserService {
     return val;
   }
 
+  pickObj(obj,flds:string[]){
+    let pickobj={};
+    flds.forEach(e => pickobj[e]=obj[e]);
+    return pickobj;
+  }
   // convNumber(value):any {
   //   const conv = value.replace(/[^0-9０-９]/g, '').replace(/[０-９]/g, function(s) {
   //     return String.fromCharCode(s.charCodeAt(0) - 65248);
