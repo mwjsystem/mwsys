@@ -174,15 +174,14 @@ export class FrmsalesComponent implements OnInit {
   download_csv(format:string){
     // console.log(this.form.getRawValue());
     
-    this.qrurl="https://mwsys.herokuapp.com/frm" + format + "/" + this.denno;
-
+    
     let head = this.usrsrv.pickObj(this.form.getRawValue(),['yday','mcode','ncode','nadr']);
     head['mcdtxt'] = this.mcdtxt;
     head['adrname'] = this.edasrv.get_name(+this.form.getRawValue().nadr);
     head['tcdnm0'] = this.stfsrv.get_name(+this.form.getRawValue().tcode);
     head['tcdnm1'] = this.stfsrv.get_name(+this.form.getRawValue().tcode1);
     head['tcd0'] = this.form.getRawValue().tcode;
-    // console.log(head);
+    // console.log(this.qrurl);
     this.dwlsrv.dl_csv(head,this.denno + format + ".csv");
     this.dwlsrv.dl_kick(this.form.getRawValue().mtbl,this.denno + format + "2.csv",this.usrsrv.system.urischema + format + "_" + this.denno,this.elementRef);
     this.dwlsrv.dl_img(this.denno + format + ".png",this.elementRef);
@@ -244,6 +243,7 @@ export class FrmsalesComponent implements OnInit {
         history.replaceState('','','./frmsales');
       } else {
         let jyuden:mwI.Jyuden=data.trjyuden_by_pk;
+
         // console.log(this.form.value);
         if(jyuden.nadr>1){
           this.form.get('nsaki').setValue("2");
@@ -260,6 +260,7 @@ export class FrmsalesComponent implements OnInit {
         this.jmeitbl.set_jyumei();
         this.usrsrv.setTmstmp(jyuden);
         this.denno=denno;
+        this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.denno;
         // console.log(this.form.getRawValue().mcode);
         this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
         this.setMcdtxt();

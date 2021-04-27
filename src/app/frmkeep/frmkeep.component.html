@@ -3,5 +3,53 @@
     <input matInput [value]="denno" disabled>
 </mat-form-field>
 <button mat-flat-button matSuffix color="accent" (click)="confKeep()">
-    <mat-icon>done</mat-icon>キープ確認済
+    <mat-icon>summarize</mat-icon>キープ確認を報告
 </button>
+<div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" aria-label="Elements">
+        <!-- <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">
+            <th mat-header-cell *matHeaderCellDef> {{column}} </th>
+            <td mat-cell *matCellDef="let emp"> {{emp[column]}} </td>
+        </ng-container> -->
+
+        <ng-container matColumnDef="sequ">
+            <th mat-header-cell *matHeaderCellDef>連番</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.sequ}}</td>
+          </ng-container>
+          
+          <ng-container matColumnDef="keycode">
+            <th mat-header-cell *matHeaderCellDef>伝票番号</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.keycode}}</td>
+          </ng-container>
+          <ng-container matColumnDef="extype">
+            <th mat-header-cell *matHeaderCellDef>タイプ</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.extype}}</td>
+          </ng-container>
+          <ng-container matColumnDef="created_by">
+            <th mat-header-cell *matHeaderCellDef>登録者</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.created_by}}</td>
+          </ng-container>
+          <ng-container matColumnDef="created_at">
+            <th mat-header-cell *matHeaderCellDef>登録日時</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.created_at | date:'yyyy/MM/dd HH:mm'}}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>ステータス</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.status}}</td>
+          </ng-container>
+          <ng-container matColumnDef="updated_by">
+            <th mat-header-cell *matHeaderCellDef>更新者</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.updated_by}}</td>
+          </ng-container>
+          <ng-container matColumnDef="updated_at">
+            <th mat-header-cell *matHeaderCellDef>更新日時</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.updated_at | date:'yyyy/MM/dd HH:mm'}}</td>
+          </ng-container>
+          <ng-container matColumnDef="memo">
+            <th mat-header-cell *matHeaderCellDef>備考</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.memo}}</td>
+          </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</div> 

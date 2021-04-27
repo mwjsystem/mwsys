@@ -109,4 +109,17 @@ declare namespace mwI {
   interface Trjyuden extends Jyuden{
     trjyumeis:Jyumei[];
   }
+
+  interface Tropelog {
+    sequ:number;
+    keycode:string;
+    extype:string;
+    memo:string;
+    created_by:string;
+    created_at:Date;
+    status:number;
+    updated_by:string;
+    updated_at:Date;
+  }
+
 }
