@@ -13,7 +13,7 @@ import { MatTableDataSource } from '@angular/material/table';
 export class FrmkeepComponent implements OnInit {
   denno:number;
   dataSource:MatTableDataSource<mwI.Tropelog>;
-  displayedColumns = ['sequ','keycode','extype','created_by','created_at','status','updated_by','updated_at','memo']; 
+  displayedColumns = ['actionsColumn','sequ','keycode','extype','created_by','created_at','status','updated_by','updated_at','memo']; 
   constructor(public usrsrv: UserService,
               private apollo: Apollo,
               private route: ActivatedRoute) { }
@@ -55,32 +55,34 @@ export class FrmkeepComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         this.dataSource= new MatTableDataSource<mwI.Tropelog>(data.tropelog);
+        // console.log(data.tropelog);
       },(error) => {
         console.log('error query get_opelog', error);
       });
   }
 
-  confKeep(){
-    const InsertOpelog = gql`
-    mutation insLog($object: [tropelog_insert_input!]!) {
-      insert_tropelog(objects: $object) {
+  confKeep(i:number){
+    console.log(i,this.dataSource.data[i]);
+    const UpdateOpelog = gql`
+    mutation iupdLog($seq: Int!, $obj: tropelog_set_input!) {
+      update_tropelog(where: {sequ: {_eq: $seq}}, _set: $obj) {
         affected_rows
       }
     }`;  
     this.apollo.mutate<any>({
-      mutation: InsertOpelog,
+      mutation: UpdateOpelog,
       variables: {
-        "object": {
-          id: this.usrsrv.compid,
-          keycode: this.denno,
-          extype:'KEEP_CON',
-          created_by:this.usrsrv.staff.code
+        "seq": this.dataSource.data[i].sequ,
+        "obj": {
+          updated_by: this.usrsrv.staff.code.toString,
+          status:'キープ済',
+          updated_at:new Date()
         }
       },
     }).subscribe(({ data }) => {
     
     },(error) => {
-      console.log('error query insert_opelog', error);
+      console.log('error query update_opelog', error);
     });
     // console.log(this.denno);
   }
