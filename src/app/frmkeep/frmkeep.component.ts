@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
+import { MatTableDataSource } from '@angular/material/table';
+import { Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
-import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-frmkeep',
@@ -22,14 +23,14 @@ export class FrmkeepComponent implements OnInit {
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('denno') !== null){
         this.denno = +params.get('denno');
-        this.get_opelog(params.get('denno'));
-        // console.log(this.denno);
-        // this.get_jyuden(this.denno);
+        this.get_opelog(params.get('denno')).subscribe(value => {
+          this.dataSource= new MatTableDataSource<mwI.Tropelog>(value);
+        });
       }
     }); 
   }
 
-  get_opelog(denno:string):void {
+  get_opelog(denno:string):Observable<mwI.Tropelog[]> {
     const GetLog = gql`
     query get_opelog($id: smallint!,$kcd:String!,$typ:String!) {
       tropelog(where: {id: {_eq: $id},keycode: {_eq: $kcd},extype: {_eq: $typ}}, order_by: {sequ: asc}) {
@@ -44,21 +45,26 @@ export class FrmkeepComponent implements OnInit {
         updated_at
       }
     }`;
-    this.apollo.watchQuery<any>({
-      query: GetLog, 
-        variables: { 
-          id : this.usrsrv.compid,
-          kcd: denno,
-          typ:'KEEP'
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        this.dataSource= new MatTableDataSource<mwI.Tropelog>(data.tropelog);
-        // console.log(data.tropelog);
-      },(error) => {
-        console.log('error query get_opelog', error);
+    let observable:Observable<mwI.Tropelog[]> = new Observable<mwI.Tropelog[]>(observer => {
+      this.apollo.watchQuery<any>({
+        query: GetLog, 
+          variables: { 
+            id : this.usrsrv.compid,
+            kcd: denno,
+            typ:'KEEP'
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          observer.next(data.tropelog);
+          
+          // console.log(data.tropelog);
+        },(error) => {
+          console.log('error query get_opelog', error);
+          observer.next([]);
+        });
       });
+      return observable;
   }
 
   confKeep(i:number){
