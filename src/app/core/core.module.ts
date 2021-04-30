@@ -10,6 +10,7 @@ import { TabDirective } from './../share/tabidx/tab.directive';
 import { NuminputDirective } from './directives/numinput.directive';
 import { QRCodeModule } from 'angular2-qrcode';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { PortalModule } from '@angular/cdk/portal';
 import { StaffPipe } from './pipes/staff.pipe';
 import { JdatePipe } from './pipes/jdate.pipe';
 
@@ -42,7 +43,8 @@ import { JdatePipe } from './pipes/jdate.pipe';
     FlexLayoutModule,
     ReactiveFormsModule,
     QRCodeModule,
-    OverlayModule  
+    OverlayModule,
+    PortalModule 
   ]
 })
 export class CoreModule { }

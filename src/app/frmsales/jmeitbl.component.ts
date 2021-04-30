@@ -27,6 +27,7 @@ export class JmeitblComponent implements OnInit {
                       'suu',
                       'iriunit',
                       'teika',
+                      'rate',
                       'tanka',
                       'money',
                       'taxkbn',
