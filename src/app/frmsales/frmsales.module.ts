@@ -6,7 +6,6 @@ import localeJa from '@angular/common/locales/ja';
 import { FrmsalesRoutingModule } from './frmsales-routing.module';
 import { FrmsalesComponent } from './frmsales.component';
 import { JmeitblComponent } from './jmeitbl.component';
-import { JdatePipe } from '../pipes/jdate.pipe';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 
 registerLocaleData(localeJa);
@@ -14,8 +13,7 @@ registerLocaleData(localeJa);
 @NgModule({
   declarations: [
     FrmsalesComponent,
-    JmeitblComponent,
-    JdatePipe
+    JmeitblComponent
   ],
   imports: [
     CommonModule,

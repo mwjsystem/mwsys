@@ -2,6 +2,9 @@ import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, HostLi
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
+import { Overlay } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
@@ -42,6 +45,11 @@ export class FrmsalesComponent implements OnInit {
   qrurl:string;
   getden:number;
   gdsttl:number=0;
+  overlayRef = this.overlay.create({
+    hasBackdrop: true,
+    positionStrategy: this.overlay
+      .position().global().centerHorizontally().centerVertically()
+  });
   constructor(public usrsrv: UserService,
               private fb: FormBuilder,
               private title: Title,
@@ -61,6 +69,7 @@ export class FrmsalesComponent implements OnInit {
               private dwlsrv:DownloadService,
               private apollo: Apollo,
               private toastr: ToastrService,
+              private overlay: Overlay,
               private cdRef:ChangeDetectorRef,
               private zone: NgZone) { 
     zone.onMicrotaskEmpty.subscribe(() => { 
@@ -70,6 +79,7 @@ export class FrmsalesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.form = this.fb.group({
       mcode: new FormControl(''),
       scode: new FormControl(''),
@@ -115,7 +125,8 @@ export class FrmsalesComponent implements OnInit {
     this.memsrv.get_members().then(result => {
       this.setMcdtxt();
       this.setScdtxt();
-      this.setNcdtxt();      
+      this.setNcdtxt();
+      this.overlayRef.detach();      
     });
     this.bnssrv.get_bunsho();
     this.okrsrv.get_haisou();
@@ -227,7 +238,8 @@ export class FrmsalesComponent implements OnInit {
   }
 
   get_jyuden(denno:number|string):void{
-    this.denno += '　読込中';
+    // this.denno += '　読込中';
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.apollo.watchQuery<any>({
       query: Query.GetJyuden, 
         variables: { 
@@ -276,12 +288,14 @@ export class FrmsalesComponent implements OnInit {
           this.enable_Jmeitbl();
         }
         history.replaceState('','','./frmsales/' + this.mode + '/' + this.denno);
+        this.overlayRef.detach();
       }
     },(error) => {
       console.log('error query GetJyuden', error);
-      this.denno = denno + '　未登録';
+      this.denno = denno + '　読込エラー';
       this.form.reset();
       history.replaceState('','','./frmsales');
+      this.overlayRef.detach();
     });
   }
  

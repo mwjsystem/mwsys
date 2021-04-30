@@ -47,14 +47,22 @@
         <a mat-menu-item>展開伝票</a>
         <a mat-menu-item>破棄伝票</a>
         <a mat-menu-item>棚卸処理</a>
-        <a mat-menu-item>在庫一覧表</a>
-        <a mat-menu-item>移動伝票一覧表</a>
-        <a mat-menu-item>展開伝票一覧表</a>
-        <a mat-menu-item>破棄伝票一覧表</a>
-        <a mat-menu-item>確保割れ在庫一覧表</a>
-        <a mat-menu-item>移動伝票納品書</a>
-        <a mat-menu-item>受注在庫集計表</a>
-        <a mat-menu-item>受注残確認表</a>
+        <button mat-menu-item [matMenuTriggerFor]="zaip">在庫印刷</button>
+        <mat-menu #zaip="matMenu">
+            <a mat-menu-item>在庫一覧表</a>
+            <a mat-menu-item>移動伝票一覧表</a>
+            <a mat-menu-item>展開伝票一覧表</a>
+            <a mat-menu-item>破棄伝票一覧表</a>
+            <a mat-menu-item>確保割れ在庫一覧表</a>
+            <a mat-menu-item>移動伝票納品書</a>
+            <a mat-menu-item>受注在庫集計表</a>
+            <a mat-menu-item>受注残確認表</a>
+        </mat-menu>
+        <button mat-menu-item [matMenuTriggerFor]="souk">倉庫</button>
+        <mat-menu #souk="matMenu">
+            <a mat-menu-item routerLink="/frmkeep">キープ表確認</a>
+            <a mat-menu-item>加工依頼確認</a>
+        </mat-menu>
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="siir">仕入関連</button>
     <mat-menu #siir="matMenu">

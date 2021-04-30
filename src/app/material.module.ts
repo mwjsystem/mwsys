@@ -10,8 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
-// import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-// import { MatSpinner } from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatTableModule } from '@angular/material/table';
@@ -34,8 +33,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
      ,MatInputModule
      ,MatMenuModule
      ,MatPaginatorModule
-    //  ,MatProgressSpinnerModule
-    //  ,MatSpinner
+     ,MatProgressSpinnerModule
      ,MatSelectModule
      ,MatStepperModule
      ,MatTableModule
@@ -60,8 +58,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
      ,MatInputModule
      ,MatMenuModule
      ,MatPaginatorModule
-    //  ,MatProgressSpinnerModule
-    //  ,MatSpinner
+     ,MatProgressSpinnerModule
      ,MatSelectModule
      ,MatStepperModule
      ,MatTableModule

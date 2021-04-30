@@ -9,13 +9,18 @@ import { RouterModule } from '@angular/router';
 import { TabDirective } from './../share/tabidx/tab.directive';
 import { NuminputDirective } from './directives/numinput.directive';
 import { QRCodeModule } from 'angular2-qrcode';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { StaffPipe } from './pipes/staff.pipe';
+import { JdatePipe } from './pipes/jdate.pipe';
 
 @NgModule({
   declarations: [
     NavbarComponent,
     TmstmpComponent,
     NuminputDirective,
-    TabDirective
+    TabDirective,
+    StaffPipe,
+    JdatePipe
   ],
   imports: [
     CommonModule,
@@ -23,18 +28,21 @@ import { QRCodeModule } from 'angular2-qrcode';
     FormsModule,
     FlexLayoutModule,
     ReactiveFormsModule,
-    RouterModule 
+    RouterModule
   ],
   exports: [
     NavbarComponent,
     NuminputDirective,
     TabDirective,
+    StaffPipe,
+    JdatePipe,
     TmstmpComponent,
     MaterialModule, 
     FormsModule,
     FlexLayoutModule,
     ReactiveFormsModule,
-    QRCodeModule 
+    QRCodeModule,
+    OverlayModule  
   ]
 })
 export class CoreModule { }

@@ -12,7 +12,6 @@ button {
 .mat-cell, .mat-footer-cell, .mat-header-cell{
     padding: 5px;
 }
-
 .mat-table {
     overflow-x: scroll;
     display: table;
@@ -29,28 +28,19 @@ button {
 ::ng-deep td .mat-form-field-infix {
     border: none;
 }
-::ng-deep .mat-form-field-appearance-outline .mat-form-field-label {
-    top: .5em;
-    margin-top: .5em;
-}
-
 ::ng-deep.mat-form-field input:disabled {
     color: black;
 }
-
 ::ng-deep.mat-form-field select:disabled {
     color: black;
 }
-
 // Add in style.scss as we are overriding css of global mat-select class which is part of other module.
 ::ng-deep.mat-form-field .mat-select-disabled .mat-select-value {
     color: black;
 }
-
 td .mat-form-field {
     height:20px;
   }
-
 tr.mat-row{
     height:20px;
 }

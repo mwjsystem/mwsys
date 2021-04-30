@@ -195,6 +195,17 @@ export class UserService {
     flds.forEach(e => pickobj[e]=obj[e]);
     return pickobj;
   }
+
+  pickObjArr(objarr,flds:string[]){
+    let pickarr=[];
+    objarr.forEach(obj =>{
+        let pickobj={};
+        flds.forEach(e => pickobj[e]=obj[e]);
+        pickarr.push(pickobj);    
+    });
+    return pickarr;
+  }
+
   // convNumber(value):any {
   //   const conv = value.replace(/[^0-9０-９]/g, '').replace(/[０-９]/g, function(s) {
   //     return String.fromCharCode(s.charCodeAt(0) - 65248);
