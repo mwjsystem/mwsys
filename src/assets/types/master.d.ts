@@ -122,12 +122,16 @@ declare namespace mwI {
     currency:string;
     cost:number;
   }
+  interface Gzai {
+    zcode:string;
+    irisu:number;
+  }
   interface Goods {
     gcode:string;
     size:string;
     color:string;
     irisu:number;
-    skbn:number;
+    gskbn:number;
     jan:string;
     weight:number;
     iriunit:string;
@@ -142,6 +146,7 @@ declare namespace mwI {
   
   interface Msgoods extends Goods{
     msgtankas:Gtanka[];
+    msgzais:Gzai[];
   }
 
   interface Ggroup {

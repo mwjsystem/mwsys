@@ -54,6 +54,7 @@ export class FrmsalesComponent implements OnInit {
               private fb: FormBuilder,
               private title: Title,
               private route: ActivatedRoute,
+              private router:Router,
               private elementRef: ElementRef,
               private dialog: MatDialog,
               public mcdsrv: McdService,
@@ -198,13 +199,24 @@ export class FrmsalesComponent implements OnInit {
     this.dwlsrv.dl_img(this.denno + format + ".png",this.elementRef);
   }
 
+  openMst(func,value){
+    const url = this.router.createUrlTree(['/'+func,'3',value]);
+    window.open(url.toString(),null,'top=100,left=100');
+  }
+
+  openOkuri(hcode,value){
+    window.open(this.okrsrv.get_url(hcode) + value,'_blank');
+  }
+
   test(value){
     this.toastr.info(this.form.value.yday);
     // this.usrsrv.getNumber('denno',2).subscribe(value => {
     //   console.log(value);
     // });
     console.log(this.usrsrv);
-
+    // this.router.navigate(['/mstmember','3',value]);
+    const url = this.router.createUrlTree(['/mstmember','3',value]);
+    window.open(url.toString(),null,'top=100,left=100');
   }
 
   refresh():void {

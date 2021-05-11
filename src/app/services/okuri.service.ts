@@ -96,4 +96,10 @@ export class OkuriService {
       });
   }
 
+  get_url(hcode):string {
+    let i:number = this.hokuri.findIndex(obj => obj.code == hcode);
+    let j:number = this.haisou.findIndex(obj => obj.code == this.hokuri[i].hscode);
+    return this.haisou[j].url;
+  }
+
 }

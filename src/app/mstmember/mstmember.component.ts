@@ -3,6 +3,9 @@ import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms'
 
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
+import { Overlay } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstm';
@@ -33,6 +36,11 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   mcd:  number | string;
   mode: number=3;
   flgadr1:number=1; //その他住所フラグ 1：未登録、2：登録済
+  overlayRef = this.overlay.create({
+    hasBackdrop: true,
+    positionStrategy: this.overlay
+      .position().global().centerHorizontally().centerVertically()
+  });
 
   constructor(public usrsrv: UserService,
               private fb: FormBuilder,
@@ -48,6 +56,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
               public memsrv: MembsService,
               private apollo: Apollo,
               private toastr: ToastrService,
+              private overlay: Overlay,
               private cdRef:ChangeDetectorRef,
               private zone: NgZone) {
       zone.onMicrotaskEmpty.subscribe(() => { console.log('mstmember detect change'); });
@@ -56,6 +65,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({});
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.form.addControl('base', new FormGroup({
       sei: new FormControl('', Validators.required),
       mei: new FormControl(''),
@@ -106,7 +116,9 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         this.mode = +params.get('mode');
       } 
     });
-    this.memsrv.get_members();
+    this.memsrv.get_members().then(result => {
+      this.overlayRef.detach();      
+    });
     this.bunsrv.get_bunrui();
     this.stfsrv.get_staff();
     this.okrsrv.get_hokuri();
@@ -184,7 +196,8 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   }
 
   get_member(mcode:number){
-    this.mcd += '　読込中';
+    // this.mcd += '　読込中';
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.apollo.watchQuery<any>({
       query: Query.GetMast1, 
         variables: { 
@@ -235,6 +248,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
           this.flgadr1=1;
         }
         this.mcd=mcode;
+        this.overlayRef.detach();
         history.replaceState('','','./mstmember/' + this.mode + '/' + this.mcd);
       }
     },(error) => {
@@ -242,6 +256,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       this.mcd = mcode + '　未登録';
       this.form.reset();
       history.replaceState('','','./mstmember');
+      this.overlayRef.detach();
     });
   }
 

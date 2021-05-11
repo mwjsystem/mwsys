@@ -57,6 +57,7 @@ export class JmeitblComponent implements OnInit {
   ngOnInit(): void {
     this.add_rows(1);
     this.refresh();
+    // console.log(this.parentForm);
   }
 
   ngAfterViewChecked(): void {
@@ -96,7 +97,7 @@ export class JmeitblComponent implements OnInit {
       toutmoney:[jyumei.toutmoney],
       taxmoney:[jyumei.taxmoney],
       taxrate:[jyumei.taxrate]
-    })
+    });
   }
 
   createRow(i:number){
@@ -125,7 +126,7 @@ export class JmeitblComponent implements OnInit {
       toutmoney:[''],
       taxmoney:[''],
       taxrate:['']
-    })
+    });
   }
 
   updGds(i: number,value: string):void {

@@ -21,6 +21,9 @@ export class BunruiService {
   public jucd: mwI.Sval[]=[];
   public skbn: mwI.Sval[]=[];
   public taxrt: mwI.Sval[]=[];
+  public gskbn: mwI.Sval[]=[];
+  public tkbn: mwI.Sval[]=[];
+  public zkbn: mwI.Sval[]=[];
   constructor(private usrsrv: UserService,
               private apollo: Apollo) { }
 
