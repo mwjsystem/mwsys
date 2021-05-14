@@ -74,7 +74,7 @@
           <mat-form-field style="width: 7em;">
             <mat-label>受注先</mat-label>
             <input tabIndex="1" matInput formControlName="mcode" required (blur)="setMcdtxt()" (change)="changeMcd()" (keydown.f4)="mcdHelp('mcode')">
-            <button mat-button mat-icon-button matSuffix (click)="openMst('mstmember',form.value.mcode)" *ngIf="mcdtxt">
+            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.mcode)" *ngIf="mcdtxt">
               <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
@@ -84,7 +84,7 @@
           <mat-form-field style="width: 7em;">
             <mat-label>請求先</mat-label>
             <input tabIndex="2" matInput formControlName="scode" required (blur)="setScdtxt()" (keydown.f4)="mcdHelp('scode')">
-            <button mat-button mat-icon-button matSuffix (click)="openMst('mstmember',form.value.scode)" *ngIf="scdtxt">
+            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.scode)" *ngIf="scdtxt">
               <mat-icon>web_asset</mat-icon>
             </button>
           </mat-form-field>
@@ -94,7 +94,7 @@
           <mat-form-field style="width: 7em;">
             <mat-label>納品先</mat-label>
             <input tabIndex="3" matInput formControlName="ncode" required (blur)="setNcdtxt()" (keydown.f4)="mcdHelp('ncode')">
-            <button mat-button mat-icon-button matSuffix (click)="openMst('mstmember',form.value.ncode)" *ngIf="ncdtxt">
+            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.ncode)" *ngIf="ncdtxt">
               <mat-icon>web_asset</mat-icon>
             </button>
           </mat-form-field>

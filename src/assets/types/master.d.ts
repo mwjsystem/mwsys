@@ -107,6 +107,7 @@ declare namespace mwI {
     msmadrs:Adrs[];
   }
   interface Gtanka {
+    gcode:string;
     day:Date;
     tanka1:number;
     tanka2:number;
@@ -142,11 +143,11 @@ declare namespace mwI {
     send:string;
     order:boolean;
     koguchi:number;
+    msgzais:Gzai[];
   }
   
   interface Msgoods extends Goods{
     msgtankas:Gtanka[];
-    msgzais:Gzai[];
   }
 
   interface Ggroup {
@@ -161,6 +162,7 @@ declare namespace mwI {
     updated_at:Date;
     updated_by:string;
     siire:string;
+    tcode:string;
     msgoods:Msgoods[];    
   }
   

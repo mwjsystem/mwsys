@@ -1,0 +1,64 @@
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">顧客検索</h1>
+<mat-dialog-content>
+    <div class="mat-elevation-z8">
+        <mat-toolbar fxLayoutGap="5px">
+          <mat-form-field>
+            <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
+            <input matInput (keyup)="updateFilter('code',$event.target.value)">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>ﾌﾘｶﾞﾅ 半角ｶﾀｶﾅのみく</mat-label>
+            <input matInput (keyup)="updateFilter('kana',$event.target.value)">
+          </mat-form-field>      
+          <mat-form-field>
+            <mat-label>名称</mat-label>
+            <input matInput (keyup)="updateFilter('name',$event.target.value)">
+          </mat-form-field>
+          <mat-paginator #paginators
+              [length]="dataSource?.data.length"
+              [pageIndex]="0"
+              [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+          </mat-paginator>
+        </mat-toolbar>
+        <table mat-table [dataSource]="dataSource" aria-label="Elements">
+          <ng-container matColumnDef="code">
+              <th mat-header-cell *matHeaderCellDef>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</th>
+              <td mat-cell *matCellDef="let row">{{row.code}}</td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>グループ名</th>
+              <td mat-cell *matCellDef="let row">{{row.name}}</td>
+          </ng-container>
+          <ng-container matColumnDef="kana">
+              <th mat-header-cell *matHeaderCellDef>フリガナ</th>
+              <td mat-cell *matCellDef="let row">{{row.kana}}</td>
+          </ng-container>
+          <ng-container matColumnDef="gkbn">
+              <th mat-header-cell *matHeaderCellDef>商品区分</th>
+              <td mat-cell *matCellDef="let row">{{row.gkbn}}</td>
+          </ng-container>
+          <ng-container matColumnDef="sozai">
+              <th mat-header-cell *matHeaderCellDef>素材</th>
+              <td mat-cell *matCellDef="let row">{{row.sozai}}</td>
+          </ng-container>
+          <ng-container matColumnDef="siire">
+              <th mat-header-cell *matHeaderCellDef>仕入先</th>
+              <td mat-cell *matCellDef="let row">{{row.siire}}</td>
+          </ng-container>
+          <ng-container matColumnDef="tcode">
+              <th mat-header-cell *matHeaderCellDef>担当者</th>
+              <td mat-cell *matCellDef="let row">{{row.tcode}}</td>
+          </ng-container>
+          <!-- <ng-container matColumnDef="bikou">
+              <th mat-header-cell *matHeaderCellDef>備考</th>
+              <td mat-cell *matCellDef="let row">{{row.bikou}}</td>
+          </ng-container> -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setGrpcd(row)"></tr>
+        </table>
+
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button class="mat-raised-button"(click)="close()">閉じる</button>
+</mat-dialog-actions>

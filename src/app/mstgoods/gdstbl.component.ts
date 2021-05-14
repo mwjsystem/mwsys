@@ -19,6 +19,7 @@ export class GdstblComponent implements OnInit {
   
   constructor(private cdRef:ChangeDetectorRef,
               private fb:     FormBuilder,
+              public usrsrv:UserService,
               public gdssrv:GoodsService,
               public bunsrv:BunruiService) {
 
@@ -40,8 +41,22 @@ export class GdstblComponent implements OnInit {
     }
     this.refresh();
   }  
-  
-  toggleRow(){
+  getGzai(gcd:string):string{
+    // console.log(gcd);
+    let tooltip:string="";
+    const i:number = this.gdssrv.goods.findIndex(obj => obj.gcode == gcd);
+    this.gdssrv.goods[i].msgzais.forEach(e => {
+      tooltip += e.zcode + '_'.repeat(25-e.zcode.length) + e.irisu + '\n';
+    });
+    return tooltip;
+  }
+  setJan(i:number){
+    this.usrsrv.getNumber('jan',1).subscribe(value => {
+      // console.log(value);
+      this.frmArr.controls[i].get('jan').setValue(this.usrsrv.addCheckDigit(value));
+    });
+  }
+  diaGzai(){
     
   }
 

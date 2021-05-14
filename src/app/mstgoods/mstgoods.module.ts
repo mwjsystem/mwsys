@@ -8,6 +8,7 @@ import { MstgoodsComponent } from './mstgoods.component';
 import { GtnktblComponent } from './gtnktbl.component';
 import { GdstblComponent } from './gdstbl.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
+import { GrpcdhelpComponent } from '../share/grpcdhelp/grpcdhelp.component';
 
 registerLocaleData(localeJa);
 
@@ -15,7 +16,8 @@ registerLocaleData(localeJa);
   declarations: [
     MstgoodsComponent,
     GtnktblComponent,
-    GdstblComponent
+    GdstblComponent,
+    GrpcdhelpComponent
   ],
   imports: [
     CommonModule,

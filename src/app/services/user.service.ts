@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { FormArray } from '@angular/forms';
 import { AuthService } from '@auth0/auth0-angular';
 import { Apollo } from 'apollo-angular';
 import { AbstractControl } from '@angular/forms';
@@ -37,7 +39,8 @@ export class UserService {
   system:System=new System();
   
   constructor(public auth: AuthService,
-              private apollo: Apollo) {
+              private apollo: Apollo,
+              private router:Router) {
       const GetMast = gql`
       query get_system($id: smallint!){
         mssystem(where: {id: {_eq: $id}}) {
@@ -111,7 +114,7 @@ export class UserService {
         inc: inc
       },
       }).subscribe(({ data }) => {
-        console.log(data.update_trnumber.returning[0].curnum,data.update_trnumber.returning[0])
+        // console.log(data.update_trnumber.returning[0].curnum,data.update_trnumber.returning[0])
         observer.next(data.update_trnumber.returning[0].curnum);
       },(error) => {
         // this.toastr.error('採番エラー','採番タイプ' + type + 'の採番ができませんでした',
@@ -121,6 +124,22 @@ export class UserService {
       });
     });
     return observable;
+  }
+
+  addCheckDigit(jan:number):number{
+    let janstr = jan.toString();
+    let evenNum = 0, oddNum = 0;
+    for (var i = 0; i < janstr.length - 1; i++) {
+        if (i % 2 == 0) { // 「奇数」かどうか（0から始まるため、iの偶数と奇数が逆）
+            oddNum += parseInt(janstr[i]);
+        } else {
+            evenNum += parseInt(janstr[i]) * 3;
+        }
+    }
+    let sumNum = oddNum + evenNum;
+    let chkNum = (sumNum % 10 === 0 ? 0 : 10 - sumNum % 10);
+    // console.log(jan,sumNum + "_" + chkNum);
+    return parseInt(janstr + chkNum.toString());
   }
 
   editFrmval(frm:AbstractControl,fld:string):any{
@@ -195,7 +214,6 @@ export class UserService {
     flds.forEach(e => pickobj[e]=obj[e]);
     return pickobj;
   }
-
   pickObjArr(objarr,flds:string[]){
     let pickarr=[];
     objarr.forEach(obj =>{
@@ -205,14 +223,24 @@ export class UserService {
     });
     return pickarr;
   }
-
-  // convNumber(value):any {
-  //   const conv = value.replace(/[^0-9０-９]/g, '').replace(/[０-９]/g, function(s) {
-  //     return String.fromCharCode(s.charCodeAt(0) - 65248);
-  //   });   //数字のみ抽出
-  //   return conv;
-    
-  // }
+  disable_mtbl(form) {
+    (<FormArray>form.get('mtbl'))
+      .controls
+      .forEach(control => {
+        control.disable();
+      })
+  }
+  enable_mtbl(form) {
+    (<FormArray>form.get('mtbl'))
+      .controls
+      .forEach(control => {
+        control.enable();
+      })
+  }
+  openMst(func,value){
+    const url = this.router.createUrlTree(['/'+func,'3',value]);
+    window.open(url.toString(),null,'top=100,left=100');
+  }
 
 }
 

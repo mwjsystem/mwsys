@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { UserService } from './../../services/user.service';
 
 @Component({
@@ -8,9 +8,17 @@ import { UserService } from './../../services/user.service';
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class TmstmpComponent implements OnInit {
-  constructor(public usrsrv: UserService) { }
+  constructor(
+    public cdRef: ChangeDetectorRef,
+    public usrsrv: UserService) { }
 
   ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void{
+    setTimeout(() => {
+      this.cdRef.detectChanges();
+    });
   }
 
 }

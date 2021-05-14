@@ -143,11 +143,11 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     }
   }
   mcdHelp(): void {
-    
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width  = '100vw';
     dialogConfig.height = '98%';
     dialogConfig.panelClass= 'full-screen-modal';
+    dialogConfig.autoFocus = true;
     let dialogRef = this.dialog.open(McdhelpComponent, dialogConfig);
     
     this.cdRef.detach();
@@ -287,6 +287,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     this.mode=3;
     this.form.disable();
     this.form.markAsPristine();
+    history.replaceState('','','./mstmember/' + this.mode + '/' + this.mcd);
   }
 
   save():void {

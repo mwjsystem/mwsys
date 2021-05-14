@@ -4,6 +4,7 @@ export const GetGood = gql`
 query get_good($id: smallint!,$gds:String!,$day: date!) {
   msgoods_by_pk(gcode: $gds, id: $id){
     msggroup {
+      code
       gkbn
       siire
     }

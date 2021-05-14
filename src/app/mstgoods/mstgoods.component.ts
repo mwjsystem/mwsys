@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, HostListener, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, ViewEncapsulation, HostListener, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
@@ -10,16 +10,11 @@ import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstg';
 import { ToastrService } from 'ngx-toastr';
 import { GdstblComponent } from './gdstbl.component';
+import { GtnktblComponent } from './gtnktbl.component';
+import { GrpcdhelpComponent } from './../share/grpcdhelp/grpcdhelp.component';
 import { UserService } from './../services/user.service';
 import { GoodsService } from './../services/goods.service';
 import { BunruiService } from './../services/bunrui.service';
-
-
-interface Ggrp {
-  code:string;
-  name:string;
-  kana:string;
-} 
 
 @Component({
   selector: 'app-mstgoods',
@@ -28,13 +23,14 @@ interface Ggrp {
   encapsulation : ViewEncapsulation.None
 })
 export class MstgoodsComponent implements OnInit {
-  @ViewChild(GdstblComponent ) gdstbl:GdstblComponent;
+  @ViewChild(GdstblComponent) gdstbl:GdstblComponent;
+  @ViewChild(GtnktblComponent) gtnktbl:GtnktblComponent;
 
   form: FormGroup;
-  ggrps: Ggrp[]=[];
   grpcd:string;
   mode:number=3;
   rows: FormArray = this.fb.array([]);
+  rows2: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -42,6 +38,7 @@ export class MstgoodsComponent implements OnInit {
   });
   constructor(private fb: FormBuilder,
     private title: Title,
+    public cdRef: ChangeDetectorRef,
     private route: ActivatedRoute,
     private elementRef: ElementRef,
     private dialog: MatDialog,
@@ -62,7 +59,8 @@ export class MstgoodsComponent implements OnInit {
       bikou: new FormControl(''),
       sozai: new FormControl(''),
       siire: new FormControl(''),
-      mtbl: this.rows 
+      mtbl: this.rows,
+      mtbl2: this.rows2 
     });
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('grpcd') === null){
@@ -77,9 +75,17 @@ export class MstgoodsComponent implements OnInit {
       }else{
         this.mode = +params.get('mode');
       } 
+
     });
+    if (this.gdssrv.ggrps.length == 0) {
+      if(!this.overlayRef) {
+        this.overlayRef.attach(new ComponentPortal(MatSpinner));
+      }
+      this.gdssrv.get_ggroups().then(result => {
+        this.overlayRef.detach();      
+      });
+    }
     this.bunsrv.get_bunrui();
-    this.get_ggroups();
   }  
 
   ngAfterViewInit(): void{
@@ -93,85 +99,87 @@ export class MstgoodsComponent implements OnInit {
   }  
 
   grpcdHelp(): void {
-    
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+    let dialogRef = this.dialog.open(GrpcdhelpComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(
+      data=>{
+        if(typeof data != 'undefined'){
+          this.grpcd = data.code;
+        }
+        this.refresh();
+      }
+    );    
   }  
 
   get_ggroup(grpcd:string){
     // this.grpcd += '　読込中';
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.apollo.watchQuery<any>({
-      query: Query.GetMast1, 
+      query: Query.GetMast0, 
         variables: { 
           id : this.usrsrv.compid,
-          grpcd: grpcd
+          code: grpcd
         },
-    })
-      .valueChanges
-      .subscribe(({ data }) => {      
-      this.form.reset();
-      if (data.msggroup_by_pk == null){
+    }).valueChanges
+      .subscribe(({ data }) => {
+      if (data.msggroup == null){
         this.grpcd = grpcd + '　未登録';
         history.replaceState('','','./mstgoods');
       } else {
-        let ggroup:mwI.Ggroup=data.msggroup_by_pk;
-        this.form.patchValue(ggroup);
-        this.usrsrv.setTmstmp(ggroup);
-        this.gdssrv.goods=[];
-        this.gdssrv.gtnks=[];
-　　　　 for(let i=0;i<ggroup.msgoods.length;i++){
-          // console.log('get_ggroup '+i,ggroup.msgoods[i]);
-          const {msgtankas,...good}=ggroup.msgoods[i];// ggroup.msgoods[i]からmsgtankasを除外して、goodに代入         
-          this.gdssrv.goods.push(good);
-          for(let j=0;j<ggroup.msgoods[i].msgtankas.length;j++){         
-            this.gdssrv.gtnks.push(Object.assign({gcode:ggroup.msgoods[i].gcode},ggroup.msgoods[i].msgtankas[j]));
+        let lcgrpcd = data.msggroup[0].code;
+        this.apollo.watchQuery<any>({
+          query: Query.GetMast1, 
+            variables: { 
+              id : this.usrsrv.compid,
+              grpcd: lcgrpcd
+            },
+        }).valueChanges
+          .subscribe(({ data }) => {      
+          this.form.reset();
+          let ggroup:mwI.Ggroup=data.msggroup_by_pk;
+          this.form.patchValue(ggroup);
+          this.usrsrv.setTmstmp(ggroup);
+          this.gdssrv.goods=[];
+          this.gdssrv.gtnks=[];
+    　　　　 for(let i=0;i<ggroup.msgoods.length;i++){
+            // console.log('get_ggroup '+i,ggroup.msgoods[i]);
+            const {msgtankas,...good}=ggroup.msgoods[i];// ggroup.msgoods[i]からmsgtankasを除外して、goodに代入         
+            this.gdssrv.goods.push(good);
+            for(let j=0;j<ggroup.msgoods[i].msgtankas.length;j++){         
+              this.gdssrv.gtnks.push(Object.assign({gcode:ggroup.msgoods[i].gcode},ggroup.msgoods[i].msgtankas[j]));
+            }
+            // console.log('get_ggroup',this.gdssrv.goods);
           }
-          // console.log('get_ggroup',this.gdssrv.goods);
-        }
-        this.gdssrv.subGds.next();
-        this.gdssrv.subTnk.next(); 
-        this.gdstbl.set_goods();
+          this.gdssrv.subGds.next();
+          this.gdssrv.subTnk.next(); 
+          this.gdstbl.set_goods();
+          this.gtnktbl.set_gtanka();
+          if(this.mode==3){
+            this.form.disable();
+            // this.usrsrv.disable_mtbl(this.form);
+          }else{
+            this.form.enable();
+            // this.usrsrv.enable_mtbl(this.form);
+          }
+          this.grpcd = lcgrpcd;
+          this.overlayRef.detach();
+          this.cdRef.detectChanges();
+          history.replaceState('','','./mstgoods/' + this.mode + '/' + this.grpcd);
+        },(error) => {
+          this.grpcd = grpcd + '　読込エラー';
+          this.form.reset();
+          console.log('error query get_ggroup', error);
+          history.replaceState('','','./mstgoods');
+          this.overlayRef.detach();
+        });       
       }
-      this.grpcd = grpcd;
-      this.overlayRef.detach();
-      history.replaceState('','','./mstgoods/' + this.mode + '/' + this.grpcd);
-    },(error) => {
-      this.grpcd = grpcd + '　読込エラー';
-      this.form.reset();
-      console.log('error query get_ggroup', error);
-      history.replaceState('','','./mstgoods');
-      this.overlayRef.detach();
     }); 
   }  
-  get_ggroups():void {
-    if (this.ggrps.length == 0) {
-      this.overlayRef.attach(new ComponentPortal(MatSpinner));
-      this.apollo.watchQuery<any>({
-        query: Query.GetMast0, 
-          variables: { 
-            id : this.usrsrv.compid
-          },
-        })
-        .valueChanges
-        .subscribe(({ data }) => {
-            // if(this.grpcd=='読込中です！'){
-            //   this.grpcd="";
-            // }
-            this.ggrps=data.msggroup;
-            this.overlayRef.detach();
-        },(error) => {
-          console.log('error query get_ggroups', error);
-          this.overlayRef.detach();
-        });
-    }  
-  }
+  
   refresh():void {
     if( this.checkMcode(this.grpcd) ){
       this.get_ggroup(this.grpcd);
-    }
-    if(this.mode==3){
-      this.form.disable();
-    }else{
-      this.form.enable();
     }
   }
 
@@ -179,8 +187,10 @@ export class MstgoodsComponent implements OnInit {
     // console.log(typeof mcode,mcode);
     let flg:boolean; 
     if (grpcd != null){
-      let i:number = this.ggrps.findIndex(obj => obj.code == grpcd);
+      let lcgrpcd = this.usrsrv.convUpper(grpcd);
+      let i:number = this.gdssrv.ggrps.findIndex(obj => obj.code == lcgrpcd);
       if( i > -1 ){
+        this.grpcd = lcgrpcd;
         flg = true;
       } else {
         if( grpcd.indexOf('未登録') == -1 && grpcd.indexOf('読込') == -1 && grpcd !== '' ){
@@ -198,7 +208,8 @@ export class MstgoodsComponent implements OnInit {
   
   test(value){
     this.toastr.info('機能作成中');
-    console.log(this.bunsrv.gskbn);
+          // this.form.disable();
+    console.log(this.form);
   }
 
 
@@ -220,9 +231,13 @@ export class MstgoodsComponent implements OnInit {
   } 
   
   cancel():void {
+    if(this.mode==1){
+      this.grpcd='';
+    }
     this.mode=3;
     this.form.disable();
     this.form.markAsPristine();
+    history.replaceState('','','./mstgoods/' + this.mode + '/' + this.grpcd);
   }
 
   shouldConfirmOnBeforeunload():boolean {

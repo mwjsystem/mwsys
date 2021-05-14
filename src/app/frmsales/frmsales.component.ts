@@ -199,11 +199,6 @@ export class FrmsalesComponent implements OnInit {
     this.dwlsrv.dl_img(this.denno + format + ".png",this.elementRef);
   }
 
-  openMst(func,value){
-    const url = this.router.createUrlTree(['/'+func,'3',value]);
-    window.open(url.toString(),null,'top=100,left=100');
-  }
-
   openOkuri(hcode,value){
     window.open(this.okrsrv.get_url(hcode) + value,'_blank');
   }
@@ -232,26 +227,11 @@ export class FrmsalesComponent implements OnInit {
     return this.form.get('mtbl') as FormArray;
   }  
 
-  disable_Jmeitbl() {
-    (<FormArray>this.form.get('mtbl'))
-      .controls
-      .forEach(control => {
-        control.disable();
-      })
-
-  }
-
-  enable_Jmeitbl() {
-    (<FormArray>this.form.get('mtbl'))
-      .controls
-      .forEach(control => {
-        control.enable();
-      })
-  }
-
   get_jyuden(denno:number|string):void{
     // this.denno += '　読込中';
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    if (!this.overlayRef) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
     this.apollo.watchQuery<any>({
       query: Query.GetJyuden, 
         variables: { 
@@ -293,11 +273,11 @@ export class FrmsalesComponent implements OnInit {
         if(this.mode==3){
           this.form.disable();
           // console.log('refresh disable');
-          this.disable_Jmeitbl();
+          this.usrsrv.disable_mtbl(this.form);
         }else{
           this.form.enable();
           // console.log('refresh enable');
-          this.enable_Jmeitbl();
+          this.usrsrv.enable_mtbl(this.form);
         }
         history.replaceState('','','./frmsales/' + this.mode + '/' + this.denno);
         this.overlayRef.detach();
@@ -499,7 +479,7 @@ export class FrmsalesComponent implements OnInit {
     this.form.get('skbn').setValue("1");
     this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
     this.form.enable();
-    this.enable_Jmeitbl();  
+    this.usrsrv.enable_mtbl(this.form); 
     this.jmeitbl.frmArr.clear();  
     this.jmeitbl.add_rows(20);
   }

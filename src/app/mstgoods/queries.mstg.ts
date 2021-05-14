@@ -1,11 +1,13 @@
 import gql from 'graphql-tag';
 
 export const GetMast0 = gql`
-query get_groups($id: smallint!) {
-  msggroup(where: {id: {_eq: $id}}, order_by: {code: asc}) {
+query MyQuery($id: smallint!, $code: String!) {
+  msggroup(where:{_and:{id:{_eq:$id},
+                  _or:[{code: {_eq: $code}},
+                       {msgoods: {gcode: {_eq: $code}}}
+                      ]
+                  }}) {
     code
-    name
-    kana
   }
 }`;
 
@@ -15,6 +17,7 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
     code
     kana
     name
+    gkbn
     sozai
     siire
     tcode
