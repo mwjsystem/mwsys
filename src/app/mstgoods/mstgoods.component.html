@@ -13,7 +13,7 @@
         <mat-icon>cancel</mat-icon>中止
       </button>
       <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
-        <mat-label>商品グループコード</mat-label>
+        <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label>
         <input matInput [ngModel]="grpcd" gcdInput (ngModelChange)="grpcd=$event" (keyup.enter)="onEnter()" (keydown.f4)="grpcdHelp()"
         (blur)="refresh()" [ngModelOptions]="{standalone: true}">
         <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" [style.display]="mode==3 ? 'inline-block' : 'none'">
@@ -26,7 +26,7 @@
           <mat-icon>find_replace</mat-icon>
         </button>
       </mat-form-field>
-      <button mat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'">
+      <button mat-button (click)="diaImage()">
         <mat-icon>perm_media</mat-icon>画像・仕様書
       </button>
       <button mat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'">

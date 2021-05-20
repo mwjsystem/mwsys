@@ -9,6 +9,7 @@ import { GtnktblComponent } from './gtnktbl.component';
 import { GdstblComponent } from './gdstbl.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 import { GrpcdhelpComponent } from '../share/grpcdhelp/grpcdhelp.component';
+import { GdsimageComponent } from '../share/gdsimage/gdsimage.component';
 
 registerLocaleData(localeJa);
 
@@ -17,7 +18,8 @@ registerLocaleData(localeJa);
     MstgoodsComponent,
     GtnktblComponent,
     GdstblComponent,
-    GrpcdhelpComponent
+    GrpcdhelpComponent,
+    GdsimageComponent
   ],
   imports: [
     CommonModule,

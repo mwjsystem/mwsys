@@ -6,6 +6,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
@@ -21,28 +22,28 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';;
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
-  imports: [
-      MatButtonModule
-     ,MatCardModule
-     ,MatCheckboxModule
-     ,MatDatepickerModule
-     ,MatDialogModule
-     ,MatExpansionModule
-     ,MatFormFieldModule
-     ,MatIconModule
-     ,MatInputModule
-     ,MatMenuModule
-     ,MatPaginatorModule
-     ,MatProgressSpinnerModule
-     ,MatSelectModule
-     ,MatStepperModule
-     ,MatTableModule
-     ,MatTabsModule
-     ,MatToolbarModule
-     ,MatTooltipModule
-     ,MatNativeDateModule
-     ,DragDropModule
-  ],
+  // imports: [
+  //     MatButtonModule
+  //    ,MatCardModule
+  //    ,MatCheckboxModule
+  //    ,MatDatepickerModule
+  //    ,MatDialogModule
+  //    ,MatExpansionModule
+  //    ,MatFormFieldModule
+  //    ,MatIconModule
+  //    ,MatInputModule
+  //    ,MatMenuModule
+  //    ,MatPaginatorModule
+  //    ,MatProgressSpinnerModule
+  //    ,MatSelectModule
+  //    ,MatStepperModule
+  //    ,MatTableModule
+  //    ,MatTabsModule
+  //    ,MatToolbarModule
+  //    ,MatTooltipModule
+  //    ,MatNativeDateModule
+  //    ,DragDropModule
+  // ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: 'ja-JP'}
   ],
@@ -54,6 +55,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
      ,MatDialogModule
      ,MatExpansionModule
      ,MatFormFieldModule
+     ,MatGridListModule
      ,MatIconModule
      ,MatInputModule
      ,MatMenuModule

@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { GdstblComponent } from './gdstbl.component';
 import { GtnktblComponent } from './gtnktbl.component';
 import { GrpcdhelpComponent } from './../share/grpcdhelp/grpcdhelp.component';
+import { GdsimageComponent } from './../share/gdsimage/gdsimage.component';
 import { UserService } from './../services/user.service';
 import { GoodsService } from './../services/goods.service';
 import { BunruiService } from './../services/bunrui.service';
@@ -59,6 +60,7 @@ export class MstgoodsComponent implements OnInit {
       bikou: new FormControl(''),
       sozai: new FormControl(''),
       siire: new FormControl(''),
+      specurl: new FormControl(''),
       mtbl: this.rows,
       mtbl2: this.rows2 
     });
@@ -88,15 +90,34 @@ export class MstgoodsComponent implements OnInit {
     this.bunsrv.get_bunrui();
   }  
 
-  ngAfterViewInit(): void{
-    setTimeout(() => {
-      this.refresh();
-    });
-  }
+  // ngAfterViewInit(): void{
+  //   setTimeout(() => {
+  //     this.refresh();
+  //   });
+  // }
 
   onEnter(): void {
     this.elementRef.nativeElement.querySelector('button').focus();
   }  
+
+　diaImage(): void {
+    let dialogConfig = new MatDialogConfig();
+    // dialogConfig.width  = '100vw';
+    // dialogConfig.height = '98%';
+    dialogConfig.data = {
+        grpcd: this.grpcd,
+        url:this.form.value.specurl
+    };
+    dialogConfig.autoFocus = true;
+    let dialogRef = this.dialog.open(GdsimageComponent, dialogConfig);
+    // dialogRef.afterClosed().subscribe(
+    //   data=>{
+    //     if(typeof data != 'undefined'){
+    //       this.grpcd = data.code;
+    //     }
+    //   }
+    // );    
+  }
 
   grpcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
@@ -124,9 +145,11 @@ export class MstgoodsComponent implements OnInit {
     }).valueChanges
       .subscribe(({ data }) => {
       if (data.msggroup == null){
+        this.form.reset();
         this.grpcd = grpcd + '　未登録';
         history.replaceState('','','./mstgoods');
       } else {
+        // console.log(data);
         let lcgrpcd = data.msggroup[0].code;
         this.apollo.watchQuery<any>({
           query: Query.GetMast1, 
@@ -178,33 +201,33 @@ export class MstgoodsComponent implements OnInit {
   }  
   
   refresh():void {
-    if( this.checkMcode(this.grpcd) ){
+    // if( this.checkMcode(this.grpcd) ){
       this.get_ggroup(this.grpcd);
-    }
+    // }
   }
 
-  checkMcode(grpcd:string):boolean {
-    // console.log(typeof mcode,mcode);
-    let flg:boolean; 
-    if (grpcd != null){
-      let lcgrpcd = this.usrsrv.convUpper(grpcd);
-      let i:number = this.gdssrv.ggrps.findIndex(obj => obj.code == lcgrpcd);
-      if( i > -1 ){
-        this.grpcd = lcgrpcd;
-        flg = true;
-      } else {
-        if( grpcd.indexOf('未登録') == -1 && grpcd.indexOf('読込') == -1 && grpcd !== '' ){
-          this.grpcd = grpcd + '　未登録';
-        }
-        this.form.reset();
-        history.replaceState('','','./mstgoods'); 
-        flg = false;
-      }
-    }else{  
-      flg=false;
-    }
-    return flg;
-  }
+  // checkMcode(grpcd:string):boolean {
+  //   // console.log(typeof mcode,mcode);
+  //   let flg:boolean; 
+  //   if (grpcd != null){
+  //     let lcgrpcd = this.usrsrv.convUpper(grpcd);
+  //     let i:number = this.gdssrv.ggrps.findIndex(obj => obj.code == lcgrpcd);
+  //     if( i > -1 ){
+  //       this.grpcd = lcgrpcd;
+  //       flg = true;
+  //     } else {
+  //       if( grpcd.indexOf('未登録') == -1 && grpcd.indexOf('読込') == -1 && grpcd !== '' ){
+  //         this.grpcd = grpcd + '　未登録';
+  //       }
+  //       this.form.reset();
+  //       history.replaceState('','','./mstgoods'); 
+  //       flg = false;
+  //     }
+  //   }else{  
+  //     flg=false;
+  //   }
+  //   return flg;
+  // }
   
   test(value){
     this.toastr.info('機能作成中');

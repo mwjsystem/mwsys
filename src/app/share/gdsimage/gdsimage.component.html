@@ -1,0 +1,31 @@
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品画像</h1>
+<mat-dialog-content fxLayout="column" fxLayoutGap="5px">
+    <div fxLayout="row">
+        <mat-form-field style="width:70em;height:30px;" appearance="outline">
+            <mat-label>仕様書Excel URL</mat-label>
+            <input type="url" matInput [(ngModel)]=url style="height:30px;">
+        </mat-form-field>
+        <button mat-flat-button matSuffix color="accent" (click)="openXlsx()" *ngIf="url" fxLayoutAlign="center" style="margin-top:5px;">開く</button>
+    </div>
+    <mat-grid-list cols="3">
+        <ng-container *ngFor="let row of noimgs;let i=index">
+            <mat-grid-tile>
+                <img #img src="{{usrsrv.system.imgurl + grpcd + '_' + i.toString() + '.jpg?' + getTimestamp()}}" onload="row=0;" onError="this.onError=null;this.src='assets/noimage.gif';">
+                <mat-grid-tile-footer fxLayoutAlign="space-between">
+                    <input name="upfile" style="display: none" type="file" #upfile accept=".jpg" (change)="onchange(upfile.files,i.toString())" />
+                    <button mat-raised-button color="primary" class="file-select-button" (click)="onClickFileInputButton(i)">
+                        ファイルを選択して登録
+                    </button>
+                    <!-- <button mat-flat-button matSuffix color="accent" (click)="test(img['src'].includes('noimage.gif'))">画像削除</button> -->
+                    <button mat-flat-button matSuffix color="accent" (click)="delImg(i.toString())" *ngIf="!img['src'].includes('noimage.gif')" >画像取消</button>
+                </mat-grid-tile-footer>
+            </mat-grid-tile>
+        </ng-container>
+    </mat-grid-list>
+    
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button class="mat-raised-button" (click)="saveUrl()">URLを保存して閉じる</button>
+    <button class="mat-raised-button" (click)="close()">閉じる</button>
+    <input name="upfile" type="file" #upfile accept=".jpg" (change)="onchange(upfile.files,'10')" capture="enviroment"/>
+</mat-dialog-actions>

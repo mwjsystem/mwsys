@@ -163,6 +163,7 @@ declare namespace mwI {
     updated_by:string;
     siire:string;
     tcode:string;
+    specurl:string;
     msgoods:Msgoods[];    
   }
   

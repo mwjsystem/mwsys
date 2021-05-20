@@ -22,6 +22,7 @@ export class System {
   maxmcd:string;
   maxdno:number;
   urischema:string;
+  imgurl:string;
   constructor(init?:Partial<System>) {
     Object.assign(this, init);
   } 
@@ -49,6 +50,7 @@ export class UserService {
           maxmcd
           maxdno
           urischema
+          imgurl
         }
       }`;
       const GetMast2 = gql`
@@ -177,7 +179,7 @@ export class UserService {
     // console.log(obj,this.tmstmp);
   }
 
-  formatDate(date):string {
+  formatDate(date?):string {
     let lcdate:Date;
     if (date !=null ){
       lcdate = new Date(date);
@@ -185,9 +187,24 @@ export class UserService {
       lcdate = new Date();
     }
     const y = lcdate.getFullYear();
-    const m = ('00' + (lcdate.getMonth()+1)).slice(-2);
+    const m = ('00' + lcdate.getMonth()).slice(-2);
     const d = ('00' + lcdate.getDate()).slice(-2);
     return (y + '-' + m + '-' + d);
+  }
+  formatTime(date?):string {
+    let lcdate:Date;
+    if (date !=null ){
+      lcdate = new Date(date);
+    }else{
+      lcdate = new Date();
+    }
+    const y = lcdate.getFullYear();
+    const m = ('00' + lcdate.getMonth()).slice(-2);
+    const d = ('00' + lcdate.getDate()).slice(-2);
+    const H = ('00' + lcdate.getHours()).slice(-2);
+    const M = ('00' + lcdate.getMinutes()).slice(-2);
+
+    return (y + m + d + H + M);
   }
   convNumber(value:string|number):number{
     let ret:number;

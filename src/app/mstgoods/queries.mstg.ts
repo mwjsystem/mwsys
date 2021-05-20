@@ -22,6 +22,7 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
     siire
     tcode
     bikou
+    specurl
     created_at
     updated_at
     created_by

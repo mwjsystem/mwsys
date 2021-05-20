@@ -32,7 +32,7 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
   encapsulation : ViewEncapsulation.None,
   changeDetection:ChangeDetectionStrategy.OnPush
 })
-export class FrmsalesComponent implements OnInit {
+export class FrmsalesComponent implements OnInit,AfterViewChecked {
   @ViewChild(JmeitblComponent ) jmeitbl:JmeitblComponent;
   form: FormGroup;
   denno:number|string;
