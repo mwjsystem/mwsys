@@ -154,7 +154,7 @@ export class UserService {
     return val;
   }
  
-  editFtel(frm:AbstractControl,fld1:string,fld2:string,fld3:string,fld4:string):any{
+  editFtel(frm:AbstractControl,fld1:string,fld2?:string,fld3?:string,fld4?:string):any{
     let val:any=''; 
     if(frm.value[fld1]){
       val += frm.value[fld1].replace(/[^0-9]/g,'');

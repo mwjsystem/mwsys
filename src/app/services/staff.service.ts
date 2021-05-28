@@ -11,7 +11,9 @@ export class StaffService {
   public tcds: mwI.Sval[]=[];
   private stfs: mwI.Staff[]=[];
   constructor(private usrsrv: UserService,
-              private apollo: Apollo) { }
+              private apollo: Apollo) {
+                // this.get_staff();
+               }
 
   get_staff():void {
     const GetMast = gql`
@@ -43,7 +45,7 @@ export class StaffService {
   }  
   get_name(code:number):string{
     const i:number= this.stfs.findIndex(obj => obj.code == code);
-    console.log(code,i);
+    // console.log(code,this.stfs);
     return this.stfs[i]?.sei;
   }              
   

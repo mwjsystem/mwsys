@@ -7,6 +7,7 @@ import localeJa from '@angular/common/locales/ja';
 
 import { FrmkeepRoutingModule } from './frmkeep-routing.module';
 import { FrmkeepComponent } from './frmkeep.component';
+// import { UserService } from './../services/user.service';
 
 registerLocaleData(localeJa);
 

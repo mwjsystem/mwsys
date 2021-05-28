@@ -119,10 +119,10 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     this.memsrv.get_members().then(result => {
       this.overlayRef.detach();      
     });
-    this.bunsrv.get_bunrui();
-    this.stfsrv.get_staff();
-    this.okrsrv.get_hokuri();
-    this.bnssrv.get_bunsho();
+    // this.bunsrv.get_bunrui();
+    // this.stfsrv.get_staff();
+    // this.okrsrv.get_hokuri();
+    // this.bnssrv.get_bunsho();
   }
 
   ngAfterViewInit(): void{
@@ -322,7 +322,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       del: this.usrsrv.editFrmval(this.form.get('base'),'del'),
       sptnkbn: this.usrsrv.editFrmval(this.form.get('base'),'sptnkbn'),
       updated_at:new Date(),
-      updated_by:this.usrsrv.userInfo.nickname,
+      updated_by:this.usrsrv.staff.code
     }
     if(this.mode==2){      
       this.apollo.mutate<any>({
@@ -351,16 +351,9 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       });
     }else{//新規登録
       let membs:any[]=[];
-      this.apollo.watchQuery<any>({
-        query: Query.GetMast5, 
-          variables: { 
-            id : this.usrsrv.compid,
-            maxmcd : +this.usrsrv.system.maxmcd
-          },
-        })
-        .valueChanges
-        .subscribe(({ data }) => {
-          this.mcd=data.msmember_aggregate.aggregate.max.mcode + 1;
+      this.usrsrv.getNumber('mcode',1)
+        .subscribe(value => {
+          this.mcd=value;
           member.mcode = this.mcd;
           if (!member.sscode) {
             member.sscode = this.mcd;
@@ -369,7 +362,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
             member.scode = this.mcd;
           }
           member.created_at = new Date();
-          member.created_by = this.usrsrv.userInfo.nickname;
+          member.created_by = this.usrsrv.staff.code;
           membs.push(member);
           this.apollo.mutate<any>({
             mutation: Query.InsertMast1,

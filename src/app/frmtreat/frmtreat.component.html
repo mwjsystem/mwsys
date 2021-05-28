@@ -1,0 +1,103 @@
+<div class="mat-elevation-z8">
+    <mat-toolbar fxLayoutGap="5px">
+        <button class="mat-raised-button" (click)="filterTreat()">検索</button>
+        <mat-form-field>
+            <mat-label>顧客コード</mat-label>
+            <input matInput (input)="fmcode=$event.target.value">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>商品グループ</mat-label>
+            <input matInput (input)="fgrpcd=$event.target.value">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>メール</mat-label>
+            <input matInput (input)="fmail=$event.target.value">
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
+            <input matInput type="number" (input)="ftel=$event.target.value">
+        </mat-form-field>
+        <button class="mat-raised-button" (click)="diaDet(-1)">新規登録</button>
+        <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"
+            [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+        </mat-paginator>
+    </mat-toolbar>
+    <table mat-table [dataSource]="dataSource" aria-label="Elements">
+        <ng-container matColumnDef="seq">
+            <th mat-header-cell *matHeaderCellDef>意味なし連番</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.seq}}</td>
+        </ng-container>
+        <ng-container matColumnDef="created_at">
+            <th mat-header-cell *matHeaderCellDef>受付日</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.created_at | date:"yy/MM/dd"}}</td>
+        </ng-container>
+        <ng-container matColumnDef="created_by">
+            <th mat-header-cell *matHeaderCellDef style="width:5em">対応者</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.created_by | staff}}</td>
+            <!-- <mat-select [(value)]="row.created_by" disabled>
+                <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+                  {{sval.viewval}}
+                </mat-option>
+            </mat-select>
+            </td> -->
+        </ng-container>
+        <ng-container matColumnDef="trttype">
+            <th mat-header-cell *matHeaderCellDef style="width:5em">タイプ</th>
+            <td mat-cell *matCellDef="let row; let i = index">
+                <mat-select [(ngModel)]="row.trttype" disabled>
+                    <mat-option *ngFor="let sval of bunsrv.trttype" [value]="sval.value">
+                    {{sval.viewval}}
+                    </mat-option>
+                </mat-select>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="genre">
+            <th mat-header-cell *matHeaderCellDef style="width:8em">ジャンル</th>
+            <td mat-cell *matCellDef="let row; let i = index">
+                <mat-select [(ngModel)]="row.genre" disabled>
+                    <mat-option *ngFor="let sval of bunsrv.genre" [value]="sval.value">
+                    {{sval.viewval}}
+                    </mat-option>
+                </mat-select>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="mcode">
+            <th mat-header-cell *matHeaderCellDef>顧客ｺｰﾄﾞ</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.mcode}}</td>
+        </ng-container>
+        <ng-container matColumnDef="grpcode">
+            <th mat-header-cell *matHeaderCellDef>商品グループコード</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.grpcode}}</td>
+        </ng-container>
+        <ng-container matColumnDef="gcode">
+            <th mat-header-cell *matHeaderCellDef>商品コード</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.gcode}}</td>
+        </ng-container>
+        <ng-container matColumnDef="tel">
+            <th mat-header-cell *matHeaderCellDef>電話番号/FAX番号</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.tel}}</td>
+        </ng-container>
+        <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>メール</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.email}}</td>
+        </ng-container>
+        <ng-container matColumnDef="question">
+            <th mat-header-cell *matHeaderCellDef>質問、問合せ、クレーム内容</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.question}}</td>
+        </ng-container>
+        <ng-container matColumnDef="answer">
+            <th mat-header-cell *matHeaderCellDef>回答、対応</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.answer}}</td>
+        </ng-container>
+        <ng-container matColumnDef="kaizen">
+            <th mat-header-cell *matHeaderCellDef>改善内容、検討事項</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.kaizen}}</td>
+        </ng-container>
+        <ng-container matColumnDef="result">
+            <th mat-header-cell *matHeaderCellDef>対処、対応結果</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{row.result}}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+        <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;" (click)="diaDet(i)"></tr>
+    </table>
+</div>

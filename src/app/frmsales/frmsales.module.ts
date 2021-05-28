@@ -7,6 +7,7 @@ import { FrmsalesRoutingModule } from './frmsales-routing.module';
 import { FrmsalesComponent } from './frmsales.component';
 import { JmeitblComponent } from './jmeitbl.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
+// import { UserService } from './../services/user.service';
 
 registerLocaleData(localeJa);
 

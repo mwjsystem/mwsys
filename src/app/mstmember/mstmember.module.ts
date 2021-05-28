@@ -10,6 +10,7 @@ import { EdahelpComponent } from './../share/adreda/edahelp.component';
 import { EdatblComponent } from './../share/adreda/edatbl.component';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { McdtblComponent } from './../share/mcdhelp/mcdtbl.component';
+// import { UserService } from './../services/user.service';
 
 
 @NgModule({
@@ -26,6 +27,7 @@ import { McdtblComponent } from './../share/mcdhelp/mcdtbl.component';
     CommonModule,
     CoreModule,
     MstmemberRoutingModule
-  ]
+  ],
+  //  providers: [UserService]
 })
 export class MstmemberModule { }

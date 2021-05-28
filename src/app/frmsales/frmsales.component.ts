@@ -129,13 +129,13 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
       this.setNcdtxt();
       this.overlayRef.detach();      
     });
-    this.bnssrv.get_bunsho();
-    this.okrsrv.get_haisou();
-    this.okrsrv.get_hokuri();
-    this.okrsrv.get_hktime();
-    this.soksrv.get_souko();
-    this.bunsrv.get_bunrui();
-    this.stfsrv.get_staff();
+    // this.bnssrv.get_bunsho();
+    // this.okrsrv.get_haisou();
+    // this.okrsrv.get_hokuri();
+    // this.okrsrv.get_hktime();
+    // this.soksrv.get_souko();
+    // this.bunsrv.get_bunrui();
+    // this.stfsrv.get_staff();
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('denno') !== null){
         this.denno = +params.get('denno');

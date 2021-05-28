@@ -1,0 +1,75 @@
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品グループコード検索</h1>
+<mat-dialog-content>
+    <div class="mat-elevation-z8">
+        <mat-toolbar fxLayoutGap="5px">
+          <mat-form-field>
+            <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
+            <input matInput (keyup)="updateFilter('code',$event.target.value)">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>商品名称</mat-label>
+            <input matInput (keyup)="updateFilter('gtext',$event.target.value)">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Janコードく</mat-label>
+            <input matInput (keyup)="updateFilter('jan',$event.target.value)">
+          </mat-form-field>
+          <mat-paginator #paginators
+              [length]="dataSource?.data.length"
+              [pageIndex]="0"
+              [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+          </mat-paginator>
+        </mat-toolbar>
+        <table mat-table [dataSource]="dataSource" aria-label="Elements">
+            <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</th>
+                <td mat-cell *matCellDef="let row">{{row.code}}</td>
+            </ng-container>
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>グループ名</th>
+                <td mat-cell *matCellDef="let row">{{row.name}}</td>
+            </ng-container>
+            <ng-container matColumnDef="gtext">
+                <th mat-header-cell *matHeaderCellDef>商品名称</th>
+                <td mat-cell *matCellDef="let row">{{row.gtext}}</td>
+            </ng-container>
+            <ng-container matColumnDef="size">
+                <th mat-header-cell *matHeaderCellDef>サイズ</th>
+                <td mat-cell *matCellDef="let row">{{row.size}}</td>
+            </ng-container>
+            <ng-container matColumnDef="color">
+                <th mat-header-cell *matHeaderCellDef>色</th>
+                <td mat-cell *matCellDef="let row">{{row.color}}</td>
+            </ng-container>
+            <ng-container matColumnDef="jan">
+                <th mat-header-cell *matHeaderCellDef>JANコード</th>
+                <td mat-cell *matCellDef="let row">{{row.jan}}</td>
+            </ng-container>
+            <ng-container matColumnDef="irisu">
+                <th mat-header-cell *matHeaderCellDef>入り数</th>
+                <td mat-cell *matCellDef="let row">{{row.irisu}}</td>
+            </ng-container>
+            <ng-container matColumnDef="iriunit">
+                <th mat-header-cell *matHeaderCellDef>入り数単位</th>
+                <td mat-cell *matCellDef="let row">{{row.iriunit}}</td>
+            </ng-container>
+            <ng-container matColumnDef="gskbn">
+                <th mat-header-cell *matHeaderCellDef>数量区分</th>
+                <td mat-cell *matCellDef="let row">{{row.gskbn}}</td>
+            </ng-container>
+            <ng-container matColumnDef="tkbn">
+                <th mat-header-cell *matHeaderCellDef>中止区分</th>
+                <td mat-cell *matCellDef="let row">{{row.tkbn}}</td>
+            </ng-container>
+            <ng-container matColumnDef="zkbn">
+                <th mat-header-cell *matHeaderCellDef>在庫区分</th>
+                <td mat-cell *matCellDef="let row">{{row.zkbn}}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setGcd(row)"></tr>
+        </table>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button class="mat-raised-button"(click)="close()">閉じる</button>
+</mat-dialog-actions>    

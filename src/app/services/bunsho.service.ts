@@ -10,7 +10,9 @@ export class BunshoService {
 
   bunsho: mwI.Bunsho[]=[];
   constructor(private usrsrv: UserService,
-    private apollo: Apollo) { }
+    private apollo: Apollo) {
+      // this.get_bunsho();
+     }
     
     
   get_bunsho():void {

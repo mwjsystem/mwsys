@@ -47,16 +47,18 @@
         <input tabIndex="111" matInput formControlName="adrname" required>
     </mat-form-field>
     <mat-checkbox formControlName="del">削除済</mat-checkbox>
-    <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;">
-        <mat-label>納品先備考</mat-label>
-        <textarea matInput formControlName="adrbikou" matTextareaAutosize></textarea>
-    </mat-form-field>
-    <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;">
-        <mat-label>納品先社内向け備考</mat-label>
-        <textarea matInput formControlName="adrinbikou" matTextareaAutosize></textarea>
-    </mat-form-field>
-    <mat-form-field style="width:100%;">
-        <mat-label>送り状備考</mat-label>
-        <textarea matInput formControlName="adrokrbko" matTextareaAutosize></textarea>
-    </mat-form-field>
+    <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+        <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;">
+            <mat-label>納品先備考</mat-label>
+            <textarea matInput formControlName="adrbikou" matTextareaAutosize></textarea>
+        </mat-form-field>
+        <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;">
+            <mat-label>納品先社内向け備考</mat-label>
+            <textarea matInput formControlName="adrinbikou" matTextareaAutosize></textarea>
+        </mat-form-field>
+        <mat-form-field style="width:100%;">
+            <mat-label>送り状備考</mat-label>
+            <textarea matInput formControlName="adrokrbko" matTextareaAutosize></textarea>
+        </mat-form-field>
+    </div>
 </form>

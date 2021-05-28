@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, ViewEncapsulation, HostListener, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
+import { ActivatedRoute, ParamMap  } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
@@ -60,6 +60,7 @@ export class MstgoodsComponent implements OnInit {
       bikou: new FormControl(''),
       sozai: new FormControl(''),
       siire: new FormControl(''),
+      genre: new FormControl(''),
       specurl: new FormControl(''),
       mtbl: this.rows,
       mtbl2: this.rows2 
@@ -87,7 +88,7 @@ export class MstgoodsComponent implements OnInit {
         this.overlayRef.detach();      
       });
     }
-    this.bunsrv.get_bunrui();
+    // this.bunsrv.get_bunrui();
   }  
 
   // ngAfterViewInit(): void{
@@ -103,7 +104,7 @@ export class MstgoodsComponent implements OnInit {
 　diaImage(): void {
     let dialogConfig = new MatDialogConfig();
     // dialogConfig.width  = '100vw';
-    // dialogConfig.height = '98%';
+    dialogConfig.height = '98%';
     dialogConfig.data = {
         grpcd: this.grpcd,
         url:this.form.value.specurl
@@ -205,6 +206,13 @@ export class MstgoodsComponent implements OnInit {
       this.get_ggroup(this.grpcd);
     // }
   }
+
+  // toTreat(){
+  //   // const url = window.location.href + '/frmtreat?=' + this.grpcd;
+  //   // console.log(url);
+  //   // window.open(url,'_blank');
+  // // 　this.router.navigate([./frmtreat])
+  // }
 
   // checkMcode(grpcd:string):boolean {
   //   // console.log(typeof mcode,mcode);

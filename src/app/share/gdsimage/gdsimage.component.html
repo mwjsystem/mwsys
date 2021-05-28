@@ -1,4 +1,7 @@
-<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品画像</h1>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between" style="margin-bottom:10px;">
+    <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品画像</h1>
+    <button mat-flat-button (click)="close()">閉じる</button>
+</mat-dialog-actions>
 <mat-dialog-content fxLayout="column" fxLayoutGap="5px">
     <div fxLayout="row">
         <mat-form-field style="width:70em;height:30px;" appearance="outline">
@@ -6,13 +9,14 @@
             <input type="url" matInput [(ngModel)]=url style="height:30px;">
         </mat-form-field>
         <button mat-flat-button matSuffix color="accent" (click)="openXlsx()" *ngIf="url" fxLayoutAlign="center" style="margin-top:5px;">開く</button>
+        <button mat-flat-button matSuffix (click)="saveUrl()">URLを保存</button>
     </div>
     <mat-grid-list cols="3">
         <ng-container *ngFor="let row of noimgs;let i=index">
             <mat-grid-tile>
-                <img #img src="{{usrsrv.system.imgurl + grpcd + '_' + i.toString() + '.jpg?' + getTimestamp()}}" onload="row=0;" onError="this.onError=null;this.src='assets/noimage.gif';">
+                <img #img src="{{usrsrv.system.imgurl + 'goods/' + grpcd + '_' + i.toString() + '.jpg?' + usrsrv.formatTime()}}" onload="row=0;" onError="this.onError=null;this.src='assets/noimage.gif';">
                 <mat-grid-tile-footer fxLayoutAlign="space-between">
-                    <input name="upfile" style="display: none" type="file" #upfile accept=".jpg" (change)="onchange(upfile.files,i.toString())" />
+                    <input name="upfile" style="display: none" type="file" #upfile accept=".jpg" (change)="onchange(upfile.files,i.toString())" capture="enviroment"/>
                     <button mat-raised-button color="primary" class="file-select-button" (click)="onClickFileInputButton(i)">
                         ファイルを選択して登録
                     </button>
@@ -22,10 +26,7 @@
             </mat-grid-tile>
         </ng-container>
     </mat-grid-list>
-    
 </mat-dialog-content>
-<mat-dialog-actions>
-    <button class="mat-raised-button" (click)="saveUrl()">URLを保存して閉じる</button>
+<!-- <mat-dialog-actions>
     <button class="mat-raised-button" (click)="close()">閉じる</button>
-    <input name="upfile" type="file" #upfile accept=".jpg" (change)="onchange(upfile.files,'10')" capture="enviroment"/>
-</mat-dialog-actions>
+</mat-dialog-actions> -->

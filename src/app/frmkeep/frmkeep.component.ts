@@ -41,7 +41,7 @@ export class FrmkeepComponent implements OnInit {
 
   ngOnInit(): void {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));    
-    this.stfsrv.get_staff();
+    // this.stfsrv.get_staff();
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('denno') !== null){
         this.denno = +params.get('denno');
@@ -127,6 +127,7 @@ export class FrmkeepComponent implements OnInit {
       history.replaceState('','','./frmkeep/') + pdenno;
     });  
   } 
+  
 
   confKeep(i:number){
     const UpdateOpelog = gql`

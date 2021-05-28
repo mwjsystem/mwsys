@@ -1,0 +1,123 @@
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between" style="margin-bottom:10px;">
+  <div class="icon-area" fxLayout="row" fxLayoutGap="5px">
+    <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">問い合わせ詳細</h1>  
+    <button mat-button class="mat-primary" (click)="setPrev()" *ngIf="idx>-1">
+      <mat-icon>keyboard_arrow_left</mat-icon>前へ
+    </button>
+    <button mat-button class="mat-primary" (click)="setNext()" *ngIf="idx>-1">
+      <mat-icon>keyboard_arrow_right</mat-icon>次へ
+    </button>
+  </div>
+  <div>
+    <button class="mat-raised-button"(click)="close()">閉じる</button>
+    <button class="mat-raised-button mat-warn"(click)="save()">保存</button>
+  </div>
+</mat-dialog-actions>
+<mat-dialog-content style="height: calc(100% - 50px);">
+<form [formGroup]="form" fxLayout="column">       
+  <div fxLayout="row wrap" fxLayoutGap="5px">
+  <mat-form-field style="width:5em">
+    <mat-label>連番</mat-label>
+    <input matInput [value]="form.value.seq" disabled>
+  </mat-form-field>
+  <mat-form-field style="width: 7em;">
+    <mat-label>受付日</mat-label>
+    <input matInput formControlName="created_at" [matDatepicker]="picker" >
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>対応者</mat-label>
+    <mat-select formControlName="created_by">
+        <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+          {{sval.viewval}}
+        </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>ジャンル</mat-label>
+    <mat-select  formControlName="genre">
+      <mat-option *ngFor="let sval of bunsrv.genre" [value]="sval.value">
+      {{sval.viewval}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>タイプ</mat-label>
+    <mat-select  formControlName="trttype">
+      <mat-option *ngFor="let sval of bunsrv.trttype" [value]="sval.value">
+      {{sval.viewval}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>顧客ｺｰﾄﾞ</mat-label>
+    <input matInput formControlName="mcode">
+    <button mat-button mat-icon-button matSuffix (click)="mcdHelp()">
+      <mat-icon>find_replace</mat-icon>
+    </button>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>商品グループコード</mat-label>
+    <input matInput formControlName="grpcode">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>商品コード</mat-label>
+    <input matInput formControlName="gcode">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>電話番号/FAX番号</mat-label>
+    <input matInput formControlName="tel">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>メール</mat-label>
+    <input matInput formControlName="email">
+  </mat-form-field>
+  </div>
+  <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+    <mat-form-field style="width:100%;">
+      <mat-label>質問、問合せ、クレーム</mat-label>
+      <textarea matInput formControlName="question" matTextareaAutosize></textarea>
+    </mat-form-field>
+    <mat-form-field style="width:100%;">
+      <mat-label>回答、対応</mat-label>
+      <textarea matInput formControlName="answer" matTextareaAutosize></textarea>
+    </mat-form-field>
+    <mat-form-field style="width:100%;">
+      <mat-label>改善内容、検討事項</mat-label>
+      <textarea matInput formControlName="kaizen" matTextareaAutosize></textarea>
+    </mat-form-field>
+    <mat-form-field style="width:100%;">
+      <mat-label>対処、対応結果</mat-label>
+      <textarea matInput formControlName="result" matTextareaAutosize></textarea>
+    </mat-form-field>
+  </div>
+  <mat-grid-list cols="3" *ngIf="idx>-1">
+      <ng-container *ngFor="let row of [].constructor(3);let i=index">
+        <mat-grid-tile>
+            <img #img src="{{usrsrv.system.imgurl + 'treat/' + form.value.seq + '_' + i.toString() + '.jpg?' + usrsrv.formatTime()}}" onload="row=0;" onError="this.onError=null;this.src='assets/noimage.gif';">
+            <mat-grid-tile-footer fxLayoutAlign="space-between">
+                <input name="upfile" style="display: none" type="file" #upfile accept=".jpg" (change)="onchange(upfile.files,i.toString())" capture="enviroment"/>
+                <button mat-raised-button color="primary" class="file-select-button" (click)="onClickFileInputButton(i)">
+                    ファイルを選択して登録
+                </button>
+                <!-- <button mat-flat-button matSuffix color="accent" (click)="test(img['src'].includes('noimage.gif'))">画像削除</button> -->
+                <button mat-flat-button matSuffix color="accent" (click)="delImg(i.toString())" *ngIf="!img['src'].includes('noimage.gif')" >画像取消</button>
+            </mat-grid-tile-footer>
+        </mat-grid-tile>
+    </ng-container>
+  </mat-grid-list>
+    <!-- <mat-form-field>
+      <mat-label>画像1</mat-label>
+      <input matInput formControlName="image1">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>画像2</mat-label>
+      <input matInput formControlName="image2">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>画像3</mat-label>
+      <input matInput formControlName="image3">
+    </mat-form-field> -->
+</form> 
+</mat-dialog-content>

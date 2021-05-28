@@ -15,7 +15,7 @@
       <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
         <mat-label>顧客コード</mat-label>
         <input matInput [(ngModel)]="mcd" (keyup.enter)="refresh()" maxlength="12"
-         (keydown.f4)="mcdHelp()" (blur)="refresh()" [ngModelOptions]="{standalone: true}">
+         (keydown.f4)="mcdHelp()" (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
         <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode==3">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
@@ -38,6 +38,10 @@
         <mat-icon>question_answer</mat-icon>
         <span  fxHide fxShow.gt-sm>問合せ</span>
       </button>
+      <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ mcode: mcd}" *ngIf="mode!==1" target="_blank">
+        <mat-icon>question_answer</mat-icon>
+        <span  fxHide fxShow.gt-sm>問合せ</span>
+      </a></button>
       <button mat-button (click)="refresh()">
         <mat-icon>autorenew</mat-icon>
         <span  fxHide fxShow.gt-sm>再表示</span>
@@ -175,14 +179,16 @@
         </mat-select>
       </mat-form-field>        
       <mat-checkbox formControlName="del">削除済</mat-checkbox>
-      <mat-form-field style="width: 100%;">
-        <mat-label>備考</mat-label>
-        <textarea matInput formControlName="bikou" matTextareaAutosize></textarea>
-      </mat-form-field>
-      <mat-form-field style="width: 100%;">
-        <mat-label>社内向け備考</mat-label>
-        <textarea matInput formControlName="inbikou" matTextareaAutosize></textarea>
-      </mat-form-field>
+      <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+        <mat-form-field style="width: 100%;">
+          <mat-label>備考</mat-label>
+          <textarea matInput formControlName="bikou" matTextareaAutosize></textarea>
+        </mat-form-field>
+        <mat-form-field style="width: 100%;">
+          <mat-label>社内向け備考</mat-label>
+          <textarea matInput formControlName="inbikou" matTextareaAutosize></textarea>
+        </mat-form-field>
+      </div>
     </form> 
   </mat-card-content> 
 </mat-card>

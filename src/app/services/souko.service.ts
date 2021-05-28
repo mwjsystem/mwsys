@@ -10,7 +10,9 @@ export class SoukoService {
 
   public scds: mwI.Sval[]=[];
   constructor(private usrsrv: UserService,
-              private apollo: Apollo) { }
+              private apollo: Apollo) { 
+                // this.get_souko();
+              }
 
   get_souko():void {
     const GetMast = gql`

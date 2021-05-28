@@ -18,8 +18,14 @@ import { GraphQLModule } from './graphql.module';
 import { ToastrModule } from 'ngx-toastr'; 
 import { NgxYubinBangoModule } from 'ngx-yubinbango';
 import { CoreModule } from './core/core.module';
+// import { UserService } from './services/user.service';
+// import { AuthService } from '@auth0/auth0-angular';
 
 import { LoginComponent } from './login/login.component';
+
+// function userInitializer(usrsrv: UserService) {
+//     return () => usersrv.initialize();
+// }
 
 @NgModule({
   declarations: [
@@ -45,7 +51,17 @@ import { LoginComponent } from './login/login.component';
     NgxYubinBangoModule,
     CoreModule
   ],
-  providers: [BeforeunloadGuard ,{ provide: LOCALE_ID, useValue: 'ja-JP' }],
+  providers: [
+    // AuthService,
+    // UserService,
+    BeforeunloadGuard,
+    { provide: LOCALE_ID, useValue: 'ja-JP' }
+    // { provide: APP_INITIALIZER,
+    //   useFactory: userInitializer,
+    //   multi: true,
+    //   deps: [UserService],
+    // },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

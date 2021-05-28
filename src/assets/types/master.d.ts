@@ -164,6 +164,7 @@ declare namespace mwI {
     siire:string;
     tcode:string;
     specurl:string;
+    genre:string;
     msgoods:Msgoods[];    
   }
   

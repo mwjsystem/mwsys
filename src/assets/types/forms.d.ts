@@ -122,4 +122,22 @@ declare namespace mwI {
     updated_at:Date;
   }
 
+  interface Trtreat {id:number;
+    seq:number;
+    created_at:Date;
+    created_by:number;
+    genre:string;
+    mcode:number;
+    grpcode:string;
+    gcode:string;
+    tel:string;
+    email:string;
+    question:string;
+    answer:string;
+    kaizen:string;
+    result:string;
+    trttype:string;
+  }
+
+
 }

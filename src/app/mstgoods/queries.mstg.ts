@@ -23,6 +23,7 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
     tcode
     bikou
     specurl
+    genre
     created_at
     updated_at
     created_by

@@ -10,6 +10,7 @@ import { GdstblComponent } from './gdstbl.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 import { GrpcdhelpComponent } from '../share/grpcdhelp/grpcdhelp.component';
 import { GdsimageComponent } from '../share/gdsimage/gdsimage.component';
+// import { UserService } from './../services/user.service';
 
 registerLocaleData(localeJa);
 

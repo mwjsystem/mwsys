@@ -14,7 +14,11 @@ export class OkuriService {
   hktime: mwI.Hktime[]=[];
   
   constructor(private usrsrv: UserService,
-              private apollo: Apollo) { }
+              private apollo: Apollo) { 
+                // this.get_hokuri();
+                // this.get_haisou();
+                // this.get_hktime();
+              }
 
   get_hokuri():void {
     const GetMast = gql`

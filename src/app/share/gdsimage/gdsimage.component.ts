@@ -39,9 +39,6 @@ export class GdsimageComponent implements OnInit,AfterViewInit {
     });
   }
 
-
-
-
   get_url(grpcd:string):void {
     const GetUrl = gql`
     query get_specurl($id: smallint!, $grpcd: String!) {
@@ -120,18 +117,13 @@ export class GdsimageComponent implements OnInit,AfterViewInit {
       );
   }
 
-  getTimestamp(){
-    return this.usrsrv.formatTime();
-    // this.cdRef.detectChanges()
-  }
-
 　openXlsx() {
 　　window.open(this.url,"_blank");
   }
 
   saveUrl() {
     this.set_url(this.grpcd,this.url);
-    this.dialogRef.close();
+    // this.dialogRef.close();
   }
 
   close() {
