@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
@@ -39,12 +40,14 @@ export class FrmtreatComponent implements OnInit {
               public usrsrv: UserService,
               public bunsrv: BunruiService,
               public stfsrv: StaffService,
+              private title: Title,
               private route: ActivatedRoute,
               private dialog: MatDialog,
               private apollo: Apollo,
               private overlay: Overlay) {
                 this.dataSource= new MatTableDataSource<mwI.Trtreat>(this.trtsrv.trts);
                 this.dataSource.paginator = this.paginator;
+                title.setTitle('問合せ一覧(MWSystem)'); 
                }
 
   ngOnInit(): void {

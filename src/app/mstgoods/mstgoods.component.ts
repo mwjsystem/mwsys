@@ -88,7 +88,7 @@ export class MstgoodsComponent implements OnInit {
         this.overlayRef.detach();      
       });
     }
-    // this.bunsrv.get_bunrui();
+    this.bunsrv.get_bunrui();
   }  
 
   // ngAfterViewInit(): void{
@@ -202,9 +202,9 @@ export class MstgoodsComponent implements OnInit {
   }  
   
   refresh():void {
-    // if( this.checkMcode(this.grpcd) ){
+    if( this.grpcd ){
       this.get_ggroup(this.grpcd);
-    // }
+    }
   }
 
   // toTreat(){
