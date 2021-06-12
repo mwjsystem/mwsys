@@ -14,7 +14,8 @@ const routes: Routes = [
   { path: 'mstgoods', loadChildren: () => import('./mstgoods/mstgoods.module').then(m => m.MstgoodsModule),  canActivate: [AuthGuard] },
   { path: 'frmkeep', loadChildren: () => import('./frmkeep/frmkeep.module').then(m => m.FrmkeepModule),  canActivate: [AuthGuard] },
   { path: 'frmtreat', loadChildren: () => import('./frmtreat/frmtreat.module').then(m => m.FrmtreatModule),  canActivate: [AuthGuard] },
-  { path: 'repstock', loadChildren: () => import('./repstock/repstock.module').then(m => m.RepstockModule),  canActivate: [AuthGuard] }
+  { path: 'repstock', loadChildren: () => import('./repstock/repstock.module').then(m => m.RepstockModule),  canActivate: [AuthGuard] },
+  { path: 'mstvendor', loadChildren: () => import('./mstvendor/mstvendor.module').then(m => m.MstvendorModule),  canActivate: [AuthGuard] }
 ];
 
 @NgModule({
