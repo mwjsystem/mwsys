@@ -1,7 +1,15 @@
-<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品グループコード検索</h1>
-<mat-dialog-content>
+<mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between" style="margin-bottom:10px;">
+    <h2 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品グループコード検索</h2>
+    <mat-paginator #paginators
+        [length]="dataSource?.data.length"
+        [pageIndex]="0"
+        [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+    </mat-paginator>
+    <button class="mat-raised-button"(click)="close()">閉じる</button>
+</mat-dialog-actions>
+<mat-dialog-content style="max-height: 85vh;">
     <div class="mat-elevation-z8">
-        <mat-toolbar fxLayoutGap="5px">
+        <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;">
           <mat-form-field>
             <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
             <input matInput (keyup)="updateFilter('code',$event.target.value)">
@@ -14,11 +22,6 @@
             <mat-label>名称</mat-label>
             <input matInput (keyup)="updateFilter('name',$event.target.value)">
           </mat-form-field>
-          <mat-paginator #paginators
-              [length]="dataSource?.data.length"
-              [pageIndex]="0"
-              [pageSizeOptions]="[20, 50, 100, 250, 1000]">
-          </mat-paginator>
         </mat-toolbar>
         <table mat-table [dataSource]="dataSource" aria-label="Elements">
           <ng-container matColumnDef="code">
@@ -41,9 +44,9 @@
               <th mat-header-cell *matHeaderCellDef>素材</th>
               <td mat-cell *matCellDef="let row">{{row.sozai}}</td>
           </ng-container>
-          <ng-container matColumnDef="siire">
+          <ng-container matColumnDef="vcode">
               <th mat-header-cell *matHeaderCellDef>仕入先</th>
-              <td mat-cell *matCellDef="let row">{{row.siire}}</td>
+              <td mat-cell *matCellDef="let row">{{row.vcode}}</td>
           </ng-container>
           <ng-container matColumnDef="tcode">
               <th mat-header-cell *matHeaderCellDef>担当者</th>
@@ -59,6 +62,3 @@
 
     </div>
 </mat-dialog-content>
-<mat-dialog-actions>
-    <button class="mat-raised-button"(click)="close()">閉じる</button>
-</mat-dialog-actions>

@@ -2,6 +2,8 @@ import { Component, OnInit, Input, ViewChild ,AfterViewChecked, ElementRef, Chan
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { SoukoService } from './../services/souko.service';
@@ -46,6 +48,7 @@ export class JmeitblComponent implements OnInit {
 
   constructor(private cdRef:ChangeDetectorRef,
               private elementRef: ElementRef,
+              private dialog: MatDialog,
               private fb:     FormBuilder,
               private apollo: Apollo,
               public usrsrv: UserService,
@@ -127,6 +130,28 @@ export class JmeitblComponent implements OnInit {
       taxmoney:[''],
       taxrate:['']
     });
+  }
+
+  contxtMenu(i: number){
+    this.gcdHelp(i);
+    return false;
+  }
+ 
+  gcdHelp(i: number): void {
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.width  = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass= 'full-screen-modal';
+    let dialogRef = this.dialog.open(GcdhelpComponent, dialogConfig);
+    
+    dialogRef.afterClosed().subscribe(
+      data=>{
+          if(typeof data != 'undefined'){
+            this.updGds(i,data.gcode);
+
+          }
+      }
+    );
   }
 
   updGds(i: number,value: string):void {

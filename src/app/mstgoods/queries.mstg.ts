@@ -19,7 +19,7 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
     name
     gkbn
     sozai
-    siire
+    vcode
     tcode
     bikou
     specurl

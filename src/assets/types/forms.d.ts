@@ -94,7 +94,7 @@ declare namespace mwI {
   interface SalGds {
     gcode:string;
     gkbn:number;
-    siire:string;
+    vcode:string;
     gtext:string;
     irisu:number;
     iriunit:string;

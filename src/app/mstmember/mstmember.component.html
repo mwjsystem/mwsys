@@ -177,7 +177,11 @@
             {{sval.name}}
           </mat-option>
         </mat-select>
-      </mat-form-field>        
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Web会員ID</mat-label>
+        <input matInput formControlName="webid" required>
+      </mat-form-field>      
       <mat-checkbox formControlName="del">削除済</mat-checkbox>
       <div fxLafxLayout="row wrap" fxLayoutGap="5px">
         <mat-form-field style="width: 100%;">

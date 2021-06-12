@@ -1,5 +1,5 @@
 <div class="mat-elevation-z8">
-    <mat-toolbar fxLayoutGap="5px">
+    <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;">
       <button class="mat-raised-button"(click)="filterMcd()">検索</button>
       <mat-form-field>
         <mat-label>顧客名(姓、名)</mat-label>
@@ -21,11 +21,10 @@
         <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
         <input matInput type="number" (input)="ftel=$event.target.value">
       </mat-form-field>
-      <mat-paginator #paginators
-          [length]="dataSource?.data.length"
-          [pageIndex]="0"
-          [pageSizeOptions]="[20, 50, 100, 250, 1000]">
-      </mat-paginator>
+      <mat-form-field>
+        <mat-label>Web会員ID</mat-label>
+        <input matInput (input)="fwebid=$event.target.value">
+      </mat-form-field>
     </mat-toolbar>
     <table mat-table [dataSource]="dataSource" aria-label="Elements">
         <ng-container matColumnDef="mcode">
@@ -47,6 +46,10 @@
         <ng-container matColumnDef="mail">
             <th mat-header-cell *matHeaderCellDef>Mail</th>
             <td mat-cell *matCellDef="let row">{{row.mail}}</td>
+        </ng-container>
+        <ng-container matColumnDef="webid">
+            <th mat-header-cell *matHeaderCellDef>Web会員ID</th>
+            <td mat-cell *matCellDef="let row">{{row.webid}}</td>
         </ng-container>
         <ng-container matColumnDef="tcode1">
             <th mat-header-cell *matHeaderCellDef>営業</th>
@@ -91,4 +94,9 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setMcd(row)"></tr>
     </table>
+    <mat-paginator #paginators
+        [length]="dataSource?.data.length"
+        [pageIndex]="0"
+        [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+    </mat-paginator>
 </div>

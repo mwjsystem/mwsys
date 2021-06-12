@@ -14,6 +14,7 @@ query get_member($where:msmember_bool_exp!,$where2:msmadr_bool_exp) {
     mail5
     tcode1
     tcode2
+    webid
     msmadrs(where:$where2) {
       eda
       zip
@@ -76,6 +77,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     updated_by
     ntype
     tntype
+    webid
     msmadrs(order_by: {eda: asc}) {
       eda
       zip

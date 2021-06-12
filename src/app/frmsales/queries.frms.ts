@@ -16,7 +16,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     max
     order
     send
-    skbn
+    gskbn
     zkbn
     msgtankas_aggregate(where: {day: {_lt: $day}}) {
       aggregate {

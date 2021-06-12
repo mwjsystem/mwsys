@@ -20,12 +20,13 @@ export class McdtblComponent implements OnInit {
   //                        {id:'mail',value:''},
   //                        {id:'tel',value:''}];
   dataSource:MatTableDataSource<Mcd>;
-  displayedColumns = ['mcode','sei','kana','tcode1','tcode2','mail','eda','zip','region','local','street','extend','extend2','adrname','tel']; 
+  displayedColumns = ['mcode','sei','kana','tcode1','tcode2','mail','webid','eda','zip','region','local','street','extend','extend2','adrname','tel']; 
   fname:string="";
   fkana:string="";
   fmail:string="";
   fadrnm:string="";
   ftel:string="";
+  fwebid:string="";
   constructor(public mcdsrv:McdService,
               public usrsrv: UserService,
               private apollo: Apollo) {
@@ -63,6 +64,9 @@ export class McdtblComponent implements OnInit {
     }
     if (this.fkana!==""){
       varWh.where._and.push({"kana" : {"_like":"%" + this.fkana + "%"}});
+    }
+    if (this.fwebid!==""){
+      varWh.where._and.push({"webid" : {"_like":"%" + this.fwebid + "%"}});
     }
     if (this.fmail!==""){
       varWh.where._and.push({"_or" : [ {"mail":{"_like":"%" + this.fmail + "%"}},

@@ -1,3 +1,5 @@
+<mat-card>
+
 <mat-form-field>
     <mat-label>受注伝票番号</mat-label>
     <input matInput [(ngModel)]="denno" (change)="to_Denno($event.target.value)">
@@ -58,4 +60,5 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-</div> 
+</div>
+</mat-card>

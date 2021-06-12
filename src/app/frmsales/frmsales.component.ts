@@ -20,6 +20,7 @@ import { SoukoService } from './../services/souko.service';
 import { McdService } from './../share/mcdhelp/mcd.service';
 import { MembsService } from './../services/membs.service';
 import { GoodsService } from './../services/goods.service';
+// import { GcdService } from './../share/gcdhelp/gcd.service';
 import { DownloadService } from './../services/download.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { EdaService } from './../share/adreda/eda.service';
@@ -66,6 +67,7 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
               public memsrv: MembsService,
               public soksrv: SoukoService,
               public gdssrv: GoodsService,
+              // public gcdsrv: GcdService,
               public jmisrv:JyumeiService,
               private dwlsrv:DownloadService,
               private apollo: Apollo,
@@ -129,13 +131,14 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
       this.setNcdtxt();
       this.overlayRef.detach();      
     });
-    // this.bnssrv.get_bunsho();
-    // this.okrsrv.get_haisou();
-    // this.okrsrv.get_hokuri();
-    // this.okrsrv.get_hktime();
-    // this.soksrv.get_souko();
-    // this.bunsrv.get_bunrui();
-    // this.stfsrv.get_staff();
+    // this.gcdsrv.get_goods();
+    this.bnssrv.get_bunsho();
+    this.okrsrv.get_haisou();
+    this.okrsrv.get_hokuri();
+    this.okrsrv.get_hktime();
+    this.soksrv.get_souko();
+    this.bunsrv.get_bunrui();
+    this.stfsrv.get_staff();
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('denno') !== null){
         this.denno = +params.get('denno');

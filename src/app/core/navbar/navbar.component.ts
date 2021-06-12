@@ -7,11 +7,17 @@ import { UserService } from './../../services/user.service';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-
+  public db:string;  
   constructor(public usrsrv:UserService) { }
 
   ngOnInit():void {
-    const color:string = localStorage.getItem(this.usrsrv.userInfo.nickname + 'MWJS_COLOR');
+    this.db=localStorage.getItem('MWSYS_DB');
+    if(this.db==null){
+      this.db='本番環境';
+    } else {  
+      this.db='テスト環境';
+    }
+    const color:string = localStorage.getItem(this.usrsrv.userInfo.nickname + 'MWSYS_COLOR');
     if ( color !== null ){this.setColor(color);}
   }
   setColor(colorname:string):void {
@@ -22,8 +28,16 @@ export class NavbarComponent implements OnInit {
           link.href = 'https://unpkg.com/@angular/material/prebuilt-themes/' + colorname + '.css';
         }
       }
-    localStorage.setItem(this.usrsrv.userInfo.nickname + 'MWJS_COLOR', colorname);
+    localStorage.setItem(this.usrsrv.userInfo.nickname + 'MWSYS_COLOR', colorname);
   }
-
+  setDB(flg:boolean){
+    if(flg){
+      localStorage.setItem('MWSYS_DB','mwsystbl');
+      window.location.reload();
+    } else {
+      localStorage.removeItem('MWSYS_DB');
+      window.location.reload();
+    }
+  }
 }
 

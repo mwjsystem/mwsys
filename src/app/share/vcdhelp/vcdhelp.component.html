@@ -1,0 +1,104 @@
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">顧客検索</h1>
+<mat-dialog-content >
+    <div class="mat-elevation-z8">
+        <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;">
+          <button class="mat-raised-button"(click)="get_vendors()">検索</button>
+          <mat-form-field>
+            <mat-label>仕入先名</mat-label>
+            <input matInput (input)="fadrnm=$event.target.value">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>ﾌﾘｶﾞﾅ 半角ｶﾀｶﾅのみく</mat-label>
+            <input matInput (input)="fkana=$event.target.value">
+          </mat-form-field>      
+          <mat-form-field>
+            <mat-label>メール1～5</mat-label>
+            <input matInput type="url" (input)="fmail=$event.target.value">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
+            <input matInput type="number" (input)="ftel=$event.target.value">
+          </mat-form-field>
+        </mat-toolbar>
+        <table mat-table [dataSource]="dataSource" aria-label="Elements">
+            <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef>仕入れ先コード</th>
+                <td mat-cell *matCellDef="let row">{{row.code}}</td>
+            </ng-container>
+            <ng-container matColumnDef="adrname">
+                <th mat-header-cell *matHeaderCellDef>宛名</th>
+                <td mat-cell *matCellDef="let row">{{row.adrname}}</td>
+            </ng-container>
+            <ng-container matColumnDef="kana">
+                <th mat-header-cell *matHeaderCellDef>カナ</th>
+                <td mat-cell *matCellDef="let row">{{row.kana}}</td>
+            </ng-container>
+            <ng-container matColumnDef="tel">
+                <th mat-header-cell *matHeaderCellDef>電話番号</th>
+                <td mat-cell *matCellDef="let row">{{row.tel}}</td>
+            </ng-container>
+            <ng-container matColumnDef="tel2">
+                <th mat-header-cell *matHeaderCellDef>電話番号</th>
+                <td mat-cell *matCellDef="let row">{{row.tel2}}</td>
+            </ng-container>
+            <ng-container matColumnDef="tel3">
+                <th mat-header-cell *matHeaderCellDef>電話番号</th>
+                <td mat-cell *matCellDef="let row">{{row.tel3}}</td>
+            </ng-container>
+            <ng-container matColumnDef="fax">
+                <th mat-header-cell *matHeaderCellDef>電話番号</th>
+                <td mat-cell *matCellDef="let row">{{row.fax}}</td>
+            </ng-container>
+            <ng-container matColumnDef="mail1">
+                <th mat-header-cell *matHeaderCellDef>Mail</th>
+                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>
+            </ng-container>
+            <ng-container matColumnDef="mail2">
+                <th mat-header-cell *matHeaderCellDef>Mail</th>
+                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>
+            </ng-container>
+            <ng-container matColumnDef="mail3">
+                <th mat-header-cell *matHeaderCellDef>Mail</th>
+                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>
+            </ng-container>
+            <ng-container matColumnDef="mail4">
+                <th mat-header-cell *matHeaderCellDef>Mail</th>
+                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>
+            </ng-container>
+            <ng-container matColumnDef="mail5">
+                <th mat-header-cell *matHeaderCellDef>Mail</th>
+                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>
+            </ng-container>
+            <ng-container matColumnDef="tanto">
+                <th mat-header-cell *matHeaderCellDef>担当者</th>
+                <td mat-cell *matCellDef="let row">{{row.tanto}}</td>
+            </ng-container>
+            <ng-container matColumnDef="zip">
+                <th mat-header-cell *matHeaderCellDef>郵便番号</th>
+                <td mat-cell *matCellDef="let row">{{row.zip}}</td>
+            </ng-container>
+            <ng-container matColumnDef="region">
+                <th mat-header-cell *matHeaderCellDef>都道府県</th>
+                <td mat-cell *matCellDef="let row">{{row.region}}</td>
+            </ng-container>
+            <ng-container matColumnDef="local">
+                <th mat-header-cell *matHeaderCellDef>市区町村</th>
+                <td mat-cell *matCellDef="let row">{{row.local}}</td>
+            </ng-container>
+            <ng-container matColumnDef="url">
+                <th mat-header-cell *matHeaderCellDef>URL</th>
+                <td mat-cell *matCellDef="let row">{{row.url}}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="sel_vcd(row)"></tr>
+        </table>
+        <mat-paginator #paginators
+            [length]="dataSource?.data.length"
+            [pageIndex]="0"
+            [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+        </mat-paginator>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button class="mat-raised-button"(click)="close()">閉じる</button>
+</mat-dialog-actions>

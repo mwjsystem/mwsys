@@ -76,10 +76,11 @@
           <mat-label>ジャンル</mat-label>
           <input matInput formControlName="genre" required>
         </mat-form-field>
-        <mat-form-field>
+        <mat-form-field style="width: 7em;">
           <mat-label>仕入先</mat-label>
-          <input matInput formControlName="siire" required>
+          <input matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
         </mat-form-field>
+        <span class="nmtxt">{{vcdtxt}}</span>
         <mat-form-field>
           <mat-label>素材</mat-label>
           <input matInput formControlName="sozai">

@@ -104,6 +104,7 @@ declare namespace mwI {
     updated_by:string;
     ntype:number;
     tntype:number;
+    webid:string;
     msmadrs:Adrs[];
   }
   interface Gtanka {
@@ -161,7 +162,7 @@ declare namespace mwI {
     created_by:string;
     updated_at:Date;
     updated_by:string;
-    siire:string;
+    vcode:string;
     tcode:string;
     specurl:string;
     genre:string;

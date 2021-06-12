@@ -85,7 +85,7 @@
             <mat-label>請求先</mat-label>
             <input tabIndex="2" matInput formControlName="scode" required (blur)="setScdtxt()" (keydown.f4)="mcdHelp('scode')">
             <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.scode)" *ngIf="scdtxt">
-              <mat-icon>web_asset</mat-icon>
+              <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
           <span class="nmtxt">{{scdtxt}}</span>
@@ -95,7 +95,7 @@
             <mat-label>納品先</mat-label>
             <input tabIndex="3" matInput formControlName="ncode" required (blur)="setNcdtxt()" (keydown.f4)="mcdHelp('ncode')">
             <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.ncode)" *ngIf="ncdtxt">
-              <mat-icon>web_asset</mat-icon>
+              <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
           <span class="nmtxt">{{ncdtxt}}</span>

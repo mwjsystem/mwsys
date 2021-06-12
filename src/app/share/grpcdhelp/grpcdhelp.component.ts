@@ -14,7 +14,7 @@ import { Ggrp,GoodsService } from './../../services/goods.service';
 export class GrpcdhelpComponent implements OnInit {
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   dataSource:MatTableDataSource<Ggrp>;
-  displayedColumns = ['code','name','kana','gkbn','sozai','siire','tcode']; 
+  displayedColumns = ['code','name','kana','gkbn','sozai','vcode','tcode']; 
   public filters: any = [{id:'code',value:''},
                          {id:'kana',value:''},
                          {id:'name',value:''},

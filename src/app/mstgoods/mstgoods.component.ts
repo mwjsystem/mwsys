@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { GdstblComponent } from './gdstbl.component';
 import { GtnktblComponent } from './gtnktbl.component';
 import { GrpcdhelpComponent } from './../share/grpcdhelp/grpcdhelp.component';
+import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 import { GdsimageComponent } from './../share/gdsimage/gdsimage.component';
 import { UserService } from './../services/user.service';
 import { GoodsService } from './../services/goods.service';
@@ -30,6 +31,7 @@ export class MstgoodsComponent implements OnInit {
   form: FormGroup;
   grpcd:string;
   mode:number=3;
+  vcdtxt:string="";
   rows: FormArray = this.fb.array([]);
   rows2: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
@@ -59,7 +61,7 @@ export class MstgoodsComponent implements OnInit {
       gkbn: new FormControl('', Validators.required),
       bikou: new FormControl(''),
       sozai: new FormControl(''),
-      siire: new FormControl(''),
+      vcode: new FormControl(''),
       genre: new FormControl(''),
       specurl: new FormControl(''),
       mtbl: this.rows,
@@ -104,7 +106,7 @@ export class MstgoodsComponent implements OnInit {
 　diaImage(): void {
     let dialogConfig = new MatDialogConfig();
     // dialogConfig.width  = '100vw';
-    dialogConfig.height = '98%';
+    // dialogConfig.maxHeight = '80vh';
     dialogConfig.data = {
         grpcd: this.grpcd,
         url:this.form.value.specurl
@@ -133,6 +135,21 @@ export class MstgoodsComponent implements OnInit {
       }
     );    
   }  
+
+  vcdHelp(): void {
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+    let dialogRef = this.dialog.open(VcdhelpComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(
+      data=>{
+        if(typeof data != 'undefined'){
+          this.form.get('vcode').setValue(data.code);
+          this.vcdtxt = data.adrname;
+        }
+        this.refresh();
+      }
+    );    
+  } 
 
   get_ggroup(grpcd:string){
     // this.grpcd += '　読込中';

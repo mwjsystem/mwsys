@@ -187,10 +187,17 @@ export class UserService {
       lcdate = new Date();
     }
     const y = lcdate.getFullYear();
-    const m = ('00' + lcdate.getMonth()).slice(-2);
+    const m = ('00' + (lcdate.getMonth() + 1)).slice(-2);
     const d = ('00' + lcdate.getDate()).slice(-2);
     return (y + '-' + m + '-' + d);
   }
+
+  toYYYYMM(date){
+    const y:string = date.getFullYear();
+    const m:string = ('00' + (date.getMonth() + 1)).slice(-2);    
+    return (y + m);
+  }
+
   formatTime(date?):string {
     let lcdate:Date;
     if (date !=null ){

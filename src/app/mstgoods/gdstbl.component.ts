@@ -45,9 +45,12 @@ export class GdstblComponent implements OnInit {
     // console.log(gcd);
     let tooltip:string="";
     const i:number = this.gdssrv.goods.findIndex(obj => obj.gcode == gcd);
-    this.gdssrv.goods[i].msgzais.forEach(e => {
-      tooltip += e.zcode + '_'.repeat(25-e.zcode.length) + e.irisu + '\n';
-    });
+    if (i>-1){
+      this.gdssrv.goods[i].msgzais.forEach(e => {
+        tooltip += e.zcode + '_'.repeat(25-e.zcode.length) + e.irisu + '\n';
+      });
+    }
+    
     return tooltip;
   }
   setJan(i:number){

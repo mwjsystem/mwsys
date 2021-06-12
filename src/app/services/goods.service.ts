@@ -11,7 +11,7 @@ export interface Ggrp {
   kana:string;
   gkbn:string;
   sozai:string;
-  siire:string;
+  vcode:string;
   tcode:string;
 } 
 
@@ -38,7 +38,7 @@ export class GoodsService {
       msgoods(where: {id: {_eq: $id}}) {
         msggroup {
           gkbn
-          siire
+          vcode
         }
         gcode
         gtext
@@ -82,7 +82,7 @@ export class GoodsService {
             skbn  : e.skbn,
             zkbn  : e.zkbn,
             gkbn  : e.msggroup.gkbn,
-            siire : e.msggroup.siire,
+            vcode : e.msggroup.vcode,
             day   : e.msgtankas_aggregate.aggregate.max.day
           };
         this.salgds.push(good);
@@ -101,7 +101,7 @@ export class GoodsService {
         kana
         gkbn
         sozai
-        siire
+        vcode
         tcode
       }
     }`;

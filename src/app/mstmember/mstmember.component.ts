@@ -83,6 +83,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       htime: new FormControl(''),
       ntype: new FormControl(''),
       tntype: new FormControl(''),
+      webid: new FormControl(''),
       del: new FormControl(''),
       bikou: new FormControl(''),
       inbikou: new FormControl(''),      
@@ -321,6 +322,9 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       tcode2: this.usrsrv.editFrmval(this.form.get('base'),'tcode2'),
       del: this.usrsrv.editFrmval(this.form.get('base'),'del'),
       sptnkbn: this.usrsrv.editFrmval(this.form.get('base'),'sptnkbn'),
+      ntype: this.usrsrv.editFrmval(this.form.get('base'),'ntype'),
+      tntype: this.usrsrv.editFrmval(this.form.get('base'),'tntype'),
+      webid: this.usrsrv.editFrmval(this.form.get('base'),'webid'),
       updated_at:new Date(),
       updated_by:this.usrsrv.staff.code
     }

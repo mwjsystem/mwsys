@@ -41,7 +41,7 @@
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="zaik">在庫関連</button>
     <mat-menu #zaik="matMenu">
-        <a mat-menu-item>在庫確認表</a>
+        <a mat-menu-item routerLink="/repstock">在庫確認表</a>
         <a mat-menu-item>商品台帳</a>
         <a mat-menu-item>入荷伝票</a>
         <a mat-menu-item>移動伝票</a>
@@ -67,7 +67,7 @@
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="siir">仕入関連</button>
     <mat-menu #siir="matMenu">
-        <a mat-menu-item>発注伝票</a>
+        <a mat-menu-item routerLink="/frmsupply">発注伝票</a>
         <a mat-menu-item>仕入伝票</a>
         <a mat-menu-item>発注履歴</a>
         <a mat-menu-item>仕入一覧表</a>
@@ -75,7 +75,7 @@
     <button mat-button [matMenuTriggerFor]="mast">各マスタ</button>
     <mat-menu #mast="matMenu">
         <a mat-menu-item routerLink="/mstgoods">商品マスタ</a>
-        <a mat-menu-item>仕入先マスタ</a>
+        <a mat-menu-item routerLink="/mstvendor">仕入先マスタ</a>
         <a mat-menu-item>伝票マスタ</a>
         <a mat-menu-item>倉庫マスタ</a>
         <a mat-menu-item>担当者マスタ</a>
@@ -109,16 +109,22 @@
                 <button mat-menu-item (click)="setColor('pink-bluegrey')">pink-bluegrey</button>
                 <button mat-menu-item (click)="setColor('purple-green')">purple-green</button>
             </mat-menu>
-            <mat-card fxLayout="column">            
+            <div fxLayout="column">            
                 <mat-form-field appearance="outline">
                     <mat-label>会社</mat-label>
-                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.system.name}}">
+                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.system.name}}" disabled>
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>ユーザ名</mat-label>
-                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.userInfo.nickname}}：{{usrsrv.userInfo.name}}">
+                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.userInfo.nickname}}：{{usrsrv.userInfo.name}}" disabled>
                 </mat-form-field>
-            </mat-card>
+            </div>
+            <mat-form-field appearance="outline">
+                <mat-label>接続先DB(切替時画面再読込)</mat-label>
+                <input matInput mat-menu-item style="pointer-events: none" value="{{db}}" disabled>
+                <button mat-button matSuffix (click)="setDB(true)" *ngIf="db=='本番環境'">テストへ切替</button>
+                <button mat-button matSuffix (click)="setDB(false)" *ngIf="db=='テスト環境'">本番へ切替</button>    
+            </mat-form-field>
             <button mat-menu-item (click)="usrsrv.logout();">
                 <mat-icon>exit_to_app</mat-icon>
                 <span>ログアウト</span>
