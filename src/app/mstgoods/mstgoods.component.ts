@@ -51,7 +51,7 @@ export class MstgoodsComponent implements OnInit {
     private apollo: Apollo,
     private toastr: ToastrService,
     private overlay: Overlay) {
-     this.title.setTitle('商品マスタ');
+     this.title.setTitle('商品マスタ(MWSystem)');
   }
 
   ngOnInit(): void {

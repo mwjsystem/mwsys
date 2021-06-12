@@ -7,7 +7,7 @@ import { FrmsupplyRoutingModule } from './frmsupply-routing.module';
 import { FrmsupplyComponent } from './frmsupply.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 import { HmeitblComponent } from './hmeitbl.component';
-import { VcdhelpComponent } from '../share/vcdhelp/vcdhelp.component';
+// import { VcdhelpComponent } from '../share/vcdhelp/vcdhelp.component';
 
 registerLocaleData(localeJa);
 
@@ -15,7 +15,7 @@ registerLocaleData(localeJa);
   declarations: [
     FrmsupplyComponent,
     HmeitblComponent,
-    VcdhelpComponent
+    // VcdhelpComponent
   ],
   imports: [
     CommonModule,
