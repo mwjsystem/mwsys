@@ -6,6 +6,7 @@ import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 import { Apollo } from 'apollo-angular';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
@@ -24,6 +25,7 @@ export class FrmsupplyComponent implements OnInit {
   denno:number|string;
   mode: number=3;
   vcdtxt:string;
+  rows: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -55,7 +57,7 @@ export class FrmsupplyComponent implements OnInit {
       if (params.get('denno') !== null){
         this.denno = +params.get('denno');
         // console.log(this.denno);
-        // this.get_jyuden(this.denno);
+        this.get_hatden(this.denno);
       }
       if (params.get('mode') === null){
         this.mode = 3;
@@ -63,8 +65,30 @@ export class FrmsupplyComponent implements OnInit {
         this.mode = +params.get('mode');
       } 
     }); 
+    this.form = this.fb.group({
+      vcode: new FormControl(''),
+      day: new FormControl(''),
+      soko: new FormControl(''),
+      tcode: new FormControl(''),
+      dbiko: new FormControl(''),
+      inbiko: new FormControl(''),
+      gtotoal: new FormControl(''),
+      ttotal: new FormControl(''),
+      tax: new FormControl(''),
+      total: new FormControl(''),
+      jdenno: new FormControl(''),
+      mtbl: this.rows 
+    });
   }
 
+  get_hatden(denno:number|string):void{
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));
+
+
+
+
+  }
+  
   test(value){
     this.toastr.info(this.form.value.yday);
     // this.usrsrv.getNumber('denno',2).subscribe(value => {
@@ -86,18 +110,16 @@ export class FrmsupplyComponent implements OnInit {
 
   vcdHelp(fldnm:string): void {
     let dialogConfig = new MatDialogConfig();
-    // dialogConfig.width  = '100vw';
-    // dialogConfig.height = '98%';
-    // dialogConfig.panelClass= 'full-screen-modal';
-    // let dialogRef = this.dialog.open(VcdhelpComponent, dialogConfig);
-    
-    // dialogRef.afterClosed().subscribe(
-    //   data=>{
-    //       if(typeof data != 'undefined'){
-    //         this.form.get(fldnm).setValue(data.vcode);
-    //       }
-    //   }
-    // );
+    dialogConfig.autoFocus = true;
+    let dialogRef = this.dialog.open(VcdhelpComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(
+      data=>{
+          if(typeof data != 'undefined'){
+            this.form.get(fldnm).setValue(data.code);
+            this.vcdtxt = data.adrname;
+          }
+      }
+    );
   }
 
   refresh():void {

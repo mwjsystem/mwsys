@@ -13,10 +13,7 @@ export class TmstmpComponent implements OnInit {
     public usrsrv: UserService) { }
 
   ngOnInit(): void {
-  }
-
-  ngAfterViewInit(): void{
-    setTimeout(() => {
+    this.usrsrv.observe.subscribe(flg=>{
       this.cdRef.detectChanges();
     });
   }

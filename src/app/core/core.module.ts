@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { NgModule, LOCALE_ID } from '@angular/core';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NavbarComponent } from './navbar/navbar.component';
@@ -13,6 +13,9 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { PortalModule } from '@angular/cdk/portal';
 import { StaffPipe } from './pipes/staff.pipe';
 import { JdatePipe } from './pipes/jdate.pipe';
+import localeJa from '@angular/common/locales/ja';
+
+registerLocaleData(localeJa);
 
 @NgModule({
   declarations: [
@@ -45,6 +48,7 @@ import { JdatePipe } from './pipes/jdate.pipe';
     QRCodeModule,
     OverlayModule,
     PortalModule 
-  ]
+  ],
+  providers: [{ provide: LOCALE_ID, useValue: 'ja-JP' }]
 })
 export class CoreModule { }

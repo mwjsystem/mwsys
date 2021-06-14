@@ -18,7 +18,7 @@ export class StaffService {
   get_staff():void {
     const GetMast = gql`
     query get_staff($id: smallint!){
-      msstaff(where: {id: {_eq: $id}}) {
+      msstaff(where: {id: {_eq: $id}},order_by: {mail: asc_nulls_last}) {
         code
         mail
         sei

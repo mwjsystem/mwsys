@@ -1,1 +1,160 @@
-<p>hmeitbl works!</p>
+<div class="mat-elevation-z8">
+    <ng-container [formGroup]="parentForm">
+        <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
+            <ng-container matColumnDef="line">
+                <th mat-header-cell *matHeaderCellDef>行番号</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['line']"
+                            (blur)="updateList(i, 'line', row.line)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="day">
+                <th mat-header-cell *matHeaderCellDef>発注日</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['day']" (blur)="updateList(i, 'day', row.day)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="inday">
+                <th mat-header-cell *matHeaderCellDef>入荷日</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['inday']"
+                            (blur)="updateList(i, 'inday', row.inday)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="soko">
+                <th mat-header-cell *matHeaderCellDef>倉庫コード</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['soko']"
+                            (blur)="updateList(i, 'soko', row.soko)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="gcode">
+                <th mat-header-cell *matHeaderCellDef>商品番号</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['gcode']"
+                            (blur)="updateList(i, 'gcode', row.gcode)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="gtext">
+                <th mat-header-cell *matHeaderCellDef>商品テキスト</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['gtext']"
+                            (blur)="updateList(i, 'gtext', row.gtext)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="suu">
+                <th mat-header-cell *matHeaderCellDef>数量</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['suu']" (blur)="updateList(i, 'suu', row.suu)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="tanka">
+                <th mat-header-cell *matHeaderCellDef>単価</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['tanka']"
+                            (blur)="updateList(i, 'tanka', row.tanka)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="money">
+                <th mat-header-cell *matHeaderCellDef>金額</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['money']"
+                            (blur)="updateList(i, 'money', row.money)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="mtax">
+                <th mat-header-cell *matHeaderCellDef>税区分</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['mtax']"
+                            (blur)="updateList(i, 'mtax', row.mtax)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="taxrate">
+                <th mat-header-cell *matHeaderCellDef>消費税率</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['taxrate']"
+                            (blur)="updateList(i, 'taxrate', row.taxrate)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="iriunit">
+                <th mat-header-cell *matHeaderCellDef>単位</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['iriunit']"
+                            (blur)="updateList(i, 'iriunit', row.iriunit)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="mbiko">
+                <th mat-header-cell *matHeaderCellDef>明細備考</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['mbiko']"
+                            (blur)="updateList(i, 'mbiko', row.mbiko)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="spec">
+                <th mat-header-cell *matHeaderCellDef>特殊在庫</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['spec']"
+                            (blur)="updateList(i, 'spec', row.spec)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="jdenno">
+                <th mat-header-cell *matHeaderCellDef>受注番号</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['jdenno']"
+                            (blur)="updateList(i, 'jdenno', row.jdenno)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="jline">
+                <th mat-header-cell *matHeaderCellDef>受注行</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['jline']"
+                            (blur)="updateList(i, 'jline', row.jline)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="yday">
+                <th mat-header-cell *matHeaderCellDef>入荷予定日</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                    <mat-form-field>
+                        <input matInput [value]="frmArr.getRawValue()[i]['yday']"
+                            (blur)="updateList(i, 'yday', row.yday)">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </ng-container>
+    <mat-paginator [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons></mat-paginator>
+</div>

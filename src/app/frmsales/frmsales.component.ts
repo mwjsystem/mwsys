@@ -152,11 +152,6 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
       } 
     }); 
   }
-  ngAfterViewInit(): void{
-    // setTimeout(() => {
-    //   this.refresh();
-    // });
-  }
 
   ngAfterViewChecked(): void {
     this.cdRef.detectChanges();

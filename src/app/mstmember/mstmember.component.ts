@@ -59,7 +59,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
               private overlay: Overlay,
               private cdRef:ChangeDetectorRef,
               private zone: NgZone) {
-      zone.onMicrotaskEmpty.subscribe(() => { console.log('mstmember detect change'); });
+      // zone.onMicrotaskEmpty.subscribe(() => { console.log('mstmember detect change'); });
       this.title.setTitle('顧客マスタ(MWSystem)');
   }
 

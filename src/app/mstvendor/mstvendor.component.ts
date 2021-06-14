@@ -4,6 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap  } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
 import { ToastrService } from 'ngx-toastr';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
@@ -19,13 +20,13 @@ export class MstvendorComponent implements OnInit {
   mode:number=3;
   
   constructor(private fb: FormBuilder,
-    private title: Title,
-    private route: ActivatedRoute,
-    private elementRef: ElementRef,
-    private dialog: MatDialog,
-    public usrsrv: UserService,
-    private apollo: Apollo,
-    private toastr: ToastrService) {
+              private title: Title,
+              private route: ActivatedRoute,
+              private elementRef: ElementRef,
+              private dialog: MatDialog,
+              public usrsrv: UserService,
+              private apollo: Apollo,
+              private toastr: ToastrService) {
       this.title.setTitle('仕入先マスタ(MWSystem)') 
   }
 
@@ -56,6 +57,17 @@ export class MstvendorComponent implements OnInit {
       kana: new FormControl(''),
     });
 
+    this.route.paramMap.subscribe((params: ParamMap)=>{
+      if (params.get('mode') === null){
+        this.mode = 3;
+      }else{
+        this.mode = +params.get('mode');
+      } 
+      if (params.get('vcd') !== null){
+        this.vcd = params.get('vcd');
+        this.get_vendor();
+      }
+    });
   }
 
   onEnter(): void {
@@ -77,7 +89,50 @@ export class MstvendorComponent implements OnInit {
   } 
 
   get_vendor(){
-
+    const GetMast = gql`
+    query get_vendor($id: smallint!,$vcd: String!)  {
+      msvendor_by_pk( id: $id,code: $vcd) {
+        code
+        adrname
+        kana
+        tel
+        tel2
+        tel3
+        fax
+        mail1
+        mail2
+        mail3
+        mail4
+        mail5
+        tanto
+        url
+        del
+        ftel
+        zip
+        region
+        local
+        created_at
+        updated_at
+        created_by
+        updated_by
+      }
+    }`;
+    this.apollo.watchQuery<any>({
+        query: GetMast, 
+        variables: { 
+          id : this.usrsrv.compid,
+          vcd :this.vcd
+        },
+      })
+      .valueChanges
+      .subscribe(({ data }) => {
+        this.form.patchValue(data.msvendor_by_pk);
+        console.log(data.msvendor_by_pk);
+        this.usrsrv.setTmstmp(data.msvendor_by_pk); 
+        history.replaceState('','','./mstvendor/' + this.mode + '/' + this.vcd);
+      },(error) => {
+        console.log('error query get_vendor', error);
+      });
 　}
 
   modeToCre():void {

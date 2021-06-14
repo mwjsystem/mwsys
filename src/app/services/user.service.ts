@@ -4,7 +4,7 @@ import { FormArray } from '@angular/forms';
 import { AuthService } from '@auth0/auth0-angular';
 import { Apollo } from 'apollo-angular';
 import { AbstractControl } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import gql from 'graphql-tag';
 
 export class TmStmp {
@@ -38,7 +38,9 @@ export class UserService {
   staff:mwI.Staff;
   tmstmp:TmStmp=new TmStmp();
   system:System=new System();
-  
+  subject = new Subject<boolean>();
+  observe = this.subject.asObservable();
+
   constructor(public auth: AuthService,
               private apollo: Apollo,
               private router:Router) {
@@ -176,6 +178,7 @@ export class UserService {
     this.tmstmp.created_by = obj.created_by;
     this.tmstmp.updated_at = obj.updated_at;
     this.tmstmp.updated_by = obj.updated_by;
+    this.subject.next(true);
     // console.log(obj,this.tmstmp);
   }
 

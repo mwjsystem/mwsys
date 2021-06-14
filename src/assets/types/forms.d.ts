@@ -138,6 +138,47 @@ declare namespace mwI {
     result:string;
     trttype:string;
   }
+  interface Hatden {
+    id:number;
+    denno:number;
+    vcode:number;
+    day:Date;
+    soko:string;
+    tcode:string;
+    dbiko:string;
+    inbiko:string;
+    gtotoal:number;
+    ttotal:number;
+    tax:number;
+    total:number;
+    created_at:string;
+    created_by:Date;
+    updated_at:string;
+    updated_by:Date;
+    jdenno:number;
+  }
 
+  interface Hatmei {
+    line:number;
+    day:Date;
+    inday:Date;
+    soko:string;
+    gcode:string;
+    gtext:string;
+    suu:number;
+    tanka:number;
+    money:number;
+    mtax:string;
+    taxrate:number;
+    iriunit:string;
+    mbiko:string;
+    spec:string;
+    jdenno:number;
+    jline:number;
+    yday:Date;
+  }
 
+  interface Trhatden extends Hatden{
+    trhatmeis:Hatmei[];
+  }
 }
