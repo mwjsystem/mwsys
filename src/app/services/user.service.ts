@@ -257,6 +257,7 @@ export class UserService {
         control.disable();
       })
   }
+  
   enable_mtbl(form) {
     (<FormArray>form.get('mtbl'))
       .controls
@@ -264,9 +265,22 @@ export class UserService {
         control.enable();
       })
   }
+
   openMst(func,value){
     const url = this.router.createUrlTree(['/'+func,'3',value]);
     window.open(url.toString(),null,'top=100,left=100');
+  }
+
+  confirmCan(dirty:boolean):boolean{
+      let ret:boolean=false;
+      if (dirty) {
+        const msg:string = 'このページを離れてもよろしいですか？'
+            + '\n行った変更が保存されない可能性があります。';
+        ret = confirm(msg);        
+      }else{
+        ret=true;
+      } 
+      return ret;
   }
 
 }

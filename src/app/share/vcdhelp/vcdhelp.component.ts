@@ -85,7 +85,7 @@ export class VcdhelpComponent implements OnInit {
       }
     }
     const GetMast = gql`
-    query get_vendor($where:msvendor_bool_exp!) {
+    query get_vendors($where:msvendor_bool_exp!) {
       msvendor(where:$where, order_by:{code: asc}) {
         code
         adrname
@@ -117,7 +117,7 @@ export class VcdhelpComponent implements OnInit {
       .subscribe(({ data }) => {
         observer.next(data.msvendor);
       },(error) => {
-        console.log('error query get_members', error);
+        console.log('error query get_vendors', error);
       });
     });
     return observable;

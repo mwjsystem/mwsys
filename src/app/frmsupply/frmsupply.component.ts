@@ -7,12 +7,15 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
+import { HmeitblComponent } from './hmeitbl.component';
 import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { SoukoService } from './../services/souko.service';
+import { HatmeiService } from './hatmei.service';
 import { DownloadService } from './../services/download.service';
 
 @Component({
@@ -21,6 +24,7 @@ import { DownloadService } from './../services/download.service';
   styleUrls: ['./../app.component.scss']
 })
 export class FrmsupplyComponent implements OnInit {
+  @ViewChild(HmeitblComponent) hmeitbl:HmeitblComponent;
   form: FormGroup;
   denno:number|string;
   mode: number=3;
@@ -42,6 +46,7 @@ export class FrmsupplyComponent implements OnInit {
               public bunsrv: BunruiService,
               public soksrv: SoukoService,
               public stfsrv: StaffService,
+              public hmisrv: HatmeiService,
               private apollo: Apollo,
               private toastr: ToastrService,
               private overlay: Overlay,
@@ -72,21 +77,101 @@ export class FrmsupplyComponent implements OnInit {
       tcode: new FormControl(''),
       dbiko: new FormControl(''),
       inbiko: new FormControl(''),
-      gtotoal: new FormControl(''),
+      gtotal: new FormControl(''),
       ttotal: new FormControl(''),
       tax: new FormControl(''),
       total: new FormControl(''),
       jdenno: new FormControl(''),
       mtbl: this.rows 
     });
+    this.hmisrv.observe.subscribe(flg=>{
+      this.cdRef.detectChanges();
+    });
   }
 
-  get_hatden(denno:number|string):void{
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
-
-
-
-
+  get_hatden(denno:number|string):void{    
+    if (!this.overlayRef) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
+    const GetTran = gql`
+    query get_hatden($dno: Int!, $id: smallint!) {
+      trhatden_by_pk(denno: $dno, id: $id) {
+        vcode
+        day
+        soko
+        tcode
+        gtotal
+        ttotal
+        jdenno
+        total
+        dbiko
+        inbiko
+        created_at
+        created_by
+        tax
+        updated_at
+        updated_by
+        trhatmeis {
+          day
+          gcode
+          gtext
+          inday
+          iriunit
+          jdenno
+          jline
+          line
+          mbiko
+          money
+          spec
+          tanka
+          suu
+          taxrate
+          yday
+          ydaykbn
+        }
+      }
+    }`;
+    this.apollo.watchQuery<any>({
+      query: GetTran, 
+        variables: { 
+          id : this.usrsrv.compid,
+          dno: denno
+        },
+    })
+    .valueChanges
+    .subscribe(({ data }) => {
+      this.form.reset();
+      if (data.trhatden_by_pk == null){
+        this.denno = denno + '　未登録';
+        history.replaceState('','','./frmsupply');
+      } else {
+        let hatden:mwI.Hatden=data.trhatden_by_pk;
+        this.form.patchValue(hatden);
+        this.usrsrv.setTmstmp(hatden);
+        this.hmisrv.hatmei=data.trhatden_by_pk.trhatmeis;
+        this.hmeitbl.set_hatmei();
+        this.setVcdtxt();
+        this.denno=denno;
+        if(this.mode==3){
+          this.form.disable();
+          // console.log('refresh disable');
+          this.usrsrv.disable_mtbl(this.form);
+        }else{
+          this.form.enable();
+          // console.log('refresh enable');
+          this.usrsrv.enable_mtbl(this.form);
+        }
+        history.replaceState('','','./frmsupply/' + this.mode + '/' + this.denno);
+      }
+      this.overlayRef.detach();
+    },(error) => {
+      console.log('error query GetHatden', error);
+      // this.denno = denno + '　読込エラー';
+      this.toastr.info("発注伝票番号" + denno + "は登録されていません");
+      this.form.reset();
+      history.replaceState('','','./frmsupply');
+      this.overlayRef.detach();
+    });
   }
   
   test(value){
@@ -125,7 +210,7 @@ export class FrmsupplyComponent implements OnInit {
   refresh():void {
     if (this.denno !=null ){
       this.denno=this.usrsrv.convNumber(this.denno);
-      // this.get_hatden(this.denno);
+      this.get_hatden(this.denno);
     }
     
     // console.log(this.jmisrv.jyumei);
@@ -136,16 +221,31 @@ export class FrmsupplyComponent implements OnInit {
   }
 
   setVcdtxt(){
-    // let vcd:number=this.form.getRawValue().vcode;
-    // // console.log(this.form.getRawValue().mcode,this.membs);
-    // const i:number = this.vensrv.vends.findIndex(obj => obj.vcode == vcd);
-    // // console.log(i);
-    // if(i > -1 ){
-    //   this.vcdtxt = this.vensrv.vends[i].mei ?? "";
-    //   this.vcdtxt = this.vensrv.vends[i].sei + this.vcdtxt;
-    // } else {
-    //   this.vcdtxt="";  
-    // }
+    const GetMast = gql`
+    query get_vendor($id:smallint!,$vcd:String!) {
+      msvendor_by_pk(id: $id,code: $vcd) {
+        adrname
+      }
+    }`;
+    this.apollo.watchQuery<any>({
+          query: GetMast, 
+          variables: { 
+            id : this.usrsrv.compid,
+            vcd: this.form.get('vcode').value
+          },
+      })
+      .valueChanges
+      .subscribe(({ data }) => {
+        // console.log(this.form.get('vcode').value,data.msvendor_by_pk != null);
+        if (data.msvendor_by_pk != null){
+          this.vcdtxt = data.msvendor_by_pk.adrname;
+        } else {
+          this.vcdtxt = "";
+          this.toastr.info("仕入先コード" + this.form.get('vcode').value + "は登録されていません");
+        }
+      },(error) => {
+        console.log('error query get_vendors', error);
+      });
   } 
 
   modeToCre():void {
@@ -160,14 +260,36 @@ export class FrmsupplyComponent implements OnInit {
   }
 
  cancel():void {
-    this.mode=3;
-    this.refresh();
-    this.form.markAsPristine();
-    history.replaceState('','','./frmsupply/' + this.mode + '/' + this.denno);
+    if (this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
+      this.mode=3;
+      this.refresh();
+      this.form.markAsPristine();
+      history.replaceState('','','./frmsupply/' + this.mode + '/' + this.denno);
+    }
   }
 
   save():void {
 
+
+
+
+
+    let member:any={
+      id: this.usrsrv.compid,
+      vcode: this.usrsrv.editFrmval(this.form,'vcode'),
+      day: this.usrsrv.editFrmval(this.form,'day'),
+      soko: this.usrsrv.editFrmval(this.form,'soko'),
+      tcode: this.usrsrv.editFrmval(this.form,'tcode'),
+      dbiko: this.usrsrv.editFrmval(this.form,'dbiko'),
+      inbiko: this.usrsrv.editFrmval(this.form,'inbiko'),
+      gtotal: this.usrsrv.editFrmval(this.form,'gtotal'),
+      ttotal: this.usrsrv.editFrmval(this.form,'ttotal'),
+      tax: this.usrsrv.editFrmval(this.form,'tax'),
+      total: this.usrsrv.editFrmval(this.form,'total'),
+      updated_at:new Date(),
+      updated_by:this.usrsrv.staff.code,
+      jdenno:this.usrsrv.editFrmval(this.form,'jdenno')
+    }
     
 
 

@@ -147,7 +147,7 @@ declare namespace mwI {
     tcode:string;
     dbiko:string;
     inbiko:string;
-    gtotoal:number;
+    gtotal:number;
     ttotal:number;
     tax:number;
     total:number;
@@ -162,20 +162,21 @@ declare namespace mwI {
     line:number;
     day:Date;
     inday:Date;
-    soko:string;
+    // soko:string;
     gcode:string;
     gtext:string;
     suu:number;
     tanka:number;
     money:number;
-    mtax:string;
-    taxrate:number;
+    taxrate:string;
     iriunit:string;
     mbiko:string;
     spec:string;
     jdenno:number;
     jline:number;
     yday:Date;
+    ydaykbn:string;
+    mtax:string;
   }
 
   interface Trhatden extends Hatden{

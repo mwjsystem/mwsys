@@ -5,9 +5,12 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
+import { BunruiService } from './../services/bunrui.service';
 import { SoukoService } from './../services/souko.service';
 import { HatmeiService } from './hatmei.service';
 import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-hmeitbl',
@@ -19,30 +22,36 @@ export class HmeitblComponent implements OnInit {
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   private el: HTMLInputElement;
   dataSource = new MatTableDataSource();
-  displayedColumns = ['line',
-                      'day',
-                      'inday',
-                      'soko',
+  copyToClipboard: string;
+  yday:Date;
+  displayedColumns = ['chk',
+                      'line',
+                      // 'soko',
                       'gcode',
                       'gtext',
                       'suu',
                       'tanka',
                       'money',
-                      'mtax',
                       'taxrate',
                       'iriunit',
                       'mbiko',
                       'spec',
                       'jdenno',
                       'jline',
+                      'day',
                       'yday',
+                      'ydaykbn',
+                      'inday',
+                      'mtax'
                       ];
   constructor(private cdRef:ChangeDetectorRef,
               private elementRef: ElementRef,
               private dialog: MatDialog,
               private fb:     FormBuilder,
               private apollo: Apollo,
+              private toastr: ToastrService,
               public usrsrv: UserService,
+              public bunsrv: BunruiService,
               public hmisrv: HatmeiService,
               public soksrv: SoukoService) { }
 
@@ -52,11 +61,50 @@ export class HmeitblComponent implements OnInit {
     // console.log(this.parentForm);
   }
 
-  updateList(i: number, fld: string,value){
-    // this.jmisrv.jyumei[i][property] = value;
-    // this.frmArr.at(i)['controls'][fld].setvalue();
-    // console.log(this.frmArr.at(i)['controls'][fld]);
-    // this.refresh();
+  calcTot(){
+    let lcgtotal:number=0;
+    let lcttotal:number=0;
+    let lctax:number=0;
+    this.frmArr.controls
+      .forEach(control => {
+        if(control.value.gcode!==''){
+          const lcmoney:number = control.value.tanka * control.value.suu;
+          control.patchValue({money:lcmoney});
+          lcgtotal += lcmoney;
+          if(control.value.mtax=='0'){
+            lcttotal += lcmoney;
+            lctax += (lcmoney * +control.value.taxrate / 100)
+            console.log(lctax);
+          }
+        }
+      })
+    this.parentForm.patchValue({gtotal:lcgtotal,ttotal:lcttotal,tax:lctax,total:lcgtotal + lctax});
+    this.hmisrv.subject.next(true);
+    this.refresh();
+    // console.log(this.frmArr,this.parentForm);
+  }
+
+  setAll(chked:boolean){
+    this.frmArr.controls
+      .forEach(control => {
+        if(control.value.gcode!==''){
+          control.patchValue({chk:chked});
+        }
+      })
+    this.refresh();
+  }
+
+  setYday(ydkbn:string){
+    let i:number=0;
+    this.frmArr.controls
+      .forEach(control => {
+        if(control.value.chk){
+          control.patchValue({yday:this.yday,ydaykbn:ydkbn});
+          i+=1;
+        }
+      })
+    this.refresh();
+    this.toastr.info(i + '件変更しました。まだ、保存されていません。');
   }
 
   contxtMenu(i: number){
@@ -82,70 +130,115 @@ export class HmeitblComponent implements OnInit {
   }
 
   updGds(i: number,value: string):void {
-    // let val:string =this.usrsrv.convUpper(value);
-    // this.frmArr.controls[i].get('gcode').setValue(val);
-    // this.apollo.watchQuery<any>({
-    //   query: Query.GetGood, 
-    //     variables: { 
-    //       id : this.usrsrv.compid,           
-    //       gds: val,
-    //       day: this.parentForm.value.day
-    //     },
-    //   })
-    //   .valueChanges
-    //   .subscribe(({ data }) => {
-    //     let msgds = data.msgoods_by_pk;
-    //     // console.log(msgds);
-    //     this.frmArr.controls[i].patchValue(msgds);
-    //   },(error) => {
-    //     console.log('error query get_good', error);
-    //   });
+    let val:string =this.usrsrv.convUpper(value);
+    this.frmArr.controls[i].get('gcode').setValue(val);
+    const GetGood = gql`
+    query get_good($id: smallint!,$gds:String!,$day: date!) {
+      msgoods_by_pk(gcode: $gds, id: $id){
+        msggroup {
+          code
+          gkbn
+          siire
+        }
+        gcode
+        gtext
+        iriunit
+        order
+        gskbn
+        zkbn
+        msgtankas_aggregate(where: {day: {_lt: $day}}) {
+          aggregate {
+            max {
+              day
+            }
+          }
+        }
+      }
+    }`;
+    this.apollo.watchQuery<any>({
+      query: GetGood, 
+        variables: { 
+          id : this.usrsrv.compid,           
+          gds: val,
+          day: this.frmArr.controls[i].get('day').value
+        },
+      })
+      .valueChanges
+      .subscribe(({ data }) => {
+        let msgds = data.msgoods_by_pk;
+        // console.log(msgds);
+        this.frmArr.controls[i].patchValue(msgds);
+        this.calcTot();
+      },(error) => {
+        console.log('error query get_good', error);
+      });
   } 
 
   updateRow(i:number,hatmei:mwI.Hatmei){
     return this.fb.group({
+      chk:[''],
       line:[{value:i,disabled:true}],
-      day:[hatmei.day],
-      inday:[hatmei.inday],
-      soko:[hatmei.soko],
+      // soko:[hatmei.soko],
       gcode:[hatmei.gcode],
       gtext:[hatmei.gtext],
       suu:[hatmei.suu],
       tanka:[hatmei.tanka],
       money:[hatmei.money],
-      mtax:[hatmei.mtax],
       taxrate:[hatmei.taxrate],
       iriunit:[hatmei.iriunit],
       mbiko:[hatmei.mbiko],
       spec:[hatmei.spec],
       jdenno:[hatmei.jdenno],
       jline:[hatmei.jline],
+      day:[hatmei.day],
       yday:[hatmei.yday],
+      ydaykbn:[hatmei.ydaykbn],
+      inday:[hatmei.inday],
+      mtax:[hatmei.mtax]
     });
   }
  
   createRow(i:number){
     return this.fb.group({
+      chk:[''],
       line:[{value:i,disabled:true}],
-      day:[''],
-      inday:[''],
-      soko:[''],
+      // soko:[''],
       gcode:[''],
       gtext:[''],
       suu:[''],
       tanka:[''],
       money:[''],
-      mtax:[''],
       taxrate:[''],
       iriunit:[''],
       mbiko:[''],
       spec:[''],
       jdenno:[''],
       jline:[''],
+      day:[''],
       yday:[''],
+      ydaykbn:[''],
+      inday:[''],
+      mtax:['']
     });
   }
 
+  del_row(row:number){
+    this.frmArr.removeAt(row);
+    this.auto_fil();  
+  }
+  ins_row(row:number){
+    this.frmArr.insert(row,this.createRow(row));
+    this.auto_fil();  
+  }
+  auto_fil(){
+    let i:number=0;
+    this.frmArr.controls
+      .forEach(control => {
+        control.patchValue({line:i+1});
+        i=i+1;
+      })
+    this.refresh();
+  }
   add_rows(rows:number){
     for (let i=0;i<rows;i++){
       this.frmArr.push(this.createRow(i+1));
@@ -159,7 +252,63 @@ export class HmeitblComponent implements OnInit {
   frmVal(i:number,fld:string):string {
     return this.frmArr.getRawValue()[i][fld];
   }
+  
+  pasteData(event: ClipboardEvent) {
+    let clipboardData = event.clipboardData;
+    let pastedText = clipboardData.getData("text");
+    let rowData = pastedText.split("\n");
+    this.frmArr.clear();
+    let i:number=0;
+    rowData.forEach(row => {
+      let col=row.split("\t");
+      if(col[1]!==null){
+        let hmei:mwI.Hatmei= {
+            line:i,
+            day:new Date(),
+            // soko:this.parentForm.get('soko').value,
+            gcode:col[0],
+            gtext:'',
+            suu:+col[1],
+            tanka:0,
+            money:0,
+            taxrate:'',
+            iriunit:'',
+            mbiko:'',
+            spec:'',
+            jdenno:0,
+            jline:null,
+            yday:null,
+            ydaykbn:'',
+            inday:null,
+            mtax:''
+          } 
+          this.frmArr.push(this.updateRow(i+1,hmei));
+          i+=1;
+      };
+    });
+    this.refresh();
+    // console.log(rowData);
+  }
 
+  copyData() {
+    this.copyToClipboard = this.ObjectToArray(this.displayedColumns);
+    this.frmArr.getRawValue().forEach(row => {
+      if(row.gcode !=='' ){
+        this.copyToClipboard += this.ObjectToArray(row);
+      }
+    })
+    this.toastr.info('クリップボードにコピーしました');
+  }
+
+  ObjectToArray(obj: object): string {
+    var result = Object.keys(obj).map((key: keyof typeof obj) => {
+      let value = obj[key];
+      // console.log(value)
+      return value;
+    });
+    // console.log(result.toString())
+    return result.toString() + "\n";
+  }
   refresh(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.data =  this.frmArr.controls;
@@ -177,7 +326,4 @@ export class HmeitblComponent implements OnInit {
     }
     this.refresh();
   }
-
-
-
 }

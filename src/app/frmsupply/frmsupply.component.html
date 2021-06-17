@@ -56,16 +56,26 @@
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
         <span class="ybtxt">{{form.value.day | jdate}}</span>
-        <mat-form-field style="width: 7em;">
+        <mat-form-field style="width: 10em;">
           <mat-label>仕入先</mat-label>
           <input tabIndex="1" matInput formControlName="vcode" required (blur)="setVcdtxt()"
             (keydown.f4)="vcdHelp('vcode')">
-          <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstvendor',form.value.vcode)"
-            *ngIf="vcdtxt">
+          <button mat-icon-button matSuffix (click)="vcdHelp('vcode')" *ngIf="frmArr.enabled">
+            <mat-icon>find_replace</mat-icon>
+          </button>
+          <button mat-icon-button matSuffix (click)="usrsrv.openMst('mstvendor',form.value.vcode)">
             <mat-icon>open_in_new</mat-icon>
           </button>
         </mat-form-field>
         <span class="nmtxt">{{vcdtxt}}</span>
+        <mat-form-field>
+          <mat-label>倉庫コード</mat-label>
+          <mat-select formControlName="soko">
+            <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-form-field>
           <mat-label>担当者</mat-label>
           <mat-select #msel1 tabIndex="2" formControlName="tcode" (keyup.enter)="msel1.close()">
@@ -85,9 +95,30 @@
           <textarea matInput formControlName="inbiko" matTextareaAutosize></textarea>
         </mat-form-field>
       </div>
-      <mat-card-content>
-        <app-hmeitbl [parentForm]="form"></app-hmeitbl>
-      </mat-card-content>
+    </mat-card-content>
+  </mat-card>
+  <mat-card>
+    <mat-card-header fxLayout="row wrap" fxLayoutAlign="start start" fxLayoutGap="10px" style="height: 40px;">
+      <mat-card-title>発注明細</mat-card-title>
+      <mat-form-field style="width:6em;">
+        <mat-label>商品計</mat-label>
+        <input matInput [value]="form.value.gtotal | number" class="i_num" disabled>
+      </mat-form-field>
+      <mat-form-field style="width:6em;">
+        <mat-label>外税対象額</mat-label>
+        <input matInput [value]="form.value.ttotal | number" class="i_num" disabled>
+      </mat-form-field>
+      <mat-form-field style="width:6em;">
+        <mat-label>消費税</mat-label>
+        <input matInput [value]="form.value.tax | number" class="i_num" disabled>
+      </mat-form-field>
+      <mat-form-field style="width:6em;">
+        <mat-label>税込合計額</mat-label>
+        <input matInput [value]="form.value.total | number" class="i_num" disabled>
+      </mat-form-field>
+    </mat-card-header>
+    <mat-card-content>
+      <app-hmeitbl [parentForm]="form"></app-hmeitbl>
     </mat-card-content>
   </mat-card>
 </form>

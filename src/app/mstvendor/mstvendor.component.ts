@@ -130,6 +130,11 @@ export class MstvendorComponent implements OnInit {
         console.log(data.msvendor_by_pk);
         this.usrsrv.setTmstmp(data.msvendor_by_pk); 
         history.replaceState('','','./mstvendor/' + this.mode + '/' + this.vcd);
+        if(this.mode==3){
+       　　this.form.disable();
+        }else{
+       　　this.form.enable();
+        }
       },(error) => {
         console.log('error query get_vendor', error);
       });
