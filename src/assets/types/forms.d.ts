@@ -166,7 +166,7 @@ declare namespace mwI {
     gcode:string;
     gtext:string;
     suu:number;
-    tanka:number;
+    genka:number;
     money:number;
     taxrate:string;
     iriunit:string;

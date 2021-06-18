@@ -219,7 +219,7 @@ export class UserService {
   convNumber(value:string|number):number{
     let ret:number;
     if(typeof value === 'string'){
-      const val = value?.replace(/[^0-9０-９]/g, '').replace(/[０-９]/g, function(s) {
+      const val = value?.replace(/[^0-9０-９.．]/g, '').replace(/[０-９．]/g, function(s) {
         return String.fromCharCode(s.charCodeAt(0) - 65248);
       });   //数字のみ抽出して半角に変換
       ret = Number(val); 

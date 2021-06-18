@@ -30,7 +30,7 @@ export class HmeitblComponent implements OnInit {
                       'gcode',
                       'gtext',
                       'suu',
-                      'tanka',
+                      'genka',
                       'money',
                       'taxrate',
                       'iriunit',
@@ -68,7 +68,7 @@ export class HmeitblComponent implements OnInit {
     this.frmArr.controls
       .forEach(control => {
         if(control.value.gcode!==''){
-          const lcmoney:number = control.value.tanka * control.value.suu;
+          const lcmoney:number = control.value.genka * control.value.suu;
           control.patchValue({money:lcmoney});
           lcgtotal += lcmoney;
           if(control.value.mtax=='0'){
@@ -138,7 +138,7 @@ export class HmeitblComponent implements OnInit {
         msggroup {
           code
           gkbn
-          siire
+          vcode
         }
         gcode
         gtext
@@ -182,7 +182,7 @@ export class HmeitblComponent implements OnInit {
       gcode:[hatmei.gcode],
       gtext:[hatmei.gtext],
       suu:[hatmei.suu],
-      tanka:[hatmei.tanka],
+      genka:[hatmei.genka],
       money:[hatmei.money],
       taxrate:[hatmei.taxrate],
       iriunit:[hatmei.iriunit],
@@ -206,7 +206,7 @@ export class HmeitblComponent implements OnInit {
       gcode:[''],
       gtext:[''],
       suu:[''],
-      tanka:[''],
+      genka:[''],
       money:[''],
       taxrate:[''],
       iriunit:[''],
@@ -252,7 +252,7 @@ export class HmeitblComponent implements OnInit {
   frmVal(i:number,fld:string):string {
     return this.frmArr.getRawValue()[i][fld];
   }
-  
+
   pasteData(event: ClipboardEvent) {
     let clipboardData = event.clipboardData;
     let pastedText = clipboardData.getData("text");
@@ -269,7 +269,7 @@ export class HmeitblComponent implements OnInit {
             gcode:col[0],
             gtext:'',
             suu:+col[1],
-            tanka:0,
+            genka:0,
             money:0,
             taxrate:'',
             iriunit:'',
@@ -283,6 +283,7 @@ export class HmeitblComponent implements OnInit {
             mtax:''
           } 
           this.frmArr.push(this.updateRow(i+1,hmei));
+          this.updGds(i,col[0]);
           i+=1;
       };
     });

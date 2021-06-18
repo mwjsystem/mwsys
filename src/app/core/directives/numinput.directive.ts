@@ -28,7 +28,7 @@ export class NuminputDirective {
   
   transform(value) {
 
-    const conv = value.replace(/[^0-9０-９]/g, '').replace(/[０-９]/g, function(s) {
+    const conv = value.replace(/[^0-9０-９.．]/g, '').replace(/[０-９．]/g, function(s) {
         return String.fromCharCode(s.charCodeAt(0) - 65248);
     });   //数字のみ抽出して半角に変換
 
