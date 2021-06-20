@@ -61,6 +61,8 @@ declare namespace mwI {
     created_by:string;
     updated_at:Date;
     updated_by:string;
+    jdstatus:string;
+    jdshsta:string;
   }
   interface Jyumei {
     line:number;

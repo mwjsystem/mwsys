@@ -124,6 +124,8 @@ export class FrmsalesComponent implements OnInit {
       taxtotal: new FormControl(''),
       syoukei: new FormControl(''),
       total: new FormControl(''),
+      jdstatus: new FormControl(''),
+      jdshsta: new FormControl(''),
       mtbl: this.rows 
     });
     this.memsrv.get_members().then(result => {
