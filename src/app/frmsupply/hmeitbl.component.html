@@ -7,14 +7,12 @@
     </mat-form-field>
     <button mat-flat-button color="primary" (click)="setYday('0')" *ngIf="frmArr.enabled">暫定一括設定</button>
     <button mat-flat-button color="warn" (click)="setYday('1')" *ngIf="frmArr.enabled">確定一括設定</button>
-
     <button mat-flat-button [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()"
         color="accent">クリップボードにコピー</button>
-    <mat-form-field appearance="outline">
-        <input matInput (paste)="pasteData($event)" *ngIf="frmArr.enabled" style="opacity: 0;">
+    <mat-form-field appearance="outline" *ngIf="frmArr.enabled">
+        <input matInput (paste)="pasteData($event)" style="opacity: 0;">
     </mat-form-field>
     <span *ngIf="frmArr.enabled">←ここにExcel等から貼付([ctrl]ｷｰ＋[v]) １列目：商品ｺｰﾄﾞ、2列目：数量、３列目(任意)：単価</span>
-
 </div>
 <div class="mat-elevation-z8">
     <ng-container [formGroup]="parentForm">

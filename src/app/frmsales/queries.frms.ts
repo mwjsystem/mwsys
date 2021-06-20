@@ -6,7 +6,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     msggroup {
       code
       gkbn
-      siire
+      vcode
     }
     gcode
     gtext
@@ -18,12 +18,21 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     send
     gskbn
     zkbn
-    msgtankas_aggregate(where: {day: {_lt: $day}}) {
-      aggregate {
-        max {
-          day
-        }
-      }
+    msgtankas(limit:1,where: {day: {_lt: $day}}, order_by: {day: desc_nulls_last}) {
+      cost
+      currency
+      day
+      genka
+      tanka1
+      tanka2
+      tanka3
+      tanka4
+      tanka5
+      tanka6
+      tanka7
+      tanka8
+      tanka9
+      taxrate
     }
   }
 }`;
@@ -55,7 +64,21 @@ query get_member($id: smallint!,$mcode:Int!) {
       adrinbikou
       adrokrbko
       del
-    }    
+    } 
+    msmstits {
+      patno
+      seq
+      stitype
+      stitno
+      vcode
+      biko
+      size
+      color
+      colorno
+      letter
+      position
+      posibikou
+    } 
   }
 }`;
 export const GetMadr = gql`
@@ -163,7 +186,7 @@ query get_jyuden($id: smallint!,$dno: Int!) {
       teika
       tanka
       money
-      taxkbn
+      mtax
       mbikou
       genka
       spec
@@ -174,6 +197,7 @@ query get_jyuden($id: smallint!,$dno: Int!) {
       toutmoney
       taxmoney
       taxrate
+      gkbn
     }
   }
 }`;

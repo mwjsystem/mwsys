@@ -49,6 +49,22 @@ declare namespace mwI {
     sei:string;
     mei:string;
     del:boolean;
+  }
+  interface Stit {
+    id:number;
+    mcode:number;
+    patno:number;
+    seq:number;
+    stitype:string;
+    stitno:string;
+    vcode:string;
+    biko:string;
+    size:string;
+    color:string;
+    colorno:number;
+    letter:string;
+    position:string;
+    posibikou:string;
   }   
   interface Adrs {
     eda:number;
@@ -106,6 +122,7 @@ declare namespace mwI {
     tntype:number;
     webid:string;
     msmadrs:Adrs[];
+    msmstits:Stit[];
   }
   interface Gtanka {
     gcode:string;

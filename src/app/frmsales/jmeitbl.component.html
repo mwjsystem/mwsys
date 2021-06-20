@@ -1,11 +1,42 @@
+<div fxLayout="row wrap" fxLayoutAlign="start end" fxLayoutGap="10px" style="height: 40px;">
+  <mat-form-field style="width: 10em;" *ngIf="frmArr.enabled">
+    <mat-label>在庫状態一括設定</mat-label>
+    <mat-select [(ngModel)]="jmeikbn" required>
+      <mat-option *ngFor="let sval of bunsrv.jmeikbn" [value]="sval.value">
+        {{sval.viewval}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button mat-flat-button color="primary" (click)="setJmeikbn(jmeikbn)" *ngIf="frmArr.enabled">一括設定</button>
+  <button mat-flat-button [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()"
+    color="accent">クリップボードにコピー</button>
+  <mat-form-field appearance="outline" *ngIf="frmArr.enabled">
+    <input matInput (paste)="pasteData($event)" style="opacity: 0;">
+  </mat-form-field>
+  <span *ngIf="frmArr.enabled">←ここにExcel等から貼付([ctrl]ｷｰ＋[v]) １列目：商品ｺｰﾄﾞ、2列目：数量、３列目(任意)：単価</span>
+</div>
 <div class="mat-elevation-z8">
   <ng-container [formGroup]="parentForm">
     <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
+      <ng-container matColumnDef="chk">
+        <th mat-header-cell *matHeaderCellDef class="i_num">
+          <mat-checkbox (change)="setAll($event.checked)" *ngIf="frmArr.enabled"></mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+          <mat-checkbox formControlName="chk" *ngIf="frmArr.enabled"></mat-checkbox>
+        </td>
+      </ng-container>
       <ng-container matColumnDef="line">
         <th mat-header-cell *matHeaderCellDef>行番号</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
-          <mat-form-field style="width:3em;">
+          <mat-form-field style="width:5em;">
             <input matInput [value]="frmArr.getRawValue()[i]['line']" class="i_num" disabled>
+            <button mat-icon-button matPrefix (click)="ins_row(i)" *ngIf="frmArr.enabled">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+            <button mat-icon-button matPrefix (click)="del_row(i)" *ngIf="frmArr.enabled">
+              <mat-icon>remove_circle</mat-icon>
+            </button>
           </mat-form-field>
         </td>
       </ng-container>
@@ -61,7 +92,7 @@
         <th mat-header-cell *matHeaderCellDef>単位</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
           <mat-form-field style="width:4em;">
-            <input matInput [value]="frmArr.getRawValue()[i]['teika']" disabled>
+            <input matInput [value]="frmArr.getRawValue()[i]['iriunit']" disabled>
           </mat-form-field>
         </td>
       </ng-container>
@@ -76,7 +107,7 @@
       <ng-container matColumnDef="rate">
         <th mat-header-cell *matHeaderCellDef>掛率</th>
         <td mat-cell *matCellDef="let row; let i =index">
-          {{frmArr.getRawValue()[i]['teika']/frmArr.getRawValue()[i]['tanka'] | percent}}
+          {{frmArr.getRawValue()[i]['tanka']/frmArr.getRawValue()[i]['teika'] | percent}}
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka">
@@ -95,11 +126,11 @@
           </mat-form-field>
         </td>
       </ng-container>
-      <ng-container matColumnDef="taxkbn">
+      <ng-container matColumnDef="mtax">
         <th mat-header-cell *matHeaderCellDef>税区分</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
           <mat-form-field style="width:4em;">
-            <mat-select #msel2 formControlName="taxkbn" required (keyup.enter)="msel2.close()">
+            <mat-select #msel2 formControlName="mtax" required (keyup.enter)="msel2.close()">
               <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -108,11 +139,16 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="spec">
-        <th mat-header-cell *matHeaderCellDef>特殊在庫</th>
+        <th mat-header-cell *matHeaderCellDef>在庫状態</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field>
+          <!-- <mat-form-field>
             <input matInput [value]="frmArr.getRawValue()[i]['spec']" disabled>
-          </mat-form-field>
+          </mat-form-field> -->
+          <mat-select #msel4 formControlName="spec" required (keyup.enter)="msel4.close()">
+            <mat-option *ngFor="let sval of bunsrv.jmeikbn" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
         </td>
       </ng-container>
       <ng-container matColumnDef="mbikou">

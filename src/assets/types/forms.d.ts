@@ -63,8 +63,6 @@ declare namespace mwI {
     updated_by:string;
   }
   interface Jyumei {
-    id:number;
-    denno:number;
     line:number;
     day:Date;
     sday:Date;
@@ -76,7 +74,7 @@ declare namespace mwI {
     teika:number;
     tanka:number;
     money:number;
-    taxkbn:number;
+    mtax:number;
     mbikou:string;
     genka:number;
     spec:string;
@@ -90,22 +88,25 @@ declare namespace mwI {
     taxmoney:number;
     taxrate:number;
     currency:string;
-  }
-  interface SalGds {
-    gcode:string;
-    gkbn:number;
+    code:string;
+    gkbn:string;
     vcode:string;
-    gtext:string;
-    irisu:number;
-    iriunit:string;
-    max:number;
-    send:string;
-    order:boolean;
-    koguchi:number;
-    skbn:number;
-    zkbn:number;
-    day:Date;
-  }  
+  }
+  // interface SalGds {
+  //   gcode:string;
+  //   gkbn:number;
+  //   vcode:string;
+  //   gtext:string;
+  //   irisu:number;
+  //   iriunit:string;
+  //   max:number;
+  //   send:string;
+  //   order:boolean;
+  //   koguchi:number;
+  //   skbn:number;
+  //   zkbn:number;
+  //   day:Date;
+  // }  
   interface Trjyuden extends Jyuden{
     trjyumeis:Jyumei[];
   }

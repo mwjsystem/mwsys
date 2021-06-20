@@ -227,30 +227,37 @@ export class FrmsupplyComponent implements OnInit {
         adrname
       }
     }`;
-    this.apollo.watchQuery<any>({
-          query: GetMast, 
-          variables: { 
-            id : this.usrsrv.compid,
-            vcd: this.form.get('vcode').value
-          },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        // console.log(this.form.get('vcode').value,data.msvendor_by_pk != null);
-        if (data.msvendor_by_pk != null){
-          this.vcdtxt = data.msvendor_by_pk.adrname;
-        } else {
-          this.vcdtxt = "";
-          this.toastr.info("仕入先コード" + this.form.get('vcode').value + "は登録されていません");
-        }
-      },(error) => {
-        console.log('error query get_vendors', error);
-      });
+    if(this.form.get('vcode').value){
+      this.apollo.watchQuery<any>({
+            query: GetMast, 
+            variables: { 
+              id : this.usrsrv.compid,
+              vcd: this.form.get('vcode').value
+            },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          // console.log(this.form.get('vcode').value,data.msvendor_by_pk != null);
+          if (data.msvendor_by_pk != null){
+            this.vcdtxt = data.msvendor_by_pk.adrname;
+          } else {
+            this.vcdtxt = "";
+            this.toastr.info("仕入先コード" + this.form.get('vcode').value + "は登録されていません");
+          }
+        },(error) => {
+          console.log('error query get_vendors', error);
+        });
+    }
   } 
 
   modeToCre():void {
     this.mode=1;
     this.form.reset();
+    this.denno="新規登録"; 
+    this.form.get('tcode').setValue(this.usrsrv.staff.code);
+    this.form.get('day').setValue(new Date());
+    this.form.get('soko').setValue("01"); 
+    this.hmeitbl.add_rows(20);
   }  
 
   modeToUpd():void {

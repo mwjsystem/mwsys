@@ -20,7 +20,7 @@ export interface Ggrp {
 })
 
 export class GoodsService {
-  public salgds: mwI.SalGds[]=[];
+  // public salgds: mwI.SalGds[]=[];
   public goods: mwI.Goods[]=[];
   public ggrps: Ggrp[]=[];
   public gtnks: mwI.Gtanka[]=[];
@@ -32,65 +32,65 @@ export class GoodsService {
   constructor(private usrsrv: UserService,
               private apollo: Apollo) {}
 
-  get_Goods(day:string):void {
-    const GetMast = gql`
-    query get_goods($id: smallint!,$day: date!) {
-      msgoods(where: {id: {_eq: $id}}) {
-        msggroup {
-          gkbn
-          vcode
-        }
-        gcode
-        gtext
-        irisu
-        iriunit
-        koguchi
-        max
-        order
-        send
-        gskbn
-        zkbn
-        msgtankas_aggregate(where: {day: {_lt: $day}}) {
-          aggregate {
-            max {
-              day
-            }
-          }
-        }
-      }
-    }`;
-    this.salgds=[];
-    this.apollo.watchQuery<any>({
-      query: GetMast, 
-        variables: { 
-          id : this.usrsrv.compid,
-          day :day
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        data.msgoods.forEach(e => {
-          const good:mwI.SalGds={
-            gcode : e.gcode,
-            gtext : e.gtext,
-            irisu : e.irisu,
-            iriunit : e.iriunit,
-            koguchi : e.koguchi,
-            max   : e.max,
-            order   : e.order,
-            send  : e.send,
-            skbn  : e.skbn,
-            zkbn  : e.zkbn,
-            gkbn  : e.msggroup.gkbn,
-            vcode : e.msggroup.vcode,
-            day   : e.msgtankas_aggregate.aggregate.max.day
-          };
-        this.salgds.push(good);
-        });
-      },(error) => {
-        console.log('error query get_Goods', error);
-      });
-  } 
+  // get_Goods(day:string):void {
+  //   const GetMast = gql`
+  //   query get_goods($id: smallint!,$day: date!) {
+  //     msgoods(where: {id: {_eq: $id}}) {
+  //       msggroup {
+  //         gkbn
+  //         vcode
+  //       }
+  //       gcode
+  //       gtext
+  //       irisu
+  //       iriunit
+  //       koguchi
+  //       max
+  //       order
+  //       send
+  //       gskbn
+  //       zkbn
+  //       msgtankas_aggregate(where: {day: {_lt: $day}}) {
+  //         aggregate {
+  //           max {
+  //             day
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }`;
+  //   this.salgds=[];
+  //   this.apollo.watchQuery<any>({
+  //     query: GetMast, 
+  //       variables: { 
+  //         id : this.usrsrv.compid,
+  //         day :day
+  //       },
+  //     })
+  //     .valueChanges
+  //     .subscribe(({ data }) => {
+  //       data.msgoods.forEach(e => {
+  //         const good:mwI.SalGds={
+  //           gcode : e.gcode,
+  //           gtext : e.gtext,
+  //           irisu : e.irisu,
+  //           iriunit : e.iriunit,
+  //           koguchi : e.koguchi,
+  //           max   : e.max,
+  //           order   : e.order,
+  //           send  : e.send,
+  //           skbn  : e.skbn,
+  //           zkbn  : e.zkbn,
+  //           gkbn  : e.msggroup.gkbn,
+  //           vcode : e.msggroup.vcode,
+  //           day   : e.msgtankas_aggregate.aggregate.max.day
+  //         };
+  //       this.salgds.push(good);
+  //       });
+  //     },(error) => {
+  //       console.log('error query get_Goods', error);
+  //     });
+  // } 
 
   get_ggroups():Promise<Boolean> {
     const GetMast = gql`

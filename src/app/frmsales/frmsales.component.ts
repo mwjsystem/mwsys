@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, HostListener, ViewChild ,AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewEncapsulation, HostListener, ViewChild ,AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
@@ -19,7 +19,7 @@ import { StaffService } from './../services/staff.service';
 import { SoukoService } from './../services/souko.service';
 import { McdService } from './../share/mcdhelp/mcd.service';
 import { MembsService } from './../services/membs.service';
-import { GoodsService } from './../services/goods.service';
+// import { GoodsService } from './../services/goods.service';
 // import { GcdService } from './../share/gcdhelp/gcd.service';
 import { DownloadService } from './../services/download.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
@@ -33,7 +33,7 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
   encapsulation : ViewEncapsulation.None,
   changeDetection:ChangeDetectionStrategy.OnPush
 })
-export class FrmsalesComponent implements OnInit,AfterViewChecked {
+export class FrmsalesComponent implements OnInit {
   @ViewChild(JmeitblComponent ) jmeitbl:JmeitblComponent;
   form: FormGroup;
   denno:number|string;
@@ -46,6 +46,7 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
   qrurl:string;
   getden:number;
   gdsttl:number=0;
+  stit:mwI.Stit[]=[];
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -66,7 +67,7 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
               public okrsrv: OkuriService,
               public memsrv: MembsService,
               public soksrv: SoukoService,
-              public gdssrv: GoodsService,
+              // public gdssrv: GoodsService,
               // public gcdsrv: GcdService,
               public jmisrv:JyumeiService,
               private dwlsrv:DownloadService,
@@ -151,10 +152,9 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
         this.mode = +params.get('mode');
       } 
     }); 
-  }
-
-  ngAfterViewChecked(): void {
-    this.cdRef.detectChanges();
+    this.jmisrv.observe.subscribe(flg=>{
+      this.cdRef.detectChanges();
+    });
   }
 
   selected(value:number){
@@ -241,7 +241,8 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
     .subscribe(({ data }) => {
       this.form.reset();
       if (data.trjyuden_by_pk == null){
-        this.denno = denno + '　未登録';
+        // this.denno = denno + '　未登録';
+        this.toastr.info("受注伝票番号" + denno + "は登録されていません");
         history.replaceState('','','./frmsales');
       } else {
         let jyuden:mwI.Jyuden=data.trjyuden_by_pk;
@@ -257,14 +258,13 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
         // this.form.get('nadr').setValue(+jyuden.nadr);
         // console.log(this.form.value.bunsyo,jyuden.bunsyo);
         this.jmisrv.jyumei=data.trjyuden_by_pk.trjyumeis;
-        // console.log(jyuden);
-        // this.jmisrv.subject.next();
+        this.jmisrv.jyumei
         this.jmeitbl.set_jyumei();
         this.usrsrv.setTmstmp(jyuden);
         this.denno=denno;
         this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.denno;
         // console.log(this.form.getRawValue().mcode);
-        this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
+        // this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
         this.setMcdtxt();
         this.setScdtxt();
         this.setNcdtxt();
@@ -282,7 +282,8 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
       }
     },(error) => {
       console.log('error query GetJyuden', error);
-      this.denno = denno + '　読込エラー';
+      // this.denno = denno + '　読込エラー';
+      this.toastr.info("受注伝票読込エラー");
       this.form.reset();
       history.replaceState('','','./frmsales');
       this.overlayRef.detach();
@@ -382,7 +383,7 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
         this.jmisrv.sptnkbn=member.sptnkbn;
         this.jmisrv.ntype=member.ntype;
         this.jmisrv.tntype=member.tntype;
-
+        this.stit=member.msmstits;
       }
     },(error) => {
       console.log('error query get_msmadr', error);
@@ -475,7 +476,7 @@ export class FrmsalesComponent implements OnInit,AfterViewChecked {
     this.form.get('day').setValue(new Date());
     this.form.get('souko').setValue("01");
     this.form.get('skbn').setValue("1");
-    this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
+    // this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
     this.form.enable();
     this.usrsrv.enable_mtbl(this.form); 
     this.jmeitbl.frmArr.clear();  

@@ -27,6 +27,7 @@ export class BunruiService {
   public zkbn: mwI.Sval[]=[];
   public trttype: mwI.Sval[]=[];
   public ydaykbn: mwI.Sval[]=[];
+  public jmeikbn: mwI.Sval[]=[];
   constructor(private usrsrv: UserService,
               private apollo: Apollo) {
                 // this.get_bunrui(); 
