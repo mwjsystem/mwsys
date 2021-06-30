@@ -6,6 +6,7 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
+import { VendsService } from './../services/vends.service';
 import { ToastrService } from 'ngx-toastr';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 
@@ -25,12 +26,14 @@ export class MstvendorComponent implements OnInit {
               private elementRef: ElementRef,
               private dialog: MatDialog,
               public usrsrv: UserService,
+              private vensrv: VendsService,
               private apollo: Apollo,
               private toastr: ToastrService) {
       this.title.setTitle('仕入先マスタ(MWSystem)') 
   }
 
   ngOnInit(): void {
+    this.vensrv.get_vendors();
     this.form = this.fb.group({
       zip: new FormControl(''),
       region: new FormControl(''),
@@ -51,7 +54,6 @@ export class MstvendorComponent implements OnInit {
       mail4: new FormControl(''),
       mail5: new FormControl(''),
       del: new FormControl(''),
-      ftel: new FormControl(''),
       tanto: new FormControl(''),
       url: new FormControl(''),
       kana: new FormControl(''),

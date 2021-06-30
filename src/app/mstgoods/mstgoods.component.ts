@@ -17,11 +17,12 @@ import { GdsimageComponent } from './../share/gdsimage/gdsimage.component';
 import { UserService } from './../services/user.service';
 import { GoodsService } from './../services/goods.service';
 import { BunruiService } from './../services/bunrui.service';
+import { VendsService } from './../services/vends.service';
 
 @Component({
   selector: 'app-mstgoods',
   templateUrl: './mstgoods.component.html',
-  styleUrls: ['./mstgoods.component.scss'],
+  styleUrls: ['./../app.component.scss'],
   encapsulation : ViewEncapsulation.None
 })
 export class MstgoodsComponent implements OnInit {
@@ -31,7 +32,6 @@ export class MstgoodsComponent implements OnInit {
   form: FormGroup;
   grpcd:string;
   mode:number=3;
-  vcdtxt:string="";
   rows: FormArray = this.fb.array([]);
   rows2: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
@@ -43,10 +43,10 @@ export class MstgoodsComponent implements OnInit {
     private title: Title,
     public cdRef: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private elementRef: ElementRef,
     private dialog: MatDialog,
     public usrsrv: UserService,
     public bunsrv: BunruiService,
+    public vensrv: VendsService,
     private gdssrv: GoodsService,
     private apollo: Apollo,
     private toastr: ToastrService,
@@ -55,6 +55,8 @@ export class MstgoodsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.vensrv.get_vendors();
+    this.bunsrv.get_bunrui();
     this.form = this.fb.group({
       kana: new FormControl('', Validators.required),
       name: new FormControl('', Validators.required),
@@ -68,9 +70,7 @@ export class MstgoodsComponent implements OnInit {
       mtbl2: this.rows2 
     });
     this.route.paramMap.subscribe((params: ParamMap)=>{
-      if (params.get('grpcd') === null){
-        // this.grpcd = '読込中です！';
-      }else{
+      if (params.get('grpcd') != null){
         //１件分だけ先に読込
         this.grpcd = params.get('grpcd');
         this.get_ggroup(this.grpcd);
@@ -90,36 +90,16 @@ export class MstgoodsComponent implements OnInit {
         this.overlayRef.detach();      
       });
     }
-    this.bunsrv.get_bunrui();
-  }  
-
-  // ngAfterViewInit(): void{
-  //   setTimeout(() => {
-  //     this.refresh();
-  //   });
-  // }
-
-  onEnter(): void {
-    this.elementRef.nativeElement.querySelector('button').focus();
   }  
 
 　diaImage(): void {
     let dialogConfig = new MatDialogConfig();
-    // dialogConfig.width  = '100vw';
-    // dialogConfig.maxHeight = '80vh';
     dialogConfig.data = {
         grpcd: this.grpcd,
         url:this.form.value.specurl
     };
     dialogConfig.autoFocus = true;
-    let dialogRef = this.dialog.open(GdsimageComponent, dialogConfig);
-    // dialogRef.afterClosed().subscribe(
-    //   data=>{
-    //     if(typeof data != 'undefined'){
-    //       this.grpcd = data.code;
-    //     }
-    //   }
-    // );    
+    let dialogRef = this.dialog.open(GdsimageComponent, dialogConfig); 
   }
 
   grpcdHelp(): void {
@@ -144,15 +124,13 @@ export class MstgoodsComponent implements OnInit {
       data=>{
         if(typeof data != 'undefined'){
           this.form.get('vcode').setValue(data.code);
-          this.vcdtxt = data.adrname;
+          this.cdRef.detectChanges();
         }
-        this.refresh();
       }
     );    
   } 
 
   get_ggroup(grpcd:string){
-    // this.grpcd += '　読込中';
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.apollo.watchQuery<any>({
       query: Query.GetMast0, 
@@ -162,13 +140,19 @@ export class MstgoodsComponent implements OnInit {
         },
     }).valueChanges
       .subscribe(({ data }) => {
-      if (data.msggroup == null){
+      if (data.msggroup.length == 0){
         this.form.reset();
-        this.grpcd = grpcd + '　未登録';
-        history.replaceState('','','./mstgoods');
+          history.replaceState('','','./mstgoods');
+          this.overlayRef.detach();
+        if(this.mode>1){
+          this.toastr.warning("商品コード、グループコードどちらでも登録されていません");
+        }        
       } else {
-        // console.log(data);
         let lcgrpcd = data.msggroup[0].code;
+        if(this.mode==1){
+          this.toastr.warning("商品グループコード" + lcgrpcd + "は登録済です。新規登録ボタンからやり直してください");
+          this.mode=3;
+        }  
         this.apollo.watchQuery<any>({
           query: Query.GetMast1, 
             variables: { 
@@ -184,31 +168,29 @@ export class MstgoodsComponent implements OnInit {
           this.gdssrv.goods=[];
           this.gdssrv.gtnks=[];
     　　　　 for(let i=0;i<ggroup.msgoods.length;i++){
-            // console.log('get_ggroup '+i,ggroup.msgoods[i]);
             const {msgtankas,...good}=ggroup.msgoods[i];// ggroup.msgoods[i]からmsgtankasを除外して、goodに代入         
             this.gdssrv.goods.push(good);
             for(let j=0;j<ggroup.msgoods[i].msgtankas.length;j++){         
               this.gdssrv.gtnks.push(Object.assign({gcode:ggroup.msgoods[i].gcode},ggroup.msgoods[i].msgtankas[j]));
             }
-            // console.log('get_ggroup',this.gdssrv.goods);
           }
-          this.gdssrv.subGds.next();
-          this.gdssrv.subTnk.next(); 
+          // this.gdssrv.subGds.next();
+          // this.gdssrv.subGds.complete();
+          // this.gdssrv.subTnk.next();
+          // this.gdssrv.subTnk.complete();
           this.gdstbl.set_goods();
           this.gtnktbl.set_gtanka();
           if(this.mode==3){
             this.form.disable();
-            // this.usrsrv.disable_mtbl(this.form);
           }else{
             this.form.enable();
-            // this.usrsrv.enable_mtbl(this.form);
           }
           this.grpcd = lcgrpcd;
           this.overlayRef.detach();
           this.cdRef.detectChanges();
           history.replaceState('','','./mstgoods/' + this.mode + '/' + this.grpcd);
         },(error) => {
-          this.grpcd = grpcd + '　読込エラー';
+          this.toastr.error("読込エラーです。ブラウザを再起動しても直らなければ、連絡を！");
           this.form.reset();
           console.log('error query get_ggroup', error);
           history.replaceState('','','./mstgoods');
@@ -224,48 +206,11 @@ export class MstgoodsComponent implements OnInit {
     }
   }
 
-  // toTreat(){
-  //   // const url = window.location.href + '/frmtreat?=' + this.grpcd;
-  //   // console.log(url);
-  //   // window.open(url,'_blank');
-  // // 　this.router.navigate([./frmtreat])
-  // }
-
-  // checkMcode(grpcd:string):boolean {
-  //   // console.log(typeof mcode,mcode);
-  //   let flg:boolean; 
-  //   if (grpcd != null){
-  //     let lcgrpcd = this.usrsrv.convUpper(grpcd);
-  //     let i:number = this.gdssrv.ggrps.findIndex(obj => obj.code == lcgrpcd);
-  //     if( i > -1 ){
-  //       this.grpcd = lcgrpcd;
-  //       flg = true;
-  //     } else {
-  //       if( grpcd.indexOf('未登録') == -1 && grpcd.indexOf('読込') == -1 && grpcd !== '' ){
-  //         this.grpcd = grpcd + '　未登録';
-  //       }
-  //       this.form.reset();
-  //       history.replaceState('','','./mstgoods'); 
-  //       flg = false;
-  //     }
-  //   }else{  
-  //     flg=false;
-  //   }
-  //   return flg;
-  // }
-  
-  test(value){
-    this.toastr.info('機能作成中');
-          // this.form.disable();
-    console.log(this.form);
-  }
-
-
   modeToCre():void {
     this.mode=1;
     this.form.reset();
     this.form.enable();
-    this.grpcd="新規登録"; 
+    // this.grpcd="新規登録"; 
   }
 
   modeToUpd():void {
@@ -275,6 +220,55 @@ export class MstgoodsComponent implements OnInit {
   }
 
   save():void {
+    
+    //★upsertに変える！！
+    let ggroup:any={
+      id: this.usrsrv.compid,
+      code: this.grpcd,
+      kana: this.usrsrv.editFrmval(this.form,'kana'),
+      name: this.usrsrv.editFrmval(this.form,'name'),
+      gkbn: this.usrsrv.editFrmval(this.form,'gkbn'),
+      bikou: this.usrsrv.editFrmval(this.form,'bikou'),
+      sozai: this.usrsrv.editFrmval(this.form,'sozai'),
+      vcode: this.usrsrv.editFrmval(this.form,'vcode'),
+      tcode: this.usrsrv.editFrmval(this.form,'tcode'),
+      specurl: this.usrsrv.editFrmval(this.form,'specurl'),
+      genre: this.usrsrv.editFrmval(this.form,'genre'),
+      updated_at:new Date(),
+      updated_by:this.usrsrv.staff.code
+    };
+    if(this.mode==2){      
+      this.apollo.mutate<any>({
+        mutation: Query.UpdateMast1,
+        variables: {
+          id: this.usrsrv.compid,
+          grpcd: this.grpcd,
+          "_set": ggroup
+        },
+      }).subscribe(({ data }) => {
+        this.toastr.success('商品グループ' + this.grpcd + 'の変更を保存しました');
+        this.mode=3;
+        this.form.disable();
+        this.form.markAsPristine();
+      },(error) => {
+        this.toastr.error('データベースエラー','商品グループ' + this.grpcd + 'の変更保存ができませんでした',
+                          {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+        console.log('error update_msggroup', error);
+      });
+
+      console.log(this.form.get('mtbl'));
+    }else{//新規登録
+
+    }
+
+
+
+
+
+
+
+
+
 
   } 
   
@@ -297,6 +291,9 @@ export class MstgoodsComponent implements OnInit {
     if (this.shouldConfirmOnBeforeunload()) {
       e.returnValue = true;
     }
+  }
+  ins_tnkrow(i){
+    this.gtnktbl.ins_row(i);
   }
 
 }

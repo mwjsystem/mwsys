@@ -38,4 +38,16 @@ export class MembsService {
         });
     });  
   }
+
+  get_mcdtxt(mcd:number):string{
+    const i:number = this.membs.findIndex(obj => obj.mcode == mcd);
+    let mcdtxt:string="";
+    if(i > -1 ){
+      mcdtxt = this.membs[i].mei ?? "";
+      mcdtxt = this.membs[i].sei + mcdtxt;
+    } else {
+      mcdtxt="";  
+    }
+    return mcdtxt;
+  }
 }

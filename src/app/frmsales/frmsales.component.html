@@ -1,30 +1,29 @@
-<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
   <div class="icon-area" fxLayout="row wrap">
-    <button mat-button (click)="modeToCre()" [style.display]="mode==3 ? 'block' : 'none'">
+    <button mat-button (click)="modeToCre()" *ngIf="mode==3">
       <mat-icon>add_box</mat-icon>新規
     </button>
-    <button mat-button (click)="modeToUpd()" [style.display]="mode==3 && this.denno ? 'block' : 'none'">
+    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.jmisrv.denno">
       <mat-icon>edit</mat-icon>編集
     </button>
-    <button mat-button (click)="save()" [style.display]="mode==3 ? 'none' : 'block'">
+    <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
       <mat-icon>save</mat-icon>保存
     </button>
-    <button mat-button (click)="cancel()" [style.display]="mode==3 ? 'none' : 'block'">
+    <button mat-button (click)="cancel()" *ngIf="mode!=3">
       <mat-icon>cancel</mat-icon>中止
     </button>
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>受注伝票番号</mat-label>
-      <input matInput [(ngModel)]="denno" tabIndex="1" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()"
+      <input matInput [(ngModel)]="jmisrv.denno" tabIndex="1" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()"
         maxlength="10" (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
-      <button mat-button mat-icon-button matSuffix (click)="dennoHelp()"
-        [style.display]="mode==3 ? 'inline-block' : 'none'">
+      <button mat-button mat-icon-button matSuffix (click)="dennoHelp()" *ngIf="mode==3">
         <mat-icon>find_replace</mat-icon>
       </button>
     </mat-form-field>
-    <button mat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'">
+    <button mat-button (click)="test(1)" *ngIf="mode!=1">
       <mat-icon>history</mat-icon>操作ログ
     </button>
-    <button mat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'">
+    <button mat-button (click)="test(1)" *ngIf="mode!=1">
       <mat-icon>local_shipping</mat-icon>出荷指示
     </button>
     <a id="csv-donwload" data-type="text/csv"></a>
@@ -51,7 +50,7 @@
   <mat-card>
     <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
       <mat-card-title>
-        基本情報
+        {{mode|modetxt}}基本情報
       </mat-card-title>
       <mat-form-field>
         <mat-label>受注伝票ステータス</mat-label>
@@ -76,43 +75,48 @@
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
             <mat-label>受注先</mat-label>
-            <input tabIndex="1" matInput formControlName="mcode" required (blur)="setMcdtxt()" (change)="changeMcd()"
+            <input tabIndex="1" matInput formControlName="mcode" required (change)="changeMcd()"
               (keydown.f4)="mcdHelp('mcode')">
-            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.mcode)"
-              *ngIf="mcdtxt">
+            <button mat-icon-button matSuffix (click)="mcdHelp('mcode')" *ngIf="frmArr.enabled">
+              <mat-icon>find_replace</mat-icon>
+            </button>
+            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.mcode)">
               <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
-          <span class="nmtxt">{{mcdtxt}}</span>
+          <span class="nmtxt">{{form.value.mcode | mcdtxt}}</span>
         </div>
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
             <mat-label>請求先</mat-label>
-            <input tabIndex="2" matInput formControlName="scode" required (blur)="setScdtxt()"
-              (keydown.f4)="mcdHelp('scode')">
-            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.scode)"
-              *ngIf="scdtxt">
+            <input tabIndex="2" matInput formControlName="scode" required (keydown.f4)="mcdHelp('scode')">
+            <button mat-icon-button matSuffix (click)="mcdHelp('scode')" *ngIf="frmArr.enabled">
+              <mat-icon>find_replace</mat-icon>
+            </button>
+            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.scode)">
               <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
-          <span class="nmtxt">{{scdtxt}}</span>
+          <span class="nmtxt">{{form.value.scode | mcdtxt}}</span>
         </div>
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
             <mat-label>納品先</mat-label>
-            <input tabIndex="3" matInput formControlName="ncode" required (blur)="setNcdtxt()"
-              (keydown.f4)="mcdHelp('ncode')">
-            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.ncode)"
-              *ngIf="ncdtxt">
+            <input tabIndex="3" matInput formControlName="ncode" required (keydown.f4)="mcdHelp('ncode')">
+            <button mat-icon-button matSuffix (click)="mcdHelp('ncode')" *ngIf="frmArr.enabled">
+              <mat-icon>find_replace</mat-icon>
+            </button>
+            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.ncode)">
               <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
-          <span class="nmtxt">{{ncdtxt}}</span>
+          <span class="nmtxt">{{form.value.ncode | mcdtxt}}</span>
         </div>
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
             <mat-label>納品先選択</mat-label>
-            <mat-select tabIndex="4" formControlName="nsaki" (selectionChange)="selBetsu($event.value)" required>
+            <mat-select #msel01 tabIndex="4" formControlName="nsaki" (selectionChange)="selBetsu($event.value)"
+              (keyup.enter)="msel01.close()" required>
               <mat-option value="0">基本住所</mat-option>
               <mat-option value="1">その他住所</mat-option>
               <mat-option value="2">別納</mat-option>
@@ -129,7 +133,7 @@
         </div>
         <mat-form-field style="width:12em">
           <mat-label>納品書タイプ</mat-label>
-          <mat-select #msel12 tabIndex="5" formControlName="bunsho" (keyup.enter)="msel12.close()">
+          <mat-select #msel02 tabIndex="5" formControlName="bunsho" (keyup.enter)="msel02.close()">
             <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
               {{sval.name}}
             </mat-option>
@@ -194,7 +198,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>倉庫</mat-label>
-          <mat-select #msel2 tabIndex="12" formControlName="souko" (keyup.enter)="msel2.close()">
+          <mat-select #msel2 tabIndex="12" formControlName="souko" (keyup.enter)="msel2.close()" required>
             <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -202,7 +206,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>出荷対象区分</mat-label>
-          <mat-select #msel3 tabIndex="13" formControlName="skbn" (keyup.enter)="msel3.close()">
+          <mat-select #msel3 tabIndex="13" formControlName="skbn" (keyup.enter)="msel3.close()" required>
             <mat-option *ngFor="let sval of bunsrv.skbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -210,7 +214,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>受注方法</mat-label>
-          <mat-select #msel4 tabIndex="14" formControlName="jcode" (keyup.enter)="msel4.close()">
+          <mat-select #msel4 tabIndex="14" formControlName="jcode" (keyup.enter)="msel4.close()" required>
             <mat-option *ngFor="let sval of bunsrv.jucd" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -218,7 +222,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>入金予定</mat-label>
-          <mat-select #msel5 tabIndex="15" formControlName="pcode" (keyup.enter)="msel5.close()">
+          <mat-select #msel5 tabIndex="15" formControlName="pcode" (keyup.enter)="msel5.close()" required>
             <mat-option *ngFor="let sval of bunsrv.pay" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -228,8 +232,8 @@
       <div fxLayout="column">
         <mat-form-field style="width: 7em;">
           <mat-label>配送方法</mat-label>
-          <mat-select #msel5 tabIndex="16" formControlName="hcode" (selectionChange)="selected(+$event.value)"
-            (keyup.enter)="msel5.close()">
+          <mat-select #msel6 tabIndex="16" formControlName="hcode" (selectionChange)="selected(+$event.value)"
+            (keyup.enter)="msel6.close()">
             <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
               {{sval.name}}
             </mat-option>
@@ -246,7 +250,7 @@
         </div>
         <mat-form-field style="width: 7em;">
           <mat-label>配送希望時間</mat-label>
-          <mat-select #msel6 tabIndex="18" formControlName="htime" (keyup.enter)="msel6.close()">
+          <mat-select #msel7 tabIndex="18" formControlName="htime" (keyup.enter)="msel7.close()">
             <mat-option *ngFor="let sval of hktval" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -360,7 +364,7 @@
         <mat-form-field style="width:10em">
           <mat-label>特別単価区分</mat-label>
           <mat-select [value]="jmisrv.sptnkbn" disabled>
-            <mat-option *ngFor="let sval of bunsrv.sptnk" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.sptnkbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>

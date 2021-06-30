@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild ,AfterViewChecked, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,8 +14,9 @@ import { BunruiService } from './../services/bunrui.service';
 export class GdstblComponent implements OnInit {
   @Input() parentForm: FormGroup;
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @Output() action = new EventEmitter();
   dataSource = new MatTableDataSource();
-  displayedColumns =['gcode','gtext','size','color','irisu','iriunit','gskbn','jan','weight','tkbn','zkbn','max','send','order','koguchi'];
+  displayedColumns =['action','gcode','gtext','size','color','irisu','iriunit','gskbn','jan','weight','tkbn','zkbn','max','send','ordering','koguchi'];
   
   constructor(private cdRef:ChangeDetectorRef,
               private fb:     FormBuilder,
@@ -30,14 +31,25 @@ export class GdstblComponent implements OnInit {
     this.refresh();
     // console.log(this.bunsrv.gskbn);
   }
-
-  ngAfterViewChecked(): void {
-    this.cdRef.detectChanges();
+  ins_row(row:number){
+    // console.log(row);
+    this.frmArr.insert(row,this.createRow());
+    this.action.emit(row);
+    // (this.parentForm.get('mtbl2') as FormArray).insert(row,this.gdssrv.createRow());
+    // console.log(this.frmArr);
+    // console.log((this.parentForm.get('mtbl2') as FormArray));
+    // this.gdssrv.subTnk.next(true);
+    // this.gdssrv.subTnk.complete();
+    this.refresh();
   }
+
+  // ngAfterViewChecked(): void {
+  //   this.cdRef.detectChanges();
+  // }
 
   add_rows(rows:number){
     for (let i=0;i<rows;i++){
-      this.frmArr.push(this.createRow(i+1));
+      this.frmArr.push(this.createRow());
     }
     this.refresh();
   }  
@@ -53,11 +65,8 @@ export class GdstblComponent implements OnInit {
     
     return tooltip;
   }
-  setJan(i:number){
-    this.usrsrv.getNumber('jan',1).subscribe(value => {
-      // console.log(value);
-      this.frmArr.controls[i].get('jan').setValue(this.usrsrv.addCheckDigit(value));
-    });
+  async setJan(i:number){
+    this.frmArr.controls[i].get('jan').setValue(this.usrsrv.addCheckDigit(await this.usrsrv.getNumber('jan',1)));
   }
   diaGzai(){
     
@@ -71,8 +80,9 @@ export class GdstblComponent implements OnInit {
     return this.frmArr.getRawValue()[i][fld];
   }
 
-  updateRow(i:number,goods:mwI.Goods){
+  updateRow(goods:mwI.Goods){
     return this.fb.group({
+      action:[''],
       gcode:[goods.gcode],
       gtext:[goods.gtext],
       size:[goods.size],
@@ -86,12 +96,13 @@ export class GdstblComponent implements OnInit {
       zkbn:[goods.zkbn],
       max:[goods.max],
       send:[goods.send],
-      order:[goods.order],
+      ordering:[goods.ordering],
       koguchi:[goods.koguchi]
     });
   }
-  createRow(i:number){
+  createRow(){
     return this.fb.group({
+      action:['ins'],
       gcode:[''],
       gtext:[''],
       size:[''],
@@ -105,17 +116,15 @@ export class GdstblComponent implements OnInit {
       zkbn:[''],
       max:[''],
       send:[''],
-      order:[''],
+      ordering:[''],
       koguchi:['']
     });
   }     
       
   set_goods(){
     this.frmArr.clear();
-    let i:number=0;
     this.gdssrv.goods.forEach(e => {
-      this.frmArr.push(this.updateRow(i+1,e));
-      i+=1;
+      this.frmArr.push(this.updateRow(e));
     });
     // for(let j=i+1;j<11;j++){
     //   this.frmArr.push(this.createRow(j));

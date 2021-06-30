@@ -14,7 +14,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     iriunit
     koguchi
     max
-    order
+    ordering
     send
     gskbn
     zkbn
@@ -34,6 +34,10 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
       tanka9
       taxrate
     }
+    msgsptnks{
+      sptnkbn
+      sptanka
+    }
   }
 }`;
 export const GetMember = gql`
@@ -50,7 +54,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     mtax
     sscode
     tcode1
-    tcode2
+    tcode
     del
     sptnkbn
     daibunrui

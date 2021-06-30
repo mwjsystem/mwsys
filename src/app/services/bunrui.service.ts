@@ -13,7 +13,7 @@ export class BunruiService {
   public bmon: mwI.Sval[]=[];
   public mtax: mwI.Sval[]=[];
   public tanka:mwI.Sval[]=[];
-  public sptnk:mwI.Sval[]=[];
+  public sptnkbn:mwI.Sval[]=[];
   public pay:  mwI.Sval[]=[];
   public nkin: mwI.Sval[]=[];
   public site: mwI.Sval[]=[];
@@ -30,6 +30,7 @@ export class BunruiService {
   public jmeikbn: mwI.Sval[]=[];
   public jdstatus: mwI.Sval[]=[];
   public jdshsta: mwI.Sval[]=[];
+  public gkbn: mwI.Sval[]=[];
   constructor(private usrsrv: UserService,
               private apollo: Apollo) {
                 // this.get_bunrui(); 

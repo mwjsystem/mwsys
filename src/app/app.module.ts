@@ -15,8 +15,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { environment } from './../environments/environment';
 import { BeforeunloadGuard } from './beforeunload.guard';
 import { GraphQLModule } from './graphql.module';
-import { ToastrModule } from 'ngx-toastr'; 
-import { NgxYubinBangoModule } from 'ngx-yubinbango';
+import { ToastrModule } from 'ngx-toastr';
 import { CoreModule } from './core/core.module';
 // import { UserService } from './services/user.service';
 // import { AuthService } from '@auth0/auth0-angular';
@@ -48,7 +47,6 @@ import { LoginComponent } from './login/login.component';
     ToastrModule.forRoot(),
     MaterialModule,
     HttpClientModule,
-    NgxYubinBangoModule,
     CoreModule
   ],
   providers: [

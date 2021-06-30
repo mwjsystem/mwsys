@@ -133,6 +133,7 @@ export class McdtblComponent implements OnInit {
           }
         }
         this.mcdsrv.subject.next();
+        this.mcdsrv.subject.complete();
       },(error) => {
         console.log('error query get_members', error);
       });

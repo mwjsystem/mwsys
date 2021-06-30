@@ -1,24 +1,28 @@
 <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">顧客検索</h1>
-<mat-dialog-content >
+<mat-dialog-content>
     <div class="mat-elevation-z8">
         <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;">
-          <button class="mat-raised-button"(click)="get_vendors()">検索</button>
-          <mat-form-field>
-            <mat-label>仕入先名</mat-label>
-            <input matInput (input)="fadrnm=$event.target.value">
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>ﾌﾘｶﾞﾅ 半角ｶﾀｶﾅのみく</mat-label>
-            <input matInput (input)="fkana=$event.target.value">
-          </mat-form-field>      
-          <mat-form-field>
-            <mat-label>メール1～5</mat-label>
-            <input matInput type="url" (input)="fmail=$event.target.value">
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
-            <input matInput type="number" (input)="ftel=$event.target.value">
-          </mat-form-field>
+            <mat-form-field>
+                <mat-label>絞込条件(全項目共通)</mat-label>
+                <input matInput (keyup)="applyFilter($event)">
+            </mat-form-field>
+            <!-- <button class="mat-raised-button"(click)="get_vendors()">検索</button> -->
+            <!-- <mat-form-field>
+                <mat-label>仕入先名</mat-label>
+                <input matInput (input)="fadrnm=$event.target.value">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>ﾌﾘｶﾞﾅ 半角ｶﾀｶﾅのみく</mat-label>
+                <input matInput (input)="fkana=$event.target.value">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>メール1～5</mat-label>
+                <input matInput type="url" (input)="fmail=$event.target.value">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
+                <input matInput type="number" (input)="ftel=$event.target.value">
+            </mat-form-field> -->
         </mat-toolbar>
         <table mat-table [dataSource]="dataSource" aria-label="Elements">
             <ng-container matColumnDef="code">
@@ -38,15 +42,15 @@
                 <td mat-cell *matCellDef="let row">{{row.tel}}</td>
             </ng-container>
             <ng-container matColumnDef="tel2">
-                <th mat-header-cell *matHeaderCellDef>電話番号</th>
+                <th mat-header-cell *matHeaderCellDef>電話番号2</th>
                 <td mat-cell *matCellDef="let row">{{row.tel2}}</td>
             </ng-container>
             <ng-container matColumnDef="tel3">
-                <th mat-header-cell *matHeaderCellDef>電話番号</th>
+                <th mat-header-cell *matHeaderCellDef>電話番号3</th>
                 <td mat-cell *matCellDef="let row">{{row.tel3}}</td>
             </ng-container>
             <ng-container matColumnDef="fax">
-                <th mat-header-cell *matHeaderCellDef>電話番号</th>
+                <th mat-header-cell *matHeaderCellDef>FAX番号</th>
                 <td mat-cell *matCellDef="let row">{{row.fax}}</td>
             </ng-container>
             <ng-container matColumnDef="mail1">
@@ -92,13 +96,11 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="sel_vcd(row)"></tr>
         </table>
-        <mat-paginator #paginators
-            [length]="dataSource?.data.length"
-            [pageIndex]="0"
+        <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"
             [pageSizeOptions]="[20, 50, 100, 250, 1000]">
         </mat-paginator>
     </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button class="mat-raised-button"(click)="close()">閉じる</button>
+    <button class="mat-raised-button" (click)="close()">閉じる</button>
 </mat-dialog-actions>

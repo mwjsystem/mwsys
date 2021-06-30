@@ -7,7 +7,7 @@ import { StaffService } from './../../services/staff.service';
 export class StaffPipe implements PipeTransform {
   constructor(private stfsrv: StaffService) {}
 
-  transform(value: number): string {
+  transform(value: string): string {
     return this.stfsrv.get_name(value);  
   }
 

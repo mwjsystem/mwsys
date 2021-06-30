@@ -26,24 +26,48 @@ export class AddressComponent implements OnInit {
 
   ngOnInit(): void {
     const form = this.parent.form;
-    form.addControl(this.formName, new FormGroup({
-      zip: new FormControl('', Validators.required),
-      region: new FormControl('', Validators.required),
-      local: new FormControl('', Validators.required),
-      street: new FormControl(''),
-      extend: new FormControl(''),
-      extend2: new FormControl(''),
-      adrname: new FormControl('', Validators.required),
-      tel: new FormControl('', Validators.required),
-      fax: new FormControl(''),
-      tel2: new FormControl(''),
-      tel3: new FormControl(''),
-      adrbikou: new FormControl(''),
-      adrinbikou: new FormControl(''),
-      adrokrbko: new FormControl(''),
-      del: new FormControl(''),
-    }));
-   
+    if (this.formName=='addr1') {
+      form.addControl(this.formName, new FormGroup({
+        zip: new FormControl(''),
+        region: new FormControl(''),
+        local: new FormControl(''),
+        street: new FormControl(''),
+        extend: new FormControl(''),
+        extend2: new FormControl(''),
+        adrname: new FormControl(''),
+        tel: new FormControl(''),
+        fax: new FormControl(''),
+        tel2: new FormControl(''),
+        tel3: new FormControl(''),
+        adrbikou: new FormControl(''),
+        adrinbikou: new FormControl(''),
+        adrokrbko: new FormControl(''),
+        del: new FormControl(''),
+      }));
+    } else {
+      form.addControl(this.formName, new FormGroup({
+        zip: new FormControl('', Validators.required),
+        region: new FormControl('', Validators.required),
+        local: new FormControl('', Validators.required),
+        street: new FormControl(''),
+        extend: new FormControl(''),
+        extend2: new FormControl(''),
+        adrname: new FormControl('', Validators.required),
+        tel: new FormControl('', Validators.required),
+        fax: new FormControl(''),
+        tel2: new FormControl(''),
+        tel3: new FormControl(''),
+        adrbikou: new FormControl(''),
+        adrinbikou: new FormControl(''),
+        adrokrbko: new FormControl(''),
+        del: new FormControl(''),
+      }));     
+    }   
+  }
+  updTel(fldnm:string,value:string){
+    let val:string =this.usrsrv.convTel(value);
+    // console.log(value,val);
+    this.parent.form.get(this.formName).get(fldnm).setValue(val);
   }
 
   saveMadr(mcode:string|number,eda:string|number,mode:number):Subject<string|number> {
@@ -83,6 +107,7 @@ export class AddressComponent implements OnInit {
       }).subscribe(({ data }) => {
         console.log('update_msmadr', data);
         neweda.next(eda);
+        neweda.complete();
       },(error) => {
         console.log('error update_msmember', error);
       });
@@ -101,6 +126,7 @@ export class AddressComponent implements OnInit {
             let lceda=data.msmadr_aggregate.aggregate.max.eda+1;
             madr.eda=lceda;
             neweda.next(lceda);
+            neweda.complete();
           } else {
             madr.eda=eda; 
           }

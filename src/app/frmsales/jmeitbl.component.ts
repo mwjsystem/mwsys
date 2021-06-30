@@ -26,6 +26,9 @@ export class JmeitblComponent implements OnInit {
   dataSource = new MatTableDataSource();
   copyToClipboard:string;
   jmeikbn:string;
+  hatden=[];
+  hidx=20;
+  mcols=5;
   displayedColumns = ['chk',
                       'line',
                       'gcode',
@@ -43,6 +46,7 @@ export class JmeitblComponent implements OnInit {
                       'tinmoney',
                       // 'toutmoney',
                       'spec',
+                      'spdet',
                       'mbikou',
                       'zaiko',
                       'jyuzan',
@@ -78,17 +82,46 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
 
-  setJmeikbn(kbn:string){
+  async setJmeikbn(kbn:string){
     let i:number=0;
+    // console.log(kbn);
+    if (this.parentForm.value.jdstatus==null){
+      this.parentForm.get('jdstatus').setValue("0");
+    }
     this.frmArr.controls
       .forEach(control => {
         if(control.value.chk){
           control.patchValue({spec:kbn});
           i+=1;
+          if(kbn=="3" && this.hatden.indexOf(control.value.vcode) == -1){
+            this.hatden.push(control.value.vcode);
+          }
         }
       })
     this.refresh();
     this.toastr.info(i + '件変更しました。まだ、保存されていません。');
+  }
+
+　async toFrmsup() {
+    this.jmisrv.denno = await this.jmisrv.get_denno();
+    let hdno = await this.usrsrv.getNumber('hdenno',1);
+    let jmei=[];
+    this.frmArr.controls
+      .forEach(control => {
+        if(control.value.vcode==this.hatden[0]){
+          jmei.push({gcd: control.value.gcode,
+                     su:  control.value.suu,
+                     jdno:this.jmisrv.denno,
+                     line:control.value.line});
+          control.patchValue({spdet:hdno});          
+        }
+      })  
+    localStorage.setItem(this.jmisrv.denno + 'MWSYS_FRMSUPPLY', 
+                         JSON.stringify({vcd:this.hatden[0],
+                                         hdno:hdno,
+                                         mei:jmei}));
+    this.usrsrv.openFrmsup(this.jmisrv.denno + 'MWSYS_FRMSUPPLY');
+    this.hatden.shift();
   }
 
   del_row(row:number){
@@ -143,7 +176,8 @@ export class JmeitblComponent implements OnInit {
       taxrate:[jyumei.taxrate],
       code:[jyumei.code],
       gkbn:[jyumei.gkbn],
-      vcode:[jyumei.vcode]    
+      vcode:[jyumei.vcode],
+      spdet:[jyumei.spdet]    
     });
   }
 
@@ -176,7 +210,8 @@ export class JmeitblComponent implements OnInit {
       taxrate:[''],
       code:[''],
       gkbn:[''],
-      vcode:['']     
+      vcode:[''],
+      spdet:['']    
     });
   }
 
@@ -216,17 +251,38 @@ export class JmeitblComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         let msgds = data.msgoods_by_pk;
-        console.log(msgds,this.frmArr.controls[i]);
-        this.frmArr.controls[i].patchValue(msgds);
-        this.frmArr.controls[i].patchValue(msgds.msggroup);
-        this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
-        this.frmArr.controls[i].patchValue({mtax:this.jmisrv.mtax,
-                                            teika:msgds.msgtankas[0]['tanka1'],
-                                            tanka:msgds.msgtankas[0]['tanka' + this.jmisrv.tankakbn],});
-
-
+        // console.log(msgds,this.frmArr.controls[i]);
+        if(msgds == null){
+          this.toastr.warning("商品コード" + val+ "は登録されていません");
+        }else{
+          this.frmArr.controls[i].patchValue(msgds);
+          this.frmArr.controls[i].patchValue(msgds.msggroup);
+          this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
+          let lctanka:number=0;
+          
+          let j:number = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn );
+          // console.log(j,msgds.msgsptnks);
+          if(j>-1){
+            lctanka=msgds.msgsptnks[j].sptanka;
+          }else{
+            lctanka=msgds.msgtankas[0]['tanka' + this.jmisrv.tankakbn];
+          }
+          this.frmArr.controls[i].patchValue({mtax:this.jmisrv.mtax,
+                                              teika:msgds.msgtankas[0]['tanka1'],
+                                              tanka:lctanka});
+          if(this.frmArr.controls[i].value.souko != null){
+            this.frmArr.controls[i].patchValue({souko:this.jmisrv.souko});
+          }
+          if(msgds.ordering){
+            this.frmArr.controls[i].patchValue({spec:'3'});
+            if(this.hatden.indexOf(msgds.msggroup.vcode) == -1){
+              this.hatden.push(msgds.msggroup.vcode);
+            }
+          }
+          this.jmisrv.subject.next(true);
+          // this.jmisrv.subject.complete();
+        }
         
-        this.jmisrv.subject.next(true);
       },(error) => {
         console.log('error query get_good', error);
       });
@@ -282,7 +338,8 @@ export class JmeitblComponent implements OnInit {
             currency:null,
             code:null,
             gkbn:null,
-            vcode:null
+            vcode:null,
+            spdet:null
           } 
           this.frmArr.push(this.updateRow(i+1,jmei));
           this.updGds(i,col[0]);

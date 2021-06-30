@@ -80,6 +80,7 @@ export class HmeitblComponent implements OnInit {
       })
     this.parentForm.patchValue({gtotal:lcgtotal,ttotal:lcttotal,tax:lctax,total:lcgtotal + lctax});
     this.hmisrv.subject.next(true);
+    this.hmisrv.subject.complete();
     this.refresh();
     // console.log(this.frmArr,this.parentForm);
   }

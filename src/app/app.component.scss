@@ -41,3 +41,8 @@ mat-form-field {
 mat-card-header {
   padding-bottom: 1em;
 }
+
+::ng-deep .mat-tooltip  {
+  white-space: pre-line    !important;
+  font-size: 20px !important;
+}

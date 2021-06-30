@@ -1,4 +1,11 @@
 declare namespace mwI {
+  interface Tbldef {
+    table_name: string;
+    column_name: string;
+    description: string;  
+  }
+
+
   interface Sval {
     value: string;
     viewval: string;  
@@ -26,7 +33,7 @@ declare namespace mwI {
     scode:  string;
     csvimp: string;
     cuscode:string;
-    order:  string; 
+    ordering:  string; 
     hscode: number;
     onmin:  number;
     onmax:  number;
@@ -49,6 +56,26 @@ declare namespace mwI {
     sei:string;
     mei:string;
     del:boolean;
+  }
+  interface Vendor {
+    code:string;
+    adrname:string;
+    kana:string;
+    tel:string;
+    tel2:string;
+    tel3:string;
+    fax:string;
+    mail1:string;
+    mail2:string;
+    mail3:string;
+    mail4:string;
+    mail5:string;
+    tanto:string;
+    url:string;
+    del:string;
+    zip:string;
+    region:string;
+    local:string;
   }
   interface Stit {
     id:number;
@@ -107,7 +134,7 @@ declare namespace mwI {
     mtax:string;
     sscode:number;
     tcode1:string;
-    tcode2:string;
+    tcode:string;
     del:boolean;
     sptnkbn:string;
     daibunuri:string;
@@ -159,7 +186,7 @@ declare namespace mwI {
     gtext:string;
     max:number;
     send:string;
-    order:boolean;
+    ordering:boolean;
     koguchi:number;
     msgzais:Gzai[];
   }
@@ -193,7 +220,7 @@ declare namespace mwI {
     memo:string;
   }
   interface Staff {
-    code:number;
+    code:string;
     mail:string;
     sei:string;
     mei:string;

@@ -6,13 +6,15 @@ import { FrmsalesRoutingModule } from './frmsales-routing.module';
 import { FrmsalesComponent } from './frmsales.component';
 import { JmeitblComponent } from './jmeitbl.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
+import { JdnohelpComponent } from '../share/jdnohelp/jdnohelp.component';
 // import { UserService } from './../services/user.service';
 
 
 @NgModule({
   declarations: [
     FrmsalesComponent,
-    JmeitblComponent
+    JmeitblComponent,
+    JdnohelpComponent
   ],
   imports: [
     CommonModule,

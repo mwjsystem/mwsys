@@ -27,20 +27,24 @@ export class GtnktblComponent implements OnInit {
     this.add_rows(1);
     this.refresh();
   }
-  ngAfterViewChecked(): void {
-    setTimeout(() => {
-      this.cdRef.detectChanges();
-    });
+  // ngAfterViewChecked(): void {
+  //   setTimeout(() => {
+  //     this.cdRef.detectChanges();
+  //   });
+  // }
+  ins_row(row:number){
+    this.frmArr.insert(row,this.createRow());
+    this.refresh();
   }
-
   add_rows(rows:number){
     for (let i=0;i<rows;i++){
-      this.frmArr.push(this.createRow(i+1));
+      this.frmArr.push(this.createRow());
     }
     this.refresh();
   }  
-  updateRow(i:number,gtanka:mwI.Gtanka){
+  updateRow(gtanka:mwI.Gtanka){
     return this.fb.group({
+      action:[''],
       gcode:[gtanka.gcode],
       day:[gtanka.day],
       tanka1:[gtanka.tanka1],
@@ -58,8 +62,9 @@ export class GtnktblComponent implements OnInit {
       taxrate:[gtanka.taxrate]
     });
   }
-  createRow(i:number){
+  createRow(){
     return this.fb.group({
+      action:['ins'],
       gcode:[''],
       day:[''],
       tanka1:[''],
@@ -76,7 +81,7 @@ export class GtnktblComponent implements OnInit {
       taxrate:[''],
       currency:['']
     });
-  } 
+  }  
 
   get frmArr():FormArray {    
     return this.parentForm.get('mtbl2') as FormArray;
@@ -88,10 +93,8 @@ export class GtnktblComponent implements OnInit {
 
   set_gtanka(){
     this.frmArr.clear();
-    let i:number=0;
     this.gdssrv.gtnks.forEach(e => {
-      this.frmArr.push(this.updateRow(i+1,e));
-      i+=1;
+      this.frmArr.push(this.updateRow(e));
     });
     // for(let j=i+1;j<11;j++){
     //   this.frmArr.push(this.createRow(j));
@@ -100,8 +103,9 @@ export class GtnktblComponent implements OnInit {
   }
 
   refresh(): void {
-    this.dataSource.data =  this.frmArr.controls;
+    this.dataSource.data = this.frmArr.controls;
     this.dataSource.paginator = this.paginator;
     this.cdRef.detectChanges();
+    // console.log("tnk"+flg, this.frmArr.controls);
   }
 }

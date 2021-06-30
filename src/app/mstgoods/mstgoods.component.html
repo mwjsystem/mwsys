@@ -1,121 +1,134 @@
-<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
-    <div class="icon-area" fxLayout="row wrap">
-      <button mat-button (click)="modeToCre()" [style.display]="mode==3 ? 'block' : 'none'">
-        <mat-icon>add_box</mat-icon>新規
-      </button>        
-      <button mat-button (click)="modeToUpd()" [style.display]="mode==3 && this.grpcd ? 'block' : 'none'">
-        <mat-icon>edit</mat-icon>編集
-      </button>
-      <button mat-button (click)="save()" [style.display]="mode==3 ? 'none' : 'block'">
-        <mat-icon>save</mat-icon>保存
-      </button>
-      <button mat-button (click)="cancel()" [style.display]="mode==3 ? 'none' : 'block'">
-        <mat-icon>cancel</mat-icon>中止
-      </button>
-      <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
-        <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label>
-        <input matInput [ngModel]="grpcd" gcdInput (ngModelChange)="grpcd=$event" (keyup.enter)="onEnter()" (keydown.f4)="grpcdHelp()"
-        (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
-        <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" [style.display]="mode==3 ? 'inline-block' : 'none'">
+<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
+  <div class="icon-area" fxLayout="row wrap">
+    <button mat-button (click)="modeToCre()" [style.display]="mode==3 ? 'block' : 'none'">
+      <mat-icon>add_box</mat-icon>新規
+    </button>
+    <button mat-button (click)="modeToUpd()" [style.display]="mode==3 && this.grpcd ? 'block' : 'none'">
+      <mat-icon>edit</mat-icon>編集
+    </button>
+    <button mat-button (click)="save()" [style.display]="mode==3 ? 'none' : 'block'">
+      <mat-icon>save</mat-icon>保存
+    </button>
+    <button mat-button (click)="cancel()" [style.display]="mode==3 ? 'none' : 'block'">
+      <mat-icon>cancel</mat-icon>中止
+    </button>
+    <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
+      <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label>
+      <input matInput [ngModel]="grpcd" gcdInput (ngModelChange)="grpcd=$event" (keydown.f4)="grpcdHelp()"
+        (keyup.enter)="get_ggroup(grpcd)" (blur)="refresh()" [ngModelOptions]="{standalone: true}">
+      <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" [style.display]="mode==3 ? 'inline-block' : 'none'">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
         <button mat-button mat-icon-button matSuffix (click)="setPrev()" [style.display]="mode==3 ? 'inline-block' : 'none'">
           <mat-icon>keyboard_arrow_down</mat-icon>
         </button> -->
-        <button mat-button mat-icon-button matSuffix (click)="grpcdHelp()" [style.display]="mode==3 ? 'inline-block' : 'none'">
-          <mat-icon>find_replace</mat-icon>
-        </button>
-      </mat-form-field>
-      <button mat-button (click)="diaImage()">
-        <mat-icon>perm_media</mat-icon>画像・仕様書
+      <button mat-button mat-icon-button matSuffix (click)="grpcdHelp()"
+        [style.display]="mode==3 ? 'inline-block' : 'none'">
+        <mat-icon>find_replace</mat-icon>
       </button>
-      <!-- <button mat-button (click)="toTreat()" *ngIf="mode!==1">
+    </mat-form-field>
+    <button mat-button (click)="diaImage()">
+      <mat-icon>perm_media</mat-icon>画像・仕様書
+    </button>
+    <!-- <button mat-button (click)="toTreat()" *ngIf="mode!==1">
         <mat-icon>question_answer</mat-icon>問合せ
       </button> -->
-      <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ grpcd: grpcd}" *ngIf="mode!==1" target="_blank">
+    <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ grpcd: grpcd}" *ngIf="mode!==1"
+        target="_blank">
         <mat-icon>question_answer</mat-icon>問合せ
       </a></button>
-      <button mat-button (click)="refresh()">
-        <mat-icon>autorenew</mat-icon>再表示
-      </button>
-      <button mat-button><a mat-button href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5" target="_blank">
+    <button mat-button (click)="refresh()">
+      <mat-icon>autorenew</mat-icon>再表示
+    </button>
+    <button mat-button><a mat-button
+        href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
+        target="_blank">
         <mat-icon>help</mat-icon>ヘルプ
       </a></button>
-    </div>
+  </div>
 </mat-toolbar>
 <form [formGroup]="form" fxLayout="column">
-<!-- <div > -->
+  <!-- <div > -->
   <mat-card fxLayout="column" fxLayoutGap="5px">
     <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
       <mat-card-title>
-          基本情報
+        {{mode|modetxt}}基本情報
       </mat-card-title>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
     <mat-card-content>
       <div fxLayout="column">
         <div fxLayoutGap="5px">
-        <mat-form-field style="width:20em">
-          <mat-label>グループ名</mat-label>
-          <input matInput formControlName="name" required>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>フリガナ</mat-label>
-          <input matInput formControlName="kana" required>
-        </mat-form-field>
-        <mat-form-field style="width:8em">
-          <mat-label>商品区分</mat-label>
-          <mat-select formControlName="gkbn" required>
-            <mat-option value ="0">商品</mat-option>
-            <mat-option value ="1">送料</mat-option>
-            <mat-option value ="2">手数料</mat-option>
-            <mat-option value ="3">値引</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>ジャンル</mat-label>
-          <input matInput formControlName="genre" required>
-        </mat-form-field>
-        <mat-form-field style="width: 7em;">
-          <mat-label>仕入先</mat-label>
-          <input matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
-        </mat-form-field>
-        <span class="nmtxt">{{vcdtxt}}</span>
-        <mat-form-field>
-          <mat-label>素材</mat-label>
-          <input matInput formControlName="sozai">
-        </mat-form-field>
-        <!-- <mat-checkbox formControlName="del">削除済</mat-checkbox> -->
+          <mat-form-field style="width:20em">
+            <mat-label>グループ名</mat-label>
+            <input matInput formControlName="name" required>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>フリガナ</mat-label>
+            <input matInput formControlName="kana" required>
+          </mat-form-field>
+          <mat-form-field style="width:8em">
+            <mat-label>商品区分</mat-label>
+            <mat-select formControlName="gkbn" required>
+              <mat-option *ngFor="let sval of bunsrv.gkbn" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>ジャンル</mat-label>
+            <mat-select formControlName="genre" required>
+              <mat-option *ngFor="let sval of bunsrv.genre" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field style="width: 7em;">
+            <mat-label>仕入先</mat-label>
+            <input matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
+            <button mat-button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode!==3">
+              <mat-icon>find_replace</mat-icon>
+            </button>
+          </mat-form-field>
+          <!-- <span class="nmtxt">{{form.value.vcode.toString()}}</span> -->
+          <span class="nmtxt">{{form.value.vcode | vcdtxt}}</span>
+          <mat-form-field>
+            <mat-label>素材</mat-label>
+            <input matInput formControlName="sozai">
+          </mat-form-field>
+          <!-- <mat-checkbox formControlName="del">削除済</mat-checkbox> -->
         </div>
-        <mat-form-field>
-          <mat-label>備考</mat-label>
-          <textarea matInput formControlName="bikou"></textarea>
-        </mat-form-field>
-      </div> 
-    </mat-card-content> 
+        <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+          <mat-form-field style="width: 100%;">
+            <mat-label>備考</mat-label>
+            <textarea matInput formControlName="bikou" matTextareaAutosize></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+    </mat-card-content>
   </mat-card>
-  <mat-card>     
-      <mat-card-header>
-          <mat-card-title>
-              商品コード一覧
-          </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-      <app-gdstbl [parentForm]="form"></app-gdstbl>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        商品コード一覧
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <app-gdstbl [parentForm]="form" (action)="ins_tnkrow($event)"></app-gdstbl>
       <!-- <app-jmeitbl [parentForm]="form"></app-jmeitbl> -->
     </mat-card-content>
   </mat-card>
-<!-- </div> -->
+  <!-- </div> -->
   <!-- <div fxLayout="row wrap"> -->
-    <mat-card>     
-      <mat-card-header>
-          <mat-card-title>
-              商品単価一覧
-          </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <app-gtnktbl [parentForm]="form"></app-gtnktbl>
-      </mat-card-content>
-    </mat-card>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        商品単価一覧
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <app-gtnktbl [parentForm]="form"></app-gtnktbl>
+    </mat-card-content>
+  </mat-card>
   <!-- </div> -->
 </form>

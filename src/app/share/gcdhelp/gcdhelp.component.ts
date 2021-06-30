@@ -88,6 +88,7 @@ export class GcdhelpComponent implements OnInit {
       .subscribe(({ data }) => {
         this.gcds=data.msgoods;
         this.subject.next();
+        this.subject.complete();
       },(error) => {
         console.log('error query get_goods', error);
       });

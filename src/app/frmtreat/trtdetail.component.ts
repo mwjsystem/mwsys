@@ -135,7 +135,7 @@ export class TrtdetailComponent implements OnInit {
     this.inputs.toArray()[num].nativeElement.click();
   }
 
-  save() {
+  async save() {
     const InsertTran = gql`
     mutation ins_treat($object: [trtreat_insert_input!]!) {
       insert_trtreat(objects: $object) {
@@ -162,23 +162,24 @@ export class TrtdetailComponent implements OnInit {
       result:this.usrsrv.editFrmval(this.form,'result'),
     }
     if(this.idx==-1){
-      this.usrsrv.getNumber('treat',1)
-        .subscribe(value => {
-          this.form.get('seq').setValue(value);
-          this.idx=0;
-          this.apollo.mutate<any>({
-            mutation: InsertTran,
-            variables: {
-              "object": {id:this.usrsrv.compid,seq:value,created_at:new Date(),created_by:this.usrsrv.staff.code,...treat}
-            },
-          }).subscribe(({ data }) => {        
-            this.toastr.success('問合せ対応を新規登録しました');
-          },(error) => {
-            this.toastr.error('データベースエラー','問合せ対応の新規登録ができませんでした',
-                              {closeButton: true,disableTimeOut: true,tapToDismiss: false});
-            console.log('error ins_treat', error);
-          });
-        });  
+      // this.usrsrv.getNumber('treat',1)
+      //   .subscribe(value => {
+      let value =await this.usrsrv.getNumber('treat',1);
+      this.form.get('seq').setValue(value);
+      this.idx=0;
+      this.apollo.mutate<any>({
+        mutation: InsertTran,
+        variables: {
+          "object": {id:this.usrsrv.compid,seq:value,created_at:new Date(),created_by:this.usrsrv.staff.code,...treat}
+        },
+      }).subscribe(({ data }) => {        
+        this.toastr.success('問合せ対応を新規登録しました');
+      },(error) => {
+        this.toastr.error('データベースエラー','問合せ対応の新規登録ができませんでした',
+                          {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+        console.log('error ins_treat', error);
+      });
+        // });  
     } else {
       this.apollo.mutate<any>({
         mutation: UpdateTran,

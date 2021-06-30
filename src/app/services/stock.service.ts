@@ -226,6 +226,7 @@ export class StockService {
       },(error) => {
         console.log('error query get_opelog', error);
         observer.next();
+        observer.complete();
       });
     });
     return observable;

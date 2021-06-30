@@ -13,7 +13,7 @@ query get_member($where:msmember_bool_exp!,$where2:msmadr_bool_exp) {
     mail4
     mail5
     tcode1
-    tcode2
+    tcode
     webid
     msmadrs(where:$where2) {
       eda
@@ -64,7 +64,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     mtax
     sscode
     tcode1
-    tcode2
+    tcode
     del
     sptnkbn
     daibunrui

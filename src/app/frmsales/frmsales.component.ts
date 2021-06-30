@@ -23,6 +23,7 @@ import { MembsService } from './../services/membs.service';
 // import { GcdService } from './../share/gcdhelp/gcd.service';
 import { DownloadService } from './../services/download.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
+import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { EdaService } from './../share/adreda/eda.service';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 
@@ -36,12 +37,12 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
 export class FrmsalesComponent implements OnInit {
   @ViewChild(JmeitblComponent ) jmeitbl:JmeitblComponent;
   form: FormGroup;
-  denno:number|string;
+  // denno:number|string;
   mode: number=3;
   hktval: mwI.Sval[]=[];
-  mcdtxt:string;
-  scdtxt:string;
-  ncdtxt:string;  
+  // mcdtxt:string;
+  // scdtxt:string;
+  // ncdtxt:string;  
   rows: FormArray = this.fb.array([]);
   qrurl:string;
   getden:number;
@@ -129,10 +130,11 @@ export class FrmsalesComponent implements OnInit {
       mtbl: this.rows 
     });
     this.memsrv.get_members().then(result => {
-      this.setMcdtxt();
-      this.setScdtxt();
-      this.setNcdtxt();
-      this.overlayRef.detach();      
+      // this.setMcdtxt();
+      // this.setScdtxt();
+      // this.setNcdtxt();
+      this.overlayRef.detach(); 
+      this.cdRef.detectChanges();     
     });
     // this.gcdsrv.get_goods();
     this.bnssrv.get_bunsho();
@@ -143,16 +145,16 @@ export class FrmsalesComponent implements OnInit {
     this.bunsrv.get_bunrui();
     this.stfsrv.get_staff();
     this.route.paramMap.subscribe((params: ParamMap)=>{
-      if (params.get('denno') !== null){
-        this.denno = +params.get('denno');
-        // console.log(this.denno);
-        this.get_jyuden(this.denno);
-      }
       if (params.get('mode') === null){
-        this.mode = 3;
+        this.mode=3;
       }else{
         this.mode = +params.get('mode');
-      } 
+      }
+      if (params.get('denno') !== null){
+        this.jmisrv.denno = +params.get('denno');
+        // console.log(this.denno);
+        this.get_jyuden(this.jmisrv.denno);
+      }
     }); 
     this.jmisrv.observe.subscribe(flg=>{
       this.cdRef.detectChanges();
@@ -188,15 +190,15 @@ export class FrmsalesComponent implements OnInit {
     
     
     let head = this.usrsrv.pickObj(this.form.getRawValue(),['yday','mcode','ncode','nadr']);
-    head['mcdtxt'] = this.mcdtxt;
+    head['mcdtxt'] = this.memsrv.get_mcdtxt(this.form.value.mcode);
     head['adrname'] = this.edasrv.get_name(+this.form.getRawValue().nadr);
-    head['tcdnm0'] = this.stfsrv.get_name(+this.form.getRawValue().tcode);
-    head['tcdnm1'] = this.stfsrv.get_name(+this.form.getRawValue().tcode1);
+    head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
+    head['tcdnm1'] = this.stfsrv.get_name(this.form.getRawValue().tcode1);
     head['tcd0'] = this.form.getRawValue().tcode;
     // console.log(this.qrurl);
-    this.dwlsrv.dl_csv(head,this.denno + format + ".csv");
-    this.dwlsrv.dl_kick(this.form.getRawValue().mtbl,this.denno + format + "2.csv",this.usrsrv.system.urischema + format + "_" + this.denno,this.elementRef);
-    this.dwlsrv.dl_img(this.denno + format + ".png",this.elementRef);
+    this.dwlsrv.dl_csv(head,this.jmisrv.denno + format + ".csv");
+    this.dwlsrv.dl_kick(this.form.getRawValue().mtbl,this.jmisrv.denno + format + "2.csv",this.usrsrv.system.urischema + format + "_" + this.jmisrv.denno,this.elementRef);
+    this.dwlsrv.dl_img(this.jmisrv.denno + format + ".png",this.elementRef);
   }
 
   openOkuri(hcode,value){
@@ -215,9 +217,9 @@ export class FrmsalesComponent implements OnInit {
   }
 
   refresh():void {
-    if (this.denno !=null ){
-      this.denno=this.usrsrv.convNumber(this.denno);
-      this.get_jyuden(this.denno);
+    if (this.jmisrv.denno>0){
+      this.jmisrv.denno=this.usrsrv.convNumber(this.jmisrv.denno);
+      this.get_jyuden(this.jmisrv.denno);
     }
     
     // console.log(this.jmisrv.jyumei);
@@ -227,69 +229,56 @@ export class FrmsalesComponent implements OnInit {
     return this.form.get('mtbl') as FormArray;
   }  
 
-  get_jyuden(denno:number|string):void{
-    // this.denno += '　読込中';
+  get_jyuden(denno:number):void{
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
-    this.apollo.watchQuery<any>({
-      query: Query.GetJyuden, 
-        variables: { 
-          id : this.usrsrv.compid,
-          dno: denno
-        },
-    })
-    .valueChanges
-    .subscribe(({ data }) => {
-      this.form.reset();
-      if (data.trjyuden_by_pk == null){
-        // this.denno = denno + '　未登録';
-        this.toastr.info("受注伝票番号" + denno + "は登録されていません");
+    if(this.jmisrv.denno>0){
+      this.apollo.watchQuery<any>({
+        query: Query.GetJyuden, 
+          variables: { 
+            id : this.usrsrv.compid,
+            dno: denno
+          },
+      })
+      .valueChanges
+      .subscribe(({ data }) => {
+        this.form.reset();
+        if (data.trjyuden_by_pk == null){
+          this.toastr.info("受注伝票番号" + denno + "は登録されていません");
+          history.replaceState('','','./frmsales');
+        } else {
+          let jyuden:mwI.Jyuden=data.trjyuden_by_pk;
+          if(jyuden.nadr>1){
+            this.form.get('nsaki').setValue("2");
+          } else { 
+            this.form.get('nsaki').setValue(jyuden.nadr.toString());  
+          }
+          this.form.patchValue(jyuden);
+          this.jmisrv.jyumei=data.trjyuden_by_pk.trjyumeis;
+          this.jmisrv.jyumei
+          this.jmeitbl.set_jyumei();
+          this.usrsrv.setTmstmp(jyuden);
+          this.jmisrv.denno=denno;
+          this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
+          history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
+          this.overlayRef.detach();
+        }
+      },(error) => {
+        console.log('error query GetJyuden', error);
+        this.toastr.info("受注伝票読込エラー");
+        this.form.reset();
         history.replaceState('','','./frmsales');
-      } else {
-        let jyuden:mwI.Jyuden=data.trjyuden_by_pk;
-
-        // console.log(this.form.value);
-        if(jyuden.nadr>1){
-          this.form.get('nsaki').setValue("2");
-        } else { 
-          this.form.get('nsaki').setValue(jyuden.nadr.toString());  
-        }
-        // console.log(this.form);
-        this.form.patchValue(jyuden);
-        // this.form.get('nadr').setValue(+jyuden.nadr);
-        // console.log(this.form.value.bunsyo,jyuden.bunsyo);
-        this.jmisrv.jyumei=data.trjyuden_by_pk.trjyumeis;
-        this.jmisrv.jyumei
-        this.jmeitbl.set_jyumei();
-        this.usrsrv.setTmstmp(jyuden);
-        this.denno=denno;
-        this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.denno;
-        // console.log(this.form.getRawValue().mcode);
-        // this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
-        this.setMcdtxt();
-        this.setScdtxt();
-        this.setNcdtxt();
-        if(this.mode==3){
-          this.form.disable();
-          // console.log('refresh disable');
-          this.usrsrv.disable_mtbl(this.form);
-        }else{
-          this.form.enable();
-          // console.log('refresh enable');
-          this.usrsrv.enable_mtbl(this.form);
-        }
-        history.replaceState('','','./frmsales/' + this.mode + '/' + this.denno);
         this.overlayRef.detach();
-      }
-    },(error) => {
-      console.log('error query GetJyuden', error);
-      // this.denno = denno + '　読込エラー';
-      this.toastr.info("受注伝票読込エラー");
-      this.form.reset();
-      history.replaceState('','','./frmsales');
-      this.overlayRef.detach();
-    });
+      });
+    }
+    if(this.mode==3){
+      this.form.disable();
+      this.usrsrv.disable_mtbl(this.form);
+    }else{
+      this.form.enable();
+      this.usrsrv.enable_mtbl(this.form);
+    }
   }
  
   mcdHelp(fldnm:string): void {
@@ -309,6 +298,19 @@ export class FrmsalesComponent implements OnInit {
   }
 
   dennoHelp(){
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.width  = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass= 'full-screen-modal';
+    let dialogRef = this.dialog.open(JdnohelpComponent, dialogConfig);
+    
+    dialogRef.afterClosed().subscribe(
+      data=>{
+          if(typeof data != 'undefined'){
+            this.jmisrv.denno = data.denno;
+          }
+      }
+    );
 
   }
   changeMcd(){
@@ -319,49 +321,30 @@ export class FrmsalesComponent implements OnInit {
       lcmcode = ""; 
     }
     this.form.get('mcode').setValue(lcmcode);
-    this.setMcdtxt();
+    // this.setMcdtxt();
     this.form.get('scode').setValue(lcmcode);
     this.form.get('ncode').setValue(lcmcode);
+    this.get_member(lcmcode);
     // this.form.get('nadr').setValue(0);
-    this.setScdtxt();
-    this.setNcdtxt();
+    // this.setScdtxt();
+    // this.setNcdtxt();
   }
-  setMcdtxt(){
-    let mcd:number=this.form.getRawValue().mcode;
-    // console.log(this.form.getRawValue().mcode,this.membs);
-    const i:number = this.memsrv.membs.findIndex(obj => obj.mcode == mcd);
-    // console.log(i);
-    if(i > -1 ){
-      this.mcdtxt = this.memsrv.membs[i].mei ?? "";
-      this.mcdtxt = this.memsrv.membs[i].sei + this.mcdtxt;
-      this.get_member(mcd);
-    } else {
-      this.mcdtxt="";  
-    }
-  }  
-  setScdtxt(){
-    let scd:number=this.form.getRawValue().scode;
-    const i:number = this.memsrv.membs.findIndex(obj => obj.mcode == scd);
-    if(i > -1 ){
-      // this.scdtxt = this.membs[i].mei ?? "";
-      this.scdtxt = this.memsrv.membs[i].sei + (this.memsrv.membs[i].mei ?? "");
-    } else {
-      this.scdtxt="";  
-    }
-  } 
+  // setMcdtxt(){
+  //   let mcd:number=this.form.getRawValue().mcode;
+  //   this.mcdtxt=this.memsrv.get_mcdtxt(mcd);
+  //   if(this.mcdtxt ){
+  //     this.get_member(mcd);
+  //   }
+  // }  
+  // setScdtxt(){
+  //   let scd:number=this.form.getRawValue().scode;
+  //   this.scdtxt=this.memsrv.get_mcdtxt(scd);
+  // } 
 
-  setNcdtxt(){
-    // this.form.get('nadr').setValue(0);
-    let ncd:number=this.form.getRawValue().ncode;
-    const i:number = this.memsrv.membs.findIndex(obj => obj.mcode == ncd);
-    // console.log(i);
-    if(i > -1 ){
-      this.ncdtxt = this.memsrv.membs[i].sei + (this.memsrv.membs[i].mei ?? "");
-      this.get_madr(ncd);
-    } else {
-      this.ncdtxt="";  
-    }
-  }
+  // setNcdtxt(){
+  //   let ncd:number=this.form.getRawValue().ncode;
+  //   this.ncdtxt=this.memsrv.get_mcdtxt(ncd);
+  // }
   get_member(mcode:number){
     this.apollo.watchQuery<any>({
       query: Query.GetMember, 
@@ -373,7 +356,7 @@ export class FrmsalesComponent implements OnInit {
     .valueChanges
     .subscribe(({ data }) => {
       if (data.msmember_by_pk == null){
-
+        this.toastr.info("顧客コード" + mcode + "は登録されていません");
       } else {
         let member:mwI.Member=data.msmember_by_pk;
         this.form.patchValue(member);
@@ -386,9 +369,10 @@ export class FrmsalesComponent implements OnInit {
         this.jmisrv.ntype=member.ntype;
         this.jmisrv.tntype=member.tntype;
         this.stit=member.msmstits;
+        this.cdRef.detectChanges();
       }
     },(error) => {
-      console.log('error query get_msmadr', error);
+      console.log('error query get_member', error);
     });
   }
 
@@ -437,7 +421,7 @@ export class FrmsalesComponent implements OnInit {
       let dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
       dialogConfig.data = {
-        mcode: ncd +'(' + this.ncdtxt + ')',
+        mcode: ncd,
         mode: this.mode,
         eda: this.form.value.nadr
       };
@@ -470,13 +454,14 @@ export class FrmsalesComponent implements OnInit {
   modeToCre():void {
     this.mode=1;
     this.form.reset();
-    this.mcdtxt=""
-    this.scdtxt=""
-    this.ncdtxt=""
-    this.denno="新規登録"; 
+    // this.mcdtxt=""
+    // this.scdtxt=""
+    // this.ncdtxt=""
+    this.jmisrv.denno=0; 
     this.form.get('tcode').setValue(this.usrsrv.staff.code);
     this.form.get('day').setValue(new Date());
     this.form.get('souko').setValue("01");
+    this.jmisrv.souko="01";
     this.form.get('skbn').setValue("1");
     // this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
     this.form.enable();
@@ -488,14 +473,25 @@ export class FrmsalesComponent implements OnInit {
   modeToUpd():void {
     this.mode=2;
     this.refresh();
-    history.replaceState('','','./frmsales/' + this.mode + '/' + this.denno);
+    history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
   }
 
   cancel():void {
     this.mode=3;
     this.refresh();
     this.form.markAsPristine();
-    history.replaceState('','','./frmsales/' + this.mode + '/' + this.denno);
+    history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
+  }
+  getInvalid():string{
+    let tooltip:string="";
+    const ctrls0=this.form.controls;
+  　for (const name in ctrls0){
+      if(ctrls0[name].invalid){
+        tooltip += this.usrsrv.getColtxt('trjyuden',name) + '⇒' + this.usrsrv.getValiderr(ctrls0[name].errors) + '\n' ;
+      }
+    }
+    return tooltip;
+
   }
 
   save():void {

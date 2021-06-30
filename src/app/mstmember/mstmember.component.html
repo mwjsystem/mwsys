@@ -1,282 +1,284 @@
-<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
-    <div class="icon-area" fxLayout="row wrap">
-      <button mat-button (click)="modeToCre()" *ngIf="mode==3" fxHide fxShow.gt-sm>
-        <mat-icon>add_box</mat-icon>新規
-      </button>        
-      <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.mcd" fxHide fxShow.gt-sm>
-        <mat-icon>edit</mat-icon>編集
-      </button>
-      <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3" fxHide fxShow.gt-sm>
-        <mat-icon>save</mat-icon>保存
-      </button>
-      <button mat-button (click)="cancel()" *ngIf="mode!=3" fxHide fxShow.gt-sm>
-        <mat-icon>cancel</mat-icon>中止
-      </button>
-      <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
-        <mat-label>顧客コード</mat-label>
-        <input matInput [(ngModel)]="mcd" (keyup.enter)="refresh()" maxlength="12"
-         (keydown.f4)="mcdHelp()" (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
-        <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode==3">
+<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
+  <div class="icon-area" fxLayout="row wrap">
+    <button mat-button (click)="modeToCre()" *ngIf="mode==3" fxHide fxShow.gt-sm>
+      <mat-icon>add_box</mat-icon>新規
+    </button>
+    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.mcd" fxHide fxShow.gt-sm>
+      <mat-icon>edit</mat-icon>編集
+    </button>
+    <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3" fxHide fxShow.gt-sm>
+      <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
+    </button>
+    <button mat-button (click)="cancel()" *ngIf="mode!=3" fxHide fxShow.gt-sm>
+      <mat-icon>cancel</mat-icon>中止
+    </button>
+    <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
+      <mat-label>顧客コード</mat-label>
+      <input matInput [(ngModel)]="mcd" (keyup.enter)="refresh()" maxlength="12" (keydown.f4)="mcdHelp()"
+        (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
+      <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode==3">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
         <button mat-button mat-icon-button matSuffix (click)="setPrev()" *ngIf="mode==3">
           <mat-icon>keyboard_arrow_down</mat-icon>
         </button> -->
-        <button mat-button mat-icon-button matSuffix (click)="mcdHelp()" *ngIf="mode==3">
-          <mat-icon>find_replace</mat-icon>
-        </button>
-      </mat-form-field>
-      <button mat-button (click)="diaBetsu()" *ngIf="mode!=1">
-        <mat-icon>local_shipping</mat-icon>
-        <span  fxHide fxShow.gt-sm>別納先</span>
+      <button mat-button mat-icon-button matSuffix (click)="mcdHelp()" *ngIf="mode==3">
+        <mat-icon>find_replace</mat-icon>
       </button>
-      <button  mat-button (click)="test(1)" *ngIf="mode!=1">
-        <mat-icon>scanner</mat-icon>
-        <span  fxHide fxShow.gt-sm>刺繍データ</span>
-      </button>
-      <button  mat-button (click)="test(1)" *ngIf="mode!=1">
+    </mat-form-field>
+    <button mat-button (click)="diaBetsu()" *ngIf="mode!=1">
+      <mat-icon>local_shipping</mat-icon>
+      <span fxHide fxShow.gt-sm>別納先</span>
+    </button>
+    <button mat-button (click)="test(1)" *ngIf="mode!=1">
+      <mat-icon>scanner</mat-icon>
+      <span fxHide fxShow.gt-sm>刺繍データ</span>
+    </button>
+    <!-- <button mat-button (click)="test(1)" *ngIf="mode!=1">
+      <mat-icon>question_answer</mat-icon>
+      <span fxHide fxShow.gt-sm>問合せ</span>
+    </button> -->
+    <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ mcode: mcd}" *ngIf="mode!==1"
+        target="_blank">
         <mat-icon>question_answer</mat-icon>
-        <span  fxHide fxShow.gt-sm>問合せ</span>
-      </button>
-      <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ mcode: mcd}" *ngIf="mode!==1" target="_blank">
-        <mat-icon>question_answer</mat-icon>
-        <span  fxHide fxShow.gt-sm>問合せ</span>
+        <span fxHide fxShow.gt-sm>問合せ</span>
       </a></button>
-      <button mat-button (click)="refresh()">
-        <mat-icon>autorenew</mat-icon>
-        <span  fxHide fxShow.gt-sm>再表示</span>
-      </button>
-      <button mat-button><a mat-button href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5" target="_blank">
+    <button mat-button (click)="refresh()">
+      <mat-icon>autorenew</mat-icon>
+      <span fxHide fxShow.gt-sm>再表示</span>
+    </button>
+    <button mat-button><a mat-button
+        href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
+        target="_blank">
         <mat-icon>help</mat-icon>
         ヘルプ
       </a></button>
-    </div>
+  </div>
 </mat-toolbar>
 <form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px">
-<mat-card fxFlex.gt-sm="50">
-  <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
-    <mat-card-title>
-        基本情報
-    </mat-card-title>
-    <app-tmstmp></app-tmstmp>
-  </mat-card-header>
-  <mat-card-content>
-    <form formGroupName="base" fxLayout="row wrap" fxLayoutGap="5px">
-      <mat-form-field style="width:20em">
-        <mat-label>姓/会社名</mat-label>
-        <input tabIndex="1" matInput formControlName="sei" required>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>名</mat-label>
-        <input tabIndex="2" matInput formControlName="mei">
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>フリガナ</mat-label>
-        <input tabIndex="3" matInput formControlName="kana" required>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>単価区分</mat-label>
-        <mat-select #msel1 tabIndex="4" formControlName="tankakbn" required (keyup.enter)="msel1.close()">
-          <mat-option *ngFor="let sval of bunsrv.tanka" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:5em">
-        <mat-label>税区分</mat-label>
-        <mat-select #msel2 tabIndex="5" formControlName="mtax" required (keyup.enter)="msel2.close()">
-          <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>入金予定初期値</mat-label>
-        <mat-select #msel3 tabIndex="6" formControlName="pcode" (keyup.enter)="msel3.close()">
-          <mat-option *ngFor="let sval of bunsrv.pay" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:4em">
-        <mat-label>配送方法初期値</mat-label>
-        <mat-select  #msel4 tabIndex="7" matInput formControlName="hcode" (keyup.enter)="msel4.close()">
-          <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
-            {{sval.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>大分類</mat-label>
-        <mat-select #msel5 tabIndex="8" formControlName="daibunrui" (keyup.enter)="msel5.close()">
-          <mat-option *ngFor="let sval of bunsrv.daib" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>中分類</mat-label>
-        <mat-select #msel6 tabIndex="9" formControlName="chubunrui" (keyup.enter)="msel6.close()">
-          <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>小分類</mat-label>
-        <mat-select #msel7 tabIndex="10" formControlName="shobunrui" (keyup.enter)="msel7.close()">
-          <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>営業担当</mat-label>
-        <mat-select #msel8 tabIndex="11" formControlName="tcode1" (keyup.enter)="msel8.close()" required>
-          <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>内勤担当</mat-label>
-        <mat-select #msel9 tabIndex="12" formControlName="tcode2" (keyup.enter)="msel9.close()" required>
-          <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>      
-      <mat-form-field style="width:8em">
-        <mat-label>特別単価区分</mat-label>
-        <mat-select #msel10 tabIndex="13" formControlName="sptnkbn" (keyup.enter)="msel10.close()">
-          <mat-option *ngFor="let sval of bunsrv.sptnk" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>配達時間帯</mat-label>
-        <mat-select #msel11 tabIndex="14" formControlName="htime" (keyup.enter)="msel11.close()">
-          <mat-option *ngFor="let sval of bunsrv.htime" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>納品書タイプ</mat-label>
-        <mat-select #msel12 tabIndex="15" formControlName="ntype" (keyup.enter)="msel12.close()">
-          <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
-            {{sval.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field style="width:8em">
-        <mat-label>納品書Type(直送)</mat-label>
-        <mat-select #msel13 tabIndex="16" formControlName="tntype" (keyup.enter)="msel13.close()">
-          <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
-            {{sval.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Web会員ID</mat-label>
-        <input matInput formControlName="webid" required>
-      </mat-form-field>      
-      <mat-checkbox formControlName="del">削除済</mat-checkbox>
-      <div fxLafxLayout="row wrap" fxLayoutGap="5px">
-        <mat-form-field style="width: 100%;">
-          <mat-label>備考</mat-label>
-          <textarea matInput formControlName="bikou" matTextareaAutosize></textarea>
-        </mat-form-field>
-        <mat-form-field style="width: 100%;">
-          <mat-label>社内向け備考</mat-label>
-          <textarea matInput formControlName="inbikou" matTextareaAutosize></textarea>
-        </mat-form-field>
-      </div>
-    </form> 
-  </mat-card-content> 
-</mat-card>
-<mat-card fxFlex.gt-sm="49">     
-    <mat-card-header>
-        <mat-card-title>
-            基本住所
-        </mat-card-title>
+  <mat-card fxFlex.gt-sm="50">
+    <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
+      <mat-card-title>
+        {{mode|modetxt}}基本情報
+      </mat-card-title>
+      <app-tmstmp></app-tmstmp>
     </mat-card-header>
-    <app-address [formName]="'addr0'"></app-address>        
-</mat-card>
-<mat-accordion multi>
-    <form formGroupName="kake">
-        <mat-expansion-panel>        
-            <mat-expansion-panel-header fxLayoutGap="10px">
-                <mat-label> 掛請求</mat-label>
-                <input type="checkbox" formControlName="torikbn">
-                <small style="margin-left:20px">締め日、入金日の末日は99を入力</small>
-            </mat-expansion-panel-header> 
-            <div fxLayoutGap="5px">
-            <mat-form-field style="width:5em">
-                <mat-label>締め日</mat-label>
-                <input tabIndex="21" matInput formControlName="sime">
-            </mat-form-field>
-            <mat-form-field style="width:5em">
-                <mat-label>入金サイト</mat-label>
-                <mat-select tabIndex="22" formControlName="site">
-                  <mat-option *ngFor="let sval of bunsrv.site" [value]="sval.value">
-                    {{sval.viewval}}
-                  </mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field style="width:5em">
-                <mat-label>入金日</mat-label>
-                <input tabIndex="23" matInput formControlName="inday">
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>請求先コード</mat-label>
-                <input tabIndex="24" matInput formControlName="scode">
-            </mat-form-field>
-            <mat-form-field>
-              <mat-label>請求書送付先コード</mat-label>
-              <input tabIndex="25" matInput formControlName="sscode">
-            </mat-form-field>
-          </div>
-        </mat-expansion-panel>
-    </form>
-    <form formGroupName="mail">
+    <mat-card-content>
+      <form formGroupName="base" fxLayout="row wrap" fxLayoutGap="5px">
+        <mat-form-field style="width:20em">
+          <mat-label>姓/会社名</mat-label>
+          <input tabIndex="1" matInput formControlName="sei" required>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>名</mat-label>
+          <input tabIndex="2" matInput formControlName="mei">
+        </mat-form-field>
+        <mat-form-field>
+          <!-- <mat-label>{{this.usrsrv.getColtxt('msmember','kana')}}</mat-label> -->
+          <mat-label>フリガナ(半角ｶﾅ)</mat-label>
+          <input tabIndex="3" matInput formControlName="kana" (change)="updKana($event.target.value)" required>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>単価区分</mat-label>
+          <mat-select #msel1 tabIndex="4" formControlName="tankakbn" required (keyup.enter)="msel1.close()">
+            <mat-option *ngFor="let sval of bunsrv.tanka" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:5em">
+          <mat-label>税区分</mat-label>
+          <mat-select #msel2 tabIndex="5" formControlName="mtax" required (keyup.enter)="msel2.close()">
+            <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>入金予定初期値</mat-label>
+          <mat-select #msel3 tabIndex="6" formControlName="pcode" (keyup.enter)="msel3.close()">
+            <mat-option *ngFor="let sval of bunsrv.pay" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:4em">
+          <mat-label>配送方法初期値</mat-label>
+          <mat-select #msel4 tabIndex="7" matInput formControlName="hcode" (keyup.enter)="msel4.close()">
+            <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
+              {{sval.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>大分類</mat-label>
+          <mat-select #msel5 tabIndex="8" formControlName="daibunrui" (keyup.enter)="msel5.close()">
+            <mat-option *ngFor="let sval of bunsrv.daib" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>中分類</mat-label>
+          <mat-select #msel6 tabIndex="9" formControlName="chubunrui" (keyup.enter)="msel6.close()">
+            <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>小分類</mat-label>
+          <mat-select #msel7 tabIndex="10" formControlName="shobunrui" (keyup.enter)="msel7.close()">
+            <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>営業担当</mat-label>
+          <mat-select #msel8 tabIndex="11" formControlName="tcode1" (keyup.enter)="msel8.close()" required>
+            <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>内勤担当</mat-label>
+          <mat-select #msel9 tabIndex="12" formControlName="tcode" (keyup.enter)="msel9.close()" required>
+            <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>特別単価区分</mat-label>
+          <mat-select #msel10 tabIndex="13" formControlName="sptnkbn" (keyup.enter)="msel10.close()">
+            <mat-option *ngFor="let sval of bunsrv.sptnkbn" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>配達時間帯</mat-label>
+          <mat-select #msel11 tabIndex="14" formControlName="htime" (keyup.enter)="msel11.close()">
+            <mat-option *ngFor="let sval of bunsrv.htime" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>納品書タイプ</mat-label>
+          <mat-select #msel12 tabIndex="15" formControlName="ntype" (keyup.enter)="msel12.close()">
+            <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
+              {{sval.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>納品書Type(直送)</mat-label>
+          <mat-select #msel13 tabIndex="16" formControlName="tntype" (keyup.enter)="msel13.close()">
+            <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
+              {{sval.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Web会員ID</mat-label>
+          <input matInput formControlName="webid">
+        </mat-form-field>
+        <mat-checkbox formControlName="del">削除済</mat-checkbox>
+        <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+          <mat-form-field style="width: 100%;">
+            <mat-label>備考</mat-label>
+            <textarea matInput formControlName="bikou" matTextareaAutosize></textarea>
+          </mat-form-field>
+          <mat-form-field style="width: 100%;">
+            <mat-label>社内向け備考</mat-label>
+            <textarea matInput formControlName="inbikou" matTextareaAutosize></textarea>
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+  <mat-card fxFlex.gt-sm="49">
+    <mat-card-header>
+      <mat-card-title>
+        基本住所
+      </mat-card-title>
+    </mat-card-header>
+    <app-address [formName]="'addr0'"></app-address>
+  </mat-card>
+  <mat-accordion multi>
+    <form formGroupName="base">
       <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <!-- <div fxLayout="column" fxLayoutGap="5px"> -->
-                <mat-form-field>
-                  <mat-label>メールアドレス</mat-label>
-                  <input tabIndex="31" matInput formControlName="mail">
-                </mat-form-field>
-            <!-- </div> -->
-          </mat-expansion-panel-header> 
-          <div fxLayout="row" fxLayoutGap="5px">
+        <mat-expansion-panel-header fxLayoutGap="10px">
+          <mat-label> 掛請求</mat-label>
+          <input type="checkbox" formControlName="torikbn">
+          <small style="margin-left:20px">締め日、入金日の末日は99を入力</small>
+        </mat-expansion-panel-header>
+        <div fxLayoutGap="5px">
+          <mat-form-field style="width:5em">
+            <mat-label>締め日</mat-label>
+            <input tabIndex="21" matInput formControlName="sime">
+          </mat-form-field>
+          <mat-form-field style="width:5em">
+            <mat-label>入金サイト</mat-label>
+            <mat-select tabIndex="22" formControlName="site">
+              <mat-option *ngFor="let sval of bunsrv.site" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field style="width:5em">
+            <mat-label>入金日</mat-label>
+            <input tabIndex="23" matInput formControlName="inday">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>請求先コード</mat-label>
+            <input tabIndex="24" matInput formControlName="scode">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>請求書送付先コード</mat-label>
+            <input tabIndex="25" matInput formControlName="sscode">
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <!-- <div fxLayout="column" fxLayoutGap="5px"> -->
+          <mat-form-field>
+            <mat-label>メールアドレス</mat-label>
+            <input tabIndex="31" matInput formControlName="mail" (change)="updMail('mail',$event.target.value)">
+          </mat-form-field>
+          <!-- </div> -->
+        </mat-expansion-panel-header>
+        <div fxLayout="row" fxLayoutGap="5px">
           <mat-form-field>
             <mat-label>メールアドレス2</mat-label>
-            <input tabIndex="32" matInput formControlName="mail2">
+            <input tabIndex="32" matInput formControlName="mail2" (change)="updMail('mail2',$event.target.value)">
           </mat-form-field>
           <mat-form-field>
             <mat-label>メールアドレス3</mat-label>
-            <input tabIndex="33" matInput formControlName="mail3">
+            <input tabIndex="33" matInput formControlName="mail3" (change)="updMail('mail3',$event.target.value)">
           </mat-form-field>
           <mat-form-field>
             <mat-label>メールアドレス4</mat-label>
-            <input tabIndex="34" matInput formControlName="mail4">
+            <input tabIndex="34" matInput formControlName="mail4" (change)="updMail('mail4',$event.target.value)">
           </mat-form-field>
           <mat-form-field>
             <mat-label>メールアドレス5</mat-label>
-            <input tabIndex="35" matInput formControlName="mail5">
+            <input tabIndex="35" matInput formControlName="mail5" (change)="updMail('mail5',$event.target.value)">
           </mat-form-field>
-          </div>
+        </div>
       </mat-expansion-panel>
-    </form>  
+    </form>
     <mat-expansion-panel>
-        <mat-expansion-panel-header>
-            <mat-panel-title>
-            その他住所
-            </mat-panel-title>
-        </mat-expansion-panel-header>
-        <app-address [formName]="'addr1'"></app-address>                
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          その他住所
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <app-address [formName]="'addr1'"></app-address>
     </mat-expansion-panel>
-</mat-accordion>
+  </mat-accordion>
 </form>

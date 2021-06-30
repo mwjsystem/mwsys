@@ -45,13 +45,13 @@ export class FrmkeepComponent implements OnInit {
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('denno') !== null){
         this.denno = +params.get('denno');
-        this.get_opelog({denno:params.get('denno')}).subscribe(value => {
+        this.get_opelog({denno:params.get('denno')}).then(value => {
           this.dataSource= new MatTableDataSource<mwI.Tropelog>(value);
           this.overlayRef.detach();
           this.cdRef.detectChanges();
         });
       } else {
-        this.get_opelog({status:"依頼中"}).subscribe(value => {
+        this.get_opelog({status:"依頼中"}).then(value => {
           this.denno = 0;
           this.dataSource= new MatTableDataSource<mwI.Tropelog>(value);
           this.overlayRef.detach();
@@ -61,7 +61,7 @@ export class FrmkeepComponent implements OnInit {
     }); 
   }
 
-  get_opelog(param:GetOpe):Observable<mwI.Tropelog[]> {
+  async get_opelog(param:GetOpe):Promise<mwI.Tropelog[]> {
     const GetLog = gql`
     query get_opelog($id:smallint!,$typ:String!,$kcd:[String!],$sts:[String!]) {
       tropelog(where:{id:{_eq:$id}, keycode:{_in:$kcd}, extype:{_eq:$typ}, status:{_in:$sts}}, order_by:{sequ: asc}) {
@@ -85,7 +85,8 @@ export class FrmkeepComponent implements OnInit {
       lcstatus=[param['status']];
     }
     // console.log(lckeycode,lcstatus);
-    let observable:Observable<mwI.Tropelog[]> = new Observable<mwI.Tropelog[]>(observer => {
+    return new Promise( resolve => {
+    // let observable:Observable<mwI.Tropelog[]> = new Observable<mwI.Tropelog[]>(observer => {
       this.apollo.watchQuery<any>({
         query: GetLog, 
           variables: { 
@@ -97,20 +98,23 @@ export class FrmkeepComponent implements OnInit {
       })
       .valueChanges
       .subscribe(({ data }) => {
-        observer.next(data.tropelog);
+        // observer.next(data.tropelog);
+        return resolve(data.tropelog);
+        // observer.complete();
         // console.log(data.tropelog);
       },(error) => {
         console.log('error query get_opelog', error);
-        observer.next([]);
+        return resolve([]); 
+        // observer.next([]);
       });
     });
-    return observable;
+    // return observable;
   }
 
   to_Req(){
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.denno = 0;
-    this.get_opelog({status:"依頼中"}).subscribe(value => {
+    this.get_opelog({status:"依頼中"}).then(value => {
       this.dataSource= new MatTableDataSource<mwI.Tropelog>(value);
       this.overlayRef.detach();
       this.cdRef.detectChanges();
@@ -120,7 +124,7 @@ export class FrmkeepComponent implements OnInit {
 
   to_Denno(pdenno){
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.get_opelog({denno:pdenno}).subscribe(value => {
+    this.get_opelog({denno:pdenno}).then(value => {
       this.dataSource= new MatTableDataSource<mwI.Tropelog>(value);
       this.overlayRef.detach();
       this.cdRef.detectChanges();

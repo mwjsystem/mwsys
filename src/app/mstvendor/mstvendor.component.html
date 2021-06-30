@@ -1,4 +1,4 @@
-<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
   <div class="icon-area" fxLayout="row wrap">
     <button mat-button (click)="modeToCre()" *ngIf="mode==3" fxHide fxShow.gt-sm>
       <mat-icon>add_box</mat-icon>新規
@@ -32,7 +32,7 @@
   <mat-card>
     <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
       <mat-card-title>
-        基本情報
+        {{mode|modetxt}}基本情報
       </mat-card-title>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>

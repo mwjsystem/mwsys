@@ -13,7 +13,7 @@ declare namespace mwI {
     ncode:number;
     nadr:number;
     souko:string;
-    tcode:number;
+    tcode:string;
     bunsho:number;
     dbikou:string;
     nbikou:string;
@@ -93,6 +93,7 @@ declare namespace mwI {
     code:string;
     gkbn:string;
     vcode:string;
+    spdet:string;
   }
   // interface SalGds {
   //   gcode:string;
