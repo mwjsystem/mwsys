@@ -319,9 +319,9 @@ export class UserService {
     const url = this.router.createUrlTree(['/'+func,'3',value]);
     window.open(url.toString(),null,'top=100,left=100');
   }
-  openFrmsup(value){
-    const url = this.router.createUrlTree(['/frmsupply','1',0]);
-    window.open(url.toString() + '?stkey=' + value ,null,'top=100,left=100');
+  openFrmsup(hdno,jdkey){
+    const url = this.router.createUrlTree(['/frmsupply','1',hdno]);
+    window.open(url.toString() + '?stkey=' + jdkey ,null,'top=100,left=100');
   }
   confirmCan(dirty:boolean):boolean{
       let ret:boolean=false;

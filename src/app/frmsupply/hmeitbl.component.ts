@@ -132,6 +132,7 @@ export class HmeitblComponent implements OnInit {
 
   updGds(i: number,value: string):void {
     let val:string =this.usrsrv.convUpper(value);
+    // console.log(this.frmArr.controls[i]);
     this.frmArr.controls[i].get('gcode').setValue(val);
     const GetGood = gql`
     query get_good($id: smallint!,$gds:String!,$day: date!) {
@@ -144,7 +145,7 @@ export class HmeitblComponent implements OnInit {
         gcode
         gtext
         iriunit
-        order
+        ordering
         gskbn
         zkbn
         msgtankas_aggregate(where: {day: {_lt: $day}}) {
@@ -258,6 +259,10 @@ export class HmeitblComponent implements OnInit {
     let clipboardData = event.clipboardData;
     let pastedText = clipboardData.getData("text");
     let rowData = pastedText.split("\n");
+    this.insRows(rowData);
+    // console.log(rowData);
+  }
+  insRows(rowData){
     this.frmArr.clear();
     let i:number=0;
     rowData.forEach(row => {
@@ -265,7 +270,7 @@ export class HmeitblComponent implements OnInit {
       if(col[1]!==null){
         let hmei:mwI.Hatmei= {
             line:i,
-            day:new Date(),
+            day:this.usrsrv.formatDate(),
             // soko:this.parentForm.get('soko').value,
             gcode:col[0],
             gtext:'',
@@ -276,22 +281,21 @@ export class HmeitblComponent implements OnInit {
             iriunit:'',
             mbiko:'',
             spec:'',
-            jdenno:0,
-            jline:null,
+            jdenno:(col[2] ?? +col[2]),
+            jline:(col[3] ?? +col[3]),
             yday:null,
             ydaykbn:'',
             inday:null,
             mtax:''
-          } 
-          this.frmArr.push(this.updateRow(i+1,hmei));
-          this.updGds(i,col[0]);
-          i+=1;
+        } 
+        this.frmArr.push(this.updateRow(i+1,hmei));
+        // console.log(this.updateRow(i+1,hmei));
+        this.updGds(i,col[0]);
+        i+=1;
       };
     });
-    this.refresh();
-    // console.log(rowData);
+    this.refresh();  
   }
-
   copyData() {
     this.copyToClipboard = this.ObjectToArray(this.displayedColumns);
     this.frmArr.getRawValue().forEach(row => {

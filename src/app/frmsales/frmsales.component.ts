@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewEncapsulation, HostListener, ViewChild ,AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, HostListener, ViewChild ,AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap  } from '@angular/router';
@@ -34,7 +34,7 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
   encapsulation : ViewEncapsulation.None,
   changeDetection:ChangeDetectionStrategy.OnPush
 })
-export class FrmsalesComponent implements OnInit {
+export class FrmsalesComponent implements OnInit, AfterViewInit {
   @ViewChild(JmeitblComponent ) jmeitbl:JmeitblComponent;
   form: FormGroup;
   // denno:number|string;
@@ -144,11 +144,20 @@ export class FrmsalesComponent implements OnInit {
     this.soksrv.get_souko();
     this.bunsrv.get_bunrui();
     this.stfsrv.get_staff();
+  }
+  ngAfterViewInit():void{
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('mode') === null){
-        this.mode=3;
+        this.cancel();
       }else{
         this.mode = +params.get('mode');
+        if(this.mode==3){
+          this.form.disable();
+          this.usrsrv.disable_mtbl(this.form);
+        }else{
+          this.form.enable();
+          this.usrsrv.enable_mtbl(this.form);
+        }
       }
       if (params.get('denno') !== null){
         this.jmisrv.denno = +params.get('denno');
@@ -160,7 +169,6 @@ export class FrmsalesComponent implements OnInit {
       this.cdRef.detectChanges();
     });
   }
-
   selected(value:number){
     const i:number = this.okrsrv.hokuri.findIndex(obj => obj.code == value);
     if(i > -1 ){
@@ -471,8 +479,9 @@ export class FrmsalesComponent implements OnInit {
   }
 
   modeToUpd():void {
-    this.mode=2;
-    this.refresh();
+    this.mode=2; 
+    this.form.enable();
+    this.usrsrv.enable_mtbl(this.form);
     history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
   }
 
@@ -491,7 +500,6 @@ export class FrmsalesComponent implements OnInit {
       }
     }
     return tooltip;
-
   }
 
   save():void {

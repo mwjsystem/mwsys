@@ -109,18 +109,16 @@ export class JmeitblComponent implements OnInit {
     this.frmArr.controls
       .forEach(control => {
         if(control.value.vcode==this.hatden[0]){
-          jmei.push({gcd: control.value.gcode,
-                     su:  control.value.suu,
-                     jdno:this.jmisrv.denno,
-                     line:control.value.line});
+          console.log(control);
+          jmei.push(control.value.gcode + "\t" + control.value.suu + "\t" 
+                    + this.jmisrv.denno + "\t" + control.value.line);
           control.patchValue({spdet:hdno});          
         }
       })  
     localStorage.setItem(this.jmisrv.denno + 'MWSYS_FRMSUPPLY', 
                          JSON.stringify({vcd:this.hatden[0],
-                                         hdno:hdno,
                                          mei:jmei}));
-    this.usrsrv.openFrmsup(this.jmisrv.denno + 'MWSYS_FRMSUPPLY');
+    this.usrsrv.openFrmsup(hdno,this.jmisrv.denno + 'MWSYS_FRMSUPPLY');
     this.hatden.shift();
   }
 
@@ -305,6 +303,11 @@ export class JmeitblComponent implements OnInit {
     let clipboardData = event.clipboardData;
     let pastedText = clipboardData.getData("text");
     let rowData = pastedText.split("\n");
+    this.insRows(rowData);
+    // console.log(rowData);
+  }
+
+  insRows(rowData){
     this.frmArr.clear();
     let i:number=0;
     rowData.forEach(row => {
@@ -320,7 +323,7 @@ export class JmeitblComponent implements OnInit {
             suu:+col[1],
             iriunit:null,
             teika:0,
-            tanka:+col[2],
+            tanka:(col[2] ?? +col[2]),
             money:0,
             mtax:null,
             mbikou:null,
@@ -347,9 +350,7 @@ export class JmeitblComponent implements OnInit {
       };
     });
     this.refresh();
-    // console.log(rowData);
   }
-
   copyData() {
     this.copyToClipboard = this.ObjectToArray(this.displayedColumns);
     this.frmArr.getRawValue().forEach(row => {

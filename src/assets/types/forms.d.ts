@@ -66,8 +66,8 @@ declare namespace mwI {
   }
   interface Jyumei {
     line:number;
-    day:Date;
-    sday:Date;
+    day:string;
+    sday:string;
     souko:string;
     gcode:string;
     gtext:string;
@@ -164,8 +164,8 @@ declare namespace mwI {
 
   interface Hatmei {
     line:number;
-    day:Date;
-    inday:Date;
+    day:string;
+    inday:string;
     // soko:string;
     gcode:string;
     gtext:string;
@@ -178,7 +178,7 @@ declare namespace mwI {
     spec:string;
     jdenno:number;
     jline:number;
-    yday:Date;
+    yday:string;
     ydaykbn:string;
     mtax:string;
   }

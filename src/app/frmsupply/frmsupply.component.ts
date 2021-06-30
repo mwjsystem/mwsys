@@ -24,7 +24,7 @@ import { filter } from 'rxjs/operators';
   templateUrl: './frmsupply.component.html',
   styleUrls: ['./../app.component.scss']
 })
-export class FrmsupplyComponent implements OnInit {
+export class FrmsupplyComponent implements OnInit, AfterViewInit {
   @ViewChild(HmeitblComponent) hmeitbl:HmeitblComponent;
   form: FormGroup;
   denno:number=0;
@@ -73,11 +73,16 @@ export class FrmsupplyComponent implements OnInit {
     this.soksrv.get_souko();
     this.bunsrv.get_bunrui();
     this.stfsrv.get_staff();
+  }
+
+  ngAfterViewInit():void{
+    // console.log(this.usrsrv);
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('mode') === null){
-        this.mode=3;
+        this.cancel();
       }else if(+params.get('mode')==1){
-        console.log(params);
+        this.modeToCre();
+        // console.log(params);
         // JSON.parse(localstrage.getItem()); 
         this.route.queryParamMap.pipe(
           filter(n=>Object.keys(n["params"]).length!==0)
@@ -86,20 +91,32 @@ export class FrmsupplyComponent implements OnInit {
               let params = n["params"];
               Object.keys(params).map(k=>{
                 if (k=="stkey"){
-                  console.log(JSON.parse(localStorage.getItem(params[k]))); 
+                  const stra = JSON.parse(localStorage.getItem(params[k])); 
+                  this.form.patchValue({vcode:stra.vcd});
+                  this.hmeitbl.insRows(stra.mei);
+                  // console.log(stra.hdno,this.denno);
+                  // localStorage.removeItem(params[k]);
                 }
               })
             }
-          )       
-
+          ) 
+          this.denno = +params.get('denno');
+          this.form.get('tcode').setValue(this.usrsrv.staff?.code);
       }else{
         this.mode = +params.get('mode');
+        if(this.mode==3){
+          this.form.disable();
+          this.usrsrv.disable_mtbl(this.form);
+        }else{
+          this.form.enable();
+          this.usrsrv.enable_mtbl(this.form);
+        }
+        if (params.get('denno') !== null){
+          this.denno = +params.get('denno');
+          // console.log(this.denno);
+          this.get_hatden(this.denno);
+        }
       } 
-      if (params.get('denno') !== null){
-        this.denno = +params.get('denno');
-        // console.log(this.denno);
-        this.get_hatden(this.denno);
-      }
     }); 
     this.hmisrv.observe.subscribe(flg=>{
       this.cdRef.detectChanges();
@@ -274,15 +291,19 @@ export class FrmsupplyComponent implements OnInit {
     this.mode=1;
     this.form.reset();
     this.denno=0; 
-    this.form.get('tcode').setValue(this.usrsrv.staff.code);
+    this.form.get('tcode').setValue(this.usrsrv.staff?.code);
     this.form.get('day').setValue(new Date());
     this.form.get('soko').setValue("01"); 
+    this.form.enable();
+    this.usrsrv.enable_mtbl(this.form); 
+    this.hmeitbl.frmArr.clear();  
     this.hmeitbl.add_rows(20);
   }  
 
   modeToUpd():void {
     this.mode=2;
-    this.refresh();
+    this.form.enable();
+    this.usrsrv.enable_mtbl(this.form); 
     history.replaceState('','','./frmsupply/' + this.mode + '/' + this.denno);
   }
 
@@ -297,11 +318,7 @@ export class FrmsupplyComponent implements OnInit {
 
   save():void {
 
-
-
-
-
-    let member:any={
+    let hatden:any={
       id: this.usrsrv.compid,
       vcode: this.usrsrv.editFrmval(this.form,'vcode'),
       day: this.usrsrv.editFrmval(this.form,'day'),
