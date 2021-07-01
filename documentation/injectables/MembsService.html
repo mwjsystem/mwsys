@@ -90,6 +90,9 @@
                     <td class="col-md-4">
                         <ul class="index-list">
                             <li>
+                                <a href="#get_mcdtxt">get_mcdtxt</a>
+                            </li>
+                            <li>
                                 <a href="#get_members">get_members</a>
                             </li>
                         </ul>
@@ -174,6 +177,76 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
+                    <a name="get_mcdtxt"></a>
+                    <span class="name">
+                        <b>
+                            get_mcdtxt
+                        </b>
+                        <a href="#get_mcdtxt"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>get_mcdtxt(mcd: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="42"
+                            class="link-to-prism">src/app/services/membs.service.ts:42</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>mcd</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
                     <a name="get_members"></a>
                     <span class="name">
                         <b>
@@ -202,7 +275,7 @@
                 <td class="col-md-4">
 
                     <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+                        <b>Returns : </b>    <code>Promise&lt;Boolean&gt;</code>
 
                     </div>
                 </td>
@@ -267,7 +340,7 @@ export class MembsService {
   constructor(private usrsrv: UserService,
               private apollo: Apollo) { }
 
-  get_members():void {
+  get_members():Promise&lt;Boolean&gt; {
     const GetMast &#x3D; gql&#x60;
     query get_members($id: smallint!) {
       msmember(where: {id: {_eq: $id}}, order_by: {mcode: asc}) {
@@ -277,19 +350,33 @@ export class MembsService {
         del
       }
     }&#x60;;
+    return new Promise&lt;Boolean&gt;(resolve &#x3D;&gt; {
+      this.apollo.watchQuery&lt;any&gt;({
+        query: GetMast, 
+          variables: { 
+            id : this.usrsrv.compid
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) &#x3D;&gt; {
+          this.membs&#x3D;data.msmember;
+          resolve(true);
+        },(error) &#x3D;&gt; {
+          console.log(&#x27;error query get_members&#x27;, error);
+        });
+    });  
+  }
 
-    this.apollo.watchQuery&lt;any&gt;({
-      query: GetMast, 
-        variables: { 
-          id : this.usrsrv.compid
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) &#x3D;&gt; {
-        this.membs&#x3D;data.msmember;
-      },(error) &#x3D;&gt; {
-        console.log(&#x27;error query get_members&#x27;, error);
-      });
+  get_mcdtxt(mcd:number):string{
+    const i:number &#x3D; this.membs.findIndex(obj &#x3D;&gt; obj.mcode &#x3D;&#x3D; mcd);
+    let mcdtxt:string&#x3D;&quot;&quot;;
+    if(i &gt; -1 ){
+      mcdtxt &#x3D; this.membs[i].mei ?? &quot;&quot;;
+      mcdtxt &#x3D; this.membs[i].sei + mcdtxt;
+    } else {
+      mcdtxt&#x3D;&quot;&quot;;  
+    }
+    return mcdtxt;
   }
 }
 </code></pre>

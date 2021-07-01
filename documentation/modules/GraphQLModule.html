@@ -76,12 +76,15 @@ import {APOLLO_OPTIONS} from &#x27;apollo-angular&#x27;;
 import {ApolloClientOptions, InMemoryCache} from &#x27;@apollo/client/core&#x27;;
 import {HttpLink} from &#x27;apollo-angular/http&#x27;;
 
-const uri &#x3D; &#x27;https://mwjtables.herokuapp.com/v1/graphql&#x27;; // &lt;-- add the URL of the GraphQL server here
+// const uri &#x3D; &#x27;https://mwjtables.herokuapp.com/v1/graphql&#x27;; // &lt;-- add the URL of the GraphQL server here
 const authHeader &#x3D; new HttpHeaders()
     .set(&#x27;X-Hasura-Access-Key&#x27;, &#x27;something_secret&#x27;)
     .set(&#x27;X-Hasura-admin-secret&#x27;, &#x27;something_secret&#x27;)
     .set(&#x27;Content-Type&#x27;, &#x27;application/json&#x27;);
 export function createApollo(httpLink: HttpLink): ApolloClientOptions&lt;any&gt; {
+  let appname:string &#x3D; localStorage.getItem(&#x27;MWSYS_DB&#x27;);
+  if ( appname&#x3D;&#x3D;null ){appname &#x3D; &#x27;mwjtables&#x27;;}
+  const uri &#x3D; &#x27;https://&#x27; + appname +&#x27;.herokuapp.com/v1/graphql&#x27;;
   return {
     link: httpLink.create({uri, headers: authHeader}),
     cache: new InMemoryCache(),

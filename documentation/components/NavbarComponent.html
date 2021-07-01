@@ -131,6 +131,10 @@
                         <ul class="index-list">
                             <li>
                                     <span class="modifier">Public</span>
+                                <a href="#db">db</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
                                 <a href="#usrsrv">usrsrv</a>
                             </li>
                         </ul>
@@ -150,6 +154,9 @@
                             </li>
                             <li>
                                 <a href="#setColor">setColor</a>
+                            </li>
+                            <li>
+                                <a href="#setDB">setDB</a>
                             </li>
                         </ul>
                     </td>
@@ -174,7 +181,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="9" class="link-to-prism">src/app/core/navbar/navbar.component.ts:9</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/app/core/navbar/navbar.component.ts:10</a></div>
                             </td>
                         </tr>
 
@@ -282,8 +289,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="17"
-                            class="link-to-prism">src/app/core/navbar/navbar.component.ts:17</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="23"
+                            class="link-to-prism">src/app/core/navbar/navbar.component.ts:23</a></div>
                 </td>
             </tr>
 
@@ -330,12 +337,110 @@
             </tr>
         </tbody>
     </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="setDB"></a>
+                    <span class="name">
+                        <b>
+                            setDB
+                        </b>
+                        <a href="#setDB"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>setDB(flg: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank">boolean</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="33"
+                            class="link-to-prism">src/app/core/navbar/navbar.component.ts:33</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>flg</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/boolean" target="_blank" >boolean</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </section>
     <section>
     
         <h3 id="inputs">
             Properties
         </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="db"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            db</b>
+                            <a href="#db"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/app/core/navbar/navbar.component.ts:10</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
         <table class="table table-sm table-bordered">
             <tbody>
                 <tr>
@@ -379,11 +484,17 @@ import { UserService } from &#x27;./../../services/user.service&#x27;;
   styleUrls: [&#x27;./navbar.component.scss&#x27;]
 })
 export class NavbarComponent implements OnInit {
-
+  public db:string;  
   constructor(public usrsrv:UserService) { }
 
   ngOnInit():void {
-    const color:string &#x3D; localStorage.getItem(this.usrsrv.userInfo.nickname + &#x27;MWJS_COLOR&#x27;);
+    this.db&#x3D;localStorage.getItem(&#x27;MWSYS_DB&#x27;);
+    if(this.db&#x3D;&#x3D;null){
+      this.db&#x3D;&#x27;本番環境&#x27;;
+    } else {  
+      this.db&#x3D;&#x27;テスト環境&#x27;;
+    }
+    const color:string &#x3D; localStorage.getItem(this.usrsrv.userInfo.nickname + &#x27;MWSYS_COLOR&#x27;);
     if ( color !&#x3D;&#x3D; null ){this.setColor(color);}
   }
   setColor(colorname:string):void {
@@ -394,9 +505,17 @@ export class NavbarComponent implements OnInit {
           link.href &#x3D; &#x27;https://unpkg.com/@angular/material/prebuilt-themes/&#x27; + colorname + &#x27;.css&#x27;;
         }
       }
-    localStorage.setItem(this.usrsrv.userInfo.nickname + &#x27;MWJS_COLOR&#x27;, colorname);
+    localStorage.setItem(this.usrsrv.userInfo.nickname + &#x27;MWSYS_COLOR&#x27;, colorname);
   }
-
+  setDB(flg:boolean){
+    if(flg){
+      localStorage.setItem(&#x27;MWSYS_DB&#x27;,&#x27;mwsystbl&#x27;);
+      window.location.reload();
+    } else {
+      localStorage.removeItem(&#x27;MWSYS_DB&#x27;);
+      window.location.reload();
+    }
+  }
 }
 
 </code></pre>
@@ -415,6 +534,7 @@ export class NavbarComponent implements OnInit {
         &lt;a mat-menu-item&gt;掛率表&lt;/a&gt;
         &lt;a mat-menu-item&gt;ＤＭ抽出&lt;/a&gt;
         &lt;a mat-menu-item&gt;ＤＭリスト&lt;/a&gt;
+        &lt;a mat-menu-item routerLink&#x3D;&quot;/frmtreat&quot;&gt;問合せ・対応&lt;/a&gt;
     &lt;/mat-menu&gt;    
     &lt;button mat-button [matMenuTriggerFor]&#x3D;&quot;depo&quot;&gt;売上入金&lt;/button&gt;
     &lt;mat-menu #depo&#x3D;&quot;matMenu&quot;&gt;
@@ -445,25 +565,33 @@ export class NavbarComponent implements OnInit {
     &lt;/mat-menu&gt;
     &lt;button mat-button [matMenuTriggerFor]&#x3D;&quot;zaik&quot;&gt;在庫関連&lt;/button&gt;
     &lt;mat-menu #zaik&#x3D;&quot;matMenu&quot;&gt;
-        &lt;a mat-menu-item&gt;在庫確認表&lt;/a&gt;
+        &lt;a mat-menu-item routerLink&#x3D;&quot;/repstock&quot;&gt;在庫確認表&lt;/a&gt;
         &lt;a mat-menu-item&gt;商品台帳&lt;/a&gt;
         &lt;a mat-menu-item&gt;入荷伝票&lt;/a&gt;
         &lt;a mat-menu-item&gt;移動伝票&lt;/a&gt;
         &lt;a mat-menu-item&gt;展開伝票&lt;/a&gt;
         &lt;a mat-menu-item&gt;破棄伝票&lt;/a&gt;
         &lt;a mat-menu-item&gt;棚卸処理&lt;/a&gt;
-        &lt;a mat-menu-item&gt;在庫一覧表&lt;/a&gt;
-        &lt;a mat-menu-item&gt;移動伝票一覧表&lt;/a&gt;
-        &lt;a mat-menu-item&gt;展開伝票一覧表&lt;/a&gt;
-        &lt;a mat-menu-item&gt;破棄伝票一覧表&lt;/a&gt;
-        &lt;a mat-menu-item&gt;確保割れ在庫一覧表&lt;/a&gt;
-        &lt;a mat-menu-item&gt;移動伝票納品書&lt;/a&gt;
-        &lt;a mat-menu-item&gt;受注在庫集計表&lt;/a&gt;
-        &lt;a mat-menu-item&gt;受注残確認表&lt;/a&gt;
+        &lt;button mat-menu-item [matMenuTriggerFor]&#x3D;&quot;zaip&quot;&gt;在庫印刷&lt;/button&gt;
+        &lt;mat-menu #zaip&#x3D;&quot;matMenu&quot;&gt;
+            &lt;a mat-menu-item&gt;在庫一覧表&lt;/a&gt;
+            &lt;a mat-menu-item&gt;移動伝票一覧表&lt;/a&gt;
+            &lt;a mat-menu-item&gt;展開伝票一覧表&lt;/a&gt;
+            &lt;a mat-menu-item&gt;破棄伝票一覧表&lt;/a&gt;
+            &lt;a mat-menu-item&gt;確保割れ在庫一覧表&lt;/a&gt;
+            &lt;a mat-menu-item&gt;移動伝票納品書&lt;/a&gt;
+            &lt;a mat-menu-item&gt;受注在庫集計表&lt;/a&gt;
+            &lt;a mat-menu-item&gt;受注残確認表&lt;/a&gt;
+        &lt;/mat-menu&gt;
+        &lt;button mat-menu-item [matMenuTriggerFor]&#x3D;&quot;souk&quot;&gt;倉庫&lt;/button&gt;
+        &lt;mat-menu #souk&#x3D;&quot;matMenu&quot;&gt;
+            &lt;a mat-menu-item routerLink&#x3D;&quot;/frmkeep&quot;&gt;キープ表確認&lt;/a&gt;
+            &lt;a mat-menu-item&gt;加工依頼確認&lt;/a&gt;
+        &lt;/mat-menu&gt;
     &lt;/mat-menu&gt;
     &lt;button mat-button [matMenuTriggerFor]&#x3D;&quot;siir&quot;&gt;仕入関連&lt;/button&gt;
     &lt;mat-menu #siir&#x3D;&quot;matMenu&quot;&gt;
-        &lt;a mat-menu-item&gt;発注伝票&lt;/a&gt;
+        &lt;a mat-menu-item routerLink&#x3D;&quot;/frmsupply&quot;&gt;発注伝票&lt;/a&gt;
         &lt;a mat-menu-item&gt;仕入伝票&lt;/a&gt;
         &lt;a mat-menu-item&gt;発注履歴&lt;/a&gt;
         &lt;a mat-menu-item&gt;仕入一覧表&lt;/a&gt;
@@ -471,7 +599,7 @@ export class NavbarComponent implements OnInit {
     &lt;button mat-button [matMenuTriggerFor]&#x3D;&quot;mast&quot;&gt;各マスタ&lt;/button&gt;
     &lt;mat-menu #mast&#x3D;&quot;matMenu&quot;&gt;
         &lt;a mat-menu-item routerLink&#x3D;&quot;/mstgoods&quot;&gt;商品マスタ&lt;/a&gt;
-        &lt;a mat-menu-item&gt;仕入先マスタ&lt;/a&gt;
+        &lt;a mat-menu-item routerLink&#x3D;&quot;/mstvendor&quot;&gt;仕入先マスタ&lt;/a&gt;
         &lt;a mat-menu-item&gt;伝票マスタ&lt;/a&gt;
         &lt;a mat-menu-item&gt;倉庫マスタ&lt;/a&gt;
         &lt;a mat-menu-item&gt;担当者マスタ&lt;/a&gt;
@@ -493,6 +621,11 @@ export class NavbarComponent implements OnInit {
             &lt;a mat-menu-item href&#x3D;&quot;https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EVW5l6FhMOdGuKCnCSPdEnoBSebtCJmimXB7VJSd0kpQYw?e&#x3D;8aM7JA&quot; target&#x3D;&quot;_blank&quot;&gt;
                 &lt;mat-icon&gt;list_alt&lt;/mat-icon&gt;改善要望Excel
             &lt;/a&gt;
+            &lt;button mat-menu-item [matMenuTriggerFor]&#x3D;&quot;setmenu&quot;&gt;&lt;mat-icon&gt;settings&lt;/mat-icon&gt;初期設定(ﾀﾞｳﾝﾛｰﾄﾞを使用する場合)&lt;/button&gt;
+            &lt;mat-menu #setmenu&#x3D;&quot;matMenu&quot;&gt;
+                &lt;a mat-menu-item href&#x3D;&quot;assets/mwjexe.reg&quot; download&#x3D;&quot;mwjexe.reg&quot;&gt;初期設定①&lt;/a&gt;
+                &lt;a mat-menu-item href&#x3D;&quot;assets/psqlodbc_x86.msi&quot; download&#x3D;&quot;psqlodbc_x86.msi&quot;&gt;初期設定②&lt;/a&gt;
+            &lt;/mat-menu&gt;
             &lt;button mat-menu-item [matMenuTriggerFor]&#x3D;&quot;colormenu&quot;&gt;&lt;mat-icon&gt;palette&lt;/mat-icon&gt;テーマカラー&lt;/button&gt;
             &lt;mat-menu #colormenu&#x3D;&quot;matMenu&quot;&gt;
                 &lt;button mat-menu-item (click)&#x3D;&quot;setColor(&#x27;indigo-pink&#x27;)&quot;&gt;indigo-pink&lt;/button&gt;
@@ -500,20 +633,26 @@ export class NavbarComponent implements OnInit {
                 &lt;button mat-menu-item (click)&#x3D;&quot;setColor(&#x27;pink-bluegrey&#x27;)&quot;&gt;pink-bluegrey&lt;/button&gt;
                 &lt;button mat-menu-item (click)&#x3D;&quot;setColor(&#x27;purple-green&#x27;)&quot;&gt;purple-green&lt;/button&gt;
             &lt;/mat-menu&gt;
+            &lt;div fxLayout&#x3D;&quot;column&quot;&gt;            
+                &lt;mat-form-field appearance&#x3D;&quot;outline&quot;&gt;
+                    &lt;mat-label&gt;会社&lt;/mat-label&gt;
+                    &lt;input matInput mat-menu-item style&#x3D;&quot;pointer-events: none&quot; value&#x3D;&quot;{{usrsrv.system.name}}&quot; disabled&gt;
+                &lt;/mat-form-field&gt;
+                &lt;mat-form-field appearance&#x3D;&quot;outline&quot;&gt;
+                    &lt;mat-label&gt;ユーザ名&lt;/mat-label&gt;
+                    &lt;input matInput mat-menu-item style&#x3D;&quot;pointer-events: none&quot; value&#x3D;&quot;{{usrsrv.userInfo.nickname}}：{{usrsrv.userInfo.name}}&quot; disabled&gt;
+                &lt;/mat-form-field&gt;
+            &lt;/div&gt;
+            &lt;mat-form-field appearance&#x3D;&quot;outline&quot;&gt;
+                &lt;mat-label&gt;接続先DB(切替時画面再読込)&lt;/mat-label&gt;
+                &lt;input matInput mat-menu-item style&#x3D;&quot;pointer-events: none&quot; value&#x3D;&quot;{{db}}&quot; disabled&gt;
+                &lt;button mat-button matSuffix (click)&#x3D;&quot;setDB(true)&quot; *ngIf&#x3D;&quot;db&#x3D;&#x3D;&#x27;本番環境&#x27;&quot;&gt;テストへ切替&lt;/button&gt;
+                &lt;button mat-button matSuffix (click)&#x3D;&quot;setDB(false)&quot; *ngIf&#x3D;&quot;db&#x3D;&#x3D;&#x27;テスト環境&#x27;&quot;&gt;本番へ切替&lt;/button&gt;    
+            &lt;/mat-form-field&gt;
             &lt;button mat-menu-item (click)&#x3D;&quot;usrsrv.logout();&quot;&gt;
                 &lt;mat-icon&gt;exit_to_app&lt;/mat-icon&gt;
                 &lt;span&gt;ログアウト&lt;/span&gt;
             &lt;/button&gt;
-            &lt;mat-card fxLayout&#x3D;&quot;column&quot;&gt;            
-                &lt;mat-form-field&gt;
-                    &lt;mat-label&gt;会社&lt;/mat-label&gt;
-                    &lt;input matInput mat-menu-item style&#x3D;&quot;pointer-events: none&quot; value&#x3D;&quot;{{usrsrv.system.name}}&quot;&gt;
-                &lt;/mat-form-field&gt;
-                &lt;mat-form-field&gt;
-                    &lt;mat-label&gt;ユーザ名&lt;/mat-label&gt;
-                    &lt;input matInput mat-menu-item style&#x3D;&quot;pointer-events: none&quot; value&#x3D;&quot;{{usrsrv.userInfo.nickname}}：{{usrsrv.userInfo.name}}&quot;&gt;
-                &lt;/mat-form-field&gt;
-            &lt;/mat-card&gt;
         &lt;/form&gt;
     &lt;/mat-menu&gt;
 &lt;/mat-toolbar&gt;
@@ -535,7 +674,17 @@ export class NavbarComponent implements OnInit {
 }
 ::ng-deep.mat-menu-panel {
     max-width: none !important;
-}</code></pre>
+}
+::ng-deep.mat-form-field-appearance-outline .mat-form-field-infix {
+    padding:0px !important;
+}
+::ng-deep.mat-form-field-appearance-outline .mat-form-field-label {
+    top:1.2em !important;
+    margin-top: .5em;
+}
+// mat-card {
+//     padding:0px;
+// }</code></pre>
     </div>
 
     <div class="tab-pane fade " id="c-tree">
@@ -563,9 +712,9 @@ export class NavbarComponent implements OnInit {
 <script src="../js/libs/htmlparser.js"></script>
 <script src="../js/libs/deep-iterator.js"></script>
 <script>
-        var COMPONENT_TEMPLATE = '<div><mat-toolbar style="height:40px;" fxLayout="row" style="text-align:center;">    <a mat-button mat-icon-button routerLink="/">        <mat-icon>dashboard</mat-icon>    </a>    <a mat-menu-item routerLink="/frmsales">受注伝票</a>    <a mat-menu-item>受注履歴</a>    <button mat-button [matMenuTriggerFor]="cust">顧客関連</button>    <mat-menu #cust="matMenu">        <a mat-menu-item routerLink="/mstmember">顧客マスタ</a>        <a mat-menu-item>掛率表</a>        <a mat-menu-item>ＤＭ抽出</a>        <a mat-menu-item>ＤＭリスト</a>    </mat-menu>        <button mat-button [matMenuTriggerFor]="depo">売上入金</button>    <mat-menu #depo="matMenu">        <a mat-menu-item>入金伝票</a>        <a mat-menu-item>一括入金処理</a>        <a mat-menu-item>代引データ読込</a>        <a mat-menu-item>掛売請求</a>        <a mat-menu-item>掛売入金</a>        <a mat-menu-item>請求予定一覧表</a>        <a mat-menu-item>請求書出力</a>        <a mat-menu-item>未入金一覧表</a>        <a mat-menu-item>ＮＰ状況確認</a>        <a mat-menu-item>ＮＰデータ編集</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="prin">印刷関連</button>    <mat-menu #prin="matMenu">        <a mat-menu-item>納品書出力</a>        <a mat-menu-item>送り状印刷</a>        <a mat-menu-item>売上一覧表</a>        <a mat-menu-item>商品別集計表</a>        <a mat-menu-item>伝票ﾌﾘｰ別集計表</a>        <a mat-menu-item>顧客ﾌﾘｰ別集計表</a>        <a mat-menu-item>顧客別商品集計表</a>        <a mat-menu-item>商品別順位表</a>        <a mat-menu-item>顧客別順位表</a>        <a mat-menu-item>顧客別売上一覧表</a>        <a mat-menu-item>ファイル出力</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="zaik">在庫関連</button>    <mat-menu #zaik="matMenu">        <a mat-menu-item>在庫確認表</a>        <a mat-menu-item>商品台帳</a>        <a mat-menu-item>入荷伝票</a>        <a mat-menu-item>移動伝票</a>        <a mat-menu-item>展開伝票</a>        <a mat-menu-item>破棄伝票</a>        <a mat-menu-item>棚卸処理</a>        <a mat-menu-item>在庫一覧表</a>        <a mat-menu-item>移動伝票一覧表</a>        <a mat-menu-item>展開伝票一覧表</a>        <a mat-menu-item>破棄伝票一覧表</a>        <a mat-menu-item>確保割れ在庫一覧表</a>        <a mat-menu-item>移動伝票納品書</a>        <a mat-menu-item>受注在庫集計表</a>        <a mat-menu-item>受注残確認表</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="siir">仕入関連</button>    <mat-menu #siir="matMenu">        <a mat-menu-item>発注伝票</a>        <a mat-menu-item>仕入伝票</a>        <a mat-menu-item>発注履歴</a>        <a mat-menu-item>仕入一覧表</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="mast">各マスタ</button>    <mat-menu #mast="matMenu">        <a mat-menu-item routerLink="/mstgoods">商品マスタ</a>        <a mat-menu-item>仕入先マスタ</a>        <a mat-menu-item>伝票マスタ</a>        <a mat-menu-item>倉庫マスタ</a>        <a mat-menu-item>担当者マスタ</a>        <a mat-menu-item>分類マスタ</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="syst">システム</button>    <mat-menu #syst="matMenu">        <a mat-menu-item>受注テキスト読込</a>        <a mat-menu-item>マスタデータ読込</a>        <a mat-menu-item>入金テキスト読込</a>        <a mat-menu-item>稼働日カレンダ</a>        <a mat-menu-item>作業ログ</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="menu">        <mat-icon>settings</mat-icon>設定    </button>    <mat-menu #menu="matMenu">        <form class="menu-form">              <a mat-menu-item href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EVW5l6FhMOdGuKCnCSPdEnoBSebtCJmimXB7VJSd0kpQYw?e=8aM7JA" target="_blank">                <mat-icon>list_alt</mat-icon>改善要望Excel            </a>            <button mat-menu-item [matMenuTriggerFor]="colormenu"><mat-icon>palette</mat-icon>テーマカラー</button>            <mat-menu #colormenu="matMenu">                <button mat-menu-item (click)="setColor(\'indigo-pink\')">indigo-pink</button>                <button mat-menu-item (click)="setColor(\'deeppurple-amber\')">deeppurple-amber</button>                <button mat-menu-item (click)="setColor(\'pink-bluegrey\')">pink-bluegrey</button>                <button mat-menu-item (click)="setColor(\'purple-green\')">purple-green</button>            </mat-menu>            <button mat-menu-item (click)="usrsrv.logout();">                <mat-icon>exit_to_app</mat-icon>                <span>ログアウト</span>            </button>            <mat-card fxLayout="column">                            <mat-form-field>                    <mat-label>会社</mat-label>                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.system.name}}">                </mat-form-field>                <mat-form-field>                    <mat-label>ユーザ名</mat-label>                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.userInfo.nickname}}：{{usrsrv.userInfo.name}}">                </mat-form-field>            </mat-card>        </form>    </mat-menu></mat-toolbar></div>'
-    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'}];
-    var DIRECTIVES = [{'name': 'TabDirective', 'selector': '[tabIndex]'}];
+        var COMPONENT_TEMPLATE = '<div><mat-toolbar style="height:40px;" fxLayout="row" style="text-align:center;">    <a mat-button mat-icon-button routerLink="/">        <mat-icon>dashboard</mat-icon>    </a>    <a mat-menu-item routerLink="/frmsales">受注伝票</a>    <a mat-menu-item>受注履歴</a>    <button mat-button [matMenuTriggerFor]="cust">顧客関連</button>    <mat-menu #cust="matMenu">        <a mat-menu-item routerLink="/mstmember">顧客マスタ</a>        <a mat-menu-item>掛率表</a>        <a mat-menu-item>ＤＭ抽出</a>        <a mat-menu-item>ＤＭリスト</a>        <a mat-menu-item routerLink="/frmtreat">問合せ・対応</a>    </mat-menu>        <button mat-button [matMenuTriggerFor]="depo">売上入金</button>    <mat-menu #depo="matMenu">        <a mat-menu-item>入金伝票</a>        <a mat-menu-item>一括入金処理</a>        <a mat-menu-item>代引データ読込</a>        <a mat-menu-item>掛売請求</a>        <a mat-menu-item>掛売入金</a>        <a mat-menu-item>請求予定一覧表</a>        <a mat-menu-item>請求書出力</a>        <a mat-menu-item>未入金一覧表</a>        <a mat-menu-item>ＮＰ状況確認</a>        <a mat-menu-item>ＮＰデータ編集</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="prin">印刷関連</button>    <mat-menu #prin="matMenu">        <a mat-menu-item>納品書出力</a>        <a mat-menu-item>送り状印刷</a>        <a mat-menu-item>売上一覧表</a>        <a mat-menu-item>商品別集計表</a>        <a mat-menu-item>伝票ﾌﾘｰ別集計表</a>        <a mat-menu-item>顧客ﾌﾘｰ別集計表</a>        <a mat-menu-item>顧客別商品集計表</a>        <a mat-menu-item>商品別順位表</a>        <a mat-menu-item>顧客別順位表</a>        <a mat-menu-item>顧客別売上一覧表</a>        <a mat-menu-item>ファイル出力</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="zaik">在庫関連</button>    <mat-menu #zaik="matMenu">        <a mat-menu-item routerLink="/repstock">在庫確認表</a>        <a mat-menu-item>商品台帳</a>        <a mat-menu-item>入荷伝票</a>        <a mat-menu-item>移動伝票</a>        <a mat-menu-item>展開伝票</a>        <a mat-menu-item>破棄伝票</a>        <a mat-menu-item>棚卸処理</a>        <button mat-menu-item [matMenuTriggerFor]="zaip">在庫印刷</button>        <mat-menu #zaip="matMenu">            <a mat-menu-item>在庫一覧表</a>            <a mat-menu-item>移動伝票一覧表</a>            <a mat-menu-item>展開伝票一覧表</a>            <a mat-menu-item>破棄伝票一覧表</a>            <a mat-menu-item>確保割れ在庫一覧表</a>            <a mat-menu-item>移動伝票納品書</a>            <a mat-menu-item>受注在庫集計表</a>            <a mat-menu-item>受注残確認表</a>        </mat-menu>        <button mat-menu-item [matMenuTriggerFor]="souk">倉庫</button>        <mat-menu #souk="matMenu">            <a mat-menu-item routerLink="/frmkeep">キープ表確認</a>            <a mat-menu-item>加工依頼確認</a>        </mat-menu>    </mat-menu>    <button mat-button [matMenuTriggerFor]="siir">仕入関連</button>    <mat-menu #siir="matMenu">        <a mat-menu-item routerLink="/frmsupply">発注伝票</a>        <a mat-menu-item>仕入伝票</a>        <a mat-menu-item>発注履歴</a>        <a mat-menu-item>仕入一覧表</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="mast">各マスタ</button>    <mat-menu #mast="matMenu">        <a mat-menu-item routerLink="/mstgoods">商品マスタ</a>        <a mat-menu-item routerLink="/mstvendor">仕入先マスタ</a>        <a mat-menu-item>伝票マスタ</a>        <a mat-menu-item>倉庫マスタ</a>        <a mat-menu-item>担当者マスタ</a>        <a mat-menu-item>分類マスタ</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="syst">システム</button>    <mat-menu #syst="matMenu">        <a mat-menu-item>受注テキスト読込</a>        <a mat-menu-item>マスタデータ読込</a>        <a mat-menu-item>入金テキスト読込</a>        <a mat-menu-item>稼働日カレンダ</a>        <a mat-menu-item>作業ログ</a>    </mat-menu>    <button mat-button [matMenuTriggerFor]="menu">        <mat-icon>settings</mat-icon>設定    </button>    <mat-menu #menu="matMenu">        <form class="menu-form">              <a mat-menu-item href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EVW5l6FhMOdGuKCnCSPdEnoBSebtCJmimXB7VJSd0kpQYw?e=8aM7JA" target="_blank">                <mat-icon>list_alt</mat-icon>改善要望Excel            </a>            <button mat-menu-item [matMenuTriggerFor]="setmenu"><mat-icon>settings</mat-icon>初期設定(ﾀﾞｳﾝﾛｰﾄﾞを使用する場合)</button>            <mat-menu #setmenu="matMenu">                <a mat-menu-item href="assets/mwjexe.reg" download="mwjexe.reg">初期設定①</a>                <a mat-menu-item href="assets/psqlodbc_x86.msi" download="psqlodbc_x86.msi">初期設定②</a>            </mat-menu>            <button mat-menu-item [matMenuTriggerFor]="colormenu"><mat-icon>palette</mat-icon>テーマカラー</button>            <mat-menu #colormenu="matMenu">                <button mat-menu-item (click)="setColor(\'indigo-pink\')">indigo-pink</button>                <button mat-menu-item (click)="setColor(\'deeppurple-amber\')">deeppurple-amber</button>                <button mat-menu-item (click)="setColor(\'pink-bluegrey\')">pink-bluegrey</button>                <button mat-menu-item (click)="setColor(\'purple-green\')">purple-green</button>            </mat-menu>            <div fxLayout="column">                            <mat-form-field appearance="outline">                    <mat-label>会社</mat-label>                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.system.name}}" disabled>                </mat-form-field>                <mat-form-field appearance="outline">                    <mat-label>ユーザ名</mat-label>                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.userInfo.nickname}}：{{usrsrv.userInfo.name}}" disabled>                </mat-form-field>            </div>            <mat-form-field appearance="outline">                <mat-label>接続先DB(切替時画面再読込)</mat-label>                <input matInput mat-menu-item style="pointer-events: none" value="{{db}}" disabled>                <button mat-button matSuffix (click)="setDB(true)" *ngIf="db==\'本番環境\'">テストへ切替</button>                <button mat-button matSuffix (click)="setDB(false)" *ngIf="db==\'テスト環境\'">本番へ切替</button>                </mat-form-field>            <button mat-menu-item (click)="usrsrv.logout();">                <mat-icon>exit_to_app</mat-icon>                <span>ログアウト</span>            </button>        </form>    </mat-menu></mat-toolbar></div>'
+    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmkeepComponent', 'selector': 'app-frmkeep'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'FrmsupplyComponent', 'selector': 'app-frmsupply'},{'name': 'FrmtreatComponent', 'selector': 'app-frmtreat'},{'name': 'GcdhelpComponent', 'selector': 'app-gcdhelp'},{'name': 'GdsimageComponent', 'selector': 'app-gdsimage'},{'name': 'GdstblComponent', 'selector': 'app-gdstbl'},{'name': 'GrpcdhelpComponent', 'selector': 'app-grpcdhelp'},{'name': 'GtnktblComponent', 'selector': 'app-gtnktbl'},{'name': 'HmeitblComponent', 'selector': 'app-hmeitbl'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JdnohelpComponent', 'selector': 'app-jdnohelp'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstgoodsComponent', 'selector': 'app-mstgoods'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'MstvendorComponent', 'selector': 'app-mstvendor'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'RepstockComponent', 'selector': 'app-repstock'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'},{'name': 'TrtdetailComponent', 'selector': 'app-trtdetail'},{'name': 'VcdhelpComponent', 'selector': 'app-vcdhelp'}];
+    var DIRECTIVES = [{'name': 'NuminputDirective', 'selector': '[numInput]'},{'name': 'TabDirective', 'selector': '[tabIndex]'}];
     var ACTUAL_COMPONENT = {'name': 'NavbarComponent'};
 </script>
 <script src="../js/tree.js"></script>

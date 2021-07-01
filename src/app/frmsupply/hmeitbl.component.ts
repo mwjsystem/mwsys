@@ -148,12 +148,9 @@ export class HmeitblComponent implements OnInit {
         ordering
         gskbn
         zkbn
-        msgtankas_aggregate(where: {day: {_lt: $day}}) {
-          aggregate {
-            max {
-              day
-            }
-          }
+        msgtankas(limit:1,where: {day: {_lt: $day}}, order_by: {day: desc_nulls_last}) {
+          genka
+          taxrate
         }
       }
     }`;
@@ -162,7 +159,7 @@ export class HmeitblComponent implements OnInit {
         variables: { 
           id : this.usrsrv.compid,           
           gds: val,
-          day: this.frmArr.controls[i].get('day').value
+          day: this.parentForm.get('day').value
         },
       })
       .valueChanges
@@ -170,6 +167,7 @@ export class HmeitblComponent implements OnInit {
         let msgds = data.msgoods_by_pk;
         // console.log(msgds);
         this.frmArr.controls[i].patchValue(msgds);
+        this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
         this.calcTot();
       },(error) => {
         console.log('error query get_good', error);
@@ -297,16 +295,45 @@ export class HmeitblComponent implements OnInit {
     this.refresh();  
   }
   copyData() {
-    this.copyToClipboard = this.ObjectToArray(this.displayedColumns);
+    this.copyToClipboard = this.objectToArray(this.displayedColumns);
     this.frmArr.getRawValue().forEach(row => {
       if(row.gcode !=='' ){
-        this.copyToClipboard += this.ObjectToArray(row);
+        this.copyToClipboard += this.objectToArray(row);
       }
     })
     this.toastr.info('クリップボードにコピーしました');
   }
-
-  ObjectToArray(obj: object): string {
+  get_hatmei(dno){
+    let hatmei=[];
+    this.frmArr.controls
+      .forEach(control => {
+        if(control.value.gcode){
+　　　　　　hatmei.push({
+            id: this.usrsrv.compid,
+            denno:dno,
+            line: this.usrsrv.editFrmval(control,'line'),
+            day: this.usrsrv.editFrmval(control,'day'),
+            inday: this.usrsrv.editFrmval(control,'inday'),
+            gcode: this.usrsrv.editFrmval(control,'gcode'),
+            gtext: this.usrsrv.editFrmval(control,'gtext'),
+            suu: this.usrsrv.editFrmval(control,'suu'),
+            genka: this.usrsrv.editFrmval(control,'genka'),
+            money: this.usrsrv.editFrmval(control,'money'),
+            taxrate: this.usrsrv.editFrmval(control,'taxrate'),
+            iriunit: this.usrsrv.editFrmval(control,'iriunit'),
+            mbiko: this.usrsrv.editFrmval(control,'mbiko'),
+            spec: this.usrsrv.editFrmval(control,'spec'),
+            jdenno: this.usrsrv.editFrmval(control,'jdenno'),
+            jline: this.usrsrv.editFrmval(control,'jline'),
+            yday: this.usrsrv.editFrmval(control,'yday'),
+            ydaykbn: this.usrsrv.editFrmval(control,'ydaykbn'),
+            mtax: this.usrsrv.editFrmval(control,'mtax')
+          });
+        }
+      });
+      return hatmei;
+  }
+  objectToArray(obj: object): string {
     var result = Object.keys(obj).map((key: keyof typeof obj) => {
       let value = obj[key];
       // console.log(value)

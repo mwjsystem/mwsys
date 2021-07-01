@@ -111,8 +111,8 @@ export class JmeitblComponent implements OnInit {
         if(control.value.vcode==this.hatden[0]){
           console.log(control);
           jmei.push(control.value.gcode + "\t" + control.value.suu + "\t" 
-                    + this.jmisrv.denno + "\t" + control.value.line);
-          control.patchValue({spdet:hdno});          
+                    + this.jmisrv.denno + "\t" + control.get('line').value);
+          control.patchValue({spdet:hdno});        
         }
       })  
     localStorage.setItem(this.jmisrv.denno + 'MWSYS_FRMSUPPLY', 
@@ -249,7 +249,6 @@ export class JmeitblComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         let msgds = data.msgoods_by_pk;
-        // console.log(msgds,this.frmArr.controls[i]);
         if(msgds == null){
           this.toastr.warning("商品コード" + val+ "は登録されていません");
         }else{
@@ -257,9 +256,7 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue(msgds.msggroup);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
           let lctanka:number=0;
-          
           let j:number = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn );
-          // console.log(j,msgds.msgsptnks);
           if(j>-1){
             lctanka=msgds.msgsptnks[j].sptanka;
           }else{
@@ -352,16 +349,16 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
   copyData() {
-    this.copyToClipboard = this.ObjectToArray(this.displayedColumns);
+    this.copyToClipboard = this.objectToArray(this.displayedColumns);
     this.frmArr.getRawValue().forEach(row => {
       if(row.gcode !=='' ){
-        this.copyToClipboard += this.ObjectToArray(row);
+        this.copyToClipboard += this.objectToArray(row);
       }
     })
     this.toastr.info('クリップボードにコピーしました');
   }
 
-  ObjectToArray(obj: object): string {
+  objectToArray(obj: object): string {
     var result = Object.keys(obj).map((key: keyof typeof obj) => {
       let value = obj[key];
       // console.log(value)

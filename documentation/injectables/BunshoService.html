@@ -192,8 +192,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="16"
-                            class="link-to-prism">src/app/services/bunsho.service.ts:16</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="18"
+                            class="link-to-prism">src/app/services/bunsho.service.ts:18</a></div>
                 </td>
             </tr>
 
@@ -265,7 +265,9 @@ export class BunshoService {
 
   bunsho: mwI.Bunsho[]&#x3D;[];
   constructor(private usrsrv: UserService,
-    private apollo: Apollo) { }
+    private apollo: Apollo) {
+      // this.get_bunsho();
+     }
     
     
   get_bunsho():void {

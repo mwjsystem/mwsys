@@ -15,6 +15,7 @@ import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { SoukoService } from './../services/souko.service';
+import { VendsService } from './../services/vends.service';
 import { HatmeiService } from './hatmei.service';
 import { DownloadService } from './../services/download.service';
 import { filter } from 'rxjs/operators';
@@ -48,6 +49,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
               public soksrv: SoukoService,
               public stfsrv: StaffService,
               public hmisrv: HatmeiService,
+              private vensrv: VendsService,
               private apollo: Apollo,
               private toastr: ToastrService,
               private overlay: Overlay,
@@ -70,12 +72,13 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       jdenno: new FormControl(''),
       mtbl: this.rows 
     });
+    this.vensrv.get_vendors();
     this.soksrv.get_souko();
     this.bunsrv.get_bunrui();
     this.stfsrv.get_staff();
   }
 
-  ngAfterViewInit():void{
+  ngAfterViewInit():void{ //子コンポーネント読み込み後に走る
     // console.log(this.usrsrv);
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('mode') === null){
@@ -186,7 +189,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
           this.usrsrv.setTmstmp(hatden);
           this.hmisrv.hatmei=data.trhatden_by_pk.trhatmeis;
           this.hmeitbl.set_hatmei();
-          this.setVcdtxt();
+          // this.setVcdtxt();
           this.denno=denno;
           history.replaceState('','','./frmsupply/' + this.mode + '/' + this.denno);
         }
@@ -245,10 +248,10 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   }
 
   refresh():void {
-    if (this.denno !=null ){
+    // if (this.denno >0 ){
       this.denno=this.usrsrv.convNumber(this.denno);
       this.get_hatden(this.denno);
-    }
+    // }
     
     // console.log(this.jmisrv.jyumei);
   }  
@@ -257,35 +260,35 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
 
   }
 
-  setVcdtxt(){
-    const GetMast = gql`
-    query get_vendor($id:smallint!,$vcd:String!) {
-      msvendor_by_pk(id: $id,code: $vcd) {
-        adrname
-      }
-    }`;
-    if(this.form.get('vcode').value){
-      this.apollo.watchQuery<any>({
-            query: GetMast, 
-            variables: { 
-              id : this.usrsrv.compid,
-              vcd: this.form.get('vcode').value
-            },
-        })
-        .valueChanges
-        .subscribe(({ data }) => {
-          // console.log(this.form.get('vcode').value,data.msvendor_by_pk != null);
-          if (data.msvendor_by_pk != null){
-            this.vcdtxt = data.msvendor_by_pk.adrname;
-          } else {
-            this.vcdtxt = "";
-            this.toastr.info("仕入先コード" + this.form.get('vcode').value + "は登録されていません");
-          }
-        },(error) => {
-          console.log('error query get_vendors', error);
-        });
-    }
-  } 
+  // setVcdtxt(){
+  //   const GetMast = gql`
+  //   query get_vendor($id:smallint!,$vcd:String!) {
+  //     msvendor_by_pk(id: $id,code: $vcd) {
+  //       adrname
+  //     }
+  //   }`;
+  //   if(this.form.get('vcode').value){
+  //     this.apollo.watchQuery<any>({
+  //           query: GetMast, 
+  //           variables: { 
+  //             id : this.usrsrv.compid,
+  //             vcd: this.form.get('vcode').value
+  //           },
+  //       })
+  //       .valueChanges
+  //       .subscribe(({ data }) => {
+  //         // console.log(this.form.get('vcode').value,data.msvendor_by_pk != null);
+  //         if (data.msvendor_by_pk != null){
+  //           this.vcdtxt = data.msvendor_by_pk.adrname;
+  //         } else {
+  //           this.vcdtxt = "";
+  //           this.toastr.info("仕入先コード" + this.form.get('vcode').value + "は登録されていません");
+  //         }
+  //       },(error) => {
+  //         console.log('error query get_vendors', error);
+  //       });
+  //   }
+  // } 
 
   modeToCre():void {
     this.mode=1;
@@ -317,7 +320,8 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   }
 
   save():void {
-
+    
+    let hatmei=this.hmeitbl.get_hatmei(this.denno);
     let hatden:any={
       id: this.usrsrv.compid,
       vcode: this.usrsrv.editFrmval(this.form,'vcode'),
@@ -332,14 +336,87 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       total: this.usrsrv.editFrmval(this.form,'total'),
       updated_at:new Date(),
       updated_by:this.usrsrv.staff.code,
-      jdenno:this.usrsrv.editFrmval(this.form,'jdenno')
+      jdenno:this.usrsrv.editFrmval(this.form,'jdenno'),
+      hdstatus:this.hmisrv.get_hdsta(hatmei)
     }
-    
 
+    if(this.mode==2){      
+      const UpdateTran = gql`
+      mutation upd_hatden($id: smallint!, $hdno: Int!,$_set: trhatden_set_input!,$obj:[trhatmei_insert_input!]!) {
+        update_trhatden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
+          affected_rows
+        }
+        delete_trhatmei(where: {id: {_eq:$id},denno: {_eq:$hdno}}) {
+          affected_rows
+        }
+        insert_trhatmei(obj: $object) {
+          affected_rows
+        }
+      }`;
 
-
-
-
+      this.apollo.mutate<any>({
+        mutation: UpdateTran,
+        variables: {
+          id: this.usrsrv.compid,
+          denno: this.denno,
+          _set: hatden,
+          obj: hatmei
+        },
+      }).subscribe(({ data }) => {
+        console.log('update_hatden', data);
+        this.toastr.success('発注伝票' + this.denno + 'の変更を保存しました');
+        this.mode=3;
+        this.form.disable();
+        this.form.markAsPristine();
+      },(error) => {
+        this.toastr.error('データベースエラー','発注伝票' + this.denno + 'の変更保存ができませんでした',
+                          {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+        console.log('error update_hatden', error);
+      });
+    }else{//新規登録
+      // let membs:any[]=[];
+      // // this.usrsrv.getNumber('mcode',1)
+      // //   .subscribe(value => {
+      // this.mcd=await this.usrsrv.getNumber('mcode',1);
+      // member.mcode = this.mcd;
+      // if (!member.sscode) {
+      //   member.sscode = this.mcd;
+      // }
+      // if (!member.scode) {
+      //   member.scode = this.mcd;
+      // }
+      // member.created_at = new Date();
+      // member.created_by = this.usrsrv.staff.code;
+      // membs.push(member);
+      // this.apollo.mutate<any>({
+      //   mutation: Query.InsertMast1,
+      //   variables: {
+      //     "object": membs
+      //   },
+      // }).subscribe(({ data }) => {
+      //   console.log('Insert_msmember', data);
+      //   this.children.toArray()[0].saveMadr(this.mcd,0,this.mode);
+      //   // console.log(this.form.get('addr1').get('zip'),);
+      //   if (this.form.get('addr1').value.zip != null) {
+      //     this.children.toArray()[1].saveMadr(this.mcd,1,this.flgadr1);
+      //   }
+        
+      //   this.toastr.success('顧客コード' + this.mcd + 'を新規登録しました');
+      //   this.mode=3;
+      //   this.form.disable();
+      //   this.form.markAsPristine();
+      //   history.replaceState('','','./mstmember/' + this.mode + '/' + this.mcd);
+      // },(error) => {
+      //   this.toastr.error('データベースエラー','顧客コード' + this.mcd + 'の新規登録ができませんでした',
+      //                     {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+      //   console.log('error Insert_msmember', error);
+      // }); 
+        // },(error) => {
+        //   this.toastr.error('データベースエラー','顧客コードの新規採番ができませんでした',
+        //                     {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+        //   console.log('error query get_maxmcode', error);
+        // });          
+    } 
     
   }  
 

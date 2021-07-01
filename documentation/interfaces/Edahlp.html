@@ -408,6 +408,16 @@ export class EdaService {
   public subject &#x3D; new Subject&lt;Edahlp[]&gt;();
   public observe &#x3D; this.subject.asObservable();
   constructor() { }
+  
+  get_name(eda:number):string{
+    let ret:string&#x3D;&quot;&quot;;
+    const i:number&#x3D; this.adrs.findIndex(obj &#x3D;&gt; obj.eda &#x3D;&#x3D; eda);
+    if(i&gt;1){
+      ret &#x3D; this.adrs[i].adrname;
+    } 
+    return ret;
+  }
+
 }
 </code></pre>
     </div>

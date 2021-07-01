@@ -75,7 +75,16 @@
                     <td class="col-md-4">
                         <ul class="index-list">
                             <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#ggrps">ggrps</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
                                 <a href="#goods">goods</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#gtnks">gtnks</a>
                             </li>
                         </ul>
                     </td>
@@ -90,10 +99,7 @@
                     <td class="col-md-4">
                         <ul class="index-list">
                             <li>
-                                <a href="#get_Goods">get_Goods</a>
-                            </li>
-                            <li>
-                                <a href="#getValue">getValue</a>
+                                <a href="#get_ggroups">get_ggroups</a>
                             </li>
                         </ul>
                     </td>
@@ -113,12 +119,12 @@
             <tbody>
                 <tr>
                     <td class="col-md-4">
-<code>constructor(usrsrv: <a href="../injectables/UserService.html">UserService</a>, apollo: Apollo)</code>
+<code>constructor(usrsrv: <a href="../injectables/UserService.html">UserService</a>, fb: <a href="https://angular.io/api/forms/FormBuilder" target="_blank">FormBuilder</a>, apollo: Apollo)</code>
                     </td>
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/app/services/goods.service.ts:12</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/app/services/goods.service.ts:27</a></div>
                             </td>
                         </tr>
 
@@ -140,6 +146,18 @@
                                                   
                                                         <td>
                                                                         <code><a href="../injectables/UserService.html" target="_self" >UserService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>fb</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="https://angular.io/api/forms/FormBuilder" target="_blank" >FormBuilder</a></code>
                                                         </td>
                                                   
                                                     <td>
@@ -177,96 +195,26 @@
         <tbody>
             <tr>
                 <td class="col-md-4">
-                    <a name="get_Goods"></a>
+                    <a name="get_ggroups"></a>
                     <span class="name">
                         <b>
-                            get_Goods
+                            get_ggroups
                         </b>
-                        <a href="#get_Goods"><span class="icon ion-ios-link"></span></a>
+                        <a href="#get_ggroups"><span class="icon ion-ios-link"></span></a>
                     </span>
                 </td>
             </tr>
             <tr>
                 <td class="col-md-4">
-<code>get_Goods(day: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+<code>get_ggroups()</code>
                 </td>
             </tr>
 
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="16"
-                            class="link-to-prism">src/app/services/goods.service.ts:16</a></div>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-
-                    <div class="io-description">
-                        <b>Parameters :</b>
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Type</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>day</td>
-                                    <td>
-                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
-                                    </td>
-
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
-
-                    </div>
-                    <div class="io-description">
-                        
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <table class="table table-sm table-bordered">
-        <tbody>
-            <tr>
-                <td class="col-md-4">
-                    <a name="getValue"></a>
-                    <span class="name">
-                        <b>
-                            getValue
-                        </b>
-                        <a href="#getValue"><span class="icon ion-ios-link"></span></a>
-                    </span>
-                </td>
-            </tr>
-            <tr>
-                <td class="col-md-4">
-<code>getValue(value)</code>
-                </td>
-            </tr>
-
-
-            <tr>
-                <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="76"
-                            class="link-to-prism">src/app/services/goods.service.ts:76</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="37"
+                            class="link-to-prism">src/app/services/goods.service.ts:37</a></div>
                 </td>
             </tr>
 
@@ -275,35 +223,8 @@
                 <td class="col-md-4">
 
                     <div class="io-description">
-                        <b>Parameters :</b>
-                        <table class="params">
-                            <thead>
-                                <tr>
-                                    <td>Name</td>
-                                    <td>Optional</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>value</td>
+                        <b>Returns : </b>    <code>Promise&lt;Boolean&gt;</code>
 
-                                    <td>
-                                        No
-                                    </td>
-
-
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                    </div>
-                    <div class="io-description">
-                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
-
-                    </div>
-                    <div class="io-description">
-                        
                     </div>
                 </td>
             </tr>
@@ -319,17 +240,18 @@
             <tbody>
                 <tr>
                     <td class="col-md-4">
-                        <a name="goods"></a>
+                        <a name="ggrps"></a>
                         <span class="name">
                             <b>
-                            goods</b>
-                            <a href="#goods"><span class="icon ion-ios-link"></span></a>
+                                <span class="modifier">Public</span>
+                            ggrps</b>
+                            <a href="#ggrps"><span class="icon ion-ios-link"></span></a>
                         </span>
                     </td>
                 </tr>
                     <tr>
                         <td class="col-md-4">
-                            <i>Type : </i>    <code>mwI.SalGds[]</code>
+                            <i>Type : </i>        <code><a href="../interfaces/Ggrp.html" target="_self" >Ggrp[]</a></code>
 
                         </td>
                     </tr>
@@ -340,7 +262,73 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/app/services/goods.service.ts:12</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="26" class="link-to-prism">src/app/services/goods.service.ts:26</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="goods"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            goods</b>
+                            <a href="#goods"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>mwI.Goods[]</code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>[]</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/app/services/goods.service.ts:25</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="gtnks"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            gtnks</b>
+                            <a href="#gtnks"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>mwI.Gtanka[]</code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>[]</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/app/services/goods.service.ts:27</a></div>
                             </td>
                         </tr>
 
@@ -354,84 +342,69 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Injectable } from &#x27;@angular/core&#x27;;
+import { Subject } from &#x27;rxjs&#x27;;
 import { Apollo } from &#x27;apollo-angular&#x27;;
 // import { AbstractControl } from &#x27;@angular/forms&#x27;;
 import gql from &#x27;graphql-tag&#x27;;
 import { UserService } from &#x27;./user.service&#x27;;
+import { FormBuilder } from &#x27;@angular/forms&#x27;;
+
+export interface Ggrp {
+  code:string;
+  name:string;
+  kana:string;
+  gkbn:string;
+  sozai:string;
+  vcode:string;
+  tcode:string;
+} 
 
 @Injectable({
   providedIn: &#x27;root&#x27;
 })
 
 export class GoodsService {
-  goods: mwI.SalGds[]&#x3D;[];
+  // public salgds: mwI.SalGds[]&#x3D;[];
+  public goods: mwI.Goods[]&#x3D;[];
+  public ggrps: Ggrp[]&#x3D;[];
+  public gtnks: mwI.Gtanka[]&#x3D;[];
+  // public subGds &#x3D; new Subject&lt;mwI.Goods[]&gt;();
+  // public subject &#x3D; new Subject&lt;boolean&gt;();
+  // // public obserGds &#x3D; this.subGds.asObservable();
+  // public observe &#x3D; this.subject.asObservable();
+
   constructor(private usrsrv: UserService,
+              private fb:     FormBuilder,
               private apollo: Apollo) {}
 
-  get_Goods(day:string):void {
+  get_ggroups():Promise&lt;Boolean&gt; {
     const GetMast &#x3D; gql&#x60;
-    query get_goods($id: smallint!,$day: date!) {
-      msgoods(where: {id: {_eq: $id}}) {
-        msggroup {
-          gkbn
-          siire
-        }
-        gcode
-        gtext
-        irisu
-        iriunit
-        koguchi
-        max
-        order
-        send
-        skbn
-        zkbn
-        msgtankas_aggregate(where: {day: {_lt: $day}}) {
-          aggregate {
-            max {
-              day
-            }
-          }
-        }
+    query get_groups($id: smallint!) {
+      msggroup(where: {id: {_eq: $id}}, order_by: {code: asc}) {
+        code
+        name
+        kana
+        gkbn
+        sozai
+        vcode
+        tcode
       }
     }&#x60;;
-    this.goods&#x3D;[];
-    this.apollo.watchQuery&lt;any&gt;({
-      query: GetMast, 
-        variables: { 
-          id : this.usrsrv.compid,
-          day :day
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) &#x3D;&gt; {
-        data.msgoods.forEach(e &#x3D;&gt; {
-          const good:mwI.SalGds&#x3D;{
-            gcode : e.gcode,
-            subname : e.subname,
-            irisu : e.irisu,
-            iriunit : e.iriunit,
-            koguchi : e.koguchi,
-            max   : e.max,
-            order   : e.order,
-            send  : e.send,
-            skbn  : e.skbn,
-            zkbn  : e.zkbn,
-            gkbn  : e.msggroup.gkbn,
-            siire : e.msggroup.siire,
-            day   : e.msgtankas_aggregate.aggregate.max.day
-          };
-        this.goods.push(good);
+    return new Promise&lt;Boolean&gt;(resolve &#x3D;&gt; {
+      this.apollo.watchQuery&lt;any&gt;({
+        query: GetMast, 
+          variables: { 
+            id : this.usrsrv.compid
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) &#x3D;&gt; {
+          this.ggrps&#x3D;data.msggroup;
+          resolve(true);
+        },(error) &#x3D;&gt; {
+          console.log(&#x27;error query get_ggroups&#x27;, error);
         });
-      },(error) &#x3D;&gt; {
-        console.log(&#x27;error query get_Goods&#x27;, error);
-      });
-  } 
-  
-  getValue(value):string {
-    const val &#x3D; value.toUpperCase().replace(/[^A-ZＡ-Ｚ0-9０-９－-]/g, &#x27;&#x27;).replace(/[０-９Ａ-Ｚ－]/g, function(s) {
-      return String.fromCharCode(s.charCodeAt(0) - 65248);})
-    return val;
+    });
   }
 
 }

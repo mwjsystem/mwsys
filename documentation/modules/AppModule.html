@@ -253,14 +253,14 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { BrowserModule } from &#x27;@angular/platform-browser&#x27;;
-import { NgModule, LOCALE_ID } from &#x27;@angular/core&#x27;;
+import { NgModule } from &#x27;@angular/core&#x27;;
 
 import { AppRoutingModule } from &#x27;./app-routing.module&#x27;;
 import { AppComponent } from &#x27;./app.component&#x27;;
 import { BrowserAnimationsModule } from &#x27;@angular/platform-browser/animations&#x27;;
 
-import { CommonModule, registerLocaleData } from &#x27;@angular/common&#x27;;
-import localeJa from &#x27;@angular/common/locales/ja&#x27;;
+import { CommonModule } from &#x27;@angular/common&#x27;;
+// import localeJa from &#x27;@angular/common/locales/ja&#x27;;
 // import { FormsModule, ReactiveFormsModule } from &#x27;@angular/forms&#x27;;
 // import { FlexLayoutModule } from &#x27;@angular/flex-layout&#x27;;
 import { MaterialModule } from &#x27;./material.module&#x27;;
@@ -269,11 +269,16 @@ import { HttpClientModule } from &#x27;@angular/common/http&#x27;;
 import { environment } from &#x27;./../environments/environment&#x27;;
 import { BeforeunloadGuard } from &#x27;./beforeunload.guard&#x27;;
 import { GraphQLModule } from &#x27;./graphql.module&#x27;;
-import { ToastrModule } from &#x27;ngx-toastr&#x27;; 
-import { NgxYubinBangoModule } from &#x27;ngx-yubinbango&#x27;;
+import { ToastrModule } from &#x27;ngx-toastr&#x27;;
 import { CoreModule } from &#x27;./core/core.module&#x27;;
+// import { UserService } from &#x27;./services/user.service&#x27;;
+// import { AuthService } from &#x27;@auth0/auth0-angular&#x27;;
 
 import { LoginComponent } from &#x27;./login/login.component&#x27;;
+
+// function userInitializer(usrsrv: UserService) {
+//     return () &#x3D;&gt; usersrv.initialize();
+// }
 
 @NgModule({
   declarations: [
@@ -296,10 +301,19 @@ import { LoginComponent } from &#x27;./login/login.component&#x27;;
     ToastrModule.forRoot(),
     MaterialModule,
     HttpClientModule,
-    NgxYubinBangoModule,
     CoreModule
   ],
-  providers: [BeforeunloadGuard ,{ provide: LOCALE_ID, useValue: &#x27;ja-JP&#x27; }],
+  providers: [
+    // AuthService,
+    // UserService,
+    BeforeunloadGuard,
+    // { provide: LOCALE_ID, useValue: &#x27;ja-JP&#x27; }
+    // { provide: APP_INITIALIZER,
+    //   useFactory: userInitializer,
+    //   multi: true,
+    //   deps: [UserService],
+    // },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -81,7 +81,13 @@ const routes: Routes &#x3D; [
   { path: &#x27;&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./home/home.module&#x27;).then(m &#x3D;&gt; m.HomeModule)&quot;,  canActivate: [AuthGuard] },
   { path: &#x27;login&#x27;, component: LoginComponent },
   { path: &#x27;mstmember&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./mstmember/mstmember.module&#x27;).then(m &#x3D;&gt; m.MstmemberModule)&quot;,  canActivate: [AuthGuard] },
-  { path: &#x27;frmsales&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./frmsales/frmsales.module&#x27;).then(m &#x3D;&gt; m.FrmsalesModule)&quot;,  canActivate: [AuthGuard] }
+  { path: &#x27;frmsales&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./frmsales/frmsales.module&#x27;).then(m &#x3D;&gt; m.FrmsalesModule)&quot;,  canActivate: [AuthGuard] },
+  { path: &#x27;frmsupply&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./frmsupply/frmsupply.module&#x27;).then(m &#x3D;&gt; m.FrmsupplyModule)&quot;,  canActivate: [AuthGuard] },
+  { path: &#x27;mstgoods&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./mstgoods/mstgoods.module&#x27;).then(m &#x3D;&gt; m.MstgoodsModule)&quot;,  canActivate: [AuthGuard] },
+  { path: &#x27;frmkeep&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./frmkeep/frmkeep.module&#x27;).then(m &#x3D;&gt; m.FrmkeepModule)&quot;,  canActivate: [AuthGuard] },
+  { path: &#x27;frmtreat&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./frmtreat/frmtreat.module&#x27;).then(m &#x3D;&gt; m.FrmtreatModule)&quot;,  canActivate: [AuthGuard] },
+  { path: &#x27;repstock&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./repstock/repstock.module&#x27;).then(m &#x3D;&gt; m.RepstockModule)&quot;,  canActivate: [AuthGuard] },
+  { path: &#x27;mstvendor&#x27;, loadChildren: () &#x3D;&gt; &quot;import(&#x27;./mstvendor/mstvendor.module&#x27;).then(m &#x3D;&gt; m.MstvendorModule)&quot;,  canActivate: [AuthGuard] }
 ];
 
 @NgModule({

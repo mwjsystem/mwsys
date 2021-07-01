@@ -71,6 +71,7 @@
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
         <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { NgModule } from &#x27;@angular/core&#x27;;
+import { ClipboardModule } from &#x27;@angular/cdk/clipboard&#x27;;
 import { MatButtonModule } from &#x27;@angular/material/button&#x27;;
 import { MatCardModule } from &#x27;@angular/material/card&#x27;;
 import { MatCheckboxModule } from &#x27;@angular/material/checkbox&#x27;;
@@ -78,12 +79,12 @@ import { MatDialogModule } from &#x27;@angular/material/dialog&#x27;;
 import { MatDatepickerModule } from &#x27;@angular/material/datepicker&#x27;;
 import { MatExpansionModule } from &#x27;@angular/material/expansion&#x27;;
 import { MatFormFieldModule } from &#x27;@angular/material/form-field&#x27;;
+import { MatGridListModule } from &#x27;@angular/material/grid-list&#x27;;
 import { MatIconModule } from &#x27;@angular/material/icon&#x27;;
 import { MatInputModule } from &#x27;@angular/material/input&#x27;;
 import { MatMenuModule } from &#x27;@angular/material/menu&#x27;;
 import { MatPaginatorModule } from &#x27;@angular/material/paginator&#x27;;
-// import { MatProgressSpinnerModule } from &#x27;@angular/material/progress-spinner&#x27;;
-// import { MatSpinner } from &#x27;@angular/material/progress-spinner&#x27;;
+import { MatProgressSpinnerModule } from &#x27;@angular/material/progress-spinner&#x27;;
 import { MatSelectModule } from &#x27;@angular/material/select&#x27;;
 import { MatStepperModule } from &#x27;@angular/material/stepper&#x27;;
 import { MatTableModule } from &#x27;@angular/material/table&#x27;;
@@ -94,46 +95,46 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from &#x27;@angular/material/cor
 import { DragDropModule } from &#x27;@angular/cdk/drag-drop&#x27;;
 
 @NgModule({
-  imports: [
-      MatButtonModule
-     ,MatCardModule
-     ,MatCheckboxModule
-     ,MatDatepickerModule
-     ,MatDialogModule
-     ,MatExpansionModule
-     ,MatFormFieldModule
-     ,MatIconModule
-     ,MatInputModule
-     ,MatMenuModule
-     ,MatPaginatorModule
-    //  ,MatProgressSpinnerModule
-    //  ,MatSpinner
-     ,MatSelectModule
-     ,MatStepperModule
-     ,MatTableModule
-     ,MatTabsModule
-     ,MatToolbarModule
-     ,MatTooltipModule
-     ,MatNativeDateModule
-     ,DragDropModule
-  ],
+  // imports: [
+  //     MatButtonModule
+  //    ,MatCardModule
+  //    ,MatCheckboxModule
+  //    ,MatDatepickerModule
+  //    ,MatDialogModule
+  //    ,MatExpansionModule
+  //    ,MatFormFieldModule
+  //    ,MatIconModule
+  //    ,MatInputModule
+  //    ,MatMenuModule
+  //    ,MatPaginatorModule
+  //    ,MatProgressSpinnerModule
+  //    ,MatSelectModule
+  //    ,MatStepperModule
+  //    ,MatTableModule
+  //    ,MatTabsModule
+  //    ,MatToolbarModule
+  //    ,MatTooltipModule
+  //    ,MatNativeDateModule
+  //    ,DragDropModule
+  // ],
   providers: [
     {provide: MAT_DATE_LOCALE, useValue: &#x27;ja-JP&#x27;}
   ],
   exports: [
-      MatButtonModule
+      ClipboardModule
+     ,MatButtonModule
      ,MatCardModule
      ,MatCheckboxModule
      ,MatDatepickerModule
      ,MatDialogModule
      ,MatExpansionModule
      ,MatFormFieldModule
+     ,MatGridListModule
      ,MatIconModule
      ,MatInputModule
      ,MatMenuModule
      ,MatPaginatorModule
-    //  ,MatProgressSpinnerModule
-    //  ,MatSpinner
+     ,MatProgressSpinnerModule
      ,MatSelectModule
      ,MatStepperModule
      ,MatTableModule

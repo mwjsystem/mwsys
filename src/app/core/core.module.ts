@@ -1,4 +1,5 @@
 import { NgModule, LOCALE_ID } from '@angular/core';
+import localeJa from '@angular/common/locales/ja';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -14,7 +15,6 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { PortalModule } from '@angular/cdk/portal';
 import { StaffPipe } from './pipes/staff.pipe';
 import { JdatePipe } from './pipes/jdate.pipe';
-import localeJa from '@angular/common/locales/ja';
 import { McdtxtPipe } from './pipes/mcdtxt.pipe';
 import { BunruiPipe } from './pipes/bunrui.pipe';
 import { VcdtxtPipe } from './pipes/vcdtxt.pipe';

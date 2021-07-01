@@ -145,7 +145,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.bunsrv.get_bunrui();
     this.stfsrv.get_staff();
   }
-  ngAfterViewInit():void{
+  ngAfterViewInit():void{ //子コンポーネント読み込み後に走る
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('mode') === null){
         this.cancel();

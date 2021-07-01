@@ -43,8 +43,9 @@
                 <th mat-header-cell *matHeaderCellDef>商品コード</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
                     <mat-form-field>
-                        <input matInput formControlName="gcode" (change)="updGds(i,$event.target.value)" maxlength="20"
-                            (keydown.f4)="gcdHelp(i)" (contextmenu)="contxtMenu(i)">
+                        <input tabIndex="2 + i * 4 + 1" matInput formControlName="gcode"
+                            (change)="updGds(i,$event.target.value)" maxlength="20" (keydown.f4)="gcdHelp(i)"
+                            (contextmenu)="contxtMenu(i)">
                         <button mat-icon-button matSuffix (click)="gcdHelp(i)" *ngIf="frmArr.enabled">
                             <mat-icon>find_replace</mat-icon>
                         </button>
@@ -67,7 +68,8 @@
                 <th mat-header-cell *matHeaderCellDef>数量</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
                     <mat-form-field style="width:4em;">
-                        <input type="number" matInput formControlName="suu" class="i_num" (change)="calcTot()">
+                        <input tabIndex="2 + i * 4 + 2" type="number" matInput formControlName="suu" class="i_num"
+                            (change)="calcTot()">
                     </mat-form-field>
                 </td>
             </ng-container>
@@ -83,7 +85,8 @@
                 <th mat-header-cell *matHeaderCellDef>単価</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
                     <mat-form-field style="width:6em;">
-                        <input matInput formControlName="genka" numInput class="i_num" (change)="calcTot()">
+                        <input tabIndex="2 + i * 4 + 3" matInput formControlName="genka" numInput class="i_num"
+                            (change)="calcTot()">
                     </mat-form-field>
                 </td>
             </ng-container>
@@ -112,7 +115,7 @@
                 <th mat-header-cell *matHeaderCellDef>明細備考</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
                     <mat-form-field>
-                        <input matInput formControlName="mbiko">
+                        <input tabIndex="2 + i * 4 + 4" matInput formControlName="mbiko">
                     </mat-form-field>
                 </td>
             </ng-container>

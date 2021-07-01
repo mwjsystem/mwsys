@@ -1,21 +1,21 @@
 <mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
   <div class="icon-area" fxLayout="row wrap">
-    <button mat-button (click)="modeToCre()" [style.display]="mode==3 ? 'block' : 'none'">
+    <button mat-button (click)="modeToCre()" *ngIf="mode==3">
       <mat-icon>add_box</mat-icon>新規
     </button>
-    <button mat-button (click)="modeToUpd()" [style.display]="mode==3 && this.denno ? 'block' : 'none'">
+    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.denno">
       <mat-icon>edit</mat-icon>編集
     </button>
-    <button mat-button (click)="save()" [style.display]="mode==3 ? 'none' : 'block'">
+    <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
       <mat-icon>save</mat-icon>保存
     </button>
-    <button mat-button (click)="cancel()" [style.display]="mode==3 ? 'none' : 'block'">
+    <button mat-button (click)="cancel()" *ngIf="mode!=3">
       <mat-icon>cancel</mat-icon>中止
     </button>
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>発注伝票番号</mat-label>
-      <input matInput [(ngModel)]="denno" tabIndex="1" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()"
-        maxlength="10" (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
+      <input matInput [(ngModel)]="denno" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()" maxlength="10"
+        (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
       <button mat-button mat-icon-button matSuffix (click)="dennoHelp()"
         [style.display]="mode==3 ? 'inline-block' : 'none'">
         <mat-icon>find_replace</mat-icon>
@@ -58,8 +58,7 @@
         <span class="ybtxt">{{form.value.day | jdate}}</span>
         <mat-form-field style="width: 10em;">
           <mat-label>仕入先</mat-label>
-          <input tabIndex="1" matInput formControlName="vcode" required (blur)="setVcdtxt()"
-            (keydown.f4)="vcdHelp('vcode')">
+          <input tabIndex="2" matInput formControlName="vcode" required (keydown.f4)="vcdHelp('vcode')">
           <button mat-icon-button matSuffix (click)="vcdHelp('vcode')" *ngIf="frmArr.enabled">
             <mat-icon>find_replace</mat-icon>
           </button>
@@ -78,7 +77,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>担当者</mat-label>
-          <mat-select #msel1 tabIndex="2" formControlName="tcode" (keyup.enter)="msel1.close()">
+          <mat-select #msel1 formControlName="tcode" (keyup.enter)="msel1.close()">
             <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>

@@ -146,6 +146,9 @@
                             <li>
                                 <a href="#saveMadr">saveMadr</a>
                             </li>
+                            <li>
+                                <a href="#updTel">updTel</a>
+                            </li>
                         </ul>
                     </td>
                 </tr>
@@ -338,8 +341,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="49"
-                            class="link-to-prism">src/app/share/address/address.component.ts:49</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="73"
+                            class="link-to-prism">src/app/share/address/address.component.ts:73</a></div>
                 </td>
             </tr>
 
@@ -410,6 +413,88 @@
             </tr>
         </tbody>
     </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="updTel"></a>
+                    <span class="name">
+                        <b>
+                            updTel
+                        </b>
+                        <a href="#updTel"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>updTel(fldnm: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>, value: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="67"
+                            class="link-to-prism">src/app/share/address/address.component.ts:67</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>fldnm</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>value</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </section>
 
 </div>
@@ -444,24 +529,48 @@ export class AddressComponent implements OnInit {
 
   ngOnInit(): void {
     const form &#x3D; this.parent.form;
-    form.addControl(this.formName, new FormGroup({
-      zip: new FormControl(&#x27;&#x27;, Validators.required),
-      region: new FormControl(&#x27;&#x27;, Validators.required),
-      local: new FormControl(&#x27;&#x27;, Validators.required),
-      street: new FormControl(&#x27;&#x27;),
-      extend: new FormControl(&#x27;&#x27;),
-      extend2: new FormControl(&#x27;&#x27;),
-      adrname: new FormControl(&#x27;&#x27;, Validators.required),
-      tel: new FormControl(&#x27;&#x27;, Validators.required),
-      fax: new FormControl(&#x27;&#x27;),
-      tel2: new FormControl(&#x27;&#x27;),
-      tel3: new FormControl(&#x27;&#x27;),
-      adrbikou: new FormControl(&#x27;&#x27;),
-      adrinbikou: new FormControl(&#x27;&#x27;),
-      adrokrbko: new FormControl(&#x27;&#x27;),
-      del: new FormControl(&#x27;&#x27;),
-    }));
-   
+    if (this.formName&#x3D;&#x3D;&#x27;addr1&#x27;) {
+      form.addControl(this.formName, new FormGroup({
+        zip: new FormControl(&#x27;&#x27;),
+        region: new FormControl(&#x27;&#x27;),
+        local: new FormControl(&#x27;&#x27;),
+        street: new FormControl(&#x27;&#x27;),
+        extend: new FormControl(&#x27;&#x27;),
+        extend2: new FormControl(&#x27;&#x27;),
+        adrname: new FormControl(&#x27;&#x27;),
+        tel: new FormControl(&#x27;&#x27;),
+        fax: new FormControl(&#x27;&#x27;),
+        tel2: new FormControl(&#x27;&#x27;),
+        tel3: new FormControl(&#x27;&#x27;),
+        adrbikou: new FormControl(&#x27;&#x27;),
+        adrinbikou: new FormControl(&#x27;&#x27;),
+        adrokrbko: new FormControl(&#x27;&#x27;),
+        del: new FormControl(&#x27;&#x27;),
+      }));
+    } else {
+      form.addControl(this.formName, new FormGroup({
+        zip: new FormControl(&#x27;&#x27;, Validators.required),
+        region: new FormControl(&#x27;&#x27;, Validators.required),
+        local: new FormControl(&#x27;&#x27;, Validators.required),
+        street: new FormControl(&#x27;&#x27;),
+        extend: new FormControl(&#x27;&#x27;),
+        extend2: new FormControl(&#x27;&#x27;),
+        adrname: new FormControl(&#x27;&#x27;, Validators.required),
+        tel: new FormControl(&#x27;&#x27;, Validators.required),
+        fax: new FormControl(&#x27;&#x27;),
+        tel2: new FormControl(&#x27;&#x27;),
+        tel3: new FormControl(&#x27;&#x27;),
+        adrbikou: new FormControl(&#x27;&#x27;),
+        adrinbikou: new FormControl(&#x27;&#x27;),
+        adrokrbko: new FormControl(&#x27;&#x27;),
+        del: new FormControl(&#x27;&#x27;),
+      }));     
+    }   
+  }
+  updTel(fldnm:string,value:string){
+    let val:string &#x3D;this.usrsrv.convTel(value);
+    // console.log(value,val);
+    this.parent.form.get(this.formName).get(fldnm).setValue(val);
   }
 
   saveMadr(mcode:string|number,eda:string|number,mode:number):Subject&lt;string|number&gt; {
@@ -501,6 +610,7 @@ export class AddressComponent implements OnInit {
       }).subscribe(({ data }) &#x3D;&gt; {
         console.log(&#x27;update_msmadr&#x27;, data);
         neweda.next(eda);
+        neweda.complete();
       },(error) &#x3D;&gt; {
         console.log(&#x27;error update_msmember&#x27;, error);
       });
@@ -519,6 +629,7 @@ export class AddressComponent implements OnInit {
             let lceda&#x3D;data.msmadr_aggregate.aggregate.max.eda+1;
             madr.eda&#x3D;lceda;
             neweda.next(lceda);
+            neweda.complete();
           } else {
             madr.eda&#x3D;eda; 
           }
@@ -544,67 +655,72 @@ export class AddressComponent implements OnInit {
     </div>
 
     <div class="tab-pane fade " id="c-templateData">
-        <pre class="line-numbers"><code class="language-html">&lt;form formGroupName&#x3D;&quot;{{formName}}&quot; ngNativeValidate ybAddress fxLayout&#x3D;&quot;row wrap&quot; div fxLayoutGap&#x3D;&quot;7px&quot;&gt;
+        <pre class="line-numbers"><code class="language-html">&lt;form formGroupName&#x3D;&quot;{{formName}}&quot; ngNativeValidate ybAddress #address&#x3D;&quot;ybAddress&quot; fxLayout&#x3D;&quot;row wrap&quot; div
+    fxLayoutGap&#x3D;&quot;7px&quot;&gt;
     &lt;mat-form-field&gt;
         &lt;mat-label&gt;郵便番号(ハイフンなし)&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;101&quot; matInput formControlName&#x3D;&quot;zip&quot; ybPostalCode required size&#x3D;&quot;7&quot; maxlength&#x3D;&quot;7&quot;&gt;
+        &lt;input tabIndex&#x3D;&quot;101&quot; matInput formControlName&#x3D;&quot;zip&quot; ybPostalCode [required]&#x3D;&quot;this.formName!&#x3D;&#x27;addr1&#x27;&quot; size&#x3D;&quot;7&quot;
+            maxlength&#x3D;&quot;7&quot;&gt;
         &lt;!-- &lt;button mat-button matSuffix mat-stroked-button aria-label&#x3D;&quot;get&quot; (click)&#x3D;&quot;address.complete()&quot;&gt;
             住所補完
         &lt;/button&gt; --&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field&gt;
         &lt;mat-label&gt;都道府県&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;102&quot; matInput formControlName&#x3D;&quot;region&quot; ybRegion required&gt;
+        &lt;input tabIndex&#x3D;&quot;102&quot; matInput formControlName&#x3D;&quot;region&quot; ybRegion [required]&#x3D;&quot;this.formName!&#x3D;&#x27;addr1&#x27;&quot;&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field&gt;
         &lt;mat-label&gt;市区町村&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;103&quot; matInput formControlName&#x3D;&quot;local&quot; ybLocality required&gt;
+        &lt;input tabIndex&#x3D;&quot;103&quot; matInput formControlName&#x3D;&quot;local&quot; ybLocality [required]&#x3D;&quot;this.formName!&#x3D;&#x27;addr1&#x27;&quot;&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field&gt;
         &lt;mat-label&gt;町名・番地&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;104&quot; matInput formControlName&#x3D;&quot;street&quot; ybStreet required&gt;
+        &lt;input tabIndex&#x3D;&quot;104&quot; matInput formControlName&#x3D;&quot;street&quot; ybStreet&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field&gt;
         &lt;mat-label&gt;マンション・ビル名&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;105&quot;  matInput formControlName&#x3D;&quot;extend&quot; ybExtended&gt;
+        &lt;input tabIndex&#x3D;&quot;105&quot; matInput formControlName&#x3D;&quot;extend&quot; ybExtended&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field *ngIf&#x3D;&quot;formName !&#x3D;&#x3D; &#x27;addr0&#x27;&quot;&gt;
         &lt;mat-label&gt;道場名&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;106&quot;  matInput formControlName&#x3D;&quot;extend2&quot;&gt;
+        &lt;input tabIndex&#x3D;&quot;106&quot; matInput formControlName&#x3D;&quot;extend2&quot;&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field&gt;
         &lt;mat-label&gt;電話番号&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;107&quot; matInput formControlName&#x3D;&quot;tel&quot;&gt;
+        &lt;input tabIndex&#x3D;&quot;107&quot; matInput formControlName&#x3D;&quot;tel&quot; (change)&#x3D;&quot;updTel(&#x27;tel&#x27;,$event.target.value)&quot;
+            [required]&#x3D;&quot;this.formName!&#x3D;&#x27;addr1&#x27;&quot;&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field&gt;
         &lt;mat-label&gt;電話番号2&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;109&quot; matInput formControlName&#x3D;&quot;tel2&quot;&gt;
+        &lt;input tabIndex&#x3D;&quot;109&quot; matInput formControlName&#x3D;&quot;tel2&quot; (change)&#x3D;&quot;updTel(&#x27;tel2&#x27;,$event.target.value)&quot;&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field&gt;
         &lt;mat-label&gt;電話番号3&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;110&quot; matInput formControlName&#x3D;&quot;tel3&quot;&gt;
+        &lt;input tabIndex&#x3D;&quot;110&quot; matInput formControlName&#x3D;&quot;tel3&quot; (change)&#x3D;&quot;updTel(&#x27;tel3&#x27;,$event.target.value)&quot;&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field&gt;
         &lt;mat-label&gt;FAX番号&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;108&quot; matInput formControlName&#x3D;&quot;fax&quot;&gt;
+        &lt;input tabIndex&#x3D;&quot;108&quot; matInput formControlName&#x3D;&quot;fax&quot; (change)&#x3D;&quot;updTel(&#x27;fax&#x27;,$event.target.value)&quot;&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-form-field style&#x3D;&quot;width:20em&quot; *ngIf&#x3D;&quot;formName !&#x3D;&#x3D; &#x27;addr0&#x27;&quot;&gt;
         &lt;mat-label&gt;住所宛名&lt;/mat-label&gt;
-        &lt;input tabIndex&#x3D;&quot;111&quot; matInput formControlName&#x3D;&quot;adrname&quot; required&gt;
+        &lt;input tabIndex&#x3D;&quot;111&quot; matInput formControlName&#x3D;&quot;adrname&quot; [required]&#x3D;&quot;this.formName!&#x3D;&#x27;addr1&#x27;&quot;&gt;
     &lt;/mat-form-field&gt;
     &lt;mat-checkbox formControlName&#x3D;&quot;del&quot;&gt;削除済&lt;/mat-checkbox&gt;
-    &lt;mat-form-field *ngIf&#x3D;&quot;formName !&#x3D;&#x3D; &#x27;addr0&#x27;&quot; style&#x3D;&quot;width:100%;&quot;&gt;
-        &lt;mat-label&gt;納品先備考&lt;/mat-label&gt;
-        &lt;textarea matInput formControlName&#x3D;&quot;adrbikou&quot; matTextareaAutosize&gt;&lt;/textarea&gt;
-    &lt;/mat-form-field&gt;
-    &lt;mat-form-field *ngIf&#x3D;&quot;formName !&#x3D;&#x3D; &#x27;addr0&#x27;&quot; style&#x3D;&quot;width:100%;&quot;&gt;
-        &lt;mat-label&gt;納品先社内向け備考&lt;/mat-label&gt;
-        &lt;textarea matInput formControlName&#x3D;&quot;adrinbikou&quot; matTextareaAutosize&gt;&lt;/textarea&gt;
-    &lt;/mat-form-field&gt;
-    &lt;mat-form-field style&#x3D;&quot;width:100%;&quot;&gt;
-        &lt;mat-label&gt;送り状備考&lt;/mat-label&gt;
-        &lt;textarea matInput formControlName&#x3D;&quot;adrokrbko&quot; matTextareaAutosize&gt;&lt;/textarea&gt;
-    &lt;/mat-form-field&gt;
+    &lt;div fxLafxLayout&#x3D;&quot;row wrap&quot; fxLayoutGap&#x3D;&quot;5px&quot;&gt;
+        &lt;mat-form-field *ngIf&#x3D;&quot;formName !&#x3D;&#x3D; &#x27;addr0&#x27;&quot; style&#x3D;&quot;width:100%;&quot;&gt;
+            &lt;mat-label&gt;納品先備考&lt;/mat-label&gt;
+            &lt;textarea matInput formControlName&#x3D;&quot;adrbikou&quot; matTextareaAutosize&gt;&lt;/textarea&gt;
+        &lt;/mat-form-field&gt;
+        &lt;mat-form-field *ngIf&#x3D;&quot;formName !&#x3D;&#x3D; &#x27;addr0&#x27;&quot; style&#x3D;&quot;width:100%;&quot;&gt;
+            &lt;mat-label&gt;納品先社内向け備考&lt;/mat-label&gt;
+            &lt;textarea matInput formControlName&#x3D;&quot;adrinbikou&quot; matTextareaAutosize&gt;&lt;/textarea&gt;
+        &lt;/mat-form-field&gt;
+        &lt;mat-form-field style&#x3D;&quot;width:100%;&quot;&gt;
+            &lt;mat-label&gt;送り状備考&lt;/mat-label&gt;
+            &lt;textarea matInput formControlName&#x3D;&quot;adrokrbko&quot; matTextareaAutosize&gt;&lt;/textarea&gt;
+        &lt;/mat-form-field&gt;
+    &lt;/div&gt;
 &lt;/form&gt;</code></pre>
     </div>
 
@@ -640,9 +756,9 @@ export class AddressComponent implements OnInit {
 <script src="../js/libs/htmlparser.js"></script>
 <script src="../js/libs/deep-iterator.js"></script>
 <script>
-        var COMPONENT_TEMPLATE = '<div><form formGroupName="{{formName}}" ngNativeValidate ybAddress fxLayout="row wrap" div fxLayoutGap="7px">    <mat-form-field>        <mat-label>郵便番号(ハイフンなし)</mat-label>        <input tabIndex="101" matInput formControlName="zip" ybPostalCode required size="7" maxlength="7">        <!-- <button mat-button matSuffix mat-stroked-button aria-label="get" (click)="address.complete()">            住所補完        </button> -->    </mat-form-field>    <mat-form-field>        <mat-label>都道府県</mat-label>        <input tabIndex="102" matInput formControlName="region" ybRegion required>    </mat-form-field>    <mat-form-field>        <mat-label>市区町村</mat-label>        <input tabIndex="103" matInput formControlName="local" ybLocality required>    </mat-form-field>    <mat-form-field>        <mat-label>町名・番地</mat-label>        <input tabIndex="104" matInput formControlName="street" ybStreet required>    </mat-form-field>    <mat-form-field>        <mat-label>マンション・ビル名</mat-label>        <input tabIndex="105"  matInput formControlName="extend" ybExtended>    </mat-form-field>    <mat-form-field *ngIf="formName !== \'addr0\'">        <mat-label>道場名</mat-label>        <input tabIndex="106"  matInput formControlName="extend2">    </mat-form-field>    <mat-form-field>        <mat-label>電話番号</mat-label>        <input tabIndex="107" matInput formControlName="tel">    </mat-form-field>    <mat-form-field>        <mat-label>電話番号2</mat-label>        <input tabIndex="109" matInput formControlName="tel2">    </mat-form-field>    <mat-form-field>        <mat-label>電話番号3</mat-label>        <input tabIndex="110" matInput formControlName="tel3">    </mat-form-field>    <mat-form-field>        <mat-label>FAX番号</mat-label>        <input tabIndex="108" matInput formControlName="fax">    </mat-form-field>    <mat-form-field style="width:20em" *ngIf="formName !== \'addr0\'">        <mat-label>住所宛名</mat-label>        <input tabIndex="111" matInput formControlName="adrname" required>    </mat-form-field>    <mat-checkbox formControlName="del">削除済</mat-checkbox>    <mat-form-field *ngIf="formName !== \'addr0\'" style="width:100%;">        <mat-label>納品先備考</mat-label>        <textarea matInput formControlName="adrbikou" matTextareaAutosize></textarea>    </mat-form-field>    <mat-form-field *ngIf="formName !== \'addr0\'" style="width:100%;">        <mat-label>納品先社内向け備考</mat-label>        <textarea matInput formControlName="adrinbikou" matTextareaAutosize></textarea>    </mat-form-field>    <mat-form-field style="width:100%;">        <mat-label>送り状備考</mat-label>        <textarea matInput formControlName="adrokrbko" matTextareaAutosize></textarea>    </mat-form-field></form></div>'
-    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'}];
-    var DIRECTIVES = [{'name': 'TabDirective', 'selector': '[tabIndex]'}];
+        var COMPONENT_TEMPLATE = '<div><form formGroupName="{{formName}}" ngNativeValidate ybAddress #address="ybAddress" fxLayout="row wrap" div    fxLayoutGap="7px">    <mat-form-field>        <mat-label>郵便番号(ハイフンなし)</mat-label>        <input tabIndex="101" matInput formControlName="zip" ybPostalCode [required]="this.formName!=\'addr1\'" size="7"            maxlength="7">        <!-- <button mat-button matSuffix mat-stroked-button aria-label="get" (click)="address.complete()">            住所補完        </button> -->    </mat-form-field>    <mat-form-field>        <mat-label>都道府県</mat-label>        <input tabIndex="102" matInput formControlName="region" ybRegion [required]="this.formName!=\'addr1\'">    </mat-form-field>    <mat-form-field>        <mat-label>市区町村</mat-label>        <input tabIndex="103" matInput formControlName="local" ybLocality [required]="this.formName!=\'addr1\'">    </mat-form-field>    <mat-form-field>        <mat-label>町名・番地</mat-label>        <input tabIndex="104" matInput formControlName="street" ybStreet>    </mat-form-field>    <mat-form-field>        <mat-label>マンション・ビル名</mat-label>        <input tabIndex="105" matInput formControlName="extend" ybExtended>    </mat-form-field>    <mat-form-field *ngIf="formName !== \'addr0\'">        <mat-label>道場名</mat-label>        <input tabIndex="106" matInput formControlName="extend2">    </mat-form-field>    <mat-form-field>        <mat-label>電話番号</mat-label>        <input tabIndex="107" matInput formControlName="tel" (change)="updTel(\'tel\',$event.target.value)"            [required]="this.formName!=\'addr1\'">    </mat-form-field>    <mat-form-field>        <mat-label>電話番号2</mat-label>        <input tabIndex="109" matInput formControlName="tel2" (change)="updTel(\'tel2\',$event.target.value)">    </mat-form-field>    <mat-form-field>        <mat-label>電話番号3</mat-label>        <input tabIndex="110" matInput formControlName="tel3" (change)="updTel(\'tel3\',$event.target.value)">    </mat-form-field>    <mat-form-field>        <mat-label>FAX番号</mat-label>        <input tabIndex="108" matInput formControlName="fax" (change)="updTel(\'fax\',$event.target.value)">    </mat-form-field>    <mat-form-field style="width:20em" *ngIf="formName !== \'addr0\'">        <mat-label>住所宛名</mat-label>        <input tabIndex="111" matInput formControlName="adrname" [required]="this.formName!=\'addr1\'">    </mat-form-field>    <mat-checkbox formControlName="del">削除済</mat-checkbox>    <div fxLafxLayout="row wrap" fxLayoutGap="5px">        <mat-form-field *ngIf="formName !== \'addr0\'" style="width:100%;">            <mat-label>納品先備考</mat-label>            <textarea matInput formControlName="adrbikou" matTextareaAutosize></textarea>        </mat-form-field>        <mat-form-field *ngIf="formName !== \'addr0\'" style="width:100%;">            <mat-label>納品先社内向け備考</mat-label>            <textarea matInput formControlName="adrinbikou" matTextareaAutosize></textarea>        </mat-form-field>        <mat-form-field style="width:100%;">            <mat-label>送り状備考</mat-label>            <textarea matInput formControlName="adrokrbko" matTextareaAutosize></textarea>        </mat-form-field>    </div></form></div>'
+    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmkeepComponent', 'selector': 'app-frmkeep'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'FrmsupplyComponent', 'selector': 'app-frmsupply'},{'name': 'FrmtreatComponent', 'selector': 'app-frmtreat'},{'name': 'GcdhelpComponent', 'selector': 'app-gcdhelp'},{'name': 'GdsimageComponent', 'selector': 'app-gdsimage'},{'name': 'GdstblComponent', 'selector': 'app-gdstbl'},{'name': 'GrpcdhelpComponent', 'selector': 'app-grpcdhelp'},{'name': 'GtnktblComponent', 'selector': 'app-gtnktbl'},{'name': 'HmeitblComponent', 'selector': 'app-hmeitbl'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JdnohelpComponent', 'selector': 'app-jdnohelp'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstgoodsComponent', 'selector': 'app-mstgoods'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'MstvendorComponent', 'selector': 'app-mstvendor'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'RepstockComponent', 'selector': 'app-repstock'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'},{'name': 'TrtdetailComponent', 'selector': 'app-trtdetail'},{'name': 'VcdhelpComponent', 'selector': 'app-vcdhelp'}];
+    var DIRECTIVES = [{'name': 'NuminputDirective', 'selector': '[numInput]'},{'name': 'TabDirective', 'selector': '[tabIndex]'}];
     var ACTUAL_COMPONENT = {'name': 'AddressComponent'};
 </script>
 <script src="../js/tree.js"></script>

@@ -1,0 +1,1182 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>mwsys documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">mwsys documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content component">
+                   <div class="content-data">
+
+
+
+
+<ol class="breadcrumb">
+  <li>Components</li>
+  <li>FrmkeepComponent</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+        <li >
+            <a href="#templateData" role="tab" id="templateData-tab" data-toggle="tab" data-link="template">Template</a>
+        </li>
+        <li >
+            <a href="#styleData" role="tab" id="styleData-tab" data-toggle="tab" data-link="style">Styles</a>
+        </li>
+        <li >
+            <a href="#tree" role="tab" id="tree-tab" data-toggle="tab" data-link="dom-tree">DOM Tree</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info"><p class="comment">
+    <h3>File</h3>
+</p>
+<p class="comment">
+    <code>src/app/frmkeep/frmkeep.component.ts</code>
+</p>
+
+
+
+    <p class="comment">
+        <h3>Implements</h3>
+    </p>
+    <p class="comment">
+                    <code><a href="https://angular.io/api/core/OnInit" target="_blank" >OnInit</a></code>
+    </p>
+
+
+<section>
+    <h3>Metadata</h3>
+    <table class="table table-sm table-hover">
+        <tbody>
+
+
+
+
+
+
+
+
+
+
+
+            <tr>
+                <td class="col-md-3">selector</td>
+                <td class="col-md-9"><code>app-frmkeep</code></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-3">styleUrls</td>
+                <td class="col-md-9"><code>./frmkeep.component.scss</code></td>
+            </tr>
+
+
+
+            <tr>
+                <td class="col-md-3">templateUrl</td>
+                <td class="col-md-9"><code>./frmkeep.component.html</code></td>
+            </tr>
+
+
+
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#cdRef">cdRef</a>
+                            </li>
+                            <li>
+                                <a href="#dataSource">dataSource</a>
+                            </li>
+                            <li>
+                                <a href="#denno">denno</a>
+                            </li>
+                            <li>
+                                <a href="#displayedColumns">displayedColumns</a>
+                            </li>
+                            <li>
+                                <a href="#overlayRef">overlayRef</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#stfsrv">stfsrv</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#usrsrv">usrsrv</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#confKeep">confKeep</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#get_opelog">get_opelog</a>
+                            </li>
+                            <li>
+                                <a href="#ngOnInit">ngOnInit</a>
+                            </li>
+                            <li>
+                                <a href="#to_Denno">to_Denno</a>
+                            </li>
+                            <li>
+                                <a href="#to_Req">to_Req</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(usrsrv: <a href="../injectables/UserService.html">UserService</a>, cdRef: <a href="https://angular.io/api/core/ChangeDetectorRef" target="_blank">ChangeDetectorRef</a>, apollo: Apollo, toastr: ToastrService, stfsrv: <a href="../injectables/StaffService.html">StaffService</a>, overlay: Overlay, route: <a href="https://angular.io/api/router/ActivatedRoute" target="_blank">ActivatedRoute</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="33" class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:33</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>usrsrv</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/UserService.html" target="_self" >UserService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>cdRef</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="https://angular.io/api/core/ChangeDetectorRef" target="_blank" >ChangeDetectorRef</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>apollo</td>
+                                                  
+                                                        <td>
+                                                                    <code>Apollo</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>toastr</td>
+                                                  
+                                                        <td>
+                                                                    <code>ToastrService</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>stfsrv</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/StaffService.html" target="_self" >StaffService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>overlay</td>
+                                                  
+                                                        <td>
+                                                                    <code>Overlay</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>route</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="https://angular.io/api/router/ActivatedRoute" target="_blank" >ActivatedRoute</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+
+
+
+
+    <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="confKeep"></a>
+                    <span class="name">
+                        <b>
+                            confKeep
+                        </b>
+                        <a href="#confKeep"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>confKeep(i: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="136"
+                            class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:136</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>i</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="get_opelog"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            get_opelog
+                        </b>
+                        <a href="#get_opelog"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>get_opelog(param: <a href="../interfaces/GetOpe.html">GetOpe</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="64"
+                            class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:64</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>param</td>
+                                    <td>
+                                                <code><a href="../interfaces/GetOpe.html" target="_self" >GetOpe</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>    <code>Promise&lt;mwI.Tropelog[]&gt;</code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="ngOnInit"></a>
+                    <span class="name">
+                        <b>
+                            ngOnInit
+                        </b>
+                        <a href="#ngOnInit"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>ngOnInit()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="42"
+                            class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:42</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="to_Denno"></a>
+                    <span class="name">
+                        <b>
+                            to_Denno
+                        </b>
+                        <a href="#to_Denno"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>to_Denno(pdenno)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="125"
+                            class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:125</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>pdenno</td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="to_Req"></a>
+                    <span class="name">
+                        <b>
+                            to_Req
+                        </b>
+                        <a href="#to_Req"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>to_Req()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="114"
+                            class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:114</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+    <section>
+    
+        <h3 id="inputs">
+            Properties
+        </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="cdRef"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            cdRef</b>
+                            <a href="#cdRef"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://angular.io/api/core/ChangeDetectorRef" target="_blank" >ChangeDetectorRef</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="35" class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:35</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="dataSource"></a>
+                        <span class="name">
+                            <b>
+                            dataSource</b>
+                            <a href="#dataSource"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>MatTableDataSource&lt;mwI.Tropelog&gt;</code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="32" class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:32</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="denno"></a>
+                        <span class="name">
+                            <b>
+                            denno</b>
+                            <a href="#denno"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:25</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="displayedColumns"></a>
+                        <span class="name">
+                            <b>
+                            displayedColumns</b>
+                            <a href="#displayedColumns"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>[]</code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>[&#x27;actionsColumn&#x27;,&#x27;sequ&#x27;,&#x27;keycode&#x27;,&#x27;extype&#x27;,&#x27;created_by&#x27;,&#x27;created_at&#x27;,&#x27;status&#x27;,&#x27;updated_by&#x27;,&#x27;updated_at&#x27;,&#x27;memo&#x27;]</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="33" class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:33</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="overlayRef"></a>
+                        <span class="name">
+                            <b>
+                            overlayRef</b>
+                            <a href="#overlayRef"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>this.overlay.create({
+    hasBackdrop: true,
+    positionStrategy: this.overlay
+      .position().global().centerHorizontally().centerVertically()
+  })</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="27" class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:27</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="stfsrv"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            stfsrv</b>
+                            <a href="#stfsrv"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="../injectables/StaffService.html" target="_self" >StaffService</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="38" class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:38</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="usrsrv"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            usrsrv</b>
+                            <a href="#usrsrv"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="../injectables/UserService.html" target="_self" >UserService</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="34" class="link-to-prism">src/app/frmkeep/frmkeep.component.ts:34</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+</section>
+
+</div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Component, OnInit, ChangeDetectorRef } from &#x27;@angular/core&#x27;;
+import { Router, ActivatedRoute, ParamMap  } from &#x27;@angular/router&#x27;;
+import { Overlay } from &#x27;@angular/cdk/overlay&#x27;;
+import { ComponentPortal } from &#x27;@angular/cdk/portal&#x27;;
+import { MatSpinner } from &#x27;@angular/material/progress-spinner&#x27;;
+import { MatTableDataSource } from &#x27;@angular/material/table&#x27;;
+import { Observable } from &#x27;rxjs&#x27;;
+import { UserService } from &#x27;./../services/user.service&#x27;;
+import { StaffService } from &#x27;./../services/staff.service&#x27;;
+import gql from &#x27;graphql-tag&#x27;;
+import { Apollo } from &#x27;apollo-angular&#x27;;
+import { ToastrService } from &#x27;ngx-toastr&#x27;;
+
+interface GetOpe {
+  denno?:string;
+  status?:string;
+}
+
+@Component({
+  selector: &#x27;app-frmkeep&#x27;,
+  templateUrl: &#x27;./frmkeep.component.html&#x27;,
+  styleUrls: [&#x27;./frmkeep.component.scss&#x27;]
+})
+export class FrmkeepComponent implements OnInit {
+  denno:number;
+  // temp:mwI.Tropelog[]&#x3D;[];
+  overlayRef &#x3D; this.overlay.create({
+    hasBackdrop: true,
+    positionStrategy: this.overlay
+      .position().global().centerHorizontally().centerVertically()
+  });
+  dataSource:MatTableDataSource&lt;mwI.Tropelog&gt;;
+  displayedColumns &#x3D; [&#x27;actionsColumn&#x27;,&#x27;sequ&#x27;,&#x27;keycode&#x27;,&#x27;extype&#x27;,&#x27;created_by&#x27;,&#x27;created_at&#x27;,&#x27;status&#x27;,&#x27;updated_by&#x27;,&#x27;updated_at&#x27;,&#x27;memo&#x27;]; 
+  constructor(public usrsrv: UserService,
+              public cdRef: ChangeDetectorRef,          
+              private apollo: Apollo,
+              private toastr: ToastrService,
+              public stfsrv: StaffService,
+              private overlay: Overlay,
+              private route: ActivatedRoute) { }
+
+  ngOnInit(): void {
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));    
+    // this.stfsrv.get_staff();
+    this.route.paramMap.subscribe((params: ParamMap)&#x3D;&gt;{
+      if (params.get(&#x27;denno&#x27;) !&#x3D;&#x3D; null){
+        this.denno &#x3D; +params.get(&#x27;denno&#x27;);
+        this.get_opelog({denno:params.get(&#x27;denno&#x27;)}).then(value &#x3D;&gt; {
+          this.dataSource&#x3D; new MatTableDataSource&lt;mwI.Tropelog&gt;(value);
+          this.overlayRef.detach();
+          this.cdRef.detectChanges();
+        });
+      } else {
+        this.get_opelog({status:&quot;依頼中&quot;}).then(value &#x3D;&gt; {
+          this.denno &#x3D; 0;
+          this.dataSource&#x3D; new MatTableDataSource&lt;mwI.Tropelog&gt;(value);
+          this.overlayRef.detach();
+          this.cdRef.detectChanges();
+        });          
+      } 
+    }); 
+  }
+
+  async get_opelog(param:GetOpe):Promise&lt;mwI.Tropelog[]&gt; {
+    const GetLog &#x3D; gql&#x60;
+    query get_opelog($id:smallint!,$typ:String!,$kcd:[String!],$sts:[String!]) {
+      tropelog(where:{id:{_eq:$id}, keycode:{_in:$kcd}, extype:{_eq:$typ}, status:{_in:$sts}}, order_by:{sequ: asc}) {
+        sequ
+        keycode
+        extype
+        memo
+        created_by
+        created_at
+        status
+        updated_by
+        updated_at
+      }
+    }&#x60;;
+    let lckeycode :string[];
+    if( param[&#x27;denno&#x27;] ){
+       lckeycode&#x3D;[param[&#x27;denno&#x27;]];
+    }
+    let lcstatus :string[];
+    if( param[&#x27;status&#x27;]){
+      lcstatus&#x3D;[param[&#x27;status&#x27;]];
+    }
+    // console.log(lckeycode,lcstatus);
+    return new Promise( resolve &#x3D;&gt; {
+    // let observable:Observable&lt;mwI.Tropelog[]&gt; &#x3D; new Observable&lt;mwI.Tropelog[]&gt;(observer &#x3D;&gt; {
+      this.apollo.watchQuery&lt;any&gt;({
+        query: GetLog, 
+          variables: { 
+            id : this.usrsrv.compid,
+            typ: &#x27;KEEP&#x27;,
+            kcd: lckeycode,
+            sts: lcstatus
+        },
+      })
+      .valueChanges
+      .subscribe(({ data }) &#x3D;&gt; {
+        // observer.next(data.tropelog);
+        return resolve(data.tropelog);
+        // observer.complete();
+        // console.log(data.tropelog);
+      },(error) &#x3D;&gt; {
+        console.log(&#x27;error query get_opelog&#x27;, error);
+        return resolve([]); 
+        // observer.next([]);
+      });
+    });
+    // return observable;
+  }
+
+  to_Req(){
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    this.denno &#x3D; 0;
+    this.get_opelog({status:&quot;依頼中&quot;}).then(value &#x3D;&gt; {
+      this.dataSource&#x3D; new MatTableDataSource&lt;mwI.Tropelog&gt;(value);
+      this.overlayRef.detach();
+      this.cdRef.detectChanges();
+      history.replaceState(&#x27;&#x27;,&#x27;&#x27;,&#x27;./frmkeep&#x27;);
+    });  
+  } 
+
+  to_Denno(pdenno){
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    this.get_opelog({denno:pdenno}).then(value &#x3D;&gt; {
+      this.dataSource&#x3D; new MatTableDataSource&lt;mwI.Tropelog&gt;(value);
+      this.overlayRef.detach();
+      this.cdRef.detectChanges();
+      history.replaceState(&#x27;&#x27;,&#x27;&#x27;,&#x27;./frmkeep/&#x27;) + pdenno;
+    });  
+  } 
+  
+
+  confKeep(i:number){
+    const UpdateOpelog &#x3D; gql&#x60;
+    mutation iupdLog($seq: Int!, $obj: tropelog_set_input!) {
+      update_tropelog(where: {sequ: {_eq: $seq}}, _set: $obj) {
+        returning {
+          status
+          updated_at
+          updated_by
+        }
+      }
+    }&#x60;;  
+    this.apollo.mutate&lt;any&gt;({
+      mutation: UpdateOpelog,
+      variables: {
+        &quot;seq&quot;: this.dataSource.data[i].sequ,
+        &quot;obj&quot;: {
+          updated_by: this.usrsrv.staff.code.toString(),
+          status:&#x27;キープ済&#x27;,
+          updated_at:new Date()
+        }
+      },
+    }).subscribe(({ data }) &#x3D;&gt; {
+      this.toastr.info(&quot;処理しました&quot;);
+      let temp:mwI.Tropelog[] &#x3D; this.usrsrv.pickObjArr(this.dataSource.data,[&#x27;sequ&#x27;,&#x27;keycode&#x27;,&#x27;extype&#x27;,&#x27;created_by&#x27;,&#x27;created_at&#x27;,&#x27;status&#x27;,&#x27;updated_by&#x27;,&#x27;updated_at&#x27;,&#x27;memo&#x27;]);
+      // console.log(temp);
+      temp[i].status &#x3D; data.update_tropelog.returning[0].status;
+      temp[i].updated_by &#x3D; data.update_tropelog.returning[0].updated_by;
+      temp[i].updated_at &#x3D; data.update_tropelog.returning[0].updated_at;
+      this.dataSource&#x3D; new MatTableDataSource&lt;mwI.Tropelog&gt;(temp);
+      this.cdRef.detectChanges();
+      // this.get_opelog(this.denno.toString()).subscribe(value &#x3D;&gt; {
+      //   this.dataSource&#x3D; new MatTableDataSource&lt;mwI.Tropelog&gt;(value);
+      //   console.log(&#x27;subscribe&#x27;,value);
+      //   this.cdRef.detectChanges();
+      // });      
+    },(error) &#x3D;&gt; {
+      console.log(&#x27;error query update_opelog&#x27;, error);
+    });
+    // console.log(this.denno);
+  }
+}
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-templateData">
+        <pre class="line-numbers"><code class="language-html">&lt;mat-card&gt;
+
+&lt;mat-form-field&gt;
+    &lt;mat-label&gt;受注伝票番号&lt;/mat-label&gt;
+    &lt;input matInput [(ngModel)]&#x3D;&quot;denno&quot; (change)&#x3D;&quot;to_Denno($event.target.value)&quot;&gt;
+&lt;/mat-form-field&gt;
+&lt;button mat-flat-button matSuffix color&#x3D;&quot;warning&quot; (click)&#x3D;&quot;to_Req()&quot; *ngIf&#x3D;&quot;(denno &gt; 0)&quot;&gt;
+    未処理一覧へ
+&lt;/button&gt;
+&lt;div class&#x3D;&quot;mat-elevation-z8&quot;&gt;
+    &lt;table mat-table [dataSource]&#x3D;&quot;dataSource&quot; aria-label&#x3D;&quot;Elements&quot;&gt;
+        &lt;!-- &lt;ng-container [matColumnDef]&#x3D;&quot;column&quot; *ngFor&#x3D;&quot;let column of displayedColumns&quot;&gt;
+            &lt;th mat-header-cell *matHeaderCellDef&gt; {{column}} &lt;/th&gt;
+            &lt;td mat-cell *matCellDef&#x3D;&quot;let emp&quot;&gt; {{emp[column]}} &lt;/td&gt;
+        &lt;/ng-container&gt; --&gt;
+        &lt;ng-container matColumnDef&#x3D;&quot;actionsColumn&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt; Action &lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot;&gt;
+            &lt;button mat-raised-button color&#x3D;&quot;warn&quot; focusable&#x3D;&quot;false&quot; (click)&#x3D;&quot;confKeep(i)&quot; *ngIf&#x3D;&quot;row.status &#x3D;&#x3D;&#x3D; &#x27;依頼中&#x27;&quot;&gt;
+              &lt;mat-icon&gt;summarize&lt;/mat-icon&gt;確認報告
+            &lt;/button&gt;
+          &lt;/td&gt;
+        &lt;/ng-container&gt;
+        &lt;ng-container matColumnDef&#x3D;&quot;sequ&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt;連番&lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row;&quot;&gt;{{row.sequ}}&lt;/td&gt;
+        &lt;/ng-container&gt;        
+        &lt;ng-container matColumnDef&#x3D;&quot;keycode&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt;伝票番号&lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row;&quot;&gt;{{row.keycode}}&lt;/td&gt;
+        &lt;/ng-container&gt;
+        &lt;ng-container matColumnDef&#x3D;&quot;extype&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt;タイプ&lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row;&quot;&gt;{{row.extype}}&lt;/td&gt;
+        &lt;/ng-container&gt;
+        &lt;ng-container matColumnDef&#x3D;&quot;created_by&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt;登録者&lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row;&quot;&gt;{{row.created_by | staff}}&lt;/td&gt;
+        &lt;/ng-container&gt;
+        &lt;ng-container matColumnDef&#x3D;&quot;created_at&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt;登録日時&lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row;&quot;&gt;{{row.created_at | date:&#x27;yyyy/MM/dd HH:mm&#x27;}}&lt;/td&gt;
+        &lt;/ng-container&gt;
+        &lt;ng-container matColumnDef&#x3D;&quot;status&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt;ステータス&lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row;&quot;&gt;{{row.status}}&lt;/td&gt;
+        &lt;/ng-container&gt;
+        &lt;ng-container matColumnDef&#x3D;&quot;updated_by&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt;更新者&lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row;&quot;&gt;{{row.updated_by | staff}}&lt;/td&gt;
+        &lt;/ng-container&gt;
+        &lt;ng-container matColumnDef&#x3D;&quot;updated_at&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt;更新日時&lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row;&quot;&gt;{{row.updated_at | date:&#x27;yyyy/MM/dd HH:mm&#x27;}}&lt;/td&gt;
+        &lt;/ng-container&gt;
+        &lt;ng-container matColumnDef&#x3D;&quot;memo&quot;&gt;
+          &lt;th mat-header-cell *matHeaderCellDef&gt;備考&lt;/th&gt;
+          &lt;td mat-cell *matCellDef&#x3D;&quot;let row;&quot;&gt;{{row.memo}}&lt;/td&gt;
+        &lt;/ng-container&gt;
+        &lt;tr mat-header-row *matHeaderRowDef&#x3D;&quot;displayedColumns;&quot;&gt;&lt;/tr&gt;
+        &lt;tr mat-row *matRowDef&#x3D;&quot;let row; columns: displayedColumns;&quot;&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+&lt;/div&gt;
+&lt;/mat-card&gt;
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-styleData">
+                <p class="comment">
+                    <code>./frmkeep.component.scss</code>
+                </p>
+                <pre class="line-numbers"><code class="language-scss">.mat-elevation-z8 {
+    margin-bottom: 10px;
+}
+.mat-cell, .mat-footer-cell, .mat-header-cell{
+    padding: 5px;
+}
+.mat-table {
+    overflow-x: scroll;
+    display: table;
+}</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-tree">
+        <div id="tree-container"></div>
+        <div class="tree-legend">
+            <div class="title">
+                <b>Legend</b>
+            </div>
+            <div>
+                <div class="color htmlelement"></div><span>Html element</span>
+            </div>
+            <div>
+                <div class="color component"></div><span>Component</span>
+            </div>
+            <div>
+                <div class="color directive"></div><span>Html element with directive</span>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+<script src="../js/libs/vis.min.js"></script>
+<script src="../js/libs/htmlparser.js"></script>
+<script src="../js/libs/deep-iterator.js"></script>
+<script>
+        var COMPONENT_TEMPLATE = '<div><mat-card><mat-form-field>    <mat-label>受注伝票番号</mat-label>    <input matInput [(ngModel)]="denno" (change)="to_Denno($event.target.value)"></mat-form-field><button mat-flat-button matSuffix color="warning" (click)="to_Req()" *ngIf="(denno > 0)">    未処理一覧へ</button><div class="mat-elevation-z8">    <table mat-table [dataSource]="dataSource" aria-label="Elements">        <!-- <ng-container [matColumnDef]="column" *ngFor="let column of displayedColumns">            <th mat-header-cell *matHeaderCellDef> {{column}} </th>            <td mat-cell *matCellDef="let emp"> {{emp[column]}} </td>        </ng-container> -->        <ng-container matColumnDef="actionsColumn">          <th mat-header-cell *matHeaderCellDef> Action </th>          <td mat-cell *matCellDef="let row; let i = index">            <button mat-raised-button color="warn" focusable="false" (click)="confKeep(i)" *ngIf="row.status === \'依頼中\'">              <mat-icon>summarize</mat-icon>確認報告            </button>          </td>        </ng-container>        <ng-container matColumnDef="sequ">          <th mat-header-cell *matHeaderCellDef>連番</th>          <td mat-cell *matCellDef="let row;">{{row.sequ}}</td>        </ng-container>                <ng-container matColumnDef="keycode">          <th mat-header-cell *matHeaderCellDef>伝票番号</th>          <td mat-cell *matCellDef="let row;">{{row.keycode}}</td>        </ng-container>        <ng-container matColumnDef="extype">          <th mat-header-cell *matHeaderCellDef>タイプ</th>          <td mat-cell *matCellDef="let row;">{{row.extype}}</td>        </ng-container>        <ng-container matColumnDef="created_by">          <th mat-header-cell *matHeaderCellDef>登録者</th>          <td mat-cell *matCellDef="let row;">{{row.created_by | staff}}</td>        </ng-container>        <ng-container matColumnDef="created_at">          <th mat-header-cell *matHeaderCellDef>登録日時</th>          <td mat-cell *matCellDef="let row;">{{row.created_at | date:\'yyyy/MM/dd HH:mm\'}}</td>        </ng-container>        <ng-container matColumnDef="status">          <th mat-header-cell *matHeaderCellDef>ステータス</th>          <td mat-cell *matCellDef="let row;">{{row.status}}</td>        </ng-container>        <ng-container matColumnDef="updated_by">          <th mat-header-cell *matHeaderCellDef>更新者</th>          <td mat-cell *matCellDef="let row;">{{row.updated_by | staff}}</td>        </ng-container>        <ng-container matColumnDef="updated_at">          <th mat-header-cell *matHeaderCellDef>更新日時</th>          <td mat-cell *matCellDef="let row;">{{row.updated_at | date:\'yyyy/MM/dd HH:mm\'}}</td>        </ng-container>        <ng-container matColumnDef="memo">          <th mat-header-cell *matHeaderCellDef>備考</th>          <td mat-cell *matCellDef="let row;">{{row.memo}}</td>        </ng-container>        <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>    </table></div></mat-card></div>'
+    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmkeepComponent', 'selector': 'app-frmkeep'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'FrmsupplyComponent', 'selector': 'app-frmsupply'},{'name': 'FrmtreatComponent', 'selector': 'app-frmtreat'},{'name': 'GcdhelpComponent', 'selector': 'app-gcdhelp'},{'name': 'GdsimageComponent', 'selector': 'app-gdsimage'},{'name': 'GdstblComponent', 'selector': 'app-gdstbl'},{'name': 'GrpcdhelpComponent', 'selector': 'app-grpcdhelp'},{'name': 'GtnktblComponent', 'selector': 'app-gtnktbl'},{'name': 'HmeitblComponent', 'selector': 'app-hmeitbl'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JdnohelpComponent', 'selector': 'app-jdnohelp'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstgoodsComponent', 'selector': 'app-mstgoods'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'MstvendorComponent', 'selector': 'app-mstvendor'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'RepstockComponent', 'selector': 'app-repstock'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'},{'name': 'TrtdetailComponent', 'selector': 'app-trtdetail'},{'name': 'VcdhelpComponent', 'selector': 'app-vcdhelp'}];
+    var DIRECTIVES = [{'name': 'NuminputDirective', 'selector': '[numInput]'},{'name': 'TabDirective', 'selector': '[tabIndex]'}];
+    var ACTUAL_COMPONENT = {'name': 'FrmkeepComponent'};
+</script>
+<script src="../js/tree.js"></script>
+
+
+
+
+
+
+
+
+
+
+                   
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'component';
+            var COMPODOC_CURRENT_PAGE_URL = 'FrmkeepComponent.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

@@ -11,7 +11,7 @@
         <a mat-menu-item>ＤＭ抽出</a>
         <a mat-menu-item>ＤＭリスト</a>
         <a mat-menu-item routerLink="/frmtreat">問合せ・対応</a>
-    </mat-menu>    
+    </mat-menu>
     <button mat-button [matMenuTriggerFor]="depo">売上入金</button>
     <mat-menu #depo="matMenu">
         <a mat-menu-item>入金伝票</a>
@@ -93,37 +93,47 @@
         <mat-icon>settings</mat-icon>設定
     </button>
     <mat-menu #menu="matMenu">
-        <form class="menu-form">  
-            <a mat-menu-item href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EVW5l6FhMOdGuKCnCSPdEnoBSebtCJmimXB7VJSd0kpQYw?e=8aM7JA" target="_blank">
+        <form class="menu-form">
+            <a mat-menu-item
+                href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EVW5l6FhMOdGuKCnCSPdEnoBSebtCJmimXB7VJSd0kpQYw?e=8aM7JA"
+                target="_blank">
                 <mat-icon>list_alt</mat-icon>改善要望Excel
             </a>
-            <button mat-menu-item [matMenuTriggerFor]="setmenu"><mat-icon>settings</mat-icon>初期設定(ﾀﾞｳﾝﾛｰﾄﾞを使用する場合)</button>
+            <button mat-menu-item [matMenuTriggerFor]="setmenu">
+                <mat-icon>settings</mat-icon>初期設定(ﾀﾞｳﾝﾛｰﾄﾞを使用する場合)
+            </button>
             <mat-menu #setmenu="matMenu">
+                <a mat-menu-item
+                    href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5XVMJM"
+                    target="_blank">初期設定Manual</a>
                 <a mat-menu-item href="assets/mwjexe.reg" download="mwjexe.reg">初期設定①</a>
                 <a mat-menu-item href="assets/psqlodbc_x86.msi" download="psqlodbc_x86.msi">初期設定②</a>
             </mat-menu>
-            <button mat-menu-item [matMenuTriggerFor]="colormenu"><mat-icon>palette</mat-icon>テーマカラー</button>
+            <button mat-menu-item [matMenuTriggerFor]="colormenu">
+                <mat-icon>palette</mat-icon>テーマカラー
+            </button>
             <mat-menu #colormenu="matMenu">
                 <button mat-menu-item (click)="setColor('indigo-pink')">indigo-pink</button>
                 <button mat-menu-item (click)="setColor('deeppurple-amber')">deeppurple-amber</button>
                 <button mat-menu-item (click)="setColor('pink-bluegrey')">pink-bluegrey</button>
                 <button mat-menu-item (click)="setColor('purple-green')">purple-green</button>
             </mat-menu>
-            <div fxLayout="column">            
+            <div fxLayout="column">
                 <mat-form-field appearance="outline">
                     <mat-label>会社</mat-label>
                     <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.system.name}}" disabled>
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                     <mat-label>ユーザ名</mat-label>
-                    <input matInput mat-menu-item style="pointer-events: none" value="{{usrsrv.userInfo.nickname}}：{{usrsrv.userInfo.name}}" disabled>
+                    <input matInput mat-menu-item style="pointer-events: none"
+                        value="{{usrsrv.userInfo.nickname}}：{{usrsrv.userInfo.name}}" disabled>
                 </mat-form-field>
             </div>
             <mat-form-field appearance="outline">
                 <mat-label>接続先DB(切替時画面再読込)</mat-label>
                 <input matInput mat-menu-item style="pointer-events: none" value="{{db}}" disabled>
                 <button mat-button matSuffix (click)="setDB(true)" *ngIf="db=='本番環境'">テストへ切替</button>
-                <button mat-button matSuffix (click)="setDB(false)" *ngIf="db=='テスト環境'">本番へ切替</button>    
+                <button mat-button matSuffix (click)="setDB(false)" *ngIf="db=='テスト環境'">本番へ切替</button>
             </mat-form-field>
             <button mat-menu-item (click)="usrsrv.logout();">
                 <mat-icon>exit_to_app</mat-icon>
@@ -132,4 +142,3 @@
         </form>
     </mat-menu>
 </mat-toolbar>
-

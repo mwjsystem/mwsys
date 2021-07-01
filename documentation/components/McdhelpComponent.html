@@ -79,6 +79,10 @@
     <table class="table table-sm table-hover">
         <tbody>
 
+            <tr>
+                <td class="col-md-3">changeDetection</td>
+                <td class="col-md-9"><code>ChangeDetectionStrategy.OnPush</code></td>
+            </tr>
 
 
 
@@ -177,7 +181,7 @@
                 </tr>
                         <tr>
                             <td class="col-md-4">
-                                <div class="io-line">Defined in <a href="" data-line="10" class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:10</a></div>
+                                <div class="io-line">Defined in <a href="" data-line="11" class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:11</a></div>
                             </td>
                         </tr>
 
@@ -258,8 +262,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="24"
-                            class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:24</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="26"
+                            class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:26</a></div>
                 </td>
             </tr>
 
@@ -297,8 +301,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="16"
-                            class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:16</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="17"
+                            class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:17</a></div>
                 </td>
             </tr>
 
@@ -336,8 +340,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="19"
-                            class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:19</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="20"
+                            class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:20</a></div>
                 </td>
             </tr>
 
@@ -411,7 +415,7 @@
                     </tr>
                         <tr>
                             <td class="col-md-4">
-                                    <div class="io-line">Defined in <a href="" data-line="12" class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:12</a></div>
+                                    <div class="io-line">Defined in <a href="" data-line="13" class="link-to-prism">src/app/share/mcdhelp/mcdhelp.component.ts:13</a></div>
                             </td>
                         </tr>
 
@@ -424,14 +428,15 @@
 
 
     <div class="tab-pane fade  tab-source-code" id="c-source">
-        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Component, OnInit } from &#x27;@angular/core&#x27;;
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Component, OnInit, ChangeDetectionStrategy } from &#x27;@angular/core&#x27;;
 import { MatDialogRef } from &quot;@angular/material/dialog&quot;;
 import { Mcd,McdService } from &#x27;./mcd.service&#x27;;
 
 @Component({
   selector: &#x27;app-mcdhelp&#x27;,
   templateUrl: &#x27;./mcdhelp.component.html&#x27;,
-  styleUrls: [&#x27;./mcdhelp.component.scss&#x27;]
+  styleUrls: [&#x27;./mcdhelp.component.scss&#x27;],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class McdhelpComponent implements OnInit {
 
@@ -444,10 +449,12 @@ export class McdhelpComponent implements OnInit {
 
   sel_mcd(selected:Mcd ) {
     // console.log(&quot;select&quot;,selected);
+    this.mcdsrv.mcds&#x3D;[];
     this.dialogRef.close(selected);
   }
 
   close() {
+    this.mcdsrv.mcds&#x3D;[];
     this.dialogRef.close();
   }
 
@@ -459,7 +466,7 @@ export class McdhelpComponent implements OnInit {
 
     <div class="tab-pane fade " id="c-templateData">
         <pre class="line-numbers"><code class="language-html">&lt;h1 mat-dialog-title cdkDrag cdkDragRootElement&#x3D;&quot;.cdk-overlay-pane&quot; cdkDragHandle style&#x3D;&quot;cursor: move;&quot;&gt;顧客検索&lt;/h1&gt;
-&lt;mat-dialog-content&gt;
+&lt;mat-dialog-content style&#x3D;&quot;height: calc(100% - 90px);&quot;&gt;
   &lt;app-mcdtbl (setmcd)&#x3D;&quot;sel_mcd($event)&quot;&gt;&lt;/app-mcdtbl&gt;
 &lt;/mat-dialog-content&gt;
 &lt;mat-dialog-actions&gt;
@@ -507,9 +514,9 @@ export class McdhelpComponent implements OnInit {
 <script src="../js/libs/htmlparser.js"></script>
 <script src="../js/libs/deep-iterator.js"></script>
 <script>
-        var COMPONENT_TEMPLATE = '<div><h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">顧客検索</h1><mat-dialog-content>  <app-mcdtbl (setmcd)="sel_mcd($event)"></app-mcdtbl></mat-dialog-content><mat-dialog-actions>  <button class="mat-raised-button"(click)="close()">閉じる</button></mat-dialog-actions></div>'
-    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'}];
-    var DIRECTIVES = [{'name': 'TabDirective', 'selector': '[tabIndex]'}];
+        var COMPONENT_TEMPLATE = '<div><h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">顧客検索</h1><mat-dialog-content style="height: calc(100% - 90px);">  <app-mcdtbl (setmcd)="sel_mcd($event)"></app-mcdtbl></mat-dialog-content><mat-dialog-actions>  <button class="mat-raised-button"(click)="close()">閉じる</button></mat-dialog-actions></div>'
+    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmkeepComponent', 'selector': 'app-frmkeep'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'FrmsupplyComponent', 'selector': 'app-frmsupply'},{'name': 'FrmtreatComponent', 'selector': 'app-frmtreat'},{'name': 'GcdhelpComponent', 'selector': 'app-gcdhelp'},{'name': 'GdsimageComponent', 'selector': 'app-gdsimage'},{'name': 'GdstblComponent', 'selector': 'app-gdstbl'},{'name': 'GrpcdhelpComponent', 'selector': 'app-grpcdhelp'},{'name': 'GtnktblComponent', 'selector': 'app-gtnktbl'},{'name': 'HmeitblComponent', 'selector': 'app-hmeitbl'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JdnohelpComponent', 'selector': 'app-jdnohelp'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstgoodsComponent', 'selector': 'app-mstgoods'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'MstvendorComponent', 'selector': 'app-mstvendor'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'RepstockComponent', 'selector': 'app-repstock'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'},{'name': 'TrtdetailComponent', 'selector': 'app-trtdetail'},{'name': 'VcdhelpComponent', 'selector': 'app-vcdhelp'}];
+    var DIRECTIVES = [{'name': 'NuminputDirective', 'selector': '[numInput]'},{'name': 'TabDirective', 'selector': '[tabIndex]'}];
     var ACTUAL_COMPONENT = {'name': 'McdhelpComponent'};
 </script>
 <script src="../js/tree.js"></script>

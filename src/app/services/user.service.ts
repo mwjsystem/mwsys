@@ -156,27 +156,27 @@ export class UserService {
 
   editFrmval(frm:AbstractControl,fld:string):any{
     let val:any;  
-    if(frm.value[fld]==""){
+    if(frm.get(fld).value==""){
       val = null;
     }else{  
-      val = frm.value[fld];
+      val = frm.get(fld).value;
     }
     return val;
   }
  
   editFtel(frm:AbstractControl,fld1:string,fld2?:string,fld3?:string,fld4?:string):any{
     let val:any=''; 
-    if(frm.value[fld1]){
-      val += frm.value[fld1].replace(/[^0-9]/g,'');
+    if(frm.get(fld1).value){
+      val += frm.get(fld1).value.replace(/[^0-9]/g,'');
     }
-    if(frm.value[fld2]){
-      val += frm.value[fld2].replace(/[^0-9]/g,'');
+    if(frm.get(fld2).value){
+      val += frm.get(fld2).value.replace(/[^0-9]/g,'');
     }
-    if(frm.value[fld3]){
-      val += frm.value[fld3].replace(/[^0-9]/g,'');
+    if(frm.get(fld3).value){
+      val += frm.get(fld3).value.replace(/[^0-9]/g,'');
     }
-    if(frm.value[fld4]){
-      val += frm.value[fld4].replace(/[^0-9]/g,'');
+    if(frm.get(fld4).value){
+      val += frm.get(fld4).value.replace(/[^0-9]/g,'');
     }
     return val;
   }  
@@ -187,7 +187,7 @@ export class UserService {
     this.tmstmp.updated_at = obj.updated_at;
     this.tmstmp.updated_by = obj.updated_by;
     this.subject.next(true);
-    this.subject.complete();
+    // this.subject.complete();
     // console.log(obj,this.tmstmp);
   }
 

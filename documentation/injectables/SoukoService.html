@@ -193,8 +193,8 @@
 
             <tr>
                 <td class="col-md-4">
-                    <div class="io-line">Defined in <a href="" data-line="15"
-                            class="link-to-prism">src/app/services/souko.service.ts:15</a></div>
+                    <div class="io-line">Defined in <a href="" data-line="17"
+                            class="link-to-prism">src/app/services/souko.service.ts:17</a></div>
                 </td>
             </tr>
 
@@ -267,7 +267,9 @@ export class SoukoService {
 
   public scds: mwI.Sval[]&#x3D;[];
   constructor(private usrsrv: UserService,
-              private apollo: Apollo) { }
+              private apollo: Apollo) { 
+                // this.get_souko();
+              }
 
   get_souko():void {
     const GetMast &#x3D; gql&#x60;

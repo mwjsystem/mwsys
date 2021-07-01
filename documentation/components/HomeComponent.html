@@ -259,7 +259,7 @@ import { Title } from &#x27;@angular/platform-browser&#x27;;
 export class HomeComponent implements OnInit {
   // userInfo: {[key: string]: any} &#x3D; {};
   constructor(private title: Title) { 
-    this.title.setTitle(&#x27;ホーム(MwjSystem)&#x27;);
+    this.title.setTitle(&#x27;ホーム(MWSystem)&#x27;);
   }
 
   ngOnInit(): void {
@@ -275,10 +275,16 @@ export class HomeComponent implements OnInit {
         &lt;h2&gt;ホーム&lt;/h2&gt;
     &lt;/mat-card-title&gt;
     &lt;mat-card-content&gt;
-        &lt;p&gt;顧客関連＞顧客マスタのみ動きます&lt;/p&gt;
+        以下、項目を確認して、気になるところがあれば、メニュー＞&lt;mat-icon&gt;settings&lt;/mat-icon&gt;設定＞改善要望Excelに記入してください。
+        &lt;p&gt;　&lt;/p&gt;
+        &lt;p&gt;　&lt;/p&gt;
+        &lt;p&gt;・受注伝票&lt;/p&gt;
+        &lt;p&gt;・顧客関連＞顧客マスタ&lt;/p&gt;
+        &lt;p&gt;・仕入関連＞発注伝票&lt;/p&gt;
+        &lt;p&gt;・各マスタ＞商品マスタ&lt;/p&gt;
+        &lt;p&gt;・各マスタ＞仕入先マスタ&lt;/p&gt;
     &lt;/mat-card-content&gt;
-&lt;/mat-card&gt;
-</code></pre>
+&lt;/mat-card&gt;</code></pre>
     </div>
 
     <div class="tab-pane fade " id="c-styleData">
@@ -313,9 +319,9 @@ export class HomeComponent implements OnInit {
 <script src="../js/libs/htmlparser.js"></script>
 <script src="../js/libs/deep-iterator.js"></script>
 <script>
-        var COMPONENT_TEMPLATE = '<div><mat-card>    <mat-card-title>        <h2>ホーム</h2>    </mat-card-title>    <mat-card-content>        <p>顧客関連＞顧客マスタのみ動きます</p>    </mat-card-content></mat-card></div>'
-    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'}];
-    var DIRECTIVES = [{'name': 'TabDirective', 'selector': '[tabIndex]'}];
+        var COMPONENT_TEMPLATE = '<div><mat-card>    <mat-card-title>        <h2>ホーム</h2>    </mat-card-title>    <mat-card-content>        以下、項目を確認して、気になるところがあれば、メニュー＞<mat-icon>settings</mat-icon>設定＞改善要望Excelに記入してください。        <p>　</p>        <p>　</p>        <p>・受注伝票</p>        <p>・顧客関連＞顧客マスタ</p>        <p>・仕入関連＞発注伝票</p>        <p>・各マスタ＞商品マスタ</p>        <p>・各マスタ＞仕入先マスタ</p>    </mat-card-content></mat-card></div>'
+    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmkeepComponent', 'selector': 'app-frmkeep'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'FrmsupplyComponent', 'selector': 'app-frmsupply'},{'name': 'FrmtreatComponent', 'selector': 'app-frmtreat'},{'name': 'GcdhelpComponent', 'selector': 'app-gcdhelp'},{'name': 'GdsimageComponent', 'selector': 'app-gdsimage'},{'name': 'GdstblComponent', 'selector': 'app-gdstbl'},{'name': 'GrpcdhelpComponent', 'selector': 'app-grpcdhelp'},{'name': 'GtnktblComponent', 'selector': 'app-gtnktbl'},{'name': 'HmeitblComponent', 'selector': 'app-hmeitbl'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JdnohelpComponent', 'selector': 'app-jdnohelp'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstgoodsComponent', 'selector': 'app-mstgoods'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'MstvendorComponent', 'selector': 'app-mstvendor'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'RepstockComponent', 'selector': 'app-repstock'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'},{'name': 'TrtdetailComponent', 'selector': 'app-trtdetail'},{'name': 'VcdhelpComponent', 'selector': 'app-vcdhelp'}];
+    var DIRECTIVES = [{'name': 'NuminputDirective', 'selector': '[numInput]'},{'name': 'TabDirective', 'selector': '[tabIndex]'}];
     var ACTUAL_COMPONENT = {'name': 'HomeComponent'};
 </script>
 <script src="../js/tree.js"></script>
