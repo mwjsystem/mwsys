@@ -6,12 +6,14 @@ import { FrmsupplyRoutingModule } from './frmsupply-routing.module';
 import { FrmsupplyComponent } from './frmsupply.component';
 import { HmeitblComponent } from './hmeitbl.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
+import { HdnohelpComponent } from '../share/hdnohelp/hdnohelp.component';
 
 
 @NgModule({
   declarations: [
     FrmsupplyComponent,
-    HmeitblComponent
+    HmeitblComponent,
+    HdnohelpComponent
   ],
   imports: [
     CommonModule,

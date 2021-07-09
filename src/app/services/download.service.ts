@@ -9,6 +9,22 @@ export class DownloadService {
 
   constructor() { }
 
+  pickObj(obj,flds:string[]){
+    let pickobj={};
+    flds.forEach(e => pickobj[e]=obj[e]);
+    return pickobj;
+  }
+
+  pickObjArr(objarr,flds:string[]){
+    let pickarr=[];
+    objarr.forEach(obj =>{
+        let pickobj={};
+        flds.forEach(e => pickobj[e]=obj[e]);
+        pickarr.push(pickobj);    
+    });
+    return pickarr;
+  }
+
   dl_kick(data,pcsv:string,pformat:string,pelRef:ElementRef) {
     
     const blob = new Blob([json2csv.parse(data)], { type: 'text/csv' });
@@ -21,17 +37,35 @@ export class DownloadService {
   }
   dl_csv(data,pcsv:string) {
     
-    const blob = new Blob([json2csv.parse(data,{unwind:'mtbl'})], { type: 'text/csv' });
+    const blob = new Blob([json2csv.parse(data)], { type: 'text/csv' });
     FileSaver.saveAs(blob, pcsv);
 
   }
 
-  async dl_img(pfnm:string,pelRef:ElementRef) {
-
-    const base64 = pelRef.nativeElement.querySelector('qr-code > img').src;
-    const blob = await this.conv64ToBlob(base64);
+  async dl_img(pfnm:string,psrc:string){ //pelRef:ElementRef) {
+    // console.log(psrc);
+    // const base64 = pelRef.nativeElement.querySelector('qr-code > img').src;
+    const blob = await this.conv64ToBlob(psrc);
     FileSaver.saveAs(blob, pfnm);
   
+  }
+
+  dl_png(pflnm:string,psel:string,pelRef:ElementRef,url:string){
+    let xhr = new XMLHttpRequest();
+    console.log()
+    xhr.open('GET', url, true);
+    xhr.responseType = 'blob';
+    xhr.onload = function(e){
+      // console.log(e,this);
+      if(this.status == 200){
+        let urlUtil = window.URL || window.webkitURL;
+        let imgUrl = urlUtil.createObjectURL(this.response);
+        const link: HTMLAnchorElement = pelRef.nativeElement.querySelector(psel) as HTMLAnchorElement;
+        link.download=pflnm;
+        link.click();
+      }
+    };
+    xhr.send();
   }
 
   private async conv64ToBlob(Base64Image: any) {

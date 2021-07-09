@@ -11,7 +11,8 @@ import { VendsService } from './../../services/vends.service';
 export class VcdtxtPipe implements PipeTransform {
   constructor(private vensrv: VendsService) { }
   transform(value: string): string  {
-    return this.vensrv.get_vcdtxt(value);  
+    // console.log(value,this.vensrv.get_vcdtxt(value));
+    return this.vensrv.get_vcdtxt(value);
     // let txt:string="";
     // const GetMast = gql`
     // query get_vendor($id: smallint!,$vcd: String!) {

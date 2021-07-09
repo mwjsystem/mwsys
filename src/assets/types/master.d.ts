@@ -61,6 +61,7 @@ declare namespace mwI {
     code:string;
     adrname:string;
     kana:string;
+    mtax:string;
     tel:string;
     tel2:string;
     tel3:string;

@@ -34,7 +34,7 @@ export class StaffService {
     .valueChanges
     .subscribe(({ data }) => {
       // console.log(this.stfs,data.msstaff);
-      this.tcds=[];
+      this.tcds=[{value:null,viewval:""}];
       this.stfs=data.msstaff;
       data.msstaff.forEach(e => {
         this.tcds.push({value:e.code,viewval:e.sei + (e.mei ?? "")}); //e.meiがnull等の時は、''を結合

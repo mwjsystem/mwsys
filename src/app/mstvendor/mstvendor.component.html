@@ -46,6 +46,14 @@
           <mat-label>フリガナ</mat-label>
           <input matInput formControlName="kana" required>
         </mat-form-field>
+        <mat-form-field style="width:5em">
+          <mat-label>税区分</mat-label>
+          <mat-select #msel2 formControlName="mtax" required (keyup.enter)="msel2.close()">
+            <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-form-field>
           <mat-label>郵便番号(ハイフンなし)</mat-label>
           <input matInput formControlName="zip" ybPostalCode size="7" maxlength="7">

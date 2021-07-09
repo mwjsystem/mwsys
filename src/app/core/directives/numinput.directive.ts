@@ -12,10 +12,12 @@ export class NuminputDirective {
     this.el = this.elementRef.nativeElement;
   }
   
-  @HostListener("focus", ["$event.target.value"])
-  onFocus() {
-    this.el.value = this.value; // opossite of transform
-  }
+  // @HostListener("focus", ["$event.target.value"])
+  // onFocus() {
+
+  //   this.el.value = this.value; // opossite of transform
+
+  // }
 
   @HostListener("blur", ["$event.target.value"])
   onBlur(value) {

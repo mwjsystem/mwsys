@@ -6,6 +6,7 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
+import { BunruiService } from './../services/bunrui.service';
 import { VendsService } from './../services/vends.service';
 import { ToastrService } from 'ngx-toastr';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
@@ -26,6 +27,7 @@ export class MstvendorComponent implements OnInit {
               private elementRef: ElementRef,
               private dialog: MatDialog,
               public usrsrv: UserService,
+              public bunsrv: BunruiService,
               private vensrv: VendsService,
               private apollo: Apollo,
               private toastr: ToastrService) {
@@ -33,8 +35,10 @@ export class MstvendorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.bunsrv.get_bunrui();
     this.vensrv.get_vendors();
     this.form = this.fb.group({
+      mtax: new FormControl(''),
       zip: new FormControl(''),
       region: new FormControl(''),
       local: new FormControl(''),
@@ -97,6 +101,7 @@ export class MstvendorComponent implements OnInit {
         code
         adrname
         kana
+        mtax
         tel
         tel2
         tel3

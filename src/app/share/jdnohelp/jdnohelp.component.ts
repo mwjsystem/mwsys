@@ -12,7 +12,7 @@ import { UserService } from './../../services/user.service';
 import { StaffService } from './../../services/staff.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { MembsService } from './../../services/membs.service';
-import { McdhelpComponent } from './../../share/mcdhelp/mcdhelp.component';
+import { McdhelpComponent } from './../mcdhelp/mcdhelp.component';
 
 
 interface Jyuden {
@@ -100,7 +100,7 @@ export class JdnohelpComponent implements OnInit {
                }
 
   ngOnInit(): void {
-      this.ftcd=this.usrsrv.staff.code;
+      this.ftcd=this.usrsrv.staff?.code;
       this.fday.setMonth(this.fday.getMonth() - 1);
       // this.observe.subscribe(value => {
       //     this.dataSource.paginator = this.paginator;
@@ -146,11 +146,7 @@ export class JdnohelpComponent implements OnInit {
       varWh.where._and.push({"tcode" : {"_eq":this.ftcd}});
     }
 
-    console.log(varWh);
-    
-    
-    
-    
+    // console.log(varWh);
     
     const GetTran = gql`
     query get_jyuden($where:trjyuden_bool_exp!) {
@@ -189,7 +185,7 @@ export class JdnohelpComponent implements OnInit {
     })
     .valueChanges
     .subscribe(({ data }) => {
-      console.log(data);
+      // console.log(data);
       // this.subject.next(data.trjyuden);
       this.dataSource= new MatTableDataSource<Jyuden>(data.trjyuden);
       this.dataSource.paginator = this.paginator;

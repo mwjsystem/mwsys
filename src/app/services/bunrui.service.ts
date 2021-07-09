@@ -30,6 +30,7 @@ export class BunruiService {
   public jmeikbn: mwI.Sval[]=[];
   public jdstatus: mwI.Sval[]=[];
   public jdshsta: mwI.Sval[]=[];
+  public hdstatus: mwI.Sval[]=[];
   public gkbn: mwI.Sval[]=[];
   constructor(private usrsrv: UserService,
               private apollo: Apollo) {
@@ -62,6 +63,7 @@ export class BunruiService {
               this[data.msbunrui[i].kubun].push(sval);
             }
           }
+          // this.hdstatus.unshift({value:null,viewval:""});
         },(error) => {
           console.log('error query get_bunrui', error);
         });

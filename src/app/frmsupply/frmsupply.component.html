@@ -7,17 +7,16 @@
       <mat-icon>edit</mat-icon>編集
     </button>
     <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
-      <mat-icon>save</mat-icon>保存
+      <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
     </button>
     <button mat-button (click)="cancel()" *ngIf="mode!=3">
       <mat-icon>cancel</mat-icon>中止
     </button>
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>発注伝票番号</mat-label>
-      <input matInput [(ngModel)]="denno" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()" maxlength="10"
-        (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
-      <button mat-button mat-icon-button matSuffix (click)="dennoHelp()"
-        [style.display]="mode==3 ? 'inline-block' : 'none'">
+      <input matInput [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
+        (blur)="onEnter()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
+      <button mat-button mat-icon-button matSuffix (click)="dennoHelp()" *ngIf="mode==3">
         <mat-icon>find_replace</mat-icon>
       </button>
     </mat-form-field>
@@ -25,7 +24,7 @@
       <mat-icon>history</mat-icon>操作ログ
     </button>
     <a id="csv-donwload" data-type="text/csv"></a>
-    <button mat-button [matMenuTriggerFor]="papermenu">
+    <button mat-button [matMenuTriggerFor]="papermenu" *ngIf="mode==3">
       <mat-icon>description</mat-icon>帳票
     </button>
     <mat-menu #papermenu="matMenu">
@@ -45,6 +44,14 @@
       <mat-card-title>
         {{mode|modetxt}}基本情報
       </mat-card-title>
+      <mat-form-field>
+        <mat-label>発注伝票ステータス</mat-label>
+        <mat-select [value]="form.getRawValue().hdstatus" disabled>
+          <mat-option *ngFor="let sval of bunsrv.hdstatus" [value]="sval.value">
+            {{sval.viewval}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
     <mat-card-content fxLayout="column">
@@ -58,7 +65,8 @@
         <span class="ybtxt">{{form.value.day | jdate}}</span>
         <mat-form-field style="width: 10em;">
           <mat-label>仕入先</mat-label>
-          <input tabIndex="2" matInput formControlName="vcode" required (keydown.f4)="vcdHelp('vcode')">
+          <input tabIndex="2" matInput formControlName="vcode" required (keydown.f4)="vcdHelp('vcode')"
+            (change)="updVcd($event.target.value)">
           <button mat-icon-button matSuffix (click)="vcdHelp('vcode')" *ngIf="frmArr.enabled">
             <mat-icon>find_replace</mat-icon>
           </button>
@@ -66,10 +74,10 @@
             <mat-icon>open_in_new</mat-icon>
           </button>
         </mat-form-field>
-        <span class="nmtxt">{{vcdtxt}}</span>
+        <span class="nmtxt">{{form.getRawValue().vcode | vcdtxt}}</span>
         <mat-form-field>
           <mat-label>倉庫コード</mat-label>
-          <mat-select formControlName="soko">
+          <mat-select formControlName="soko" required>
             <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -78,7 +86,17 @@
         <mat-form-field>
           <mat-label>担当者</mat-label>
           <mat-select #msel1 formControlName="tcode" (keyup.enter)="msel1.close()">
-            <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+            <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value" required>
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <a id="png-download" data-type="img/png"></a>
+        <!-- onError="this.onError=null;this.src='assets/noimage.gif';" style="width:50px;"></a> -->
+        <mat-form-field style="width: 5em;">
+          <mat-label>仕入先ﾏｽﾀ税区分</mat-label>
+          <mat-select #msel2 formControlName="mtax" required (keyup.enter)="msel2.close()">
+            <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>

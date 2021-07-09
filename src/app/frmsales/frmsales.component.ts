@@ -129,13 +129,13 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       jdshsta: new FormControl(''),
       mtbl: this.rows 
     });
-    this.memsrv.get_members().then(result => {
+    // this.memsrv.get_members().then(result => {
       // this.setMcdtxt();
       // this.setScdtxt();
       // this.setNcdtxt();
-      this.overlayRef.detach(); 
-      this.cdRef.detectChanges();     
-    });
+      // this.overlayRef.detach(); 
+      // this.cdRef.detectChanges();     
+    // });
     // this.gcdsrv.get_goods();
     this.bnssrv.get_bunsho();
     this.okrsrv.get_haisou();
@@ -146,27 +146,23 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.stfsrv.get_staff();
   }
   ngAfterViewInit():void{ //子コンポーネント読み込み後に走る
-    this.route.paramMap.subscribe((params: ParamMap)=>{
-      if (params.get('mode') === null){
-        this.cancel();
-      }else{
-        this.mode = +params.get('mode');
-        if(this.mode==3){
-          this.form.disable();
-          this.usrsrv.disable_mtbl(this.form);
+    this.memsrv.get_members().then(result => {
+      this.route.paramMap.subscribe((params: ParamMap)=>{
+        if (params.get('mode') === null){
+          this.cancel();
         }else{
-          this.form.enable();
-          this.usrsrv.enable_mtbl(this.form);
+          this.mode = +params.get('mode');
+          this.refresh();
         }
-      }
-      if (params.get('denno') !== null){
-        this.jmisrv.denno = +params.get('denno');
-        // console.log(this.denno);
-        this.get_jyuden(this.jmisrv.denno);
-      }
-    }); 
-    this.jmisrv.observe.subscribe(flg=>{
-      this.cdRef.detectChanges();
+        if (params.get('denno') !== null){
+          this.jmisrv.denno = +params.get('denno');
+          // console.log(this.denno);
+          this.get_jyuden(this.jmisrv.denno);
+        }
+      }); 
+      this.jmisrv.observe.subscribe(flg=>{
+        this.cdRef.detectChanges();
+      });
     });
   }
   selected(value:number){
@@ -197,16 +193,19 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     // console.log(this.form.getRawValue());
     
     
-    let head = this.usrsrv.pickObj(this.form.getRawValue(),['yday','mcode','ncode','nadr']);
+    let head = this.dwlsrv.pickObj(this.form.getRawValue(),['yday','mcode','ncode','nadr']);
+    const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl,['line','gcode','gtext','suu','iriunit','mbikou','spec'])
     head['mcdtxt'] = this.memsrv.get_mcdtxt(this.form.value.mcode);
     head['adrname'] = this.edasrv.get_name(+this.form.getRawValue().nadr);
     head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
     head['tcdnm1'] = this.stfsrv.get_name(this.form.getRawValue().tcode1);
     head['tcd0'] = this.form.getRawValue().tcode;
     // console.log(this.qrurl);
-    this.dwlsrv.dl_csv(head,this.jmisrv.denno + format + ".csv");
-    this.dwlsrv.dl_kick(this.form.getRawValue().mtbl,this.jmisrv.denno + format + "2.csv",this.usrsrv.system.urischema + format + "_" + this.jmisrv.denno,this.elementRef);
-    this.dwlsrv.dl_img(this.jmisrv.denno + format + ".png",this.elementRef);
+    this.dwlsrv.dl_csv(head,this.jmisrv.denno + format + "H.csv");
+    this.dwlsrv.dl_kick(det,this.jmisrv.denno + format + "M.csv",this.usrsrv.system.urischema + format + "_" + this.jmisrv.denno,this.elementRef);
+    
+    const base64 = this.elementRef.nativeElement.querySelector('qr-code > img').src;
+    this.dwlsrv.dl_img(this.jmisrv.denno + format + ".png",base64);
   }
 
   openOkuri(hcode,value){
@@ -224,10 +223,18 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     window.open(url.toString(),null,'top=100,left=100');
   }
 
-  refresh():void {
-    if (this.jmisrv.denno>0){
+  onEnter(){
       this.jmisrv.denno=this.usrsrv.convNumber(this.jmisrv.denno);
       this.get_jyuden(this.jmisrv.denno);
+  }
+
+  refresh():void {
+    if(this.mode==3){
+      this.form.disable();
+      this.usrsrv.disable_mtbl(this.form);
+    }else{
+      this.form.enable();
+      this.usrsrv.enable_mtbl(this.form);
     }
     
     // console.log(this.jmisrv.jyumei);
@@ -264,14 +271,14 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           }
           this.form.patchValue(jyuden);
           this.jmisrv.jyumei=data.trjyuden_by_pk.trjyumeis;
-          this.jmisrv.jyumei
           this.jmeitbl.set_jyumei();
           this.usrsrv.setTmstmp(jyuden);
           this.jmisrv.denno=denno;
           this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
           history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
-          this.overlayRef.detach();
         }
+        this.refresh();
+        this.overlayRef.detach();
       },(error) => {
         console.log('error query GetJyuden', error);
         this.toastr.info("受注伝票読込エラー");
@@ -280,13 +287,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         this.overlayRef.detach();
       });
     }
-    if(this.mode==3){
-      this.form.disable();
-      this.usrsrv.disable_mtbl(this.form);
-    }else{
-      this.form.enable();
-      this.usrsrv.enable_mtbl(this.form);
-    }
+    this.overlayRef.detach();
+    this.cdRef.detectChanges();
   }
  
   mcdHelp(fldnm:string): void {
@@ -316,6 +318,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       data=>{
           if(typeof data != 'undefined'){
             this.jmisrv.denno = data.denno;
+            this.get_jyuden(this.jmisrv.denno);
           }
       }
     );
@@ -462,41 +465,49 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   modeToCre():void {
     this.mode=1;
     this.form.reset();
-    // this.mcdtxt=""
-    // this.scdtxt=""
-    // this.ncdtxt=""
     this.jmisrv.denno=0; 
     this.form.get('tcode').setValue(this.usrsrv.staff.code);
     this.form.get('day').setValue(new Date());
     this.form.get('souko').setValue("01");
     this.jmisrv.souko="01";
     this.form.get('skbn').setValue("1");
-    // this.gdssrv.get_Goods(this.usrsrv.formatDate(this.form.value.day));
-    this.form.enable();
-    this.usrsrv.enable_mtbl(this.form); 
-    this.jmeitbl.frmArr.clear();  
+    this.jmeitbl.frmArr.clear(); 
+    this.refresh(); 
     this.jmeitbl.add_rows(20);
   }
 
   modeToUpd():void {
-    this.mode=2; 
-    this.form.enable();
-    this.usrsrv.enable_mtbl(this.form);
+    this.mode=2;
+    this.refresh(); 
     history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
   }
 
   cancel():void {
-    this.mode=3;
-    this.refresh();
-    this.form.markAsPristine();
-    history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
+    if (this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
+      this.mode=3;
+      this.get_jyuden(this.jmisrv.denno);
+      this.refresh();
+      this.form.markAsPristine();
+      history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
+    }
   }
   getInvalid():string{
     let tooltip:string="";
     const ctrls0=this.form.controls;
   　for (const name in ctrls0){
       if(ctrls0[name].invalid){
-        tooltip += this.usrsrv.getColtxt('trjyuden',name) + '⇒' + this.usrsrv.getValiderr(ctrls0[name].errors) + '\n' ;
+        if(name=='mtbl'){
+          const ctrls=(this.frmArr.at(0) as FormGroup).controls
+          for (const nam in ctrls){
+            if(ctrls[nam].invalid){
+              tooltip += this.usrsrv.getColtxt('trjyumei',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors) + '\n' ;
+            }
+          }
+      
+        }else{
+          // console.log(name);  
+          tooltip += this.usrsrv.getColtxt('trjyuden',name) + '⇒' + this.usrsrv.getValiderr(ctrls0[name].errors) + '\n' ;
+        }
       }
     }
     return tooltip;

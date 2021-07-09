@@ -23,6 +23,7 @@ export class TabDirective implements AfterViewInit  {
     if (e.which === 13) {
       this.tabService.selectedInput.next(this.index + 1)
       e.preventDefault();
+      // console.log(e,this.index);
     }
   }
   constructor(private el: ElementRef, private tabService: TabService) { 

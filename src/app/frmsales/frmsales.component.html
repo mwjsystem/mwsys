@@ -7,15 +7,15 @@
       <mat-icon>edit</mat-icon>編集
     </button>
     <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
-      <mat-icon>save</mat-icon>保存
+      <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
     </button>
     <button mat-button (click)="cancel()" *ngIf="mode!=3">
       <mat-icon>cancel</mat-icon>中止
     </button>
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>受注伝票番号</mat-label>
-      <input matInput [(ngModel)]="jmisrv.denno" tabIndex="1" (keyup.enter)="refresh()" (keydown.f4)="dennoHelp()"
-        maxlength="10" (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
+      <input matInput [(ngModel)]="jmisrv.denno" tabIndex="1" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()"
+        maxlength="10" (blur)="onEnter()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
       <button mat-button mat-icon-button matSuffix (click)="dennoHelp()" *ngIf="mode==3">
         <mat-icon>find_replace</mat-icon>
       </button>
@@ -27,7 +27,7 @@
       <mat-icon>local_shipping</mat-icon>出荷指示
     </button>
     <a id="csv-donwload" data-type="text/csv"></a>
-    <button mat-button [matMenuTriggerFor]="papermenu">
+    <button mat-button [matMenuTriggerFor]="papermenu" *ngIf="mode==3">
       <mat-icon>description</mat-icon>帳票
     </button>
     <mat-menu #papermenu="matMenu">
@@ -84,7 +84,7 @@
               <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
-          <span class="nmtxt">{{form.value.mcode | mcdtxt}}</span>
+          <span class="nmtxt">{{form.getRawValue().mcode | mcdtxt}}</span>
         </div>
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
@@ -97,7 +97,7 @@
               <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
-          <span class="nmtxt">{{form.value.scode | mcdtxt}}</span>
+          <span class="nmtxt">{{form.getRawValue().scode | mcdtxt}}</span>
         </div>
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
@@ -110,7 +110,7 @@
               <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
-          <span class="nmtxt">{{form.value.ncode | mcdtxt}}</span>
+          <span class="nmtxt">{{form.getRawValue().ncode | mcdtxt}}</span>
         </div>
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
@@ -337,7 +337,7 @@
         </mat-form-field>
         <mat-form-field style="width:10em">
           <mat-label>小分類</mat-label>
-          <mat-select formControlName="shobunrui" required>
+          <mat-select formControlName="shobunrui">
             <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>

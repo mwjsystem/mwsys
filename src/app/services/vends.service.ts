@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
-import { Subject } from 'rxjs';
+// import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,19 +10,20 @@ import { Subject } from 'rxjs';
 export class VendsService {
 
   vends:  mwI.Vendor[]=[];
-  public subject = new Subject<mwI.Vendor[]>();
-  public observe = this.subject.asObservable();  
+  // public subject = new Subject<mwI.Vendor[]>();
+  // public observe = this.subject.asObservable();  
 
   constructor(private usrsrv: UserService,
               private apollo: Apollo) { }
 
-get_vendors(): void{
+get_vendors():Promise<Boolean>{
     const GetMast = gql`
     query get_vendors($id: smallint!) {
       msvendor(where: {id: {_eq: $id}}, order_by: {code: asc}) {
         code
         adrname
         kana
+        mtax
         tel
         tel2
         tel3
@@ -41,23 +42,27 @@ get_vendors(): void{
         local
       }
     }`;
-    this.apollo.watchQuery<any>({
-      query: GetMast, 
-        variables: { 
-          id : this.usrsrv.compid
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        this.vends=data.msvendor;
-        this.subject.next(this.vends);
-      },(error) => {
-        console.log('error query get_vendors', error);
-      });
+    return new Promise<Boolean>(resolve => {
+      this.apollo.watchQuery<any>({
+        query: GetMast, 
+          variables: { 
+            id : this.usrsrv.compid
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          this.vends=data.msvendor;
+          // this.subject.next(this.vends);
+          resolve(true);
+        },(error) => {
+          console.log('error query get_vendors', error);
+        });
+      });  
   }
 
   get_vcdtxt(vcd:string):string{
     const i:number = this.vends.findIndex(obj => obj.code == vcd);
+    // console.log(vcd,this.vends);
     let vcdtxt:string="";
     if(i > -1 ){
       vcdtxt = this.vends[i].adrname;
@@ -66,4 +71,21 @@ get_vendors(): void{
     }
     return vcdtxt;
   }
+　get_vendor(vcd:string):any{
+    let vendor={};
+    const i:number = this.vends.findIndex(obj => obj.code == vcd);
+    if(i > -1 ){
+      vendor['name'] = this.vends[i].adrname;
+      vendor['mtax'] = this.vends[i].mtax;
+      vendor['tel'] = this.vends[i].tel;
+      vendor['fax'] = this.vends[i].fax;
+    } else {
+      vendor['name'] ="";
+      vendor['mtax']="";
+      vendor['tel']="";  
+      vendor['fax']="";    
+    }
+    return vendor; 
+  }
+
 }

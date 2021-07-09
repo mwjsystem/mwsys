@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -11,6 +11,7 @@ import { HatmeiService } from './hatmei.service';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { ToastrService } from 'ngx-toastr';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-hmeitbl',
@@ -20,6 +21,7 @@ import { ToastrService } from 'ngx-toastr';
 export class HmeitblComponent implements OnInit {
   @Input() parentForm: FormGroup;
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @ViewChildren('gcdInputs') gcdInps: QueryList<ElementRef>;
   private el: HTMLInputElement;
   dataSource = new MatTableDataSource();
   copyToClipboard: string;
@@ -74,7 +76,7 @@ export class HmeitblComponent implements OnInit {
           if(control.value.mtax=='0'){
             lcttotal += lcmoney;
             lctax += (lcmoney * +control.value.taxrate / 100)
-            console.log(lctax);
+            // console.log(lctax);
           }
         }
       })
@@ -108,10 +110,10 @@ export class HmeitblComponent implements OnInit {
     this.toastr.info(i + '件変更しました。まだ、保存されていません。');
   }
 
-  contxtMenu(i: number){
-    this.gcdHelp(i);
-    return false;
-  }
+  // contxtMenu(i: number){
+  //   this.gcdHelp(i);
+  //   return false;
+  // }
 
   gcdHelp(i: number): void {
     let dialogConfig = new MatDialogConfig();
@@ -168,57 +170,35 @@ export class HmeitblComponent implements OnInit {
         // console.log(msgds);
         this.frmArr.controls[i].patchValue(msgds);
         this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
+        this.frmArr.controls[i].patchValue({day:this.parentForm.get('day').value,mtax:this.parentForm.get('mtax').value});
         this.calcTot();
+        this.hmisrv.subject.next(true);
       },(error) => {
         console.log('error query get_good', error);
       });
   } 
 
-  updateRow(i:number,hatmei:mwI.Hatmei){
+  createRow(i:number,hatmei?:mwI.Hatmei){
     return this.fb.group({
       chk:[''],
       line:[{value:i,disabled:true}],
       // soko:[hatmei.soko],
-      gcode:[hatmei.gcode],
-      gtext:[hatmei.gtext],
-      suu:[hatmei.suu],
-      genka:[hatmei.genka],
-      money:[hatmei.money],
-      taxrate:[hatmei.taxrate],
-      iriunit:[hatmei.iriunit],
-      mbiko:[hatmei.mbiko],
-      spec:[hatmei.spec],
-      jdenno:[hatmei.jdenno],
-      jline:[hatmei.jline],
-      day:[hatmei.day],
-      yday:[hatmei.yday],
-      ydaykbn:[hatmei.ydaykbn],
-      inday:[hatmei.inday],
-      mtax:[hatmei.mtax]
-    });
-  }
- 
-  createRow(i:number){
-    return this.fb.group({
-      chk:[''],
-      line:[{value:i,disabled:true}],
-      // soko:[''],
-      gcode:[''],
-      gtext:[''],
-      suu:[''],
-      genka:[''],
-      money:[''],
-      taxrate:[''],
-      iriunit:[''],
-      mbiko:[''],
-      spec:[''],
-      jdenno:[''],
-      jline:[''],
-      day:[''],
-      yday:[''],
-      ydaykbn:[''],
-      inday:[''],
-      mtax:['']
+      gcode:[hatmei?.gcode, Validators.required],
+      gtext:[hatmei?.gtext],
+      suu:[hatmei?.suu, Validators.required],
+      genka:[hatmei?.genka],
+      money:[hatmei?.money],
+      taxrate:[hatmei?.taxrate],
+      iriunit:[hatmei?.iriunit],
+      mbiko:[hatmei?.mbiko],
+      spec:[hatmei?.spec],
+      jdenno:[hatmei?.jdenno],
+      jline:[hatmei?.jline],
+      day:[hatmei?.day],
+      yday:[hatmei?.yday],
+      ydaykbn:[hatmei?.ydaykbn],
+      inday:[hatmei?.inday],
+      mtax:[hatmei?.mtax]
     });
   }
 
@@ -245,7 +225,8 @@ export class HmeitblComponent implements OnInit {
     }
     this.refresh();
   }  
-  get frmArr():FormArray {    
+  get frmArr():FormArray {
+    // console.log(this.parentForm);    
     return this.parentForm.get('mtbl') as FormArray;
   }  
   
@@ -279,14 +260,14 @@ export class HmeitblComponent implements OnInit {
             iriunit:'',
             mbiko:'',
             spec:'',
-            jdenno:(col[2] ?? +col[2]),
-            jline:(col[3] ?? +col[3]),
+            jdenno:+col?.[2],
+            jline:+col?.[3],
             yday:null,
             ydaykbn:'',
             inday:null,
             mtax:''
         } 
-        this.frmArr.push(this.updateRow(i+1,hmei));
+        this.frmArr.push(this.createRow(i+1,hmei));
         // console.log(this.updateRow(i+1,hmei));
         this.updGds(i,col[0]);
         i+=1;
@@ -350,13 +331,31 @@ export class HmeitblComponent implements OnInit {
   set_hatmei(){
     this.frmArr.clear();
     let i:number=0;
+    // console.log(this.hmisrv.hatmei);
     this.hmisrv.hatmei.forEach(e => {
-      this.frmArr.push(this.updateRow(i+1,e));
+      this.frmArr.push(this.createRow(i+1,e));
       i+=1;
     });
-    for(let j=i+1;j<21;j++){
-      this.frmArr.push(this.createRow(j));
-    }
     this.refresh();
   }
+
+  add_newrow(i:number){
+    
+    this.gcdInps.changes.pipe(take(1)).subscribe({
+      next: changes => {
+        changes.last.nativeElement.focus()
+        // console.log(changes.last);
+        }
+    })
+    // console.log(i,this.frmArr.length);
+    if (i+1 == this.frmArr.length){
+      this.frmArr.push(this.createRow(i+2));
+    }
+    this.refresh();
+    // console.log(this.gcdInps);
+    // this.gcdInps.last.nativeElement.focus();
+    // ((this.frmArr.at(i+1) as FormGroup).controls['gcode']as any).nativeElement = this.elementRef.nativeElement;
+    // ((this.frmArr.at(i+1) as FormGroup).controls['gcode']as any).nativeElement.focus();
+  }
+
 }

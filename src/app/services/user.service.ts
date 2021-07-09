@@ -104,7 +104,7 @@ export class UserService {
     this.auth.logout({ returnTo: window.location.origin });
   }
 
-  async getNumber(type:string,inc:number):Promise<number>{
+  async getNumber(type:string,inc:number,dno?:number):Promise<number>{
     const UpdateNumber = gql`
     mutation getNextnum($id: smallint!, $typ: String!, $inc: bigint!) {
       update_trnumber(where: {id: {_eq: $id}, type: {_eq: $typ}}, _inc: {curnum: $inc}) {
@@ -115,25 +115,30 @@ export class UserService {
     }`;
     // let observable:Observable<number> = new Observable<number>(observer => {
     return new Promise( resolve => {
-      this.apollo.mutate<any>({
-      mutation: UpdateNumber,
-      variables: {
-        id: this.compid,
-        typ: type,
-        inc: inc
-      },
-      }).subscribe(({ data }) => {
-        return resolve(data.update_trnumber.returning[0].curnum);
-        // observer.next(data.update_trnumber.returning[0].curnum);
-        // observer.complete();
-      },(error) => {
-        this.toastr.error('採番エラー','採番タイプ' + type + 'の採番ができませんでした',
-                            {closeButton: true,disableTimeOut: true,tapToDismiss: false});
-        console.log('error mutation getNextnum', error);
-        return resolve(0);
-        // observer.next(-1);
-        // observer.complete();
-      });
+      if(dno > 0){
+        return resolve(dno);
+      }else{
+        this.apollo.mutate<any>({
+          mutation: UpdateNumber,
+          variables: {
+            id: this.compid,
+            typ: type,
+            inc: inc
+          },
+          }).subscribe(({ data }) => {
+            return resolve(data.update_trnumber.returning[0].curnum);
+            // observer.next(data.update_trnumber.returning[0].curnum);
+            // observer.complete();
+          },(error) => {
+            this.toastr.error('採番エラー','採番タイプ' + type + 'の採番ができませんでした',
+                                {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+            console.log('error mutation getNextnum', error);
+            return resolve(0);
+            // observer.next(-1);
+            // observer.complete();
+        });
+      }
+      
     });
     // return observable;
   }
@@ -287,25 +292,13 @@ export class UserService {
             .replace(/゜/g, 'ﾟ');
     return val;
   }
-  pickObj(obj,flds:string[]){
-    let pickobj={};
-    flds.forEach(e => pickobj[e]=obj[e]);
-    return pickobj;
-  }
-  pickObjArr(objarr,flds:string[]){
-    let pickarr=[];
-    objarr.forEach(obj =>{
-        let pickobj={};
-        flds.forEach(e => pickobj[e]=obj[e]);
-        pickarr.push(pickobj);    
-    });
-    return pickarr;
-  }
+
   disable_mtbl(form) {
     (<FormArray>form.get('mtbl'))
       .controls
       .forEach(control => {
         control.disable();
+        control.clearValidators();
       })
   } 
   enable_mtbl(form) {
@@ -313,6 +306,7 @@ export class UserService {
       .controls
       .forEach(control => {
         control.enable();
+        control.clearValidators();
       })
   }
   openMst(func,value){
@@ -355,7 +349,8 @@ export class UserService {
   }
   getColtxt(tbnm:string,colnm:string):string{
     let i:number = this.tbldef.findIndex(obj => obj.table_name== tbnm && obj.column_name == colnm);
-    return this.tbldef[i].description.split('/n')[0];
+    // console.log(tbnm+"."+colnm,i);    
+    return this.tbldef[i]?.description.split('/n')[0];
   }
   getValiderr(obj):string{
     let ret:string="";

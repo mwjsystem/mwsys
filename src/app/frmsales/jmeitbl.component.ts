@@ -91,6 +91,7 @@ export class JmeitblComponent implements OnInit {
     this.frmArr.controls
       .forEach(control => {
         if(control.value.chk){
+          // console.log(control.value);
           control.patchValue({spec:kbn});
           i+=1;
           if(kbn=="3" && this.hatden.indexOf(control.value.vcode) == -1){
@@ -108,8 +109,9 @@ export class JmeitblComponent implements OnInit {
     let jmei=[];
     this.frmArr.controls
       .forEach(control => {
-        if(control.value.vcode==this.hatden[0]){
-          console.log(control);
+          // console.log(control,this.hatden[0]);
+        console.log(control.get('spec').value=="3",control);
+        if(control.get('spec').value=="3" && control.get('vcode').value==this.hatden[0]){
           jmei.push(control.value.gcode + "\t" + control.value.suu + "\t" 
                     + this.jmisrv.denno + "\t" + control.get('line').value);
           control.patchValue({spdet:hdno});        
