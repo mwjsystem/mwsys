@@ -32,6 +32,10 @@ export class GtnktblComponent implements OnInit {
   //     this.cdRef.detectChanges();
   //   });
   // }
+  del_row(row:number){
+    this.frmArr.removeAt(row);
+    this.refresh();
+  }
   ins_row(row:number){
     this.frmArr.insert(row,this.createRow());
     this.refresh();
@@ -42,46 +46,45 @@ export class GtnktblComponent implements OnInit {
     }
     this.refresh();
   }  
-  updateRow(gtanka:mwI.Gtanka){
+  createRow(gtanka?:mwI.Gtanka){
     return this.fb.group({
-      action:[''],
-      gcode:[gtanka.gcode],
-      day:[gtanka.day],
-      tanka1:[gtanka.tanka1],
-      tanka2:[gtanka.tanka2],
-      tanka3:[gtanka.tanka3],
-      tanka4:[gtanka.tanka4],
-      tanka5:[gtanka.tanka5],
-      tanka6:[gtanka.tanka6],
-      tanka7:[gtanka.tanka7],
-      tanka8:[gtanka.tanka8],
-      tanka9:[gtanka.tanka9],
-      currency:[gtanka.currency],
-      cost:[gtanka.cost],
-      genka:[gtanka.genka],
-      taxrate:[gtanka.taxrate]
+      gcode:[gtanka?.gcode],
+      day:[gtanka?.day],
+      tanka1:[gtanka?.tanka1],
+      tanka2:[gtanka?.tanka2],
+      tanka3:[gtanka?.tanka3],
+      tanka4:[gtanka?.tanka4],
+      tanka5:[gtanka?.tanka5],
+      tanka6:[gtanka?.tanka6],
+      tanka7:[gtanka?.tanka7],
+      tanka8:[gtanka?.tanka8],
+      tanka9:[gtanka?.tanka9],
+      currency:[gtanka?.currency],
+      cost:[gtanka?.cost],
+      genka:[gtanka?.genka],
+      taxrate:[gtanka?.taxrate]
     });
   }
-  createRow(){
-    return this.fb.group({
-      action:['ins'],
-      gcode:[''],
-      day:[''],
-      tanka1:[''],
-      tanka2:[''],
-      tanka3:[''],
-      tanka4:[''],
-      tanka5:[''],
-      tanka6:[''],
-      tanka7:[''],
-      tanka8:[''],
-      tanka9:[''],
-      cost:[''],
-      genka:[''],
-      taxrate:[''],
-      currency:['']
-    });
-  }  
+  // createRow(){
+  //   return this.fb.group({
+  //     action:['ins'],
+  //     gcode:[''],
+  //     day:[''],
+  //     tanka1:[''],
+  //     tanka2:[''],
+  //     tanka3:[''],
+  //     tanka4:[''],
+  //     tanka5:[''],
+  //     tanka6:[''],
+  //     tanka7:[''],
+  //     tanka8:[''],
+  //     tanka9:[''],
+  //     cost:[''],
+  //     genka:[''],
+  //     taxrate:[''],
+  //     currency:['']
+  //   });
+  // }  
 
   get frmArr():FormArray {    
     return this.parentForm.get('mtbl2') as FormArray;
@@ -94,7 +97,7 @@ export class GtnktblComponent implements OnInit {
   set_gtanka(){
     this.frmArr.clear();
     this.gdssrv.gtnks.forEach(e => {
-      this.frmArr.push(this.updateRow(e));
+      this.frmArr.push(this.createRow(e));
     });
     // for(let j=i+1;j<11;j++){
     //   this.frmArr.push(this.createRow(j));
@@ -105,7 +108,7 @@ export class GtnktblComponent implements OnInit {
   refresh(): void {
     this.dataSource.data = this.frmArr.controls;
     this.dataSource.paginator = this.paginator;
-    this.cdRef.detectChanges();
+    // this.cdRef.detectChanges();
     // console.log("tnk"+flg, this.frmArr.controls);
   }
 }

@@ -1,10 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialogRef } from "@angular/material/dialog";
+import { MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
+import { GrpcdhelpComponent } from './../grpcdhelp/grpcdhelp.component';
 import { Subject } from 'rxjs';
 // import { Gcd,GcdService } from './gcd.service';
 
@@ -38,7 +39,9 @@ export class GcdhelpComponent implements OnInit {
   public subject = new Subject<Gcd[]>();
   public observe = this.subject.asObservable();  
   constructor(private dialogRef: MatDialogRef<GcdhelpComponent>,
+              private dialog: MatDialog,
               public usrsrv: UserService,
+              public cdRef: ChangeDetectorRef,
               // public gcdsrv: GcdService,
               private apollo: Apollo) {
                 this.dataSource= new MatTableDataSource<Gcd>(this.gcds);
@@ -93,6 +96,22 @@ export class GcdhelpComponent implements OnInit {
         console.log('error query get_goods', error);
       });
   }
+
+  grpcdHelp(): void {
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+    let dialogRef = this.dialog.open(GrpcdhelpComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(
+      data=>{
+        if(typeof data != 'undefined'){
+          this.code = data.code;
+          this.cdRef.detectChanges();
+          console.log(this.code, data.code);
+        }
+        this.refresh();
+      }
+    );    
+  }  
 
   setGcd(selected ) {
     this.dialogRef.close(selected);

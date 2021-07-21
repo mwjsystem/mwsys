@@ -39,6 +39,7 @@ export class MstvendorComponent implements OnInit {
     this.vensrv.get_vendors();
     this.form = this.fb.group({
       mtax: new FormControl(''),
+      currency: new FormControl(''),
       zip: new FormControl(''),
       region: new FormControl(''),
       local: new FormControl(''),
@@ -102,6 +103,7 @@ export class MstvendorComponent implements OnInit {
         adrname
         kana
         mtax
+        currency
         tel
         tel2
         tel3

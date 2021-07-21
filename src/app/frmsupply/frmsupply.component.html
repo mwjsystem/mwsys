@@ -91,7 +91,8 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <a id="png-download" data-type="img/png"></a>
+        <!-- <a id="png-download" data-type="image/png"></a> -->
+        <!-- <img [src]="srcpng"> -->
         <!-- onError="this.onError=null;this.src='assets/noimage.gif';" style="width:50px;"></a> -->
         <mat-form-field style="width: 5em;">
           <mat-label>仕入先ﾏｽﾀ税区分</mat-label>
@@ -99,6 +100,13 @@
             <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:4em;">
+          <mat-label>通貨</mat-label>
+          <mat-select #msel3 formControlName="currency" (keyup.enter)="msel3.close()">
+            <mat-option value="JPY">JPY</mat-option>
+            <mat-option value="USD">USD</mat-option>
           </mat-select>
         </mat-form-field>
       </div>

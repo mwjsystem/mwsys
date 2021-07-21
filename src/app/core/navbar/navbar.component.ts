@@ -18,6 +18,7 @@ export class NavbarComponent implements OnInit {
       this.db='テスト環境';
     }
     const color:string = localStorage.getItem(this.usrsrv.userInfo.nickname + 'MWSYS_COLOR');
+    // console.log(color);
     if ( color !== null ){this.setColor(color);}
   }
   setColor(colorname:string):void {

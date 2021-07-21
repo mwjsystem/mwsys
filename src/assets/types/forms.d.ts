@@ -92,6 +92,7 @@ declare namespace mwI {
     currency:string;
     code:string;
     gkbn:string;
+    zkbn:string;
     vcode:string;
     spdet:string;
   }
@@ -160,6 +161,7 @@ declare namespace mwI {
     updated_at:string;
     updated_by:Date;
     jdenno:number;
+    currency:string;
   }
 
   interface Hatmei {

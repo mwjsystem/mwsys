@@ -1,12 +1,12 @@
 <div class="mat-elevation-z8">
   <ng-container [formGroup]="parentForm">
-    <button mat-button (click)="refresh()">ref</button>
+    <!-- <button mat-button (click)="refresh()">ref</button> -->
     <table mat-table formArrayName="mtbl2" [dataSource]="dataSource" aria-label="Elements">
       <ng-container matColumnDef="gcode">
         <th mat-header-cell *matHeaderCellDef>商品コード</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
           <mat-form-field style="width:10em;">
-            <input matInput formControlName="gcode">
+            <input matInput [value]="frmArr.getRawValue()[i]['gcode']" disabled>
           </mat-form-field>
         </td>
       </ng-container>
@@ -96,8 +96,7 @@
         <th mat-header-cell *matHeaderCellDef>営業原価</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
           <mat-form-field style="width:6em;">
-            <input matInput formControlName="cost" class="i_num"
-              [value]="frmVal(i,'cost') | currency :frmVal(i,'currency')">
+            <input matInput formControlName="cost" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
@@ -105,8 +104,7 @@
         <th mat-header-cell *matHeaderCellDef>商品原価</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
           <mat-form-field style="width:6em;">
-            <input matInput formControlName="genka" class="i_num"
-              [value]="frmVal(i,'genka') | currency :frmVal(i,'currency')">
+            <input matInput formControlName="genka" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
@@ -135,5 +133,6 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   </ng-container>
-  <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator>
+  <mat-paginator [length]="dataSource?.data.length" [pageIndex]="0" [pageSize]="10"
+    [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
 </div>

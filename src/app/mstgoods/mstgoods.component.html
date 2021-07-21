@@ -1,15 +1,15 @@
 <mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
   <div class="icon-area" fxLayout="row wrap">
-    <button mat-button (click)="modeToCre()" [style.display]="mode==3 ? 'block' : 'none'">
+    <button mat-button (click)="modeToCre()" *ngIf="mode==3">
       <mat-icon>add_box</mat-icon>新規
     </button>
-    <button mat-button (click)="modeToUpd()" [style.display]="mode==3 && this.grpcd ? 'block' : 'none'">
+    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.grpcd">
       <mat-icon>edit</mat-icon>編集
     </button>
-    <button mat-button (click)="save()" [style.display]="mode==3 ? 'none' : 'block'">
-      <mat-icon>save</mat-icon>保存
+    <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
+      <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
     </button>
-    <button mat-button (click)="cancel()" [style.display]="mode==3 ? 'none' : 'block'">
+    <button mat-button (click)="cancel()" *ngIf="mode!=3">
       <mat-icon>cancel</mat-icon>中止
     </button>
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
@@ -22,8 +22,7 @@
         <button mat-button mat-icon-button matSuffix (click)="setPrev()" [style.display]="mode==3 ? 'inline-block' : 'none'">
           <mat-icon>keyboard_arrow_down</mat-icon>
         </button> -->
-      <button mat-button mat-icon-button matSuffix (click)="grpcdHelp()"
-        [style.display]="mode==3 ? 'inline-block' : 'none'">
+      <button mat-button mat-icon-button matSuffix (click)="grpcdHelp()" *ngIf="mode==3">
         <mat-icon>find_replace</mat-icon>
       </button>
     </mat-form-field>
@@ -61,15 +60,15 @@
         <div fxLayoutGap="5px">
           <mat-form-field style="width:20em">
             <mat-label>グループ名</mat-label>
-            <input matInput formControlName="name" required>
+            <input tabIndex="1" matInput formControlName="name" required>
           </mat-form-field>
           <mat-form-field>
             <mat-label>フリガナ</mat-label>
-            <input matInput formControlName="kana" required>
+            <input tabIndex="2" matInput formControlName="kana" required (change)="updKana($event.target.value)">
           </mat-form-field>
           <mat-form-field style="width:8em">
             <mat-label>商品区分</mat-label>
-            <mat-select formControlName="gkbn" required>
+            <mat-select tabIndex="3" #msel01 formControlName="gkbn" required (keyup.enter)="msel01.close()">
               <mat-option *ngFor="let sval of bunsrv.gkbn" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -77,7 +76,7 @@
           </mat-form-field>
           <mat-form-field>
             <mat-label>ジャンル</mat-label>
-            <mat-select formControlName="genre" required>
+            <mat-select tabIndex="4" #msel02 formControlName="genre" required (keyup.enter)="msel02.close()">
               <mat-option *ngFor="let sval of bunsrv.genre" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -85,7 +84,7 @@
           </mat-form-field>
           <mat-form-field style="width: 7em;">
             <mat-label>仕入先</mat-label>
-            <input matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
+            <input tabIndex="5" matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
             <button mat-button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode!==3">
               <mat-icon>find_replace</mat-icon>
             </button>
@@ -94,14 +93,14 @@
           <span class="nmtxt">{{form.value.vcode | vcdtxt}}</span>
           <mat-form-field>
             <mat-label>素材</mat-label>
-            <input matInput formControlName="sozai">
+            <input tabIndex="6" matInput formControlName="sozai">
           </mat-form-field>
           <!-- <mat-checkbox formControlName="del">削除済</mat-checkbox> -->
         </div>
         <div fxLafxLayout="row wrap" fxLayoutGap="5px">
           <mat-form-field style="width: 100%;">
             <mat-label>備考</mat-label>
-            <textarea matInput formControlName="bikou" matTextareaAutosize></textarea>
+            <textarea tabIndex="7" matInput formControlName="bikou" matTextareaAutosize></textarea>
           </mat-form-field>
         </div>
       </div>

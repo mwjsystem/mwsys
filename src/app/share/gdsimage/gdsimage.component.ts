@@ -101,18 +101,20 @@ export class GdsimageComponent implements OnInit,AfterViewInit {
     data.append('upfile', f, this.grpcd + "_" + num + ".jpg");
 
     // サーバーに送信(画像データがあるので、POST)
-    this.http.post('https://mwjapan.sakura.ne.jp/mwjsys/index.php?topath=./goods/&file=ins', data, {responseType: 'text'})
+    this.http.post(this.usrsrv.system.imgurl + 'index.php?topath=./goods/&func=ins', data, {responseType: 'text'})
       .subscribe(
         data => this.cdRef.detectChanges(),
         error => console.log(error)
       );
   }
-　
+　//ファイルの削除
   delImg(num:string){
     // サーバーに送信(ファイル名のみなので、GET)
-    this.http.get('https://mwjapan.sakura.ne.jp/mwjsys/index.php?topath=./goods/&file=' + this.grpcd + '_' + num + '.jpg', {responseType: 'text'})
+    this.http.get(this.usrsrv.system.imgurl + 'index.php?topath=./goods/&func=del&file=' + this.grpcd + '_' + num + '.jpg', {responseType: 'text'})
       .subscribe(
-        data => this.cdRef.detectChanges(),
+        data => {
+          this.toastr.warning('画像を削除しました(しばらくすれば、画面からも消えます)');
+          this.cdRef.detectChanges();},
         error => console.log(error)
       );
   }

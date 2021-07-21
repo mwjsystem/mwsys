@@ -15,6 +15,7 @@ import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { filter } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -44,6 +45,7 @@ export class FrmtreatComponent implements OnInit {
               private route: ActivatedRoute,
               private dialog: MatDialog,
               private apollo: Apollo,
+              private toastr: ToastrService,
               private overlay: Overlay) {
                 this.dataSource= new MatTableDataSource<mwI.Trtreat>(this.trtsrv.trts);
                 this.dataSource.paginator = this.paginator;
@@ -88,7 +90,19 @@ export class FrmtreatComponent implements OnInit {
   }
   
   filterTreat(){
-
+    let vars = {"id" : this.usrsrv.compid};
+    // if (this.fvcd){
+    //   varWh.where._and.push({"vcode" : {"_eq":this.fvcd}});
+    // }  
+    // if (this.fday){
+    //   varWh.where._and.push({"day" : {"_gt":this.fday}});
+    // }   
+    // if (this.fhdst.length>0){
+    //   varWh.where._and.push({"hdstatus" : {"_in":this.fhdst}});
+    // }         
+    // if (this.ftcd){
+    //   varWh.where._and.push({"tcode" : {"_eq":this.ftcd}});
+    // }
     
   }
 
@@ -123,6 +137,9 @@ export class FrmtreatComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         this.trtsrv.trts = data.trtreat;
+        if (this.trtsrv.trts.length == 0){
+            this.toastr.info("条件に一致する問合せ記録はありません");
+        }
         this.refresh();
         // console.log(this.trtsrv.trts);
       },(error) => {

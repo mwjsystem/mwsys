@@ -130,8 +130,15 @@ export class MstgoodsComponent implements OnInit {
     );    
   } 
 
+  updKana(value: string){
+    let val:string =this.usrsrv.convKana(value);
+    // console.log(value,val);
+    this.form.get('kana').setValue(val);
+  }
+
   get_ggroup(grpcd:string){
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    grpcd=this.usrsrv.convUpper(grpcd);
     this.apollo.watchQuery<any>({
       query: Query.GetMast0, 
         variables: { 
@@ -174,10 +181,6 @@ export class MstgoodsComponent implements OnInit {
               this.gdssrv.gtnks.push(Object.assign({gcode:ggroup.msgoods[i].gcode},ggroup.msgoods[i].msgtankas[j]));
             }
           }
-          // this.gdssrv.subGds.next();
-          // this.gdssrv.subGds.complete();
-          // this.gdssrv.subTnk.next();
-          // this.gdssrv.subTnk.complete();
           this.gdstbl.set_goods();
           this.gtnktbl.set_gtanka();
           if(this.mode==3){
@@ -221,7 +224,7 @@ export class MstgoodsComponent implements OnInit {
 
   save():void {
     
-    //★upsertに変える！！
+    //★upsertに変える？！！
     let ggroup:any={
       id: this.usrsrv.compid,
       code: this.grpcd,
@@ -231,7 +234,7 @@ export class MstgoodsComponent implements OnInit {
       bikou: this.usrsrv.editFrmval(this.form,'bikou'),
       sozai: this.usrsrv.editFrmval(this.form,'sozai'),
       vcode: this.usrsrv.editFrmval(this.form,'vcode'),
-      tcode: this.usrsrv.editFrmval(this.form,'tcode'),
+      // tcode: this.usrsrv.editFrmval(this.form,'tcode'),
       specurl: this.usrsrv.editFrmval(this.form,'specurl'),
       genre: this.usrsrv.editFrmval(this.form,'genre'),
       updated_at:new Date(),
@@ -256,7 +259,7 @@ export class MstgoodsComponent implements OnInit {
         console.log('error update_msggroup', error);
       });
 
-      console.log(this.form.get('mtbl'));
+      // console.log(this.form.get('mtbl'));
     }else{//新規登録
 
     }
@@ -271,15 +274,62 @@ export class MstgoodsComponent implements OnInit {
 
 
   } 
-  
-  cancel():void {
-    if(this.mode==1){
-      this.grpcd='';
+
+  get frmArr():FormArray {    
+    return this.form.get('mtbl') as FormArray;
+  } 
+
+  get frmArr2():FormArray {    
+    return this.form.get('mtbl2') as FormArray;
+  } 
+
+  getInvalid():string{
+    let tooltip:string="";
+    const ctrls0=this.form.controls;
+  　for (const name in ctrls0){
+      if(ctrls0[name].invalid){
+        if(name=='mtbl'){
+          for(let i=0;i<this.frmArr.length;i++){ 
+            const ctrls=(this.frmArr.at(i) as FormGroup).controls
+            for (const nam in ctrls){
+              if(ctrls[nam].invalid){
+                tooltip += this.usrsrv.getColtxt('msgoods',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors) + '\n' ;
+              }
+            } 
+          }
+        } else if(name=='mtbl2'){
+          for(let i=0;i<this.frmArr2.length;i++){ 
+            const ctrls=(this.frmArr2.at(i) as FormGroup).controls
+            for (const nam in ctrls){
+              if(ctrls[nam].invalid){
+                tooltip += this.usrsrv.getColtxt('msgtanka',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors) + '\n' ;
+              }
+            } 
+          }
+            
+        } else {  
+          tooltip += this.usrsrv.getColtxt('msggroup',name) + '⇒' + this.usrsrv.getValiderr(ctrls0[name].errors) + '\n' ;
+        }
+      }
     }
-    this.mode=3;
-    this.form.disable();
-    this.form.markAsPristine();
-    history.replaceState('','','./mstgoods/' + this.mode + '/' + this.grpcd);
+    return tooltip;
+  }
+
+  test(){
+    console.log(this.gtnktbl.frmArr,this.gdstbl.frmArr,);
+  }
+
+  cancel():void {
+    if (this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
+      if(this.mode==1){
+        this.grpcd='';
+      }
+      this.mode=3;
+      this.refresh();
+      this.form.disable();
+      this.form.markAsPristine();
+      history.replaceState('','','./mstgoods/' + this.mode + '/' + this.grpcd);
+    }
   }
 
   shouldConfirmOnBeforeunload():boolean {
@@ -292,8 +342,13 @@ export class MstgoodsComponent implements OnInit {
       e.returnValue = true;
     }
   }
-  ins_tnkrow(i){
-    this.gtnktbl.ins_row(i);
+  ins_tnkrow(emitParam:any){
+    if(emitParam.flg){
+      this.gtnktbl.ins_row(emitParam.row);
+    }else{
+      this.gtnktbl.del_row(emitParam.row);
+    }
+
   }
 
 }

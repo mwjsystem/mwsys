@@ -44,7 +44,8 @@ export class HmeitblComponent implements OnInit {
                       'yday',
                       'ydaykbn',
                       'inday',
-                      'mtax'
+                      'mtax',
+                      // 'currency'
                       ];
   constructor(private cdRef:ChangeDetectorRef,
               private elementRef: ElementRef,
@@ -153,6 +154,7 @@ export class HmeitblComponent implements OnInit {
         msgtankas(limit:1,where: {day: {_lt: $day}}, order_by: {day: desc_nulls_last}) {
           genka
           taxrate
+          currency
         }
       }
     }`;
@@ -167,11 +169,18 @@ export class HmeitblComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         let msgds = data.msgoods_by_pk;
+        
+        if(msgds == null){
+          this.toastr.warning("商品コード" + val+ "は登録されていません");
+          this.frmArr.controls[i].get('gcode').setErrors({'incorrect': true});
+        }else{
         // console.log(msgds);
-        this.frmArr.controls[i].patchValue(msgds);
-        this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
-        this.frmArr.controls[i].patchValue({day:this.parentForm.get('day').value,mtax:this.parentForm.get('mtax').value});
-        this.calcTot();
+          this.frmArr.controls[i].get('gcode').setErrors(null);
+          this.frmArr.controls[i].patchValue(msgds);
+          this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
+          this.frmArr.controls[i].patchValue({day:this.parentForm.get('day').value,mtax:this.parentForm.get('mtax').value});
+          this.calcTot();
+        }
         this.hmisrv.subject.next(true);
       },(error) => {
         console.log('error query get_good', error);
@@ -198,7 +207,8 @@ export class HmeitblComponent implements OnInit {
       yday:[hatmei?.yday],
       ydaykbn:[hatmei?.ydaykbn],
       inday:[hatmei?.inday],
-      mtax:[hatmei?.mtax]
+      mtax:[hatmei?.mtax],
+      // currency:[hatmei?.currency]
     });
   }
 
@@ -234,19 +244,24 @@ export class HmeitblComponent implements OnInit {
     return this.frmArr.getRawValue()[i][fld];
   }
 
-  pasteData(event: ClipboardEvent) {
+  pasteData(event: ClipboardEvent,flg:boolean) {
     let clipboardData = event.clipboardData;
     let pastedText = clipboardData.getData("text");
     let rowData = pastedText.split("\n");
-    this.insRows(rowData);
+    this.insRows(rowData,flg);
+    this.parentForm.markAsDirty();
     // console.log(rowData);
   }
-  insRows(rowData){
-    this.frmArr.clear();
+  insRows(rowData,flg:boolean){
     let i:number=0;
+    if(flg){
+      this.frmArr.clear();
+    }else{
+      i=this.frmArr.length;
+    }
     rowData.forEach(row => {
       let col=row.split("\t");
-      if(col[1]!==null){
+      if(col[0]!=""){
         let hmei:mwI.Hatmei= {
             line:i,
             day:this.usrsrv.formatDate(),
@@ -265,7 +280,8 @@ export class HmeitblComponent implements OnInit {
             yday:null,
             ydaykbn:'',
             inday:null,
-            mtax:''
+            mtax:'',
+            // currency:''
         } 
         this.frmArr.push(this.createRow(i+1,hmei));
         // console.log(this.updateRow(i+1,hmei));

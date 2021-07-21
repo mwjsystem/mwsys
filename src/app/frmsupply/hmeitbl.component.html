@@ -9,8 +9,13 @@
     <button mat-flat-button color="warn" (click)="setYday('0')" *ngIf="frmArr.enabled">確定一括設定</button>
     <button mat-flat-button [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()"
         color="accent">クリップボードにコピー</button>
-    <mat-form-field appearance="outline" *ngIf="frmArr.enabled">
-        <input matInput (paste)="pasteData($event)" style="opacity: 0;">
+    <mat-form-field appearance="outline" floatLabel="always" style="width:5em;" *ngIf="frmArr.enabled">
+        <mat-label>明細洗替</mat-label>
+        <input matInput (paste)="pasteData($event,true)" style="opacity: 0;">
+    </mat-form-field>
+    <mat-form-field appearance="outline" floatLabel="always" style="width:6em;" *ngIf="frmArr.enabled">
+        <mat-label>末尾に追加</mat-label>
+        <input matInput (paste)="pasteData($event,false)" style="opacity: 0;">
     </mat-form-field>
     <span *ngIf="frmArr.enabled">←ここにExcel等から貼付([ctrl]ｷｰ＋[v]) １列目：商品ｺｰﾄﾞ、2列目：数量</span>
 </div>
@@ -206,6 +211,17 @@
                     </mat-form-field>
                 </td>
             </ng-container>
+            <ng-container matColumnDef="currency">
+                <th mat-header-cell *matHeaderCellDef>原価通貨</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+                  <mat-form-field style="width:4em;">
+                    <mat-select #msel05 formControlName="currency" (keyup.enter)="msel05.close()">
+                      <mat-option value="JPY">JPY</mat-option>
+                      <mat-option value="USD">USD</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </ng-container>
             <!-- <ng-container matColumnDef="action">
                 <th mat-header-cell *matHeaderCellDef>Action</th>
                 <td mat-cell *matCellDef="let row; let i = index" class="i_num" fxLayout="row">

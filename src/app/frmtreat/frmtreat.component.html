@@ -17,7 +17,7 @@
             <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
             <input matInput type="number" (input)="ftel=$event.target.value">
         </mat-form-field>
-        <button class="mat-raised-button" (click)="diaDet(-1)">新規登録</button>
+        <button class="mat-raised-button" color="warn" (click)="diaDet(-1)">新規登録</button>
         <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"
             [pageSizeOptions]="[20, 50, 100, 250, 1000]">
         </mat-paginator>

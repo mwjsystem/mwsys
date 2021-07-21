@@ -214,13 +214,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 
   test(value){
     this.toastr.info(this.form.value.yday);
-    // this.usrsrv.getNumber('denno',2).subscribe(value => {
-    //   console.log(value);
-    // });
-    console.log(this.usrsrv);
-    // this.router.navigate(['/mstmember','3',value]);
-    const url = this.router.createUrlTree(['/mstmember','3',value]);
-    window.open(url.toString(),null,'top=100,left=100');
+    console.log(this.getInvalid());
+    // // this.router.navigate(['/mstmember','3',value]);
+    // const url = this.router.createUrlTree(['/mstmember','3',value]);
+    // window.open(url.toString(),null,'top=100,left=100');
   }
 
   onEnter(){
@@ -236,8 +233,6 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       this.form.enable();
       this.usrsrv.enable_mtbl(this.form);
     }
-    
-    // console.log(this.jmisrv.jyumei);
   }  
 
   get frmArr():FormArray {    
@@ -332,30 +327,11 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       lcmcode = ""; 
     }
     this.form.get('mcode').setValue(lcmcode);
-    // this.setMcdtxt();
     this.form.get('scode').setValue(lcmcode);
     this.form.get('ncode').setValue(lcmcode);
     this.get_member(lcmcode);
-    // this.form.get('nadr').setValue(0);
-    // this.setScdtxt();
-    // this.setNcdtxt();
   }
-  // setMcdtxt(){
-  //   let mcd:number=this.form.getRawValue().mcode;
-  //   this.mcdtxt=this.memsrv.get_mcdtxt(mcd);
-  //   if(this.mcdtxt ){
-  //     this.get_member(mcd);
-  //   }
-  // }  
-  // setScdtxt(){
-  //   let scd:number=this.form.getRawValue().scode;
-  //   this.scdtxt=this.memsrv.get_mcdtxt(scd);
-  // } 
 
-  // setNcdtxt(){
-  //   let ncd:number=this.form.getRawValue().ncode;
-  //   this.ncdtxt=this.memsrv.get_mcdtxt(ncd);
-  // }
   get_member(mcode:number){
     this.apollo.watchQuery<any>({
       query: Query.GetMember, 
@@ -497,10 +473,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   　for (const name in ctrls0){
       if(ctrls0[name].invalid){
         if(name=='mtbl'){
-          const ctrls=(this.frmArr.at(0) as FormGroup).controls
-          for (const nam in ctrls){
-            if(ctrls[nam].invalid){
-              tooltip += this.usrsrv.getColtxt('trjyumei',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors) + '\n' ;
+          for(let i=0;i<this.frmArr.length;i++){ 
+            const ctrls=(this.frmArr.at(i) as FormGroup).controls;
+            for (const nam in ctrls){
+              if(ctrls[nam].invalid){
+                tooltip += this.usrsrv.getColtxt('trjyumei',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors) + '\n' ;
+              }
             }
           }
       

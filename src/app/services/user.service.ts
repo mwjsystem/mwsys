@@ -24,6 +24,7 @@ export class System {
   maxdno:number;
   urischema:string;
   imgurl:string;
+  currate:number;
   constructor(init?:Partial<System>) {
     Object.assign(this, init);
   } 
@@ -56,6 +57,7 @@ export class UserService {
         maxdno
         urischema
         imgurl
+        currate
       }
     }`;
     const GetMast2 = gql`
@@ -67,37 +69,48 @@ export class UserService {
       }
     }`;
     this.auth.user$.subscribe(user => {
-    this.userInfo = user;
-    // console.log(this.userInfo);
-    this.compid=this.userInfo['https://userids'][0];
-    this.apollo.watchQuery<any>({
-      query: GetMast, 
-        variables: { 
-          id : this.compid
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        this.system=data.mssystem[0];
-      },(error) => {
-        console.log('error query get_system', error);
-      });
-    this.apollo.watchQuery<any>({
-      query: GetMast2, 
-        variables: { 
-          id : this.compid,
-          mail : this.userInfo.email
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        this.staff=data.msstaff[0];
-      },(error) => {
-        console.log('error query get_system', error);
-      });  
+      this.userInfo = user;
+      // console.log(this.userInfo);
+      this.compid=this.userInfo['https://userids'][0];
+      this.apollo.watchQuery<any>({
+        query: GetMast, 
+          variables: { 
+            id : this.compid
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          this.system=data.mssystem[0];
+        },(error) => {
+          console.log('error query get_system', error);
+        });
+      this.apollo.watchQuery<any>({
+        query: GetMast2, 
+          variables: { 
+            id : this.compid,
+            mail : this.userInfo.email
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          this.staff=data.msstaff[0];
+        },(error) => {
+          console.log('error query get_system', error);
+        });
+      const color:string = localStorage.getItem(user.nickname + 'MWSYS_COLOR');
+      // console.log(color);
+      if ( color !== null ){
+        var links = document.getElementsByTagName("link");
+        for(var i=0; i < links.length; i++) {
+          var link = links[i];
+          if (link.id=='themeAsset') {
+            link.href = 'https://unpkg.com/@angular/material/prebuilt-themes/' + color + '.css';
+          }
+        }
+      }          
     });
     this.getTbldef();
-   }
+  }
 
   logout(): void {
     // Call this to log the user out of the application
@@ -360,7 +373,13 @@ export class UserService {
     if ( obj.email ){
       ret += "メールの形式が不正です！";      
     }
-
+    if ( obj.incorrect ){
+      ret += "マスタ未登録です！";      
+    }
+    if ( obj.existed ){
+      ret += "マスタ登録済です！";      
+    }
+    // console.log(obj);
 
     return ret;
   }

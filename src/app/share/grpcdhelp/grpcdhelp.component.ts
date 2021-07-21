@@ -5,6 +5,9 @@ import { MatDialogRef } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import { UserService } from './../../services/user.service';
 import { Ggrp,GoodsService } from './../../services/goods.service';
+import { Overlay } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { MatSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-grpcdhelp',
@@ -19,15 +22,27 @@ export class GrpcdhelpComponent implements OnInit {
                          {id:'kana',value:''},
                          {id:'name',value:''},
                         ];
- 
+  overlayRef = this.overlay.create({
+    hasBackdrop: true,
+    positionStrategy: this.overlay
+      .position().global().centerHorizontally().centerVertically()
+  }); 
   constructor(private dialogRef: MatDialogRef<GrpcdhelpComponent>,
               public usrsrv: UserService,
               public gdssrv: GoodsService,
-              private apollo: Apollo) {
+              private apollo: Apollo,
+              private overlay: Overlay) {
                 this.dataSource= new MatTableDataSource<Ggrp>(this.gdssrv.ggrps);
                }
 
   ngOnInit(): void {
+    if (this.gdssrv.ggrps.length == 0) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+      this.gdssrv.get_ggroups().then(result => {
+        this.dataSource= new MatTableDataSource<Ggrp>(this.gdssrv.ggrps);
+        this.overlayRef.detach();      
+      });
+    }
     this.dataSource.paginator = this.paginator;
     this.dataSource.filterPredicate = (data: Ggrp, filtersJson: string) => {
       const matchFilter = [];

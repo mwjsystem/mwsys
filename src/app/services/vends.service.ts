@@ -24,6 +24,7 @@ get_vendors():Promise<Boolean>{
         adrname
         kana
         mtax
+        currency
         tel
         tel2
         tel3
@@ -77,11 +78,13 @@ get_vendors():Promise<Boolean>{
     if(i > -1 ){
       vendor['name'] = this.vends[i].adrname;
       vendor['mtax'] = this.vends[i].mtax;
+      vendor['currency'] = this.vends[i].currency;
       vendor['tel'] = this.vends[i].tel;
       vendor['fax'] = this.vends[i].fax;
     } else {
       vendor['name'] ="";
       vendor['mtax']="";
+      vendor['currency']="";
       vendor['tel']="";  
       vendor['fax']="";    
     }

@@ -202,6 +202,7 @@ query get_jyuden($id: smallint!,$dno: Int!) {
       taxmoney
       taxrate
       gkbn
+      zkbn
     }
   }
 }`;

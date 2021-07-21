@@ -33,6 +33,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   form: FormGroup;
   denno:number=0;
   mode: number=3;
+  // base64:string;
   // vcdtxt:string;
   rows: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
@@ -48,7 +49,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
               private elementRef: ElementRef,
               private dialog: MatDialog,
               private apollo: Apollo,
-              private dwlsrv:DownloadService,
+              public dwlsrv:DownloadService,
               public bunsrv: BunruiService,
               public soksrv: SoukoService,
               public stfsrv: StaffService,
@@ -67,6 +68,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       soko: new FormControl('', Validators.required),
       tcode: new FormControl('', Validators.required),
       mtax: new FormControl(''),
+      currency: new FormControl(''),
       hdstatus: new FormControl(''),
       dbiko: new FormControl(''),
       inbiko: new FormControl(''),
@@ -105,7 +107,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
                     const stra = JSON.parse(localStorage.getItem(params[k])); 
                     this.form.patchValue({vcode:stra.vcd});
                     this.updVcd(stra.vcd);
-                    this.hmeitbl.insRows(stra.mei);
+                    this.hmeitbl.insRows(stra.mei,true);
                     // console.log(stra.hdno,this.denno);
                     localStorage.removeItem(params[k]);
                   }
@@ -165,8 +167,8 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.cdRef.detectChanges();
   }
   updVcd(value: string):void {
-    this.form.patchValue({mtax:this.vensrv.get_vendor(value)?.mtax});
-  } 
+    this.form.patchValue({mtax:this.vensrv.get_vendor(value)?.mtax,currency:this.vensrv.get_vendor(value)?.currency});
+  }
   test(value){
     this.toastr.info(this.form.value.yday);
     // this.usrsrv.getNumber('denno',2).subscribe(value => {
@@ -180,7 +182,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   }
 
   async download_csv(format:string){
-    let head = this.dwlsrv.pickObj(this.form.getRawValue(),['day','vcode','soko']);
+    let head = this.dwlsrv.pickObj(this.form.getRawValue(),['day','vcode','soko','biko']);
     // head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
     const vend = this.vensrv.get_vendor(this.form.getRawValue().vcode);
     head['adrname'] = vend.name;
@@ -196,8 +198,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     head['stel'] = soko.tel;
     head['sfax'] = soko.fax;
     const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl,['line','gcode','gtext','suu','iriunit','jdenno','mbikou']);
-    this.dwlsrv.dl_png(this.denno + format + ".png","#png-download",this.elementRef,
-                        this.usrsrv.system.imgurl + 'staff/' + this.form.getRawValue().tcode.toString() + ".png");
+    this.dwlsrv.dl_png('staff/',this.form.getRawValue().tcode.toString() + ".png",this.denno + format + ".png");
     this.dwlsrv.dl_csv(head,this.denno + format + "H.csv");
     this.dwlsrv.dl_kick(det,this.denno + format + "M.csv",this.usrsrv.system.urischema + format + "_" + this.denno,this.elementRef);
  }
@@ -229,10 +230,10 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     // }
     if(this.mode==3){
       this.form.disable();
-      this.usrsrv.disable_mtbl(this.form);
+      // this.usrsrv.disable_mtbl(this.form);
     }else{
       this.form.enable();
-      this.usrsrv.enable_mtbl(this.form);
+      // this.usrsrv.enable_mtbl(this.form);
     }
     this.cdRef.detectChanges();
   }  
@@ -352,11 +353,13 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   　for (const name in ctrls0){
       if(ctrls0[name].invalid){
         if(name=='mtbl'){
-          const ctrls=(this.frmArr.at(0) as FormGroup).controls
-          for (const nam in ctrls){
-            if(ctrls[nam].invalid){
-              tooltip += this.usrsrv.getColtxt('trhatmei',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors) + '\n' ;
-            }
+          for(let i=0;i<this.frmArr.length;i++){ 
+            const ctrls=(this.frmArr.at(i) as FormGroup).controls
+            for (const nam in ctrls){
+              if(ctrls[nam].invalid){
+                tooltip += this.usrsrv.getColtxt('trhatmei',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors) + '\n' ;
+              }
+            } 
           }
       
         }else{  

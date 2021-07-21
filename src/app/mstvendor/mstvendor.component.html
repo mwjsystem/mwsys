@@ -54,6 +54,13 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-form-field style="width:4em;">
+          <mat-label>通貨</mat-label>
+          <mat-select #msel3 formControlName="currency" (keyup.enter)="msel3.close()">
+            <mat-option value="JPY">JPY</mat-option>
+            <mat-option value="USD">USD</mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-form-field>
           <mat-label>郵便番号(ハイフンなし)</mat-label>
           <input matInput formControlName="zip" ybPostalCode size="7" maxlength="7">
