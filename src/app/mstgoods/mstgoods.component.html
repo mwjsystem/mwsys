@@ -3,7 +3,7 @@
     <button mat-button (click)="modeToCre()" *ngIf="mode==3">
       <mat-icon>add_box</mat-icon>新規
     </button>
-    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.grpcd">
+    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.gdssrv.grpcd">
       <mat-icon>edit</mat-icon>編集
     </button>
     <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
@@ -14,8 +14,8 @@
     </button>
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label>
-      <input matInput [ngModel]="grpcd" gcdInput (ngModelChange)="grpcd=$event" (keydown.f4)="grpcdHelp()"
-        (keyup.enter)="get_ggroup(grpcd)" (blur)="refresh()" [ngModelOptions]="{standalone: true}">
+      <input matInput [ngModel]="gdssrv.grpcd" gcdInput (ngModelChange)="gdssrv.grpcd=$event" (keydown.f4)="grpcdHelp()"
+        (keyup.enter)="get_ggroup(gdssrv.grpcd)" (blur)="refresh()" [ngModelOptions]="{standalone: true}">
       <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" [style.display]="mode==3 ? 'inline-block' : 'none'">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
@@ -32,7 +32,7 @@
     <!-- <button mat-button (click)="toTreat()" *ngIf="mode!==1">
         <mat-icon>question_answer</mat-icon>問合せ
       </button> -->
-    <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ grpcd: grpcd}" *ngIf="mode!==1"
+    <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ grpcd: gdssrv.grpcd}" *ngIf="mode!==1"
         target="_blank">
         <mat-icon>question_answer</mat-icon>問合せ
       </a></button>
@@ -60,7 +60,7 @@
         <div fxLayoutGap="5px">
           <mat-form-field style="width:20em">
             <mat-label>グループ名</mat-label>
-            <input tabIndex="1" matInput formControlName="name" required>
+            <input tabIndex="1" matInput formControlName="name" required id="first-fld">
           </mat-form-field>
           <mat-form-field>
             <mat-label>フリガナ</mat-label>
@@ -68,7 +68,7 @@
           </mat-form-field>
           <mat-form-field style="width:8em">
             <mat-label>商品区分</mat-label>
-            <mat-select tabIndex="3" #msel01 formControlName="gkbn" required (keyup.enter)="msel01.close()">
+            <mat-select tabIndex="3" #msel01 formControlName="gkbn" required (keydown.enter)="msel01.close()">
               <mat-option *ngFor="let sval of bunsrv.gkbn" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -76,7 +76,7 @@
           </mat-form-field>
           <mat-form-field>
             <mat-label>ジャンル</mat-label>
-            <mat-select tabIndex="4" #msel02 formControlName="genre" required (keyup.enter)="msel02.close()">
+            <mat-select tabIndex="4" #msel02 formControlName="genre" required (keydown.enter)="msel02.close()">
               <mat-option *ngFor="let sval of bunsrv.genre" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>

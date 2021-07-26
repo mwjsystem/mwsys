@@ -22,6 +22,8 @@ export interface Ggrp {
 
 export class GoodsService {
   // public salgds: mwI.SalGds[]=[];
+ 
+  public grpcd:string; 
   public goods: mwI.Goods[]=[];
   public ggrps: Ggrp[]=[];
   public gtnks: mwI.Gtanka[]=[];

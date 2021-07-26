@@ -120,11 +120,18 @@ export class JmeitblComponent implements OnInit {
   setAll(chked:boolean){
     this.frmArr.controls
       .forEach(control => {
-        if(control.value.gcode!==''){
-          control.patchValue({chk:chked});
-        }
+        control.patchValue({chk:chked});
       })
     this.refresh();
+  }
+
+  setKoguchi(){
+    this.frmArr.controls
+      .forEach(control => {
+
+
+
+      })
   }
 
   async setJmeikbn(kbn:string){
@@ -222,8 +229,11 @@ export class JmeitblComponent implements OnInit {
       code:[jyumei?.code],
       gkbn:[jyumei?.gkbn],
       zkbn:[jyumei?.zkbn],
+      spdet:[jyumei?.spdet],
+      ordering:[jyumei?.ordering],
       vcode:[jyumei?.vcode],
-      spdet:[jyumei?.spdet]    
+      max:[jyumei?.max],
+      send:[jyumei?.send]    
     });
   }
  
@@ -315,14 +325,6 @@ export class JmeitblComponent implements OnInit {
   frmVal(i:number,fld:string):string {
     return this.frmArr.getRawValue()[i][fld];
   }
-  // pasteData(event: ClipboardEvent,flg:boolean) {
-  //   let clipboardData = event.clipboardData;
-  //   let pastedText = clipboardData.getData("text");
-  //   let rowData = pastedText.split("\n");
-  //   this.insRows(rowData,flg);
-  //   this.parentForm.markAsDirty();
-  //   // console.log(rowData);
-  // }
 
   pasteFromClipboard(flg:boolean){
     // if(navigator.clipboard){
@@ -375,8 +377,11 @@ export class JmeitblComponent implements OnInit {
             code:null,
             gkbn:null,
             zkbn:null,
+            spdet:null,
+            ordering:null,
             vcode:null,
-            spdet:null
+            max:null,
+            send:null
           } 
           this.frmArr.push(this.createRow(i+1,jmei));
           this.updGds(i,col[0]);
@@ -413,30 +418,22 @@ export class JmeitblComponent implements OnInit {
     this.frmArr.clear();
     let i:number=0;
     this.jmisrv.jyumei.forEach(e => {
-      // console.log(e);
       this.frmArr.push(this.createRow(i+1,e));
       i+=1;
     });
-    // for(let j=i+1;j<21;j++){
-    //   this.frmArr.push(this.createRow(j));
-    // }
     this.refresh();
   }
 
   add_newrow(i:number){
-    
     this.gcdInps.changes.pipe(take(1)).subscribe({
       next: changes => {
         changes.last.nativeElement.focus()
-        // console.log(changes.last);
         }
     })
-    // console.log(i,this.frmArr.length);
     if (i+1 == this.frmArr.length){
       this.frmArr.push(this.createRow(i+2));
     }
     this.refresh();
-    
   }  
   getIdx(index : number)    {
     if(this.paginator){

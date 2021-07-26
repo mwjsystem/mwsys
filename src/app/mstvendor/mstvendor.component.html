@@ -14,7 +14,7 @@
     </button>
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>仕入先コード</mat-label>
-      <input matInput [(ngModel)]="vcd" (keyup.enter)="refresh()" maxlength="12" (keydown.f4)="vcdHelp()"
+      <input matInput [(ngModel)]="vcd" (keydown.enter)="refresh()" maxlength="12" (keydown.f4)="vcdHelp()"
         (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
       <button mat-button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode==3">
         <mat-icon>find_replace</mat-icon>
@@ -48,7 +48,7 @@
         </mat-form-field>
         <mat-form-field style="width:5em">
           <mat-label>税区分</mat-label>
-          <mat-select #msel2 formControlName="mtax" required (keyup.enter)="msel2.close()">
+          <mat-select #msel2 formControlName="mtax" required (keydown.enter)="msel2.close()">
             <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -56,7 +56,7 @@
         </mat-form-field>
         <mat-form-field style="width:4em;">
           <mat-label>通貨</mat-label>
-          <mat-select #msel3 formControlName="currency" (keyup.enter)="msel3.close()">
+          <mat-select #msel3 formControlName="currency" (keydown.enter)="msel3.close()">
             <mat-option value="JPY">JPY</mat-option>
             <mat-option value="USD">USD</mat-option>
           </mat-select>

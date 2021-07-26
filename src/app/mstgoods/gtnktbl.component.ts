@@ -15,8 +15,8 @@ export class GtnktblComponent implements OnInit {
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   dataSource = new MatTableDataSource();
   displayedColumns =['gcode','day','tanka1','tanka2','tanka3','tanka4','tanka5','tanka6','tanka7','tanka8','tanka9','cost','genka','taxrate','currency'];
-
-
+  hidx=10000; //tabindex用ヘッダ項目数
+  mcols=14; //tabindex用明細列数  
   constructor(public bunsrv: BunruiService,
               private cdRef:ChangeDetectorRef,
               private fb:     FormBuilder,

@@ -190,6 +190,7 @@ declare namespace mwI {
     send:string;
     ordering:boolean;
     koguchi:number;
+    lot:number;
     msgzais:Gzai[];
   }
   
@@ -201,7 +202,7 @@ declare namespace mwI {
     code:string;
     kana:string;
     name:string;
-    gkbn:number;
+    gkbn:string;
     bikou:string;
     sozai:string;
     created_at:Date;

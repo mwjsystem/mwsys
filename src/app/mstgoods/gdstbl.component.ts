@@ -2,6 +2,8 @@ import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChil
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { Apollo } from 'apollo-angular';
+import * as Query from './queries.mstg';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
 import { GoodsService } from './../services/goods.service';
@@ -22,11 +24,12 @@ export class GdstblComponent implements OnInit,AfterViewInit {
   // @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   @Output() action = new EventEmitter();
   dataSource = new MatTableDataSource();
-  displayedColumns =['action','gcode','gtext','size','color','irisu','iriunit','gskbn','jan','weight','tkbn','zkbn','max','send','ordering','koguchi'];
+  displayedColumns =['action','gcode','gtext','size','color','irisu','iriunit','gskbn','jan','weight','tkbn','zkbn','max','send','ordering','koguchi','lot'];
   hidx=6; //tabindex用ヘッダ項目数
   mcols=11; //tabindex用明細列数  
   constructor(private cdRef:ChangeDetectorRef,
               private fb:     FormBuilder,
+              private apollo: Apollo,
               private toastr: ToastrService,
               public usrsrv:UserService,
               public gdssrv:GoodsService,
@@ -99,27 +102,41 @@ export class GdstblComponent implements OnInit,AfterViewInit {
   }
 
 　updGds(i: number,value: string){
-    this.frmArr.controls
-      .forEach(control => {
-        console.log(control.get('gcode').value);
-        if(control.get('gcode').value == value){
+    this.apollo.watchQuery<any>({
+      query: Query.GetMast2, 
+        variables: { 
+          id : this.usrsrv.compid,
+          grpcd: this.gdssrv.grpcd,
+          gcode: value
+        },
+      }).valueChanges
+        .subscribe(({ data }) => {  
+          if(data.msgoods.length==0){
+            this.frmArr.controls[i].get('gcode').setErrors(null);
+            let j:number=0;
+            this.frmArr.controls
+              .forEach(control => {
+                // console.log(control.get('gcode').value,control);
+                if(control.get('gcode').value == value && j != i){
 
-          // this.toastr.error('商品コード入力エラー', value + 'は重複しています(' + '行目)',
-          //                 {closeButton: true,disableTimeOut: true,tapToDismiss: false});
-          // // console.log(control.value);
-          // control.patchValue({spec:kbn});
-          // i+=1;
-          // if(kbn=="3" && this.hatden.indexOf(control.value.vcode) == -1){
-          //   this.hatden.push(control.value.vcode);
-          // }
-        }
-      });
-    (this.parentForm.get('mtbl2') as FormArray).controls[i].get('gcode').setValue(value);
+                  this.toastr.error( value + 'は重複しています(' + (j+1) + '行目)','商品コード入力エラー',
+                                  {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+                  this.frmArr.controls[i].get('gcode').setErrors({'exist': true});
+                }
+                j+=1;
+              });
+          } else {
+            this.toastr.error( value + 'は商品ｸﾞﾙｰﾌﾟ' + data.msgoods[0].msggroup.code + 'で登録済です','商品コード入力エラー',
+                      {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+            this.frmArr.controls[i].get('gcode').setErrors({'exist': true});
+          }
+      });  
+  (this.parentForm.get('mtbl2') as FormArray).controls[i].get('gcode').setValue(value);
   }
   createRow(flg:boolean,goods?:mwI.Goods){
     return this.fb.group({
       ins:[flg],
-      gcode:[{value:goods?.gcode,disabled:!flg}],
+      gcode:[{value:goods?.gcode,disabled:flg}],
       gtext:[goods?.gtext],
       size:[goods?.size],
       color:[goods?.color],
@@ -133,7 +150,8 @@ export class GdstblComponent implements OnInit,AfterViewInit {
       max:[goods?.max],
       send:[goods?.send],
       ordering:[goods?.ordering],
-      koguchi:[goods?.koguchi]
+      koguchi:[goods?.koguchi],
+      lot:[goods?.lot]
     });
   }    
       

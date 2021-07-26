@@ -181,7 +181,29 @@ export class UserService {
     }
     return val;
   }
- 
+
+  editDay(frm:AbstractControl,fld:string):any{
+    let val:any;  
+    if(frm.get(fld).value==null){
+      val = "2000-01-01";
+    }else{  
+      val = frm.get(fld).value;
+    }
+    return val;
+  }
+
+  editInt(frm:AbstractControl,fld:string):any{
+    let val:any;  
+    if(frm.get(fld).value==null){
+      val = null;
+    } else if(frm.get(fld).value==""){
+      val = null;
+    }else{ 
+      val = frm.get(fld).value.toString().replace(/,/g,'');
+    }
+    return val;
+  }
+
   editFtel(frm:AbstractControl,fld1:string,fld2?:string,fld3?:string,fld4?:string):any{
     let val:any=''; 
     if(frm.get(fld1).value){

@@ -93,8 +93,11 @@ declare namespace mwI {
     code:string;
     gkbn:string;
     zkbn:string;
-    vcode:string;
     spdet:string;
+    ordering:boolean;
+    vcode:string;
+    max:number;
+    send:string;
   }
   // interface SalGds {
   //   gcode:string;

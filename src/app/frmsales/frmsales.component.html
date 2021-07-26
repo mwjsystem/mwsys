@@ -116,7 +116,7 @@
           <mat-form-field style="width: 7em;">
             <mat-label>納品先選択</mat-label>
             <mat-select #msel01 tabIndex="4" formControlName="nsaki" (selectionChange)="selBetsu($event.value)"
-              (keyup.enter)="msel01.close()" required>
+              (keydown.enter)="msel01.close()" required>
               <mat-option value="0">基本住所</mat-option>
               <mat-option value="1">その他住所</mat-option>
               <mat-option value="2">別納</mat-option>
@@ -133,7 +133,7 @@
         </div>
         <mat-form-field style="width:12em">
           <mat-label>納品書タイプ</mat-label>
-          <mat-select #msel02 tabIndex="5" formControlName="bunsho" (keyup.enter)="msel02.close()">
+          <mat-select #msel02 tabIndex="5" formControlName="bunsho" (keydown.enter)="msel02.close()">
             <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
               {{sval.name}}
             </mat-option>
@@ -190,7 +190,7 @@
       <div fxLayout="column">
         <mat-form-field>
           <mat-label>担当者</mat-label>
-          <mat-select #msel1 tabIndex="11" formControlName="tcode" (keyup.enter)="msel1.close()">
+          <mat-select #msel1 tabIndex="11" formControlName="tcode" (keydown.enter)="msel1.close()">
             <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -198,7 +198,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>倉庫</mat-label>
-          <mat-select #msel2 tabIndex="12" formControlName="souko" (keyup.enter)="msel2.close()" required>
+          <mat-select #msel2 tabIndex="12" formControlName="souko" (keydown.enter)="msel2.close()" required>
             <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -206,7 +206,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>出荷対象区分</mat-label>
-          <mat-select #msel3 tabIndex="13" formControlName="skbn" (keyup.enter)="msel3.close()" required>
+          <mat-select #msel3 tabIndex="13" formControlName="skbn" (keydown.enter)="msel3.close()" required>
             <mat-option *ngFor="let sval of bunsrv.skbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -214,7 +214,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>受注方法</mat-label>
-          <mat-select #msel4 tabIndex="14" formControlName="jcode" (keyup.enter)="msel4.close()" required>
+          <mat-select #msel4 tabIndex="14" formControlName="jcode" (keydown.enter)="msel4.close()" required>
             <mat-option *ngFor="let sval of bunsrv.jucd" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -222,7 +222,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>入金予定</mat-label>
-          <mat-select #msel5 tabIndex="15" formControlName="pcode" (keyup.enter)="msel5.close()" required>
+          <mat-select #msel5 tabIndex="15" formControlName="pcode" (keydown.enter)="msel5.close()" required>
             <mat-option *ngFor="let sval of bunsrv.pay" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -233,7 +233,7 @@
         <mat-form-field style="width: 7em;">
           <mat-label>配送方法</mat-label>
           <mat-select #msel6 tabIndex="16" formControlName="hcode" (selectionChange)="selected(+$event.value)"
-            (keyup.enter)="msel6.close()">
+            (keydown.enter)="msel6.close()">
             <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
               {{sval.name}}
             </mat-option>
@@ -250,7 +250,7 @@
         </div>
         <mat-form-field style="width: 7em;">
           <mat-label>配送希望時間</mat-label>
-          <mat-select #msel7 tabIndex="18" formControlName="htime" (keyup.enter)="msel7.close()">
+          <mat-select #msel7 tabIndex="18" formControlName="htime" (keydown.enter)="msel7.close()">
             <mat-option *ngFor="let sval of hktval" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
