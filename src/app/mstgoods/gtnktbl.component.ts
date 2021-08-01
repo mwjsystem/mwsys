@@ -2,6 +2,7 @@ import { Component, OnInit, Input, ViewChild, ChangeDetectorRef } from '@angular
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { UserService } from './../services/user.service';
 import { GoodsService } from './../services/goods.service';
 import { BunruiService } from './../services/bunrui.service';
 
@@ -20,6 +21,7 @@ export class GtnktblComponent implements OnInit {
   constructor(public bunsrv: BunruiService,
               private cdRef:ChangeDetectorRef,
               private fb:     FormBuilder,
+              public usrsrv: UserService,
               public gdssrv: GoodsService
     ) {}
 

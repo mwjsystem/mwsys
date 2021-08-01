@@ -79,7 +79,13 @@
         <a mat-menu-item>伝票マスタ</a>
         <a mat-menu-item>倉庫マスタ</a>
         <a mat-menu-item>担当者マスタ</a>
-        <a mat-menu-item>分類マスタ</a>
+        <button mat-menu-item [matMenuTriggerFor]="mstmenu">
+            ﾏｽﾀﾒﾝﾃﾅﾝｽ(一括更新)
+        </button>
+        <mat-menu #mstmenu="matMenu">
+            <button mat-menu-item (click)="dl_kick('BUNRUI_')">分類ﾏｽﾀﾒﾝﾃ</button>
+            <button mat-menu-item (click)="dl_kick('GOODS_')">商品ﾏｽﾀﾒﾝﾃ</button>
+        </mat-menu>
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="syst">システム</button>
     <mat-menu #syst="matMenu">
@@ -92,6 +98,7 @@
     <button mat-button [matMenuTriggerFor]="menu">
         <mat-icon>settings</mat-icon>設定
     </button>
+    <a id="csv-donwload" data-type="text/csv"></a>
     <mat-menu #menu="matMenu">
         <form class="menu-form">
             <a mat-menu-item
@@ -139,6 +146,7 @@
                 <mat-icon>exit_to_app</mat-icon>
                 <span>ログアウト</span>
             </button>
+            
         </form>
     </mat-menu>
 </mat-toolbar>

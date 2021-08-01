@@ -24,7 +24,7 @@ export class GdstblComponent implements OnInit,AfterViewInit {
   // @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   @Output() action = new EventEmitter();
   dataSource = new MatTableDataSource();
-  displayedColumns =['action','gcode','gtext','size','color','irisu','iriunit','gskbn','jan','weight','tkbn','zkbn','max','send','ordering','koguchi','lot'];
+  displayedColumns =['action','gcode','gtext','size','color','unit','gskbn','jan','weight','tkbn','zkbn','max','send','ordering','koguchi','lot'];
   hidx=6; //tabindex用ヘッダ項目数
   mcols=11; //tabindex用明細列数  
   constructor(private cdRef:ChangeDetectorRef,
@@ -140,8 +140,7 @@ export class GdstblComponent implements OnInit,AfterViewInit {
       gtext:[goods?.gtext],
       size:[goods?.size],
       color:[goods?.color],
-      irisu:[goods?.irisu ?? 1],
-      iriunit:[goods?.iriunit],
+      unit:[goods?.unit],
       gskbn:[goods?.gskbn],
       jan:[goods?.jan],
       weight:[goods?.weight],
@@ -175,5 +174,15 @@ export class GdstblComponent implements OnInit,AfterViewInit {
       return index;
     }
   }
+
+  setBgcolor(tkbn: string): string {
+    let color:string;
+    if ( tkbn == '9' ){ 
+      color = 'lightgray';
+    } else {
+      color = 'transparent'; 
+    }
+    return color;
+  } 
 
 }

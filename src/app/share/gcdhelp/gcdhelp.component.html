@@ -25,6 +25,10 @@
                     <mat-label>Janコード</mat-label>
                     <input matInput (input)="jan=$event.target.value">
                 </mat-form-field>
+                <mat-form-field>
+                    <mat-label>中止区分</mat-label>
+                    <input matInput (input)="tkbn=$event.target.value">
+                </mat-form-field>
             </div>
         </mat-toolbar>
         <table mat-table [dataSource]="dataSource" aria-label="Elements">

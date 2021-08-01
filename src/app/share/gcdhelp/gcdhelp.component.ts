@@ -36,6 +36,7 @@ export class GcdhelpComponent implements OnInit {
   public code:string="";
   public jan:string="";
   public gtext:string="";
+  public tkbn:string="0";
   public subject = new Subject<Gcd[]>();
   public observe = this.subject.asObservable();  
   constructor(private dialogRef: MatDialogRef<GcdhelpComponent>,
@@ -65,6 +66,9 @@ export class GcdhelpComponent implements OnInit {
     }    
     if (this.gtext!==""){
       varWh.where._and.push({"gtext" : {"_like":"%" + this.gtext + "%"}});
+    }
+    if (this.tkbn!==""){
+      varWh.where._and.push({"tkbn" : {"_eq":this.tkbn}});
     }
     const GetMast = gql`
     query get_goods($where:msgoods_bool_exp!) {

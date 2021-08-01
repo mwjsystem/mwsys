@@ -10,8 +10,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     }
     gcode
     gtext
-    irisu
-    iriunit
+    unit
     koguchi
     max
     ordering
@@ -37,6 +36,10 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     msgsptnks{
       sptnkbn
       sptanka
+    }
+    msgzais {
+      zcode
+      irisu
     }
   }
 }`;
@@ -203,6 +206,21 @@ query get_jyuden($id: smallint!,$dno: Int!) {
       taxrate
       gkbn
       zkbn
+      msgood {
+        max
+        koguchi
+        ordering
+        send
+        msggroup {
+          vcode
+          gkbn
+          code
+        }
+        msgzais {
+          zcode
+          irisu
+        }
+      }
     }
   }
 }`;

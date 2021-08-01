@@ -3,18 +3,18 @@
     <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
       <!-- <table mat-table multiTemplateDataRows formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements"> -->
       <ng-container matColumnDef="action">
-        <th mat-header-cell fxLayout="row" *matHeaderCellDef [style.display]="frmArr.enabled ? 'block':'none'">
-          <span>行挿入</span>
-          <button mat-icon-button (click)="ins_row(getActualIndex(0))">
+        <th mat-header-cell fxLayout="row" *matHeaderCellDef style="border-bottom-style:none;">
+          <span *ngIf="frmArr.enabled">行挿入</span>
+          <button mat-icon-button (click)="ins_row(getActualIndex(0))" *ngIf="frmArr.enabled">
             <mat-icon>add_circle</mat-icon>
           </button>
         </th>
-        <td mat-cell fxLayout="row" *matCellDef="let row; let i = index" [style.display]="frmArr.enabled ? 'block':'none'">
-          <button mat-icon-button matPrefix (click)="ins_row(getActualIndex(i)+1)">
+        <td mat-cell fxLayout="row" *matCellDef="let row; let i = index" style="border-bottom-style:none;">
+          <button mat-icon-button matPrefix (click)="ins_row(getActualIndex(i)+1)" *ngIf="frmArr.enabled">
             <mat-icon>add_circle</mat-icon>
           </button>
           <button mat-icon-button matPrefix (click)="del_row(getActualIndex(i))"
-            *ngIf="!frmArr.getRawValue()[getActualIndex(i)]['ins']">
+            *ngIf="frmArr.enabled && !frmArr.getRawValue()[getActualIndex(i)]['ins']">
             <mat-icon>remove_circle</mat-icon>
           </button>
         </td>
@@ -33,7 +33,7 @@
         <th mat-header-cell *matHeaderCellDef>商品名</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getActualIndex(i)">
           <mat-form-field style="width:20em;">
-            <input [tabIndex]="hidx + i * mcols + 2" matInput formControlName="gtext">
+            <input [tabIndex]="hidx + i * mcols + 2" matInput formControlName="gtext" required>
           </mat-form-field>
         </td>
       </ng-container>
@@ -53,20 +53,20 @@
           </mat-form-field>
         </td>
       </ng-container>
-      <ng-container matColumnDef="irisu">
+      <!-- <ng-container matColumnDef="irisu">
         <th mat-header-cell *matHeaderCellDef>出荷数</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getActualIndex(i)">
           <mat-form-field style="width:4em;">
             <input [tabIndex]="hidx + i * mcols + 5" type="number" matInput formControlName="irisu" class="i_num">
           </mat-form-field>
         </td>
-      </ng-container>
-      <ng-container matColumnDef="iriunit">
+      </ng-container> -->
+      <ng-container matColumnDef="unit">
         <th mat-header-cell *matHeaderCellDef>単位</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getActualIndex(i)">
           <mat-form-field style="width:4em;">
-            <!-- <input [tabIndex]="hidx + i * mcols + 6" matInput formControlName="iriunit"> -->
-            <mat-select [tabIndex]="hidx + i * mcols + 6" #msel10 formControlName="iriunit" required
+            <!-- <input [tabIndex]="hidx + i * mcols + 6" matInput formControlName="unit"> -->
+            <mat-select [tabIndex]="hidx + i * mcols + 6" #msel10 formControlName="unit" required
               (keydown.enter)="msel10.close()">
               <mat-option value="着">着</mat-option>
               <mat-option value="本">本</mat-option>
@@ -200,8 +200,8 @@
         </td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;" [style.background]="setBgcolor(frmArr.getRawValue()[getActualIndex(i)]['tkbn'])"></tr>
     </table>
   </ng-container>
-  <mat-paginator [pageSizeOptions]="[5,10, 20, 50, 100]"></mat-paginator>
+  <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
 </div>

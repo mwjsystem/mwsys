@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef } from '@angular/core';
 import { UserService } from './../../services/user.service';
+import { DownloadService } from './../../services/download.service';
 
 @Component({
   selector: 'app-navbar',
@@ -8,7 +9,9 @@ import { UserService } from './../../services/user.service';
 })
 export class NavbarComponent implements OnInit {
   public db:string;  
-  constructor(public usrsrv:UserService) { }
+  constructor(public usrsrv:UserService,
+              public dwlsrv:DownloadService,
+              public elementRef: ElementRef) { }
 
   ngOnInit():void {
     this.db=localStorage.getItem('MWSYS_DB');
@@ -39,6 +42,10 @@ export class NavbarComponent implements OnInit {
       localStorage.removeItem('MWSYS_DB');
       window.location.reload();
     }
+  }
+  dl_kick(form){
+    // console.log(this.elementRef.nativeElement); 
+    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + form + this.usrsrv.compid,this.elementRef);
   }
 }
 

@@ -72,7 +72,7 @@ declare namespace mwI {
     gcode:string;
     gtext:string;
     suu:number;
-    iriunit:string;
+    unit:string;
     teika:number;
     tanka:number;
     money:number;
@@ -98,6 +98,8 @@ declare namespace mwI {
     vcode:string;
     max:number;
     send:string;
+    koguchi:number;
+    msgzais:Gzai[];
   }
   // interface SalGds {
   //   gcode:string;
@@ -165,6 +167,10 @@ declare namespace mwI {
     updated_by:Date;
     jdenno:number;
     currency:string;
+    msvendor:{
+      mtax:string;
+      currency:string;
+    }
   }
 
   interface Hatmei {
@@ -178,7 +184,7 @@ declare namespace mwI {
     genka:number;
     money:number;
     taxrate:string;
-    iriunit:string;
+    unit:string;
     mbiko:string;
     spec:string;
     jdenno:number;

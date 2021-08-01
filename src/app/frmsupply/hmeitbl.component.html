@@ -86,11 +86,11 @@
                     </mat-form-field>
                 </td>
             </ng-container>
-            <ng-container matColumnDef="iriunit">
+            <ng-container matColumnDef="unit">
                 <th mat-header-cell *matHeaderCellDef>単位</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
                     <mat-form-field style="width:4em;">
-                        <input matInput [value]="frmArr.getRawValue()[i]['iriunit']" disabled>
+                        <input matInput [value]="frmArr.getRawValue()[i]['unit']" disabled>
                     </mat-form-field>
                 </td>
             </ng-container>

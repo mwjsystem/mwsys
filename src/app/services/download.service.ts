@@ -28,21 +28,16 @@ export class DownloadService {
     return pickarr;
   }
 
-  dl_kick(data,pcsv:string,pformat:string,pelRef:ElementRef) {
-    
-    const blob = new Blob([json2csv.parse(data)], { type: 'text/csv' });
-    FileSaver.saveAs(blob, pcsv);
+  dl_kick(pformat:string,pelRef:ElementRef) {
     const link: HTMLAnchorElement = pelRef.nativeElement.querySelector('#csv-donwload') as HTMLAnchorElement;
     // console.log(link);
     link.href = pformat;
     link.click();
-
   }
   dl_csv(data,pcsv:string) {
     const blob = new Blob([json2csv.parse(data)], { type: 'text/csv' });
     FileSaver.saveAs(blob, pcsv);
   }
-
   async dl_img(pfnm:string,psrc:string){ //pelRef:ElementRef) {
     // console.log(psrc);
     // const base64 = pelRef.nativeElement.querySelector('qr-code > img').src;

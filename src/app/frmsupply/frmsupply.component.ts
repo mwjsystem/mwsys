@@ -146,10 +146,11 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
           } else {
             let hatden:mwI.Trhatden=result;
             this.form.patchValue(hatden);
+            this.form.patchValue(hatden.msvendor[0]);
             this.usrsrv.setTmstmp(hatden);
             this.hmisrv.hatmei=result.trhatmeis;
             this.hmeitbl.set_hatmei();
-            this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
+            // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             this.denno=denno;
             history.replaceState('','','./frmsupply/' + this.mode + '/' + this.denno);
           }
@@ -200,7 +201,8 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl,['line','gcode','gtext','suu','iriunit','jdenno','mbikou']);
     this.dwlsrv.dl_png('staff/',this.form.getRawValue().tcode.toString() + ".png",this.denno + format + ".png");
     this.dwlsrv.dl_csv(head,this.denno + format + "H.csv");
-    this.dwlsrv.dl_kick(det,this.denno + format + "M.csv",this.usrsrv.system.urischema + format + "_" + this.denno,this.elementRef);
+    this.dwlsrv.dl_csv(det,this.denno + format + "M.csv");
+    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + format + "_" + this.denno,this.elementRef);
  }
 
   get frmArr():FormArray {    

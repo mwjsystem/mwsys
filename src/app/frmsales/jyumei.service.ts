@@ -33,4 +33,11 @@ export class JyumeiService {
       }
     // });
   }
+  set_jyumei(data:any[]){
+    data.forEach(element => {
+      let {msgood,...rest} = element;
+      let {msggroup,...rest2} = msgood;
+      this.jyumei.push({...msggroup, ...rest, ...rest2});
+    });
+  }
 }

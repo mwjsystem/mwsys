@@ -31,6 +31,10 @@ export class HatmeiService {
         updated_at
         updated_by
         hdstatus
+        msvendor {
+          mtax
+          currency
+        }
         trhatmeis {
           day
           gcode

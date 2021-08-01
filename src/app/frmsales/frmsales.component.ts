@@ -202,10 +202,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     head['tcd0'] = this.form.getRawValue().tcode;
     // console.log(this.qrurl);
     this.dwlsrv.dl_csv(head,this.jmisrv.denno + format + "H.csv");
-    this.dwlsrv.dl_kick(det,this.jmisrv.denno + format + "M.csv",this.usrsrv.system.urischema + format + "_" + this.jmisrv.denno,this.elementRef);
+    this.dwlsrv.dl_csv(det,this.jmisrv.denno + format + "M.csv");
     
     const base64 = this.elementRef.nativeElement.querySelector('qr-code > img').src;
     this.dwlsrv.dl_img(this.jmisrv.denno + format + ".png",base64);
+    
+    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + format + "_" + this.jmisrv.denno,this.elementRef);
   }
 
   openOkuri(hcode,value){
@@ -265,7 +267,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             this.form.get('nsaki').setValue(jyuden.nadr.toString());  
           }
           this.form.patchValue(jyuden);
-          this.jmisrv.jyumei=data.trjyuden_by_pk.trjyumeis;
+          this.jmisrv.set_jyumei(data.trjyuden_by_pk.trjyumeis);
+          // console.log(this.jmisrv.jyumei);
           this.jmeitbl.set_jyumei();
           this.usrsrv.setTmstmp(jyuden);
           this.jmisrv.denno=denno;

@@ -38,7 +38,7 @@ export class JmeitblComponent implements OnInit {
                       'gcode',
                       'gtext',
                       'suu',
-                      'iriunit',
+                      'unit',
                       'teika',
                       'rate',
                       'tanka',
@@ -209,7 +209,7 @@ export class JmeitblComponent implements OnInit {
       gcode:[jyumei?.gcode, Validators.required],
       gtext:[jyumei?.gtext],
       suu:[jyumei?.suu],
-      iriunit:[jyumei?.iriunit],
+      unit:[jyumei?.unit],
       teika:[{value:jyumei?.teika,disabled:true}],
       tanka:[jyumei?.tanka],
       money:[{value:jyumei?.money,disabled:true}],
@@ -233,7 +233,9 @@ export class JmeitblComponent implements OnInit {
       ordering:[jyumei?.ordering],
       vcode:[jyumei?.vcode],
       max:[jyumei?.max],
-      send:[jyumei?.send]    
+      send:[jyumei?.send], 
+      koguchi:[jyumei?.koguchi],
+      msgzais:this.fb.array([])   
     });
   }
  
@@ -273,7 +275,6 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].get('gcode').setErrors({'incorrect': true});
         }else{
           this.frmArr.controls[i].get('gcode').setErrors(null);
-          this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msggroup);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
@@ -356,7 +357,7 @@ export class JmeitblComponent implements OnInit {
             gcode:col[0],
             gtext:'',
             suu:+col[1],
-            iriunit:null,
+            unit:null,
             teika:0,
             tanka:(col[2] ?? +col[2]),
             money:0,
@@ -381,7 +382,9 @@ export class JmeitblComponent implements OnInit {
             ordering:null,
             vcode:null,
             max:null,
-            send:null
+            send:null,
+            koguchi:null,
+            msgzais:[]
           } 
           this.frmArr.push(this.createRow(i+1,jmei));
           this.updGds(i,col[0]);
@@ -397,7 +400,7 @@ export class JmeitblComponent implements OnInit {
         this.copyToClipboard += this.objectToArray(row);
       }
     })
-    this.toastr.info('クリップボードにコピーしました');
+    this.toastr.info('明細をクリップボードにコピーしました');
   }
 
   objectToArray(obj: object): string {

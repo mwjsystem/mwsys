@@ -35,7 +35,7 @@ export class HmeitblComponent implements OnInit {
                       'genka',
                       'money',
                       'taxrate',
-                      'iriunit',
+                      'unit',
                       'mbiko',
                       'spec',
                       'jdenno',
@@ -147,7 +147,7 @@ export class HmeitblComponent implements OnInit {
         }
         gcode
         gtext
-        iriunit
+        unit
         ordering
         gskbn
         zkbn
@@ -198,7 +198,7 @@ export class HmeitblComponent implements OnInit {
       genka:[hatmei?.genka],
       money:[hatmei?.money],
       taxrate:[hatmei?.taxrate],
-      iriunit:[hatmei?.iriunit],
+      unit:[hatmei?.unit],
       mbiko:[hatmei?.mbiko],
       spec:[hatmei?.spec],
       jdenno:[hatmei?.jdenno],
@@ -272,7 +272,7 @@ export class HmeitblComponent implements OnInit {
             genka:0,
             money:0,
             taxrate:'',
-            iriunit:'',
+            unit:'',
             mbiko:'',
             spec:'',
             jdenno:+col?.[2],
@@ -316,7 +316,7 @@ export class HmeitblComponent implements OnInit {
           genka: this.usrsrv.editFrmval(control,'genka'),
           money: this.usrsrv.editFrmval(control,'money'),
           taxrate: this.usrsrv.editFrmval(control,'taxrate'),
-          iriunit: this.usrsrv.editFrmval(control,'iriunit'),
+          unit: this.usrsrv.editFrmval(control,'unit'),
           mbiko: this.usrsrv.editFrmval(control,'mbiko'),
           spec: this.usrsrv.editFrmval(control,'spec'),
           jdenno: this.usrsrv.editFrmval(control,'jdenno'),

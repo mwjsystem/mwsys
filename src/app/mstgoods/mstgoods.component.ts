@@ -200,6 +200,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
             this.gdssrv.grpcd = lcgrpcd;
             this.overlayRef.detach();
             this.refresh();
+            // console.log(this.form.enabled);
             // this.cdRef.detectChanges();
             history.replaceState('','','./mstgoods/' + this.mode + '/' + this.gdssrv.grpcd);
           },(error) => {
@@ -286,7 +287,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
           gskbn: this.usrsrv.editFrmval(control,'gskbn'),
           jan: this.usrsrv.editFrmval(control,'jan'),
           weight: this.usrsrv.editFrmval(control,'weight'),
-          iriunit: this.usrsrv.editFrmval(control,'iriunit'),
+          unit: this.usrsrv.editFrmval(control,'unit'),
           tkbn: this.usrsrv.editFrmval(control,'tkbn'),
           zkbn: this.usrsrv.editFrmval(control,'zkbn'),
           gtext: this.usrsrv.editFrmval(control,'gtext'),
@@ -383,6 +384,8 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
 
       // console.log(this.form.get('mtbl'));
     }else{//新規登録
+      ggroup.created_at = ggroup.updated_at;
+      ggroup.created_by = this.usrsrv.staff.code;    
       this.apollo.mutate<any>({
         mutation: Query.InsertMast1,
         variables: {

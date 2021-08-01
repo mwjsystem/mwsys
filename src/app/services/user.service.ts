@@ -25,6 +25,16 @@ export class System {
   urischema:string;
   imgurl:string;
   currate:number;
+  mtax:string;
+  tnk1txt:number;
+  tnk2txt:number;
+  tnk3txt:number;
+  tnk4txt:number;
+  tnk5txt:number;
+  tnk6txt:number;
+  tnk7txt:number;
+  tnk8txt:number;
+  tnk9txt:number;
   constructor(init?:Partial<System>) {
     Object.assign(this, init);
   } 
@@ -58,6 +68,16 @@ export class UserService {
         urischema
         imgurl
         currate
+        mtax
+        tnk1txt
+        tnk2txt
+        tnk3txt
+        tnk4txt
+        tnk5txt
+        tnk6txt
+        tnk7txt
+        tnk8txt
+        tnk9txt
       }
     }`;
     const GetMast2 = gql`

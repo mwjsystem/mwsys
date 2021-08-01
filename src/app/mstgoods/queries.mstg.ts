@@ -32,8 +32,7 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
     msgoods(order_by: {gcode: asc}) {
       gcode
       color
-      irisu
-      iriunit
+      unit
       jan
       koguchi
       max
@@ -97,11 +96,10 @@ mutation upd_ggroup($id: smallint!, $grpcd: String!,$_set: msggroup_set_input!,$
   }
   insert_msgoods(objects:$ogds, on_conflict: {constraint: msgvari_pkey, update_columns: [size,
     color,
-    irisu,
     gskbn,
     jan,
     weight,
-    iriunit,
+    unit,
     tkbn,
     zkbn,
     gtext,

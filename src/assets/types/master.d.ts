@@ -178,11 +178,10 @@ declare namespace mwI {
     gcode:string;
     size:string;
     color:string;
-    irisu:number;
     gskbn:number;
     jan:string;
     weight:number;
-    iriunit:string;
+    unit:string;
     tkbn:number;
     zkbn:number;
     gtext:string;

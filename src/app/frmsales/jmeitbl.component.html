@@ -10,17 +10,12 @@
   </mat-form-field>
   <button mat-flat-button color="primary" (click)="setJmeikbn(jmeikbn)" *ngIf="frmArr.enabled">一括設定</button>
   <button mat-flat-button color="accent" (click)="setKoguchi()" *ngIf="frmArr.enabled">個口送料計算</button>
-  <button mat-stroke-button [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">ｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
-  <!-- <mat-form-field appearance="outline" floatLabel="always" style="width:5em;" *ngIf="frmArr.enabled">
-    <mat-label>明細洗替</mat-label>
-    <input matInput (paste)="pasteData($event,true)" style="opacity: 0;">
-  </mat-form-field>
-  <mat-form-field appearance="outline" floatLabel="always" style="width:6em;" *ngIf="frmArr.enabled">
-    <mat-label>末尾に追加</mat-label>
-    <input matInput (paste)="pasteData($event,false)" style="opacity: 0;">
-  </mat-form-field> -->
-  <button mat-flat-button color="warn" (click)="pasteFromClipboard(true)" *ngIf="frmArr.enabled && navCli">貼付(明細洗替)</button>
-  <button mat-flat-button color="warn" (click)="pasteFromClipboard(false)" *ngIf="frmArr.enabled && navCli">貼付(末尾に追加)</button>
+  <button mat-flat-button color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
+  <mat-menu #cnp="matMenu">
+    <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
+    <button mat-menu-item (click)="pasteFromClipboard(true)" *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(明細洗替)</button>
+    <button mat-menu-item (click)="pasteFromClipboard(false)" *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(末尾に追加)</button>
+  </mat-menu>
   <!-- <span *ngIf="frmArr.enabled">←ここにExcel等から貼付([ctrl]ｷｰ＋[v]) １列目：商品ｺｰﾄﾞ、2列目：数量、３列目(任意)：単価</span> -->
 </div>
 <div class="mat-elevation-z8">
@@ -96,11 +91,11 @@
           </mat-form-field>
         </td>
       </ng-container>
-      <ng-container matColumnDef="iriunit">
+      <ng-container matColumnDef="unit">
         <th mat-header-cell *matHeaderCellDef>単位</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
-            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['iriunit']" disabled>
+            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['unit']" disabled>
           </mat-form-field>
         </td>
       </ng-container>
