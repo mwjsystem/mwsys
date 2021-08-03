@@ -126,6 +126,7 @@ export class JmeitblComponent implements OnInit {
   }
 
   setKoguchi(){
+    console.log(this.frmArr);
     this.frmArr.controls
       .forEach(control => {
 

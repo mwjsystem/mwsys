@@ -18,6 +18,7 @@ import { UserService } from './../services/user.service';
 import { GoodsService } from './../services/goods.service';
 import { BunruiService } from './../services/bunrui.service';
 import { VendsService } from './../services/vends.service';
+// import { StaffService } from './../services/staff.service';
 
 @Component({
   selector: 'app-mstgoods',
@@ -48,6 +49,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     public bunsrv: BunruiService,
     public vensrv: VendsService,
     public gdssrv: GoodsService,
+    // public stfsrv: StaffService,
     private apollo: Apollo,
     private toastr: ToastrService,
     private overlay: Overlay) {
@@ -57,6 +59,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.vensrv.get_vendors();
     this.bunsrv.get_bunrui();
+    // this.stfsrv.get_staff();
     this.form = this.fb.group({
       kana: new FormControl('', Validators.required),
       name: new FormControl('', Validators.required),
@@ -91,7 +94,6 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       }else{
         this.mode = +params.get('mode');
       } 
-
     });
     this.refresh();
   }
@@ -283,7 +285,6 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
           gcode: this.usrsrv.editFrmval(control,'gcode'),
           size: this.usrsrv.editFrmval(control,'size'),
           color: this.usrsrv.editFrmval(control,'color'),
-          irisu: this.usrsrv.editFrmval(control,'irisu'),
           gskbn: this.usrsrv.editFrmval(control,'gskbn'),
           jan: this.usrsrv.editFrmval(control,'jan'),
           weight: this.usrsrv.editFrmval(control,'weight'),
@@ -431,7 +432,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
             const ctrls=(this.frmArr.at(i) as FormGroup).controls
             for (const nam in ctrls){
               if(ctrls[nam].invalid){
-                tooltip += this.usrsrv.getColtxt('msgoods',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors) + '\n' ;
+                tooltip += this.usrsrv.getColtxt('msgoods',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors,i) + '\n' ;
               }
             } 
           }
@@ -440,7 +441,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
             const ctrls=(this.frmArr2.at(i) as FormGroup).controls
             for (const nam in ctrls){
               if(ctrls[nam].invalid){
-                tooltip += this.usrsrv.getColtxt('msgtanka',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors) + '\n' ;
+                tooltip += this.usrsrv.getColtxt('msgtanka',nam) + '⇒' + this.usrsrv.getValiderr(ctrls[nam].errors,i) + '\n' ;
               }
             } 
           }
@@ -454,7 +455,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   }
 
   test(){
-    console.log(this.gtnktbl.frmArr,this.gdstbl.frmArr,);
+    console.log(this.form);
   }
 
   shouldConfirmOnBeforeunload():boolean {

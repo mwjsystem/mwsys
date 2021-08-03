@@ -15,28 +15,30 @@ export class SoukoService {
               }
 
   get_souko():void {
-    const GetMast = gql`
-    query get_souko($id: smallint!) {
-      mssouko(where: {id: {_eq: $id}},order_by: {sort: asc}) {
-        code
-        subname
-      }
-    }`;
-    this.apollo.watchQuery<any>({
-    
-      query: GetMast, 
-        variables: { 
-          id : this.usrsrv.compid
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        data.mssouko.forEach(e => {
-          this.scds.push({value:e.code,viewval:e.subname}); 
+    if (this.scds.length==0){
+      const GetMast = gql`
+      query get_souko($id: smallint!) {
+        mssouko(where: {id: {_eq: $id}},order_by: {sort: asc}) {
+          code
+          subname
+        }
+      }`;    
+      this.apollo.watchQuery<any>({
+      
+        query: GetMast, 
+          variables: { 
+            id : this.usrsrv.compid
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          data.mssouko.forEach(e => {
+            this.scds.push({value:e.code,viewval:e.subname}); 
+          });
+        },(error) => {
+          console.log('error query get_souko', error);
         });
-      },(error) => {
-        console.log('error query get_souko', error);
-      });
+    }
   }
 
   async get_sokoadr(scd):Promise<any> {

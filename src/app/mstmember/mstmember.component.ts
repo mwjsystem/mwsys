@@ -108,7 +108,7 @@ export class MstmemberComponent implements OnInit {
     });
 
     this.bunsrv.get_bunrui();
-    this.stfsrv.get_staff();
+    // this.stfsrv.get_staff();
     this.okrsrv.get_hokuri();
     this.bnssrv.get_bunsho();
     this.route.paramMap.subscribe((params: ParamMap)=>{

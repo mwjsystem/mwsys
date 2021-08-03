@@ -16,32 +16,34 @@ export class BunshoService {
     
     
   get_bunsho():void {
-    const GetMast = gql`
-    query get_bunsho($id: smallint!) {
-    msbunsho(where: {id: {_eq: $id}}) {
-      code
-      name
-      title
-      gakutxt
-      stamp
-      atesaki
-      message
-      second
-      include
+    if (this.bunsho.length==0){
+      const GetMast = gql`
+      query get_bunsho($id: smallint!) {
+        msbunsho(where: {id: {_eq: $id}}) {
+          code
+          name
+          title
+          gakutxt
+          stamp
+          atesaki
+          message
+          second
+          include
+        }
+      }`;
+      this.apollo.watchQuery<any>({
+        query: GetMast, 
+          variables: { 
+            id : this.usrsrv.compid
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          this.bunsho=data.msbunsho;
+        },(error) => {
+          console.log('error query get_bunsho', error);
+        });
     }
-  }`;
-    this.apollo.watchQuery<any>({
-      query: GetMast, 
-        variables: { 
-          id : this.usrsrv.compid
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        this.bunsho=data.msbunsho;
-      },(error) => {
-        console.log('error query get_bunsho', error);
-      });
   }
   
 }

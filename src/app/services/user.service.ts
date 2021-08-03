@@ -193,6 +193,7 @@ export class UserService {
   }
 
   editFrmval(frm:AbstractControl,fld:string):any{
+    // console.log(frm,fld);
     let val:any;  
     if(frm.get(fld).value==""){
       val = null;
@@ -407,7 +408,7 @@ export class UserService {
     // console.log(tbnm+"."+colnm,i);    
     return this.tbldef[i]?.description.split('/n')[0];
   }
-  getValiderr(obj):string{
+  getValiderr(obj,i?:number):string{
     let ret:string="";
     if ( obj.required ){
       ret += "未入力です！";      
@@ -422,7 +423,9 @@ export class UserService {
       ret += "マスタ登録済です！";      
     }
     // console.log(obj);
-
+    if(i){
+      ret +="(明細"+ i.toString() + "行目)"
+    }
     return ret;
   }
 }

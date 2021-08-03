@@ -44,6 +44,9 @@ export class StaffService {
     });
   }  
   get_name(code:string):string{
+    if (this.stfs.length==0) {
+      this.get_staff();
+    }
     const i:number= this.stfs.findIndex(obj => obj.code == code);
     // console.log(code,this.stfs);
     return this.stfs[i]?.sei;

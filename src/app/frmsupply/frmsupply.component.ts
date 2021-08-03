@@ -84,7 +84,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
 
     this.soksrv.get_souko();
     this.bunsrv.get_bunrui();
-    this.stfsrv.get_staff();
+    // this.stfsrv.get_staff();
   }
 
   ngAfterViewInit():void{ //子コンポーネント読み込み後に走る
