@@ -167,7 +167,7 @@ export class GdstblComponent implements OnInit,AfterViewInit {
     this.dataSource.data =  this.frmArr.controls;
   }
 
-  getActualIndex(index : number)    {
+  getIdx(index : number)    {
     if(this.paginator){
       return index + this.paginator.pageSize * this.paginator.pageIndex;
     } else{

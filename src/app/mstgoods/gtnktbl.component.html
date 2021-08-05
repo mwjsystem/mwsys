@@ -4,7 +4,7 @@
     <table mat-table formArrayName="mtbl2" [dataSource]="dataSource" aria-label="Elements">
       <ng-container matColumnDef="gcode">
         <th mat-header-cell *matHeaderCellDef>商品コード</th>
-        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:10em;">
             <input matInput [value]="frmArr.getRawValue()[i]['gcode']" disabled>
           </mat-form-field>
@@ -12,7 +12,7 @@
       </ng-container>
       <ng-container matColumnDef="day">
         <th mat-header-cell *matHeaderCellDef>有効開始日</th>
-        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width: 7em;">
             <input [tabIndex]="hidx + i * mcols + 1" matInput formControlName="day" [matDatepicker]="picker">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -22,79 +22,127 @@
       </ng-container>
       <ng-container matColumnDef="tanka1">
         <th mat-header-cell *matHeaderCellDef>{{usrsrv.system.tnk1txt}}</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field style="width:6em;">
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:5em;">
             <input [tabIndex]="hidx + i * mcols + 2" matInput formControlName="tanka1" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka2">
-        <th mat-header-cell *matHeaderCellDef>{{usrsrv.system.tnk2txt}}</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field style="width:6em;">
+        <th mat-header-cell *matHeaderCellDef colspan="2">{{usrsrv.system.tnk2txt}}</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
             <input [tabIndex]="hidx + i * mcols + 3" matInput formControlName="tanka2" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
+      <ng-container matColumnDef="tnk2">
+        <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
+        <td mat-cell *matCellDef="let i =index">
+          {{frmArr.getRawValue()[getIdx(i)]['tanka2']/frmArr.getRawValue()[getIdx(i)]['tanka1'] | percent}}
+        </td>
+      </ng-container>
       <ng-container matColumnDef="tanka3">
-        <th mat-header-cell *matHeaderCellDef>{{usrsrv.system.tnk3txt}}</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field style="width:6em;">
+        <th mat-header-cell *matHeaderCellDef colspan="2">{{usrsrv.system.tnk3txt}}</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
             <input [tabIndex]="hidx + i * mcols + 4" matInput formControlName="tanka3" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
+      <ng-container matColumnDef="tnk3">
+        <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
+        <td mat-cell *matCellDef="let i =index">
+          {{frmArr.getRawValue()[getIdx(i)]['tanka3']/frmArr.getRawValue()[getIdx(i)]['tanka1'] | percent}}
+        </td>
+      </ng-container>
       <ng-container matColumnDef="tanka4">
-        <th mat-header-cell *matHeaderCellDef>{{usrsrv.system.tnk4txt}}</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field style="width:6em;">
+        <th mat-header-cell *matHeaderCellDef colspan="2">{{usrsrv.system.tnk4txt}}</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
             <input [tabIndex]="hidx + i * mcols + 5" matInput formControlName="tanka4" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
+      <ng-container matColumnDef="tnk4">
+        <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
+        <td mat-cell *matCellDef="let i =index">
+          {{frmArr.getRawValue()[getIdx(i)]['tanka4']/frmArr.getRawValue()[getIdx(i)]['tanka1'] | percent}}
+        </td>
+      </ng-container>
       <ng-container matColumnDef="tanka5">
-        <th mat-header-cell *matHeaderCellDef>{{usrsrv.system.tnk5txt}}</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field style="width:6em;">
+        <th mat-header-cell *matHeaderCellDef colspan="2">{{usrsrv.system.tnk5txt}}</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
             <input [tabIndex]="hidx + i * mcols + 6" matInput formControlName="tanka5" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
+      <ng-container matColumnDef="tnk5">
+        <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
+        <td mat-cell *matCellDef="let i =index">
+          {{frmArr.getRawValue()[getIdx(i)]['tanka5']/frmArr.getRawValue()[getIdx(i)]['tanka1'] | percent}}
+        </td>
+      </ng-container>
       <ng-container matColumnDef="tanka6">
-        <th mat-header-cell *matHeaderCellDef>{{usrsrv.system.tnk6txt}}</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field style="width:6em;">
+        <th mat-header-cell *matHeaderCellDef colspan="2">{{usrsrv.system.tnk6txt}}</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
             <input [tabIndex]="hidx + i * mcols + 7" matInput formControlName="tanka6" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
+      <ng-container matColumnDef="tnk6">
+        <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
+        <td mat-cell *matCellDef="let i =index">
+          {{frmArr.getRawValue()[getIdx(i)]['tanka6']/frmArr.getRawValue()[getIdx(i)]['tanka1'] | percent}}
+        </td>
+      </ng-container>
       <ng-container matColumnDef="tanka7">
-        <th mat-header-cell *matHeaderCellDef>{{usrsrv.system.tnk7txt}}</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field style="width:6em;">
+        <th mat-header-cell *matHeaderCellDef colspan="2">{{usrsrv.system.tnk7txt}}</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
             <input [tabIndex]="hidx + i * mcols + 8" matInput formControlName="tanka7" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
+      <ng-container matColumnDef="tnk7">
+        <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
+        <td mat-cell *matCellDef="let i =index">
+          {{frmArr.getRawValue()[getIdx(i)]['tanka7']/frmArr.getRawValue()[getIdx(i)]['tanka1'] | percent}}
+        </td>
+      </ng-container>
       <ng-container matColumnDef="tanka8">
-        <th mat-header-cell *matHeaderCellDef>{{usrsrv.system.tnk8txt}}</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field style="width:6em;">
+        <th mat-header-cell *matHeaderCellDef colspan="2">{{usrsrv.system.tnk8txt}}</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
             <input [tabIndex]="hidx + i * mcols + 9" matInput formControlName="tanka8" numInput class="i_num">
           </mat-form-field>
         </td>
+      </ng-container> 
+           <ng-container matColumnDef="tnk8">
+        <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
+        <td mat-cell *matCellDef="let i =index">
+          {{frmArr.getRawValue()[getIdx(i)]['tanka8']/frmArr.getRawValue()[getIdx(i)]['tanka1'] | percent}}
+        </td>
       </ng-container>
       <ng-container matColumnDef="tanka9">
-        <th mat-header-cell *matHeaderCellDef>{{usrsrv.system.tnk9txt}}</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
-          <mat-form-field style="width:6em;">
+        <th mat-header-cell *matHeaderCellDef colspan="2">{{usrsrv.system.tnk9txt}}</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
             <input [tabIndex]="hidx + i * mcols + 10" matInput formControlName="tanka9" numInput class="i_num">
           </mat-form-field>
         </td>
       </ng-container>
+      <ng-container matColumnDef="tnk9">
+        <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
+        <td mat-cell *matCellDef="let i =index">
+          {{frmArr.getRawValue()[getIdx(i)]['tanka9']/frmArr.getRawValue()[getIdx(i)]['tanka1'] | percent}}
+        </td>
+      </ng-container>
       <ng-container matColumnDef="cost">
         <th mat-header-cell *matHeaderCellDef>営業原価</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
             <input [tabIndex]="hidx + i * mcols + 11" matInput formControlName="cost" numInput class="i_num">
           </mat-form-field>
@@ -102,7 +150,7 @@
       </ng-container>
       <ng-container matColumnDef="genka">
         <th mat-header-cell *matHeaderCellDef>商品原価</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
             <input [tabIndex]="hidx + i * mcols + 12" matInput formControlName="genka" numInput class="i_num">
           </mat-form-field>
@@ -110,7 +158,7 @@
       </ng-container>
       <ng-container matColumnDef="taxrate">
         <th mat-header-cell *matHeaderCellDef>消費税率</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-select [tabIndex]="hidx + i * mcols + 13" #msel23 formControlName="taxrate" (keydown.enter)="msel23.close()">
             <mat-option *ngFor="let sval of bunsrv.taxrt" [value]="sval.value">
               {{sval.viewval}}
@@ -120,7 +168,7 @@
       </ng-container>
       <ng-container matColumnDef="currency">
         <th mat-header-cell *matHeaderCellDef>原価通貨</th>
-        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
             <mat-select [tabIndex]="hidx + i * mcols + 14" #msel24 formControlName="currency" (keydown.enter)="msel24.close()">
               <mat-option value="JPY">JPY</mat-option>

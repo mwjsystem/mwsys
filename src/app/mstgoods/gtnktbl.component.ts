@@ -15,7 +15,16 @@ export class GtnktblComponent implements OnInit {
   @Input() parentForm: FormGroup;
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   dataSource = new MatTableDataSource();
-  displayedColumns =['gcode','day','tanka1','tanka2','tanka3','tanka4','tanka5','tanka6','tanka7','tanka8','tanka9','cost','genka','taxrate','currency'];
+  displayedColumns =['gcode','day','tanka1',
+                      'tanka2','tnk2',
+                      'tanka3','tnk3',
+                      'tanka4','tnk4',
+                      'tanka5','tnk5',
+                      'tanka6','tnk6',
+                      'tanka7','tnk7',
+                      'tanka8','tnk8',
+                      'tanka9','tnk9',
+                      'cost','genka','taxrate','currency'];
   hidx=10000; //tabindex用ヘッダ項目数
   mcols=14; //tabindex用明細列数  
   constructor(public bunsrv: BunruiService,
@@ -107,6 +116,13 @@ export class GtnktblComponent implements OnInit {
     this.refresh();
   }
 
+  getIdx(index : number)    {
+    if(this.paginator){
+      return index + this.paginator.pageSize * this.paginator.pageIndex;
+    } else{
+      return index;
+    }
+  }
   refresh(): void {
     this.dataSource.data = this.frmArr.controls;
     this.dataSource.paginator = this.paginator;
