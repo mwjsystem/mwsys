@@ -14,6 +14,7 @@ import { HttpClient } from '@angular/common/http';
 export class GdsimageComponent implements OnInit,AfterViewInit {
   public noimgs:Boolean[]=[];
 　public url:string="";
+　public cat:string="";
   public grpcd:string="";
   @ViewChildren('upfile',{read:ElementRef}) inputs:QueryList<ElementRef>;
   constructor(public usrsrv: UserService,
@@ -43,6 +44,7 @@ export class GdsimageComponent implements OnInit,AfterViewInit {
     const GetUrl = gql`
     query get_specurl($id: smallint!, $grpcd: String!) {
       msggroup_by_pk(id: $id, code: $grpcd) {
+        catalog
         specurl
       }
     }`;
@@ -56,15 +58,16 @@ export class GdsimageComponent implements OnInit,AfterViewInit {
     .valueChanges
     .subscribe(({ data }) => {
       this.url=data.msggroup_by_pk.specurl;
+      this.cat=data.msggroup_by_pk.catalog;
     },(error) => {
       console.log('error query get_url', error);
     });
   }
 
-  set_url(grpcd:string,url:string):void {
+  saveUrl():void {
     const SetUrl= gql`
-    mutation set_specurl($id: smallint!, $grpcd: String!, $url: String) {
-      update_msggroup(where: {id: {_eq: $id}, code: {_eq: $grpcd}}, _set: {specurl: $url}) {
+    mutation set_specurl($id: smallint!, $grpcd: String!, $url: String, $cat: String) {
+      update_msggroup(where: {id: {_eq: $id}, code: {_eq: $grpcd}}, _set: {specurl: $url,catalog: $cat}) {
         affected_rows
       }
     }`;
@@ -72,12 +75,13 @@ export class GdsimageComponent implements OnInit,AfterViewInit {
       mutation: SetUrl, 
       variables: { 
         id : this.usrsrv.compid,
-        grpcd:grpcd,
-        url:url
+        grpcd:this.grpcd,
+        url:this.url,
+        cat:this.cat
       },
     })
     .subscribe(({ data }) => {
-      this.toastr.success('仕様書Urlの変更を保存しました');
+      this.toastr.success('仕様書Url・カタログコメントの変更を保存しました');
     },(error) => {
       this.toastr.error("先に基本情報を保存してください");
       console.log('error query get_url', error);
@@ -123,10 +127,10 @@ export class GdsimageComponent implements OnInit,AfterViewInit {
 　　window.open(this.url,"_blank");
   }
 
-  saveUrl() {
-    this.set_url(this.grpcd,this.url);
-    // this.dialogRef.close();
-  }
+  // saveUrl() {
+  //   this.set_url(this.grpcd,this.url);
+  //   // this.dialogRef.close();
+  // }
 
   close() {
     this.dialogRef.close();
