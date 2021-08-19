@@ -101,10 +101,15 @@ export class GtnktblComponent implements OnInit {
     return this.parentForm.get('mtbl2') as FormArray;
   }  
   
-  frmVal(i:number,fld:string):string {
-    return this.frmArr.getRawValue()[i][fld];
-  }
+  // frmVal(i:number,fld:string):string {
+  //   return this.frmArr.getRawValue()[i][fld];
+  // }
 
+  get_teika(i:number):number{
+    // console.log(this.frmArr.getRawValue()[this.getIdx(i)]['tanka1']*(+this.usrsrv.system.mtax)/(100 + +this.frmArr.getRawValue()[this.getIdx(i)]['taxrate'])*10);
+    return this.frmArr.getRawValue()[this.getIdx(i)]['tanka1'] -
+          (this.frmArr.getRawValue()[this.getIdx(i)]['tanka1']*(+this.usrsrv.system.mtax)/(100 + +this.frmArr.getRawValue()[this.getIdx(i)]['taxrate'])*10);
+  }
   set_gtanka(){
     this.frmArr.clear();
     this.gdssrv.gtnks.forEach(e => {

@@ -14,8 +14,8 @@
     </button>
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>顧客コード</mat-label>
-      <input matInput [(ngModel)]="mcd" (keyup.enter)="refresh()" maxlength="12" (keydown.f4)="mcdHelp()"
-        (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
+      <input matInput [(ngModel)]="mcd" (keyup.enter)="get_member(this.mcd)" maxlength="12" (keydown.f4)="mcdHelp()"
+        (blur)="get_member(this.mcd)" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
       <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode==3">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
@@ -64,7 +64,7 @@
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
     <mat-card-content>
-      <form formGroupName="base" fxLayout="row wrap" fxLayoutGap="5px">
+      <form formGroupName="base" fxLayout="row wrap" fxLayoutGap="5px" fxLayoutAlign="start end">
         <mat-form-field style="width:20em">
           <mat-label>姓/会社名</mat-label>
           <input tabIndex="1" matInput formControlName="sei" required>
@@ -187,12 +187,12 @@
           <input matInput formControlName="webid">
         </mat-form-field>
         <mat-checkbox formControlName="del">削除済</mat-checkbox>
-        <div fxLafxLayout="row wrap" fxLayoutGap="5px">
-          <mat-form-field style="width: 100%;">
+        <div fxLafxLayout="column" style="width:100%;">
+          <mat-form-field style="width:100%;margin-top:5px;">
             <mat-label>備考</mat-label>
             <textarea matInput formControlName="bikou" matTextareaAutosize></textarea>
           </mat-form-field>
-          <mat-form-field style="width: 100%;">
+          <mat-form-field style="width:100%;margin-top:5px;">
             <mat-label>社内向け備考</mat-label>
             <textarea matInput formControlName="inbikou" matTextareaAutosize></textarea>
           </mat-form-field>
@@ -213,7 +213,7 @@
       <mat-expansion-panel>
         <mat-expansion-panel-header fxLayoutGap="10px">
           <mat-label> 掛請求</mat-label>
-          <input type="checkbox" formControlName="torikbn">
+          <mat-checkbox formControlName="torikbn"></mat-checkbox>
           <small style="margin-left:20px">締め日、入金日の末日は99を入力</small>
         </mat-expansion-panel-header>
         <div fxLayoutGap="5px">
@@ -245,30 +245,35 @@
       </mat-expansion-panel>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <!-- <div fxLayout="column" fxLayoutGap="5px"> -->
-          <mat-form-field>
-            <mat-label>メールアドレス</mat-label>
-            <input tabIndex="31" matInput formControlName="mail" (change)="updMail('mail',$event.target.value)">
-          </mat-form-field>
-          <!-- </div> -->
+          <div fxLayout="row" fxLayoutGap="5px" fxLayoutAlign="start end">
+            <mat-form-field>
+              <mat-label>メールアドレス</mat-label>
+              <input tabIndex="31" matInput formControlName="mail" (change)="updMail('mail',$event.target.value)">
+            </mat-form-field>
+            <mat-checkbox formControlName="mtgt1">一括送信対象</mat-checkbox>
+          </div>
         </mat-expansion-panel-header>
-        <div fxLayout="row" fxLayoutGap="5px">
+        <div fxLayout="row" fxLayoutGap="5px" fxLayoutAlign="start end">
           <mat-form-field>
             <mat-label>メールアドレス2</mat-label>
             <input tabIndex="32" matInput formControlName="mail2" (change)="updMail('mail2',$event.target.value)">
           </mat-form-field>
+          <mat-checkbox formControlName="mtgt2">一括送信対象</mat-checkbox>
           <mat-form-field>
             <mat-label>メールアドレス3</mat-label>
             <input tabIndex="33" matInput formControlName="mail3" (change)="updMail('mail3',$event.target.value)">
           </mat-form-field>
+          <mat-checkbox formControlName="mtgt3">一括送信対象</mat-checkbox>
           <mat-form-field>
             <mat-label>メールアドレス4</mat-label>
             <input tabIndex="34" matInput formControlName="mail4" (change)="updMail('mail4',$event.target.value)">
           </mat-form-field>
+          <mat-checkbox formControlName="mtgt4">一括送信対象</mat-checkbox>
           <mat-form-field>
             <mat-label>メールアドレス5</mat-label>
             <input tabIndex="35" matInput formControlName="mail5" (change)="updMail('mail5',$event.target.value)">
           </mat-form-field>
+          <mat-checkbox formControlName="mtgt5">一括送信対象</mat-checkbox>
         </div>
       </mat-expansion-panel>
     </form>

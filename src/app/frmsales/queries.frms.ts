@@ -65,7 +65,18 @@ query get_member($id: smallint!,$mcode:Int!) {
     shobunrui
     ntype
     tntype
-    msmadrs(where: {eda: {_eq: 0}}) {
+    msmadrs {
+      eda
+      zip
+      region
+      local
+      street
+      extend
+      tel
+      fax
+      tel2
+      tel3
+      extend2
       adrname
       adrbikou
       adrinbikou
@@ -88,27 +99,27 @@ query get_member($id: smallint!,$mcode:Int!) {
     } 
   }
 }`;
-export const GetMadr = gql`
-query get_member($id: smallint!,$mcode:Int!) {
-  msmadr(where: {id: {_eq: $id,}, mcode: {_eq: $mcode}}, order_by: {eda: asc}) {
-    eda
-    zip
-    region
-    local
-    street
-    extend
-    tel
-    fax
-    tel2
-    tel3
-    extend2
-    adrname
-    adrbikou
-    adrinbikou
-    adrokrbko
-    del
-  } 
-}`;
+// export const GetMadr = gql`
+// query get_member($id: smallint!,$mcode:Int!) {
+//   msmadr(where: {id: {_eq: $id,}, mcode: {_eq: $mcode}}, order_by: {eda: asc}) {
+//     eda
+//     zip
+//     region
+//     local
+//     street
+//     extend
+//     tel
+//     fax
+//     tel2
+//     tel3
+//     extend2
+//     adrname
+//     adrbikou
+//     adrinbikou
+//     adrokrbko
+//     del
+//   } 
+// }`;
 
 export const GetMast1 = gql`
 query get_denno($id: smallint!,$maxdno: Int){
@@ -184,14 +195,13 @@ query get_jyuden($id: smallint!,$dno: Int!) {
     daibiki
     trjyumeis(order_by: {line: asc}) {
       line
-      day
       sday
       souko
       gcode
       gtext
       suu
-      teika
       tanka
+      tanka1
       money
       mtax
       mbikou
@@ -204,13 +214,13 @@ query get_jyuden($id: smallint!,$dno: Int!) {
       toutmoney
       taxmoney
       taxrate
-      gkbn
-      zkbn
       msgood {
         max
         koguchi
         ordering
         send
+        zkbn
+        unit
         msggroup {
           vcode
           gkbn

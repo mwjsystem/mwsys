@@ -78,6 +78,11 @@ query get_member($id: smallint!,$mcode:Int!) {
     ntype
     tntype
     webid
+    mtgt1
+    mtgt2
+    mtgt3
+    mtgt4
+    mtgt5
     msmadrs(order_by: {eda: asc}) {
       eda
       zip
@@ -95,6 +100,7 @@ query get_member($id: smallint!,$mcode:Int!) {
       adrinbikou
       adrokrbko
       del
+      target
     }    
   }
 }`;

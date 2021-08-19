@@ -2,6 +2,9 @@ import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { Mcd, McdService } from './mcd.service';
+import { Overlay } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { MatSpinner } from '@angular/material/progress-spinner';
 import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
@@ -27,8 +30,14 @@ export class McdtblComponent implements OnInit {
   fadrnm:string="";
   ftel:string="";
   fwebid:string="";
+  overlayRef = this.overlay.create({
+    hasBackdrop: true,
+    positionStrategy: this.overlay
+      .position().global().centerHorizontally().centerVertically()
+  });
   constructor(public mcdsrv:McdService,
               public usrsrv: UserService,
+              private overlay: Overlay,
               private apollo: Apollo) {
     this.dataSource= new MatTableDataSource<Mcd>(this.mcdsrv.mcds);
   }
@@ -102,6 +111,7 @@ export class McdtblComponent implements OnInit {
     // "where2":{"zip": {"_like": "%%"},"tel":{"_like":"%%"}}
     // }
     this.mcdsrv.mcds=[];
+    this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.apollo.watchQuery<any>({
         query: Query.GetMast, 
         variables: varWh
@@ -134,8 +144,10 @@ export class McdtblComponent implements OnInit {
         }
         this.mcdsrv.subject.next();
         this.mcdsrv.subject.complete();
+        this.overlayRef.detach();
       },(error) => {
         console.log('error query get_members', error);
+        this.overlayRef.detach();
       });
   }  
 

@@ -26,7 +26,7 @@ export class AddressComponent implements OnInit {
 
   ngOnInit(): void {
     const form = this.parent.form;
-    if (this.formName=='addr1') {
+    // if (this.formName=='addr1') {
       form.addControl(this.formName, new FormGroup({
         zip: new FormControl(''),
         region: new FormControl(''),
@@ -43,26 +43,28 @@ export class AddressComponent implements OnInit {
         adrinbikou: new FormControl(''),
         adrokrbko: new FormControl(''),
         del: new FormControl(''),
+        target: new FormControl('')
       }));
-    } else {
-      form.addControl(this.formName, new FormGroup({
-        zip: new FormControl('', Validators.required),
-        region: new FormControl('', Validators.required),
-        local: new FormControl('', Validators.required),
-        street: new FormControl(''),
-        extend: new FormControl(''),
-        extend2: new FormControl(''),
-        adrname: new FormControl('', Validators.required),
-        tel: new FormControl('', Validators.required),
-        fax: new FormControl(''),
-        tel2: new FormControl(''),
-        tel3: new FormControl(''),
-        adrbikou: new FormControl(''),
-        adrinbikou: new FormControl(''),
-        adrokrbko: new FormControl(''),
-        del: new FormControl(''),
-      }));     
-    }   
+    // } else {
+    //   form.addControl(this.formName, new FormGroup({
+    //     zip: new FormControl('', Validators.required),
+    //     region: new FormControl('', Validators.required),
+    //     local: new FormControl('', Validators.required),
+    //     street: new FormControl(''),
+    //     extend: new FormControl(''),
+    //     extend2: new FormControl(''),
+    //     adrname: new FormControl('', Validators.required),
+    //     tel: new FormControl('', Validators.required),
+    //     fax: new FormControl(''),
+    //     tel2: new FormControl(''),
+    //     tel3: new FormControl(''),
+    //     adrbikou: new FormControl(''),
+    //     adrinbikou: new FormControl(''),
+    //     adrokrbko: new FormControl(''),
+    //     del: new FormControl(''),
+    //     target: new FormControl('')
+    //   }));     
+    // }   
   }
   updTel(fldnm:string,value:string){
     let val:string =this.usrsrv.convTel(value);
@@ -93,7 +95,8 @@ export class AddressComponent implements OnInit {
       adrinbikou:this.usrsrv.editFrmval(form.get(this.formName),'adrinbikou'),
       adrokrbko:this.usrsrv.editFrmval(form.get(this.formName),'adrokrbko'),
       del:this.usrsrv.editFrmval(form.get(this.formName),'del'),
-      ftel:this.usrsrv.editFtel(form.get(this.formName),'tel','fax','tel2','tel3')
+      ftel:this.usrsrv.editFtel(form.get(this.formName),'tel','fax','tel2','tel3'),
+      target:this.usrsrv.editFrmval(form.get(this.formName),'target')
     }
     if(mode==2){      
       this.apollo.mutate<any>({

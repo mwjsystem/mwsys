@@ -66,14 +66,13 @@ declare namespace mwI {
   }
   interface Jyumei {
     line:number;
-    day:string;
     sday:string;
     souko:string;
     gcode:string;
     gtext:string;
     suu:number;
     unit:string;
-    teika:number;
+    tanka1:number;
     tanka:number;
     money:number;
     mtax:number;

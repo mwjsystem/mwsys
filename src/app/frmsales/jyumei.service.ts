@@ -12,7 +12,7 @@ export class JyumeiService {
   public mtax:string;
   public tankakbn:string;
   public sptnkbn:string;
-  public souko:string;
+  // public souko:string;
   public ntype:number;
   public tntype:number;
   public subject = new Subject<boolean>();
@@ -33,11 +33,14 @@ export class JyumeiService {
       }
     // });
   }
-  set_jyumei(data:any[]){
+  edit_jyumei(data:any[]){
     data.forEach(element => {
+      // console.log(element);
       let {msgood,...rest} = element;
       let {msggroup,...rest2} = msgood;
+      // console.log(rest,rest2);
       this.jyumei.push({...msggroup, ...rest, ...rest2});
     });
+    // console.log(this.jyumei);
   }
 }

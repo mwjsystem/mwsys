@@ -112,6 +112,7 @@ declare namespace mwI {
     adrinbikou:string;
     adrokrbko:string;
     del:boolean;
+    target:boolean;
   }
   interface Member {
     mcode:number;
@@ -150,6 +151,11 @@ declare namespace mwI {
     ntype:number;
     tntype:number;
     webid:string;
+    mtgt1:boolean;
+    mtgt2:boolean;
+    mtgt3:boolean;
+    mtgt4:boolean;
+    mtgt5:boolean;
     msmadrs:Adrs[];
     msmstits:Stit[];
   }

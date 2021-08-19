@@ -8,6 +8,7 @@ import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { SoukoService } from './../services/souko.service';
 import { GoodsService } from './../services/goods.service';
+import { EdaService } from './../share/adreda/eda.service';
 import { JyumeiService } from './jyumei.service';
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
@@ -39,12 +40,8 @@ export class JmeitblComponent implements OnInit {
                       'gtext',
                       'suu',
                       'unit',
-                      'teika',
                       'rate',
                       'tanka',
-                      'money',
-                      'mtax',
-                      'taxmoney',
                       // 'tintanka',
                       // 'touttanka',
                       'tinmoney',
@@ -56,6 +53,10 @@ export class JmeitblComponent implements OnInit {
                       'jyuzan',
                       'genka',
                       'souko',
+                      'tanka1',
+                      'money',
+                      'mtax',
+                      'taxmoney',
                       'taxrate'];
 
   constructor(private cdRef:ChangeDetectorRef,
@@ -68,7 +69,8 @@ export class JmeitblComponent implements OnInit {
               public bunsrv: BunruiService,
               public soksrv: SoukoService,
               public gdssrv: GoodsService,
-              public jmisrv:  JyumeiService) {}
+              public edasrv: EdaService,
+              public jmisrv: JyumeiService) {}
 
   ngOnInit(): void {
     this.add_rows(1);
@@ -126,13 +128,62 @@ export class JmeitblComponent implements OnInit {
   }
 
   setKoguchi(){
-    console.log(this.frmArr);
-    this.frmArr.controls
-      .forEach(control => {
-
-
-
-      })
+    // console.log(this.frmArr);
+    let i:number=0;
+    let forDel:number[]=[];
+    let calc:{ [key: string]: number; } = {};
+    let sour:{ [key: string]: number; } = {};
+    let kogu:number = 0;
+    this.frmArr.controls.forEach(control => {
+      if(!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02')){
+        forDel.push(i);
+      } else if (control.value.zkbn=='0'){
+        if(control.value.koguchi){
+          if (sour[control.value.send]>0){
+            sour[control.value.send] += +control.value.suu; 
+          } else{
+            sour[control.value.send] = +control.value.suu; 
+          }
+          kogu += (+control.value.koguchi * +control.value.suu);
+        }else if (+control.value.max > 0){
+          if(calc[control.value.send]>0){
+            calc[control.value.send] += (+control.value.suu / +control.value.max);
+          } else {
+            calc[control.value.send] = (+control.value.suu / +control.value.max);
+          }
+        }
+      }
+      i=+1;
+    })
+    forDel.reverse().forEach(fordel => {
+      this.frmArr.removeAt(fordel);
+    })
+    let j:number = this.edasrv.edas.findIndex(obj => obj.eda == this.parentForm.value.nadr);
+    let sufi:string="";
+    if(this.edasrv.edas[j].region=='北海道'){
+      sufi='-01';
+    } else if (this.edasrv.edas[j].region=='沖縄県'){
+      sufi='-47';
+    }
+    for (let kbn in calc) {
+       kogu += Math.ceil(calc[kbn]);
+       if(sour[kbn]>0){
+         sour[kbn] += Math.ceil(calc[kbn]);
+       } else {
+         sour[kbn] = Math.ceil(calc[kbn]);
+       }
+    }
+    for (let kbn in sour) {
+      let lcgcd:string;
+      if (kbn=='null'){
+        lcgcd = 'Z01' + sufi;
+      } else {
+        lcgcd = 'Z01' + '-' + kbn + sufi;
+      }
+      this.insRows([lcgcd + "\t" + sour[kbn]],false);
+    }
+    this.auto_fil();
+    this.parentForm.get('okurisuu').setValue(kogu);
   }
 
   async setJmeikbn(kbn:string){
@@ -204,14 +255,13 @@ export class JmeitblComponent implements OnInit {
     return this.fb.group({
       chk:[''],
       line:[{value:i,disabled:true}],
-      day:[jyumei?.day],
       sday:[jyumei?.sday],
       souko:[jyumei?.souko],
       gcode:[jyumei?.gcode, Validators.required],
       gtext:[jyumei?.gtext],
       suu:[jyumei?.suu],
       unit:[jyumei?.unit],
-      teika:[{value:jyumei?.teika,disabled:true}],
+      tanka1:[{value:jyumei?.tanka1,disabled:true}],
       tanka:[jyumei?.tanka],
       money:[{value:jyumei?.money,disabled:true}],
       mtax:[jyumei?.mtax],
@@ -279,12 +329,14 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msggroup);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
+          this.frmArr.controls[i].patchValue({souko:this.parentForm.value.souko});
           let lctanka:number=0;
           let lcgenka:number=0;
+          // console.log(msgds.msgtankas[0].genka);
           if(msgds.msgtankas[0].currency=="USD"){
-            lcgenka=msgds.msgtankas[0].lcgenka * this.usrsrv.system.currate;
+            lcgenka = Math.round(msgds.msgtankas[0].genka * this.usrsrv.system.currate);
           }else{
-            lcgenka=msgds.msgtankas[0].lcgenka;
+            lcgenka = msgds.msgtankas[0].genka;
           }
           let j:number = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn );
           if(j>-1){
@@ -292,19 +344,18 @@ export class JmeitblComponent implements OnInit {
           }else{
             lctanka=msgds.msgtankas[0]['tanka' + this.jmisrv.tankakbn];
           }
+          // console.log(this.jmisrv.souko);
           this.frmArr.controls[i].patchValue({mtax:this.jmisrv.mtax,
-                                              teika:msgds.msgtankas[0]['tanka1'],
+                                              tanka1:msgds.msgtankas[0]['tanka1'],
                                               tanka:lctanka,
                                               genka:lcgenka});
-          if(this.frmArr.controls[i].value.souko != null){
-            this.frmArr.controls[i].patchValue({souko:this.jmisrv.souko});
-          }
           if(msgds.ordering){
             this.frmArr.controls[i].patchValue({spec:'3'});
             if(this.hatden.indexOf(msgds.msggroup.vcode) == -1){
               this.hatden.push(msgds.msggroup.vcode);
             }
           }
+          this.calcMei(i);
           this.calcTot();
           // this.jmisrv.subject.complete();
         }
@@ -314,11 +365,37 @@ export class JmeitblComponent implements OnInit {
       });
   } 
 
-  updateList(i: number, fld: string){
-    // this.jmisrv.jyumei[i][property] = value;
-    // this.frmArr.at(i)['controls'][fld].setvalue();
-    // console.log(this.frmArr.at(i)['controls'][fld]);
-    // this.refresh();
+  calcMei(i: number):void {
+    const lcmoney:number = this.frmArr.controls[i].value.suu * this.frmArr.controls[i].value.tanka;
+    const lctaxrate:number = +this.frmArr.getRawValue()[i]['taxrate'] / 100;
+    let lctaxmoney:number=0;
+    let lctinmoney:number=0;
+    switch (this.frmArr.getRawValue()[i]['mtax']) {
+      case '0' :
+        lctaxmoney = Math.round(lcmoney * lctaxrate);
+        lctinmoney = lcmoney + lctaxmoney;
+      　break;
+      case '1' :
+        lctaxmoney = Math.round(lcmoney * (1 + lctaxrate));
+        lctinmoney = lcmoney;
+      　break;
+      case '2' :
+        lctaxmoney=0;
+        lctinmoney = lcmoney;
+      　break;     
+    }  
+    this.frmArr.controls[i].patchValue({
+      money:lcmoney,
+      taxmoney:lctaxmoney,
+      tinmoney:lctinmoney
+    });
+
+  }
+  changeTax(i : number,value:number){
+    if (this.frmArr.getRawValue()[i]['mtax']=="0") {
+      const lcmoney:number = this.frmArr.controls[i].value.suu * this.frmArr.controls[i].value.tanka;
+      this.frmArr.controls[i].patchValue({tinmoney:(lcmoney + value)});  
+    }    
   }
   get frmArr():FormArray {    
     return this.parentForm.get('mtbl') as FormArray;
@@ -348,18 +425,17 @@ export class JmeitblComponent implements OnInit {
     }
     rowData.forEach(row => {
       let col=row.split("\t");
-      console.log(col,row);
+      // console.log(col,row);
       if(col[0]!=""){
         let jmei:mwI.Jyumei= {
             line:i,
-            day:this.parentForm.get('day').value,
             sday:null,
             souko:this.parentForm.get('souko').value,
             gcode:col[0],
             gtext:'',
             suu:+col[1],
             unit:null,
-            teika:0,
+            tanka1:0,
             tanka:(col[2] ?? +col[2]),
             money:0,
             mtax:null,
@@ -446,4 +522,23 @@ export class JmeitblComponent implements OnInit {
       return index;
     }
   }
+  getKkrt(i : number):number {
+    const lcteika:number = +this.frmArr.getRawValue()[i]['tanka1'];
+    const lctanka:number = +this.frmArr.getRawValue()[i]['tanka'];
+    const lctaxrate:number = +this.frmArr.getRawValue()[i]['taxrate']/100;
+    switch (this.frmArr.getRawValue()[i]['mtax']) {
+      case '0' :
+        return ((lctanka * (1 + lctaxrate)) / lcteika);
+      　break;
+      case '1' :
+        return (lctanka/ lcteika); 
+      　break;
+      case '2' :
+        return ((lctanka * (1 + lctaxrate)) / lcteika);
+      　break;     
+    }    
+
+  }
+
+
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, ViewChildren, QueryList, HostListener, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, ViewChildren, QueryList, HostListener, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 
 import { Title } from '@angular/platform-browser';
@@ -29,7 +29,7 @@ import { AddressComponent } from './../share/address/address.component';
   encapsulation : ViewEncapsulation.None,
   changeDetection:ChangeDetectionStrategy.OnPush
 })
-export class MstmemberComponent implements OnInit {
+export class MstmemberComponent implements OnInit, AfterViewInit {
   @ViewChildren( AddressComponent)
     private children: QueryList<AddressComponent>;
   form: FormGroup;
@@ -102,15 +102,22 @@ export class MstmemberComponent implements OnInit {
       mail3: new FormControl('', Validators.email),
       mail4: new FormControl('', Validators.email),
       mail5: new FormControl('', Validators.email), 
+      mtgt1: new FormControl(''),
+      mtgt2: new FormControl(''),
+      mtgt3: new FormControl(''),
+      mtgt4: new FormControl(''),
+      mtgt5: new FormControl(''),
     }));
-    this.memsrv.get_members().then(result => {
-      this.overlayRef.detach();      
-    });
-
     this.bunsrv.get_bunrui();
     // this.stfsrv.get_staff();
     this.okrsrv.get_hokuri();
     this.bnssrv.get_bunsho();
+
+  }
+  ngAfterViewInit():void{ //子コンポーネント読み込み後に走る
+    this.memsrv.get_members().then(result => {
+      this.overlayRef.detach();      
+    });
     this.route.paramMap.subscribe((params: ParamMap)=>{
       if (params.get('mode') === null){
         this.mode = 3;
@@ -119,6 +126,7 @@ export class MstmemberComponent implements OnInit {
       } 
       if (params.get('mcd') === null){
         // this.mcd = '読込中です！';
+        this.refresh();
       }else{
         //１件分だけ先に読込
         this.mcd = +params.get('mcd');
@@ -128,19 +136,14 @@ export class MstmemberComponent implements OnInit {
     });
   }
 
-  // ngAfterViewInit(): void{
-  //   setTimeout(() => {
-  //     this.refresh();
-  //   });
-  // }
-
   diaBetsu():void {
     if( this.checkMcode(this.mcd) ){
       let dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
       dialogConfig.data = {
-        mcode: this.mcd +'(' + this.form.get('base').get('sei').value + ')',
-        mode: this.mode
+        mcode: this.mcd +'(' + this.memsrv.get_mcdtxt(this.mcd) + ')',
+        mode: this.mode,
+        flg: false
       };
       let dialogRef = this.dialog.open(AdredaComponent, dialogConfig);
     }
@@ -160,20 +163,21 @@ export class MstmemberComponent implements OnInit {
         if(typeof data != 'undefined'){
           this.mcd = data.mcode;
         }
-        this.refresh();
+        this.get_member(+this.mcd);
       }
     );
   }
 
   refresh():void {
-    if( this.checkMcode(this.mcd) ){
-      this.get_member(+this.mcd);
-    }
+    // if( this.checkMcode(this.mcd) ){
+    //   this.get_member(+this.mcd);
+    // }
     if(this.mode==3){
       this.form.disable();
     }else{
       this.form.enable();
     }
+    this.cdRef.detectChanges();
   }
 
   checkMcode(mcode:number):boolean {
@@ -204,7 +208,7 @@ export class MstmemberComponent implements OnInit {
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
-    if(mcode>0){
+    if(this.checkMcode(mcode)){
       this.apollo.watchQuery<any>({
         query: Query.GetMast1, 
           variables: { 
@@ -256,6 +260,7 @@ export class MstmemberComponent implements OnInit {
           }
           this.mcd=mcode;
           this.overlayRef.detach();
+          this.refresh();
           // console.log("get_member");
           this.cdRef.detectChanges();
           history.replaceState('','','./mstmember/' + this.mode + '/' + this.mcd);
@@ -333,6 +338,7 @@ export class MstmemberComponent implements OnInit {
   cancel():void {
     if(this.mode==1){
       this.mcd=0;
+      this.form.reset();
     }1
     this.mode=3;
     this.form.disable();
@@ -374,6 +380,11 @@ export class MstmemberComponent implements OnInit {
       ntype: this.usrsrv.editFrmval(this.form.get('base'),'ntype'),
       tntype: this.usrsrv.editFrmval(this.form.get('base'),'tntype'),
       webid: this.usrsrv.editFrmval(this.form.get('base'),'webid'),
+      mtgt1: this.usrsrv.editFrmval(this.form.get('base'),'mtgt1'),
+      mtgt2: this.usrsrv.editFrmval(this.form.get('base'),'mtgt2'),
+      mtgt3: this.usrsrv.editFrmval(this.form.get('base'),'mtgt3'),
+      mtgt4: this.usrsrv.editFrmval(this.form.get('base'),'mtgt4'),
+      mtgt5: this.usrsrv.editFrmval(this.form.get('base'),'mtgt5'),
       updated_at:new Date(),
       updated_by:this.usrsrv.staff.code
     }

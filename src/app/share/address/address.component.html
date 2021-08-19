@@ -1,5 +1,6 @@
 <form formGroupName="{{formName}}" ngNativeValidate ybAddress #address="ybAddress" fxLayout="row wrap" div
     fxLayoutGap="7px">
+    <mat-checkbox *ngIf="formName !== 'addr'" formControlName="target">ＤＭ一括送信対象</mat-checkbox>
     <mat-form-field>
         <mat-label>郵便番号(ハイフンなし)</mat-label>
         <input tabIndex="101" matInput formControlName="zip" ybPostalCode [required]="this.formName!='addr1'" size="7"
@@ -50,16 +51,16 @@
         <input tabIndex="111" matInput formControlName="adrname" [required]="this.formName!='addr1'">
     </mat-form-field>
     <mat-checkbox formControlName="del">削除済</mat-checkbox>
-    <div fxLafxLayout="row wrap" fxLayoutGap="5px">
-        <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;">
+    <div fxLafxLayout="row wrap" style="width: 100%;">
+        <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;margin-top:5px;">
             <mat-label>納品先備考</mat-label>
             <textarea matInput formControlName="adrbikou" matTextareaAutosize></textarea>
         </mat-form-field>
-        <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;">
+        <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;margin-top:5px;">
             <mat-label>納品先社内向け備考</mat-label>
             <textarea matInput formControlName="adrinbikou" matTextareaAutosize></textarea>
         </mat-form-field>
-        <mat-form-field style="width:100%;">
+        <mat-form-field style="width:100%;margin-top:5px;">
             <mat-label>送り状備考</mat-label>
             <textarea matInput formControlName="adrokrbko" matTextareaAutosize></textarea>
         </mat-form-field>
