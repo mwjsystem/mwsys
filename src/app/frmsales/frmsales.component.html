@@ -48,11 +48,11 @@
 </mat-toolbar>
 <form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($event)">
   <mat-card>
-    <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
+    <mat-card-header fxLayout="row wrap" fxLayoutGap="5px">
       <mat-card-title>
         {{mode|modetxt}}基本情報
       </mat-card-title>
-      <mat-form-field>
+      <mat-form-field >
         <mat-label>受注伝票ステータス</mat-label>
         <mat-select [value]="form.value.jdstatus" disabled>
           <mat-option *ngFor="let sval of bunsrv.jdstatus" [value]="sval.value">
@@ -60,7 +60,7 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field *ngIf="form.value.skbn != 1">
         <mat-label>受注伝票出荷ステータス</mat-label>
         <mat-select [value]="form.value.jdshsta" disabled>
           <mat-option *ngFor="let sval of bunsrv.jdshsta" [value]="sval.value">
@@ -68,6 +68,7 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
+      <mat-checkbox formControlName="torikbn">掛請求</mat-checkbox>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
     <mat-card-content fxLayout="row wrap">
@@ -298,12 +299,13 @@
     </mat-expansion-panel-header>
     <div fxLayout="row wrap">
       <div fxLayout="column">
-        <div class="mat-form-field mat-form-field-infix">
-          <mat-checkbox formControlName="torikbn">掛請求</mat-checkbox>
-        </div>
         <mat-form-field>
           <mat-label>受注先伝票番号</mat-label>
           <input matInput formControlName="cusden">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>領収書宛名</mat-label>
+          <input matInput formControlName="ryoate">
         </mat-form-field>
         <mat-form-field>
           <mat-label>代引き金額</mat-label>

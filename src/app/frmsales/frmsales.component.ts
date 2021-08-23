@@ -115,6 +115,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       torikbn: new FormControl(''),
       cusden: new FormControl(''),
       daibiki: new FormControl(''),
+      ryoate: new FormControl(''),
       daibunrui: new FormControl(''),
       chubunrui: new FormControl(''),
       shobunrui: new FormControl(''),

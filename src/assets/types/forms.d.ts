@@ -64,6 +64,7 @@ declare namespace mwI {
     updated_by:string;
     jdstatus:string;
     jdshsta:string;
+    ryoate:string;
   }
   interface Jyumei {
     line:number;

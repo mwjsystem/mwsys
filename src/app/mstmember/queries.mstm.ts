@@ -79,6 +79,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     ntype
     tntype
     webid
+    ryoate
     mtgt1
     mtgt2
     mtgt3

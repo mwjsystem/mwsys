@@ -150,6 +150,7 @@ declare namespace mwI {
     ntype:number;
     tntype:number;
     webid:string;
+    ryoate:string;
     mtgt1:boolean;
     mtgt2:boolean;
     mtgt3:boolean;

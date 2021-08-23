@@ -194,6 +194,7 @@ query get_jyuden($id: smallint!,$dno: Int!) {
     updated_at
     updated_by
     daibiki
+    ryoate
     trjyumeis(order_by: {line: asc}) {
       line
       sday
