@@ -6,6 +6,16 @@
         bottom: 0;
     }
 }
+::ng-deep.mat-form-field input:disabled {
+  color: black;
+}
+::ng-deep.mat-form-field select:disabled {
+  color: black;
+}
+// Add in style.scss as we are overriding css of global mat-select class which is part of other module.
+::ng-deep.mat-form-field .mat-select-disabled .mat-select-value {
+  color: black;
+}
 .RouterOutlet {
     padding-top: 35px;
 }

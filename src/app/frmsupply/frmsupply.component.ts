@@ -117,6 +117,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
             ) 
             this.denno = +params.get('denno');
             this.form.get('tcode').setValue(this.usrsrv.staff?.code);
+            this.form.get('autoproc').setValue(true);
         }else{
           this.mode = +params.get('mode');
           if (params.get('denno') !== null){

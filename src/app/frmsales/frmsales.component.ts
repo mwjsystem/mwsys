@@ -339,17 +339,19 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   changeEda(eda:number){
-    let i:number = this.edasrv.adrs.findIndex(obj => obj.eda == eda);
-    // console.log(eda,this.edasrv.adrs);
-    if( i > -1 ){
-      const adr = this.edasrv.adrs[i];
-      this.form.get('nbikou').setValue(adr.nbikou);
-      this.form.get('sbikou').setValue(adr.sbikou);
-      this.form.get('obikou').setValue(adr.obikou);
-      this.jmisrv.address = adr.zip + '\n' + adr.region + adr.local + '\n' +  adr.street + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
-    } else {
-      this.toastr.info("別納品先枝番" + eda + "は登録されていません");      
-    }  
+    if (eda!==null){
+      let i:number = this.edasrv.adrs.findIndex(obj => obj.eda == eda);
+      // console.log(eda,this.edasrv.adrs);
+      if( i > -1 ){
+        const adr = this.edasrv.adrs[i];
+        this.form.get('nbikou').setValue(adr.nbikou);
+        this.form.get('sbikou').setValue(adr.sbikou);
+        this.form.get('obikou').setValue(adr.obikou);
+        this.jmisrv.address = adr.zip + '\n' + adr.region + adr.local + '\n' +  adr.street + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
+      } else {
+        this.toastr.info("別納品先枝番" + eda + "は登録されていません");      
+      }  
+    }
   }
 
   get_member(mcode:number,flg:boolean){

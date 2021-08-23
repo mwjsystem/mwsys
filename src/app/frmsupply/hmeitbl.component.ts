@@ -25,6 +25,7 @@ export class HmeitblComponent implements OnInit {
   private el: HTMLInputElement;
   dataSource = new MatTableDataSource();
   copyToClipboard: string;
+  navCli=navigator.clipboard;
   yday:Date;
   displayedColumns = ['chk',
                       'line',
@@ -243,15 +244,25 @@ export class HmeitblComponent implements OnInit {
   frmVal(i:number,fld:string):string {
     return this.frmArr.getRawValue()[i][fld];
   }
-
-  pasteData(event: ClipboardEvent,flg:boolean) {
-    let clipboardData = event.clipboardData;
-    let pastedText = clipboardData.getData("text");
-    let rowData = pastedText.split("\n");
-    this.insRows(rowData,flg);
-    this.parentForm.markAsDirty();
-    // console.log(rowData);
+  pasteFromClipboard(flg:boolean){
+    // if(navigator.clipboard){
+    navigator.clipboard.readText()
+    .then((text) => {
+      console.log(text);
+        let rowData = text.split("\n");
+        this.insRows(rowData,flg);
+        this.parentForm.markAsDirty();
+    });
+    // }
   }
+  // pasteData(event: ClipboardEvent,flg:boolean) {
+  //   let clipboardData = event.clipboardData;
+  //   let pastedText = clipboardData.getData("text");
+  //   let rowData = pastedText.split("\n");
+  //   this.insRows(rowData,flg);
+  //   this.parentForm.markAsDirty();
+  //   // console.log(rowData);
+  // }
   insRows(rowData,flg:boolean){
     let i:number=0;
     if(flg){

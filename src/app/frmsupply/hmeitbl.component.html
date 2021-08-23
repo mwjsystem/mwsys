@@ -7,17 +7,14 @@
     </mat-form-field>
     <button mat-flat-button color="primary" (click)="setYday('1')" *ngIf="frmArr.enabled">暫定一括設定</button>
     <button mat-flat-button color="warn" (click)="setYday('0')" *ngIf="frmArr.enabled">確定一括設定</button>
-    <button mat-flat-button [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()"
-        color="accent">クリップボードにコピー</button>
-    <mat-form-field appearance="outline" floatLabel="always" style="width:5em;" *ngIf="frmArr.enabled">
-        <mat-label>明細洗替</mat-label>
-        <input matInput (paste)="pasteData($event,true)" style="opacity: 0;">
-    </mat-form-field>
-    <mat-form-field appearance="outline" floatLabel="always" style="width:6em;" *ngIf="frmArr.enabled">
-        <mat-label>末尾に追加</mat-label>
-        <input matInput (paste)="pasteData($event,false)" style="opacity: 0;">
-    </mat-form-field>
-    <span *ngIf="frmArr.enabled">←ここにExcel等から貼付([ctrl]ｷｰ＋[v]) １列目：商品ｺｰﾄﾞ、2列目：数量</span>
+    <button mat-flat-button color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
+    <mat-menu #cnp="matMenu">
+      <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
+      <button mat-menu-item (click)="pasteFromClipboard(true)"
+        *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(明細洗替)</button>
+      <button mat-menu-item (click)="pasteFromClipboard(false)"
+        *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(末尾に追加)</button>
+    </mat-menu>
 </div>
 <div class="mat-elevation-z8">
     <ng-container [formGroup]="parentForm">

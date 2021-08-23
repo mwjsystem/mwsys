@@ -208,7 +208,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
-    if(this.checkMcode(mcode)){
+    // if(this.checkMcode(mcode)){
       this.apollo.watchQuery<any>({
         query: Query.GetMast1, 
           variables: { 
@@ -273,7 +273,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         history.replaceState('','','./mstmember');
         this.overlayRef.detach();
       });
-    }
+    // }
   }
   updKana(value: string){
     let val:string =this.usrsrv.convKana(value);

@@ -79,8 +79,7 @@ export class GcdhelpComponent implements OnInit {
       size
       color
       jan
-      irisu
-      iriunit
+      unit
       gskbn
       tkbn
       zkbn
