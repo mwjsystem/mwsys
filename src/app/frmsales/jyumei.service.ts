@@ -15,6 +15,7 @@ export class JyumeiService {
   // public souko:string;
   public ntype:number;
   public tntype:number;
+  public address:string="";
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
   constructor(private usrsrv: UserService,

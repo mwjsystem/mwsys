@@ -86,7 +86,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       webid: new FormControl(''),
       del: new FormControl(''),
       bikou: new FormControl(''),
-      inbikou: new FormControl(''),      
+      // inbikou: new FormControl(''),      
     // }));
     // this.form.addControl('kake', new FormGroup({
       torikbn: new FormControl(''),
@@ -219,13 +219,14 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       .valueChanges
       .subscribe(({ data }) => {
         this.form.reset();
+        // console.log(mcode,data);
         if (data.msmember_by_pk == null){
           this.toastr.warning("顧客コード" + mcode + "は登録されていません");
           history.replaceState('','','./mstmember');
         } else {
           let member:mwI.Member=data.msmember_by_pk;
           this.form.get('base').patchValue(member);
-          this.form.get('base').patchValue({bikou:member.msmadrs[0].adrbikou,inbikou:member.msmadrs[0].adrinbikou});
+          // this.form.get('base').patchValue({bikou:member.msmadrs[0].adrbikou,inbikou:member.msmadrs[0].adrinbikou});
           // this.form.get('kake').patchValue(member);
           // this.form.get('mail').patchValue(member);
           this.usrsrv.setTmstmp(member); 
@@ -233,8 +234,8 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
           this.edasrv.edas=[];
           this.edasrv.adrs=[];
           for (let j=0;j<member.msmadrs.length;j++){
+            this.edasrv.adrs.push(member.msmadrs[j]);
             if (member.msmadrs[j].eda > 1){
-              this.edasrv.adrs.push(member.msmadrs[j]);
               this.edasrv.edas.push({
                 eda:member.msmadrs[j].eda,
                 zip:member.msmadrs[j].zip,
@@ -365,7 +366,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       inday: this.usrsrv.editFrmval(this.form.get('base'),'inday'),
       scode: this.usrsrv.editFrmval(this.form.get('base'),'scode'),
       bikou: this.usrsrv.editFrmval(this.form.get('base'),'bikou'),
-      inbikou: this.usrsrv.editFrmval(this.form.get('base'),'inbikou'),
+      // inbikou: this.usrsrv.editFrmval(this.form.get('base'),'inbikou'),
       pcode: this.usrsrv.editFrmval(this.form.get('base'),'pcode'),
       hcode: this.usrsrv.editFrmval(this.form.get('base'),'hcode'),
       mtax: this.usrsrv.editFrmval(this.form.get('base'),'mtax'),

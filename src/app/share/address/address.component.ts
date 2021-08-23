@@ -39,9 +39,9 @@ export class AddressComponent implements OnInit {
         fax: new FormControl(''),
         tel2: new FormControl(''),
         tel3: new FormControl(''),
-        adrbikou: new FormControl(''),
-        adrinbikou: new FormControl(''),
-        adrokrbko: new FormControl(''),
+        nbikou: new FormControl(''),
+        sbikou: new FormControl(''),
+        obikou: new FormControl(''),
         del: new FormControl(''),
         target: new FormControl('')
       }));
@@ -91,9 +91,9 @@ export class AddressComponent implements OnInit {
       tel3:this.usrsrv.editFrmval(form.get(this.formName),'tel3'),
       extend2:this.usrsrv.editFrmval(form.get(this.formName),'extend2'),
       adrname:this.usrsrv.editFrmval(form.get(this.formName),'adrname'),
-      adrbikou:this.usrsrv.editFrmval(form.get(this.formName),'adrbikou'),
-      adrinbikou:this.usrsrv.editFrmval(form.get(this.formName),'adrinbikou'),
-      adrokrbko:this.usrsrv.editFrmval(form.get(this.formName),'adrokrbko'),
+      nbikou:this.usrsrv.editFrmval(form.get(this.formName),'nbikou'),
+      sbikou:this.usrsrv.editFrmval(form.get(this.formName),'sbikou'),
+      obikou:this.usrsrv.editFrmval(form.get(this.formName),'obikou'),
       del:this.usrsrv.editFrmval(form.get(this.formName),'del'),
       ftel:this.usrsrv.editFtel(form.get(this.formName),'tel','fax','tel2','tel3'),
       target:this.usrsrv.editFrmval(form.get(this.formName),'target')

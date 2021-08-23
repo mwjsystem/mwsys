@@ -43,15 +43,16 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void{
-    if(this.edasrv.adrs.length>0 && this.eda == null ){
-      // console.log(this.edasrv);
-      this.eda=this.edasrv.adrs[0].eda;
-    } else {
-      // this.mode=1;
+    let i:number = this.edasrv.adrs.findIndex(obj => obj.eda > 1);
+    
+    // console.log(i);
+    if(i > -1 && ( this.eda == null || this.eda =='' ) ){
+      this.eda=this.edasrv.adrs[i].eda;
+    } else if ( this.eda == null ) {
       this.form.reset();
-      // this.form.enable();
-      // this.eda="新規登録";
+      // this.cdRef.detectChanges();
     } 
+    // console.log(this.eda);
     this.refresh();
   }
 
@@ -69,6 +70,11 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     this.form.enable();
     this.edaOld=+this.eda;
     this.eda="新規登録";
+    const bikou={nbikou:this.edasrv.adrs[0].nbikou,
+                 sbikou:this.edasrv.adrs[0].sbikou,
+                 obikou:this.edasrv.adrs[0].obikou};
+    this.form.get('addr').patchValue(bikou);
+
     // let tmp=this.edasrv.adrs[this.edasrv.adrs.length-1].eda;
     // if(tmp>9){
     //   this.eda=tmp + 1;
@@ -108,7 +114,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
 
   setPrev(){
     let i:number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
-    if(i > 0 ){
+    if(i > 0 && this.edasrv.adrs[i].eda > 10){
       this.eda = this.edasrv.adrs[i-1].eda;
     }
     this.refresh();
@@ -116,6 +122,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
 
   refresh():void {
     let i:number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
+    // console.log(i,this.eda);
     if(i > -1 ){
       let adrs:mwI.Adrs=this.edasrv.adrs[i];
       // console.log(adrs,this.form.get('addr'));
@@ -151,12 +158,13 @@ export class AdredaComponent implements OnInit, AfterViewInit {
 
   getInvalid():string{
     let tooltip:string="";
-    const ctrls=this.form.controls;
+    const ctrls=(this.form.controls['addr'] as FormGroup).controls;
+    // console.log('addr',ctrls);
   　for (const name in ctrls){
       if(ctrls[name].invalid){
+        // console.log('addr',name);
         tooltip += this.usrsrv.getColtxt('msmadr',name) + '⇒' + this.usrsrv.getValiderr(ctrls[name].errors) + '\n' ;
         // invalid.push(name + '_' + ctrls1[name].invalid);
-        // console.log('addr1',name);
       }
     }
     // console.log(tooltip);

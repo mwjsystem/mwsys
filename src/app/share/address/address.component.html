@@ -46,23 +46,23 @@
         <mat-label>FAX番号</mat-label>
         <input tabIndex="108" matInput formControlName="fax" (change)="updTel('fax',$event.target.value)">
     </mat-form-field>
-    <mat-form-field style="width:20em" *ngIf="formName !== 'addr0'">
+    <mat-form-field style="width:20em">
         <mat-label>住所宛名</mat-label>
         <input tabIndex="111" matInput formControlName="adrname" [required]="this.formName!='addr1'">
     </mat-form-field>
     <mat-checkbox formControlName="del">削除済</mat-checkbox>
     <div fxLafxLayout="row wrap" style="width: 100%;">
-        <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;margin-top:5px;">
-            <mat-label>納品先備考</mat-label>
-            <textarea matInput formControlName="adrbikou" matTextareaAutosize></textarea>
+        <mat-form-field class="txtar">
+            <mat-label>納品書備考</mat-label>
+            <textarea matInput formControlName="nbikou" matTextareaAutosize></textarea>
         </mat-form-field>
-        <mat-form-field *ngIf="formName !== 'addr0'" style="width:100%;margin-top:5px;">
-            <mat-label>納品先社内向け備考</mat-label>
-            <textarea matInput formControlName="adrinbikou" matTextareaAutosize></textarea>
+        <mat-form-field class="txtar">
+            <mat-label>出荷指示書備考</mat-label>
+            <textarea matInput formControlName="sbikou" matTextareaAutosize></textarea>
         </mat-form-field>
-        <mat-form-field style="width:100%;margin-top:5px;">
+        <mat-form-field class="txtar">
             <mat-label>送り状備考</mat-label>
-            <textarea matInput formControlName="adrokrbko" matTextareaAutosize></textarea>
+            <textarea matInput formControlName="obikou" matTextareaAutosize></textarea>
         </mat-form-field>
     </div>
 </form>

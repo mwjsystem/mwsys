@@ -107,8 +107,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       jcode: new FormControl('', Validators.required),
       pcode: new FormControl('', Validators.required),
       skbn: new FormControl('', Validators.required),
-      dbikou: new FormControl(''),
+      bikou: new FormControl(''),
       nbikou: new FormControl(''),
+      sbikou: new FormControl(''),
       obikou: new FormControl(''),
       inbikou: new FormControl(''),
       torikbn: new FormControl(''),
@@ -186,6 +187,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       this.form.get('nadr').setValue('');
     } else {
       this.form.get('nadr').setValue(+value); 
+      this.changeEda(+value);
     }
   }
 
@@ -336,6 +338,20 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.get_member(lcmcode,true);
   }
 
+  changeEda(eda:number){
+    let i:number = this.edasrv.adrs.findIndex(obj => obj.eda == eda);
+    // console.log(eda,this.edasrv.adrs);
+    if( i > -1 ){
+      const adr = this.edasrv.adrs[i];
+      this.form.get('nbikou').setValue(adr.nbikou);
+      this.form.get('sbikou').setValue(adr.sbikou);
+      this.form.get('obikou').setValue(adr.obikou);
+      this.jmisrv.address = adr.zip + '\n' + adr.region + adr.local + '\n' +  adr.street + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
+    } else {
+      this.toastr.info("別納品先枝番" + eda + "は登録されていません");      
+    }  
+  }
+
   get_member(mcode:number,flg:boolean){
     this.apollo.watchQuery<any>({
       query: Query.GetMember, 
@@ -353,9 +369,6 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         if(flg){
           this.form.patchValue(member);
         }
-        this.form.get('dbikou').setValue(member.msmadrs[0].adrinbikou);
-        this.form.get('inbikou').setValue(member.msmadrs[0].adrinbikou);
-        this.form.get('obikou').setValue(member.msmadrs[0].adrokrbko);
         this.jmisrv.mtax=member.mtax;
         this.jmisrv.tankakbn=member.tankakbn;
         this.jmisrv.sptnkbn=member.sptnkbn;
@@ -366,9 +379,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         this.edasrv.mcode = mcode ;
         this.edasrv.edas=[];
         this.edasrv.adrs=[];
-        for (let j=0;j<msmadrs.length;j++){
+        for (let j=0;j<msmadrs.length;j++){          
+          this.edasrv.adrs.push(msmadrs[j]);
           if (msmadrs[j].eda > 1){
-            this.edasrv.adrs.push(msmadrs[j]);
             this.edasrv.edas.push({
               eda:msmadrs[j].eda,
               zip:msmadrs[j].zip,
@@ -382,6 +395,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             });
           }
         }
+        this.changeEda(this.form.value.nadr);
         this.cdRef.detectChanges();
       }
     },(error) => {
@@ -389,44 +403,13 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // get_madr(mcode:number){
-  //   this.apollo.watchQuery<any>({
-  //     query: Query.GetMadr, 
-  //       variables: { 
-  //         id : this.usrsrv.compid,
-  //         mcode: mcode
-  //       },
-  //   })
-  //   .valueChanges
-  //   .subscribe(({ data }) => {
-  //     if (data.msmadr.length == 0){
-
-  //     } else {
-  //       let msmadrs:mwI.Adrs[]=data.msmadr;
-  //       this.edasrv.mcode = mcode ;
-  //       this.edasrv.edas=[];
-  //       this.edasrv.adrs=[];
-  //       for (let j=0;j<msmadrs.length;j++){
-  //         if (msmadrs[j].eda > 1){
-  //           this.edasrv.adrs.push(msmadrs[j]);
-  //           this.edasrv.edas.push({
-  //             eda:msmadrs[j].eda,
-  //             zip:msmadrs[j].zip,
-  //             region:msmadrs[j].region,
-  //             local:msmadrs[j].local,
-  //             street:msmadrs[j].street,
-  //             extend:msmadrs[j].extend,
-  //             extend2:msmadrs[j].extend2,
-  //             adrname:msmadrs[j].adrname,
-  //             tel:this.mcdsrv.set_tel(msmadrs[j].tel,msmadrs[j].tel2,msmadrs[j].tel3,msmadrs[j].fax)
-  //           });
-  //         }
-  //       }
-  //     }
-  //   },(error) => {
-  //     console.log('error query get_msmadr', error);
-  //   });
-  // }
+　canEnter(e:KeyboardEvent):void{
+    let element = e.target as HTMLElement;
+    // console.log(element,element.tagName);
+    if(element.tagName !=='TEXTAREA'){
+      e.preventDefault();
+    }
+  }
 
   diaBetsu():void {
     let ncd:number=this.form.value.ncode;
@@ -446,7 +429,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             // console.log(data);
             if(typeof data != 'undefined' && this.mode!=3){
               this.form.get('nadr').setValue(data);
-              this.get_member(this.mode,false);
+              this.changeEda(data);
             }
         }
       );

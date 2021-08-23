@@ -46,7 +46,7 @@
       </a></button>
   </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="$event.preventDefault()">
+<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($event)">
   <mat-card>
     <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
       <mat-card-title>
@@ -122,9 +122,9 @@
               <mat-option value="2">別納</mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field style="width: 3em;">
+          <mat-form-field style="width: 3em;" *ngIf="form.value.nsaki=='2'">
             <mat-label>別納先枝番</mat-label>
-            <input matInput formControlName="nadr" required>
+            <input matInput formControlName="nadr" required  (change)="changeEda($event.target.value)">
           </mat-form-field>
           <button mat-button (click)="diaBetsu()" *ngIf="form.value.nsaki=='2'">
             <mat-icon>local_shipping</mat-icon>
@@ -273,20 +273,20 @@
         </mat-form-field>
       </div>
       <div fxLafxLayout="row wrap" fxLayoutGap="5px">
-        <mat-form-field style="width: 100%;">
+        <mat-form-field class="txtar">
           <mat-label>伝票備考</mat-label>
-          <textarea matInput formControlName="dbikou" matTextareaAutosize></textarea>
+          <textarea matInput formControlName="bikou" matTextareaAutosize></textarea>
         </mat-form-field>
-        <mat-form-field style="width: 100%;">
+        <mat-form-field class="txtar">
           <mat-label>納品書備考</mat-label>
           <textarea matInput formControlName="nbikou" matTextareaAutosize></textarea>
         </mat-form-field>
-        <mat-form-field style="width: 100%;">
+        <mat-form-field class="txtar">
           <mat-label>送り状備考</mat-label>
           <textarea matInput formControlName="obikou" matTextareaAutosize></textarea>
         </mat-form-field>
-        <mat-form-field style="width: 100%;">
-          <mat-label>社内向け備考</mat-label>
+        <mat-form-field class="txtar">
+          <mat-label>出荷指示書備考</mat-label>
           <textarea matInput formControlName="inbikou" matTextareaAutosize></textarea>
         </mat-form-field>
       </div>
@@ -386,6 +386,10 @@
           </mat-select>
         </mat-form-field>
       </div>
+      <mat-form-field>
+        <mat-label>納品先住所</mat-label>
+        <textarea matInput [value]="jmisrv.address" matTextareaAutosize disabled></textarea>
+      </mat-form-field>      
       <qr-code [value]="qrurl" [size]="100"></qr-code>
     </div>
   </mat-expansion-panel>

@@ -139,8 +139,8 @@
                 <td mat-cell *matCellDef="let row">{{row.torikbn}}</td>
             </ng-container> -->
             <ng-container matColumnDef="mcode">
-                <th mat-header-cell *matHeaderCellDef>受注顧客コード</th>
-                <td mat-cell *matCellDef="let row">{{row.mcode}}</td>
+                <th mat-header-cell *matHeaderCellDef>受注顧客</th>
+                <td mat-cell *matCellDef="let row">{{row.mcode | mcdtxt}}</td>
             </ng-container>
             <ng-container matColumnDef="scode">
                 <th mat-header-cell *matHeaderCellDef>請求先顧客コード</th>

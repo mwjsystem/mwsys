@@ -63,6 +63,9 @@
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
         <span class="ybtxt">{{form.value.day | jdate}}</span>
+        <div class="mat-form-field mat-form-field-infix">
+          <mat-checkbox formControlName="autoproc">自動仕入処理</mat-checkbox>
+        </div>
         <mat-form-field style="width: 10em;">
           <mat-label>仕入先</mat-label>
           <input tabIndex="2" matInput formControlName="vcode" required (keydown.f4)="vcdHelp('vcode')"
@@ -111,11 +114,11 @@
         </mat-form-field>
       </div>
       <div fxLafxLayout="row wrap" fxLayoutGap="5px">
-        <mat-form-field style="width: 100%;">
+        <mat-form-field class="txtar">
           <mat-label>伝票備考</mat-label>
           <textarea matInput formControlName="dbiko" matTextareaAutosize></textarea>
         </mat-form-field>
-        <mat-form-field style="width: 100%;">
+        <mat-form-field class="txtar">
           <mat-label>社内向け備考</mat-label>
           <textarea matInput formControlName="inbiko" matTextareaAutosize></textarea>
         </mat-form-field>

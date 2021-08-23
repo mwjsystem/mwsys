@@ -108,9 +108,9 @@ declare namespace mwI {
     fax:string;
     tel2:string;
     tel3:string;
-    adrbikou:string;
-    adrinbikou:string;
-    adrokrbko:string;
+    nbikou:string;
+    sbikou:string;
+    obikou:string;
     del:boolean;
     target:boolean;
   }
@@ -130,8 +130,6 @@ declare namespace mwI {
     site:string;
     inday:number;
     scode:number;
-    bikou:string;
-    inbikou:string;
     pcode:string;
     hcode:string;
     mtax:string;
@@ -139,6 +137,7 @@ declare namespace mwI {
     tcode1:string;
     tcode:string;
     del:boolean;
+    bikou:string;
     sptnkbn:string;
     daibunuri:string;
     chubunrui:string;

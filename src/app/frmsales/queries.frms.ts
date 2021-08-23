@@ -59,6 +59,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     tcode1
     tcode
     del
+    bikou
     sptnkbn
     daibunrui
     chubunrui
@@ -78,9 +79,9 @@ query get_member($id: smallint!,$mcode:Int!) {
       tel3
       extend2
       adrname
-      adrbikou
-      adrinbikou
-      adrokrbko
+      nbikou
+      sbikou
+      obikou
       del
     } 
     msmstits {
@@ -149,14 +150,14 @@ query get_jyuden($id: smallint!,$dno: Int!) {
     souko
     tcode
     bunsho
-    dbikou
+    bikou
     nbikou
+    sbikou
     obikou
     keep
     okurisuu
     okurino
     cusden
-    inbikou
     gtotal
     souryou
     tesuu

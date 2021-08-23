@@ -66,6 +66,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     tcode1
     tcode
     del
+    bikou
     sptnkbn
     daibunrui
     chubunrui
@@ -96,9 +97,9 @@ query get_member($id: smallint!,$mcode:Int!) {
       tel3
       extend2
       adrname
-      adrbikou
-      adrinbikou
-      adrokrbko
+      nbikou
+      sbikou
+      obikou
       del
       target
     }    

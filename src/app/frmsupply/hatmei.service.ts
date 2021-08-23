@@ -19,6 +19,7 @@ export class HatmeiService {
         day
         soko
         tcode
+        autoproc
         gtotal
         ttotal
         jdenno
