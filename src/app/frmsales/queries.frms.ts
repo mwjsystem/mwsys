@@ -66,6 +66,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     shobunrui
     ntype
     tntype
+    ryoate
     msmadrs {
       eda
       zip
