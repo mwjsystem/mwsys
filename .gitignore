@@ -46,5 +46,3 @@ testem.log
 Thumbs.db
 
 /documentation
-
-/asset/postgresql-12.8-1-windows-x64.exe

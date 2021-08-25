@@ -79,46 +79,92 @@ export class JmeitblComponent implements OnInit {
   }
 
   calcTot(){
-    let lcgtotal:number=0;
-    let lcsouryou:number=0;
-    let lctesuu:number=0;
-    let lcnebiki:number=0;
-    let lcttotal:number=0;
-    let lctax:number=0;
-    let lcsyoukei:number=0;
+    // let lcgtotal:number=0;
+    // let lcsouryou:number=0;
+    // let lctesuu:number=0;
+    // let lcnebiki:number=0;
+    // let lcttotal:number=0;
+    // let lctax:number=0;
+    // let lcsyoukei:number=0;
     let lctotal:number=0;
-    let lcuttotal:number=0;
-    let lcutax:number=0;
-    let lchttotal:number=0;
+    // let lcuttotal:number=0;
+    // let lcutax:number=0;
+    // let lchttotal:number=0;
     let lcgtotalzn:number=0;
     let lcsouryouzn:number=0;
     let lctesuuzn:number=0;
     let lcnebikizn:number=0;
     let lctaxtotal:number=0;
     let lcgenka:number=0;
-    let lchgenka:number=0;
-    let lcegenka:number=0;
+    // let lchgenka:number=0;
+    // let lcegenka:number=0;
 
     this.frmArr.controls
       .forEach(control => {
-        // if(control.value.gcode!==''){
-        //   const lcmoney:number = control.value.genka * control.value.suu;
-        //   control.patchValue({money:lcmoney});
-        //   lcgtotal += lcmoney;
-        //   if(control.value.mtax=='0'){
-        //     lcttotal += lcmoney;
-        //     lctax += (lcmoney * +control.value.taxrate / 100)
-        //     // console.log(lctax);
-        //   }
-        // }
+        switch (control.value.gkbn) {
+          case '0' :
+            lcgtotalzn += control.value.tinmoney;
+          　break;
+          case '1' :
+            lcsouryouzn += control.value.tinmoney;
+          　break;
+          case '2' :
+            lctesuuzn += control.value.tinmoney;
+          　break;     
+          case '3' :
+            lcnebikizn += control.value.tinmoney;
+          　break;     
+        }
+        lctaxtotal += control.value.taxmoney; 
+        lcgenka += control.value.genka;
       })
-    // this.parentForm.patchValue({gtotal:lcgtotal,ttotal:lcttotal,tax:lctax,total:lcgtotal + lctax});
+    lctotal =  lcgtotalzn + lcsouryouzn + lctesuuzn + lcnebikizn + lctaxtotal;
+    this.parentForm.patchValue({gtotalzn:lcgtotalzn,
+                                souryouzn:lcsouryouzn,
+                                tesuuzn:lctesuuzn,
+                                nebikizn:lcnebikizn,
+                                taxtotal:lctaxtotal,
+                                total:lctotal,
+                                genka:lcgenka});
     this.jmisrv.subject.next(true);
     this.jmisrv.subject.complete();
     this.refresh();
     // console.log(this.frmArr,this.parentForm);
   }
+  calcMei(i: number):void {
+    const lcmoney:number = this.frmArr.controls[i].value.tanka * this.frmArr.controls[i].value.suu;
+    const lctaxrate:number = +this.frmArr.getRawValue()[i]['taxrate'] / 100;
+    let lctaxmoney:number=0;
+    let lctoutmoney:number=0;
+    let lctinmoney:number=0;
+    let lcgenka:number=0;
+    switch (this.frmArr.getRawValue()[i]['mtax']) {
+      case '0' :
+        lctaxmoney = Math.round(this.frmArr.controls[i].value.tanka * lctaxrate) * this.frmArr.controls[i].value.suu;
+        lctoutmoney = lcmoney;  
+        lctinmoney = lcmoney + lctaxmoney;
+      　break;
+      case '1' :
+        lctaxmoney = Math.floor(this.frmArr.controls[i].value.tanka * (1 + lctaxrate)) * this.frmArr.controls[i].value.suu;
+        lctinmoney = lcmoney;
+        lctoutmoney = lcmoney - lctaxmoney;  
+      　break;
+      case '2' :
+        lctaxmoney=0;
+        lctoutmoney = lcmoney;
+        lctinmoney = lcmoney;
+      　break;     
+    }
+    lcgenka = this.frmArr.controls[i].value.genka * this.frmArr.controls[i].value.suu;
+    this.frmArr.controls[i].patchValue({
+      money:lcmoney,
+      genka:lcgenka,
+      taxmoney:lctaxmoney,
+      toutmoney:lctoutmoney,
+      tinmoney:lctinmoney
+    });
 
+  }
   setAll(chked:boolean){
     this.frmArr.controls
       .forEach(control => {
@@ -334,9 +380,9 @@ export class JmeitblComponent implements OnInit {
           let lcgenka:number=0;
           // console.log(msgds.msgtankas[0].genka);
           if(msgds.msgtankas[0].currency=="USD"){
-            lcgenka = Math.round(msgds.msgtankas[0].genka * this.usrsrv.system.currate);
+            lcgenka = Math.round((msgds.msgtankas[0].genka + msgds.msgtankas[0].cost) * this.usrsrv.system.currate);
           }else{
-            lcgenka = msgds.msgtankas[0].genka;
+            lcgenka = msgds.msgtankas[0].genka + msgds.msgtankas[0].cost;
           }
           let j:number = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn );
           if(j>-1){
@@ -365,32 +411,6 @@ export class JmeitblComponent implements OnInit {
       });
   } 
 
-  calcMei(i: number):void {
-    const lcmoney:number = this.frmArr.controls[i].value.suu * this.frmArr.controls[i].value.tanka;
-    const lctaxrate:number = +this.frmArr.getRawValue()[i]['taxrate'] / 100;
-    let lctaxmoney:number=0;
-    let lctinmoney:number=0;
-    switch (this.frmArr.getRawValue()[i]['mtax']) {
-      case '0' :
-        lctaxmoney = Math.round(lcmoney * lctaxrate);
-        lctinmoney = lcmoney + lctaxmoney;
-      　break;
-      case '1' :
-        lctaxmoney = Math.round(lcmoney * (1 + lctaxrate));
-        lctinmoney = lcmoney;
-      　break;
-      case '2' :
-        lctaxmoney=0;
-        lctinmoney = lcmoney;
-      　break;     
-    }  
-    this.frmArr.controls[i].patchValue({
-      money:lcmoney,
-      taxmoney:lctaxmoney,
-      tinmoney:lctinmoney
-    });
-
-  }
   changeTax(i : number,value:number){
     if (this.frmArr.getRawValue()[i]['mtax']=="0") {
       const lcmoney:number = this.frmArr.controls[i].value.suu * this.frmArr.controls[i].value.tanka;
