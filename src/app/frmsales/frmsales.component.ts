@@ -120,15 +120,18 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       chubunrui: new FormControl(''),
       shobunrui: new FormControl(''),
       tcode1: new FormControl(''),
-      gtotal: new FormControl(''),
-      souryou: new FormControl(''),
-      tesuu: new FormControl(''),
-      nebiki: new FormControl(''),
+      gtotalzn: new FormControl(''),
+      souryouzn: new FormControl(''),
+      tesuuzn: new FormControl(''),
+      nebikizn: new FormControl(''),
       taxtotal: new FormControl(''),
-      syoukei: new FormControl(''),
       total: new FormControl(''),
+      // ttotal: new FormControl(''),
       jdstatus: new FormControl(''),
       jdshsta: new FormControl(''),
+      genka: new FormControl(''),
+      hgenka: new FormControl(''),
+      egenka: new FormControl(''),
       mtbl: this.rows 
     });
     // this.memsrv.get_members().then(result => {
@@ -249,45 +252,78 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
     if(this.jmisrv.denno>0){
-      this.apollo.watchQuery<any>({
-        query: Query.GetJyuden, 
-          variables: { 
-            id : this.usrsrv.compid,
-            dno: denno
-          },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        this.form.reset();
-        this.jmisrv.jyumei=[];
-        if (data.trjyuden_by_pk == null){
-          this.toastr.info("受注伝票番号" + denno + "は登録されていません");
-          history.replaceState('','','./frmsales');
-        } else {
-          let jyuden:mwI.Jyuden=data.trjyuden_by_pk;
-          if(jyuden.nadr>1){
-            this.form.get('nsaki').setValue("2");
-          } else { 
-            this.form.get('nsaki').setValue(jyuden.nadr.toString());  
+      this.jmisrv.qry_jyuden(denno).subscribe(
+        result => {
+           this.form.reset();
+          this.jmisrv.jyumei=[];
+          if (result == null){
+            this.toastr.info("受注伝票番号" + denno + "は登録されていません");
+            history.replaceState('','','./frmsales');
+          } else {
+            let jyuden:mwI.Trjyuden=result;
+            if(jyuden.nadr>1){
+              this.form.get('nsaki').setValue("2");
+            } else { 
+              this.form.get('nsaki').setValue(jyuden.nadr.toString());  
+            }
+            this.form.patchValue(jyuden);
+            this.jmisrv.edit_jyumei(jyuden.trjyumeis);
+            this.jmeitbl.set_jyumei();
+            this.usrsrv.setTmstmp(jyuden);
+            this.jmisrv.denno=denno;
+            this.get_member(+jyuden.mcode,false);
+            this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
+            history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
           }
-          this.form.patchValue(jyuden);
-          this.jmisrv.edit_jyumei(data.trjyuden_by_pk.trjyumeis);
-          this.jmeitbl.set_jyumei();
-          this.usrsrv.setTmstmp(jyuden);
-          this.jmisrv.denno=denno;
-          this.get_member(+jyuden.mcode,false);
-          this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
-          history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
+          this.refresh();
+          this.overlayRef.detach();
+        },error => {
+          console.log('error query GetJyuden', error);
+          this.toastr.info("受注伝票読込エラー");
+          this.form.reset();
+          history.replaceState('','','./frmsales');
+          this.overlayRef.detach();
         }
-        this.refresh();
-        this.overlayRef.detach();
-      },(error) => {
-        console.log('error query GetJyuden', error);
-        this.toastr.info("受注伝票読込エラー");
-        this.form.reset();
-        history.replaceState('','','./frmsales');
-        this.overlayRef.detach();
-      });
+      );
+      // this.apollo.watchQuery<any>({
+      //   query: Query.GetJyuden, 
+      //     variables: { 
+      //       id : this.usrsrv.compid,
+      //       dno: denno
+      //     },
+      // })
+      // .valueChanges      
+      // .subscribe(({ data }) => {
+      //   this.form.reset();
+      //   this.jmisrv.jyumei=[];
+      //   if (data.trjyuden_by_pk == null){
+      //     this.toastr.info("受注伝票番号" + denno + "は登録されていません");
+      //     history.replaceState('','','./frmsales');
+      //   } else {
+      //     let jyuden:mwI.Jyuden=data.trjyuden_by_pk;
+      //     if(jyuden.nadr>1){
+      //       this.form.get('nsaki').setValue("2");
+      //     } else { 
+      //       this.form.get('nsaki').setValue(jyuden.nadr.toString());  
+      //     }
+      //     this.form.patchValue(jyuden);
+      //     this.jmisrv.edit_jyumei(data.trjyuden_by_pk.trjyumeis);
+      //     this.jmeitbl.set_jyumei();
+      //     this.usrsrv.setTmstmp(jyuden);
+      //     this.jmisrv.denno=denno;
+      //     this.get_member(+jyuden.mcode,false);
+      //     this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
+      //     history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
+      //   }
+      //   this.refresh();
+      //   this.overlayRef.detach();
+      // },(error) => {
+      //   console.log('error query GetJyuden', error);
+      //   this.toastr.info("受注伝票読込エラー");
+      //   this.form.reset();
+      //   history.replaceState('','','./frmsales');
+      //   this.overlayRef.detach();
+      // });
     }
     this.overlayRef.detach();
     this.cdRef.detectChanges();
@@ -462,6 +498,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.form.get('souko').setValue("01");
     // this.jmisrv.souko="01";
     this.form.get('skbn').setValue("1");
+    this.form.get('tcode').setValue(this.usrsrv.staff?.code);
     this.jmeitbl.frmArr.clear(); 
     this.refresh(); 
     this.jmeitbl.add_rows(1);
@@ -506,15 +543,103 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     return tooltip;
   }
 
-  save():void {
-
+  async save() {
     
+    let jyuden:any={
+      day: this.usrsrv.editFrmval(this.form,'day'),
+      yday: this.usrsrv.editFrmval(this.form,'yday'),
+      sday: this.usrsrv.editFrmval(this.form,'sday'),
+      uday: this.usrsrv.editFrmval(this.form,'uday'),
+      nday: this.usrsrv.editFrmval(this.form,'nday'),
+      hday: this.usrsrv.editFrmval(this.form,'hday'),
+      htime: this.usrsrv.editFrmval(this.form,'htime'),
+      hcode: this.usrsrv.editFrmval(this.form,'hcode'),
+      ncode: this.usrsrv.editFrmval(this.form,'ncode'),
+      nadr: this.usrsrv.editFrmval(this.form,'nadr'),
+      souko: this.usrsrv.editFrmval(this.form,'souko'),
+      tcode: this.usrsrv.editFrmval(this.form,'tcode'),
+      bunsho: this.usrsrv.editFrmval(this.form,'bunsho'),
+      bikou: this.usrsrv.editFrmval(this.form,'bikou'),
+      nbikou: this.usrsrv.editFrmval(this.form,'nbikou'),
+      sbikou: this.usrsrv.editFrmval(this.form,'sbikou'),
+      obikou: this.usrsrv.editFrmval(this.form,'obikou'),
+      keep: this.usrsrv.editFrmval(this.form,'keep'),
+      okurisuu: this.usrsrv.editFrmval(this.form,'okurisuu'),
+      okurino: this.usrsrv.editFrmval(this.form,'okurino'),
+      cusden: this.usrsrv.editFrmval(this.form,'cusden'),
+      inbikou: this.usrsrv.editFrmval(this.form,'inbikou'),
+      // gtotal: this.usrsrv.editFrmval(this.form,'gtotal'),
+      // souryou: this.usrsrv.editFrmval(this.form,'souryou'),
+      // tesuu: this.usrsrv.editFrmval(this.form,'tesuu'),
+      // nebiki: this.usrsrv.editFrmval(this.form,'nebiki'),
+      // ttotal: this.usrsrv.editFrmval(this.form,'ttotal'),
+      // tax: this.usrsrv.editFrmval(this.form,'tax'),
+      // syoukei: this.usrsrv.editFrmval(this.form,'syoukei'),
+      total: this.usrsrv.editFrmval(this.form,'total'),
+      okurinusi: this.usrsrv.editFrmval(this.form,'okurinusi'),
+      skbn: this.usrsrv.editFrmval(this.form,'skbn'),
+      // uttotal: this.usrsrv.editFrmval(this.form,'uttotal'),
+      // utax: this.usrsrv.editFrmval(this.form,'utax'),
+      // httotal: this.usrsrv.editFrmval(this.form,'httotal'),
+      gtotalzn: this.usrsrv.editFrmval(this.form,'gtotalzn'),
+      souryouzn: this.usrsrv.editFrmval(this.form,'souryouzn'),
+      tesuuzn: this.usrsrv.editFrmval(this.form,'tesuuzn'),
+      nebikizn: this.usrsrv.editFrmval(this.form,'nebikizn'),
+      taxtotal: this.usrsrv.editFrmval(this.form,'taxtotal'),
+      genka: this.usrsrv.editFrmval(this.form,'genka'),
+      hgenka: this.usrsrv.editFrmval(this.form,'hgenka'),
+      egenka: this.usrsrv.editFrmval(this.form,'egenka'),
+      torikbn: this.usrsrv.editFrmval(this.form,'torikbn'),
+      mcode: this.usrsrv.editFrmval(this.form,'mcode'),
+      scode: this.usrsrv.editFrmval(this.form,'scode'),
+      jcode: this.usrsrv.editFrmval(this.form,'jcode'),
+      pcode: this.usrsrv.editFrmval(this.form,'pcode'),
+      daibunrui: this.usrsrv.editFrmval(this.form,'daibunrui'),
+      chubunrui: this.usrsrv.editFrmval(this.form,'chubunrui'),
+      shobunrui: this.usrsrv.editFrmval(this.form,'shobunrui'),
+      tcode1: this.usrsrv.editFrmval(this.form,'tcode1'),
+      del: this.usrsrv.editFrmval(this.form,'del'),
+      daibiki: this.usrsrv.editFrmval(this.form,'daibiki'),
+      ryoate: this.usrsrv.editFrmval(this.form,'ryoate'),
+      updated_at:new Date(),
+      updated_by:this.usrsrv.staff.code
+    }
 
-
-
-
-
-    
+    if(this.mode==2){ 
+      let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno);     
+      this.jmisrv.upd_jyuden(this.jmisrv.denno,{...jyuden,jdstatus:this.jmisrv.get_jdsta(jyumei)},jyumei)
+      .then(result => {
+        this.toastr.success('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
+        this.form.markAsPristine();
+        this.cancel();
+       }).catch(error => {
+        this.toastr.error('データベースエラー','受注伝票' + this.jmisrv.denno + 'の変更保存ができませんでした',
+                          {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+        console.log('error update_jyuen', error);
+      });
+    }else{//新規登録
+      this.jmisrv.denno = await this.jmisrv.get_denno();
+      const jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno);
+      const trjyuden:mwI.Trjyuden[] = [{
+        ...{ id: this.usrsrv.compid,
+             denno: this.jmisrv.denno,
+             created_at:new Date(),
+             created_by:this.usrsrv.staff.code,
+             jdstatus:this.jmisrv.get_jdsta(jyumei)}
+        ,...jyuden,
+      }]
+      this.jmisrv.ins_jyuden(trjyuden,jyumei)
+      .then(result => {
+        console.log('insert_trjyu',result);
+        this.toastr.success('受注伝票' + this.jmisrv.denno + 'を新規登録しました');
+        this.form.markAsPristine();
+        this.cancel();
+       }).catch(error => {
+        this.toastr.error('データベースエラー','受注伝票の新規登録ができませんでした',
+                          {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+        console.log('error insert_jyuden', error);
+      });
+    } 
   }  
   
   shouldConfirmOnBeforeunload():boolean {

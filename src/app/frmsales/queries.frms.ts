@@ -238,27 +238,27 @@ query get_jyuden($id: smallint!,$dno: Int!) {
   }
 }`;
 
-export const InsertMast1 = gql`
-mutation ins_member($object: [msmember_insert_input!]!) {
-  insert_msmember(objects: $object) {
-    affected_rows
-  }
-}`;
-export const InsertMast2 = gql`
-mutation ins_madr($object: [msmadr_insert_input!]!) {
-  insert_msmadr(objects: $object) {
-    affected_rows
-  }
-}`;
-export const UpdateMast1 = gql`
-mutation upd_member($id: smallint!, $mcode: Int!,$_set: msmember_set_input!) {
-  update_msmember(where: {id: {_eq: $id},mcode: {_eq:$mcode}}, _set: $_set)  {
-    affected_rows
-  }
-}`;
-export const UpdateMast2 = gql`
-mutation upd_madr($id: smallint!, $mcode: Int!, $eda: Int!,$_set: msmadr_set_input!) {
-  update_msmadr(where: {id: {_eq: $id},mcode: {_eq:$mcode},eda: {_eq:$eda}}, _set: $_set)  {
-    affected_rows
-  }
-}`;
+// export const InsertMast1 = gql`
+// mutation ins_member($object: [msmember_insert_input!]!) {
+//   insert_msmember(objects: $object) {
+//     affected_rows
+//   }
+// }`;
+// export const InsertMast2 = gql`
+// mutation ins_madr($object: [msmadr_insert_input!]!) {
+//   insert_msmadr(objects: $object) {
+//     affected_rows
+//   }
+// }`;
+// export const UpdateMast1 = gql`
+// mutation upd_member($id: smallint!, $mcode: Int!,$_set: msmember_set_input!) {
+//   update_msmember(where: {id: {_eq: $id},mcode: {_eq:$mcode}}, _set: $_set)  {
+//     affected_rows
+//   }
+// }`;
+// export const UpdateMast2 = gql`
+// mutation upd_madr($id: smallint!, $mcode: Int!, $eda: Int!,$_set: msmadr_set_input!) {
+//   update_msmadr(where: {id: {_eq: $id},mcode: {_eq:$mcode},eda: {_eq:$eda}}, _set: $_set)  {
+//     affected_rows
+//   }
+// }`;

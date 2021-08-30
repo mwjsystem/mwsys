@@ -143,9 +143,9 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   }
 
   get_ggroup(grpcd:string){   
-    if (!this.overlayRef) {
+    // if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    }
+    // }
     if( grpcd ){
       grpcd=this.usrsrv.convUpper(grpcd);
       this.apollo.watchQuery<any>({
@@ -349,41 +349,6 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
                           {closeButton: true,disableTimeOut: true,tapToDismiss: false});
         console.log('error update_msggroup', error);
       });
- 
-        // if(upd.length>0){
-        //   this.apollo.mutate<any>({
-        //     mutation: Query.UpdateMast2,
-        //     variables: {
-        //       id: this.usrsrv.compid,
-        //       grpcd: this.gdssrv.grpcd,
-        //       "_set": upd
-        //     },
-        //   }).subscribe(({ data }) => {
-
-        //   },(error) => {
-        //     this.toastr.error('データベースエラー','商品グループ' + this.gdssrv.grpcd + 'の変更保存ができませんでした',
-        //                       {closeButton: true,disableTimeOut: true,tapToDismiss: false});
-        //     console.log('error update_msgoods', error);            
-        //   });
-        // } 
-        // if(ins.length>0){
-        //   this.apollo.mutate<any>({
-        //     mutation: Query.InsertMast2,
-        //     variables: {
-        //       object: ins
-        //     },
-        //   }).subscribe(({ data }) => {
-
-        //   },(error) => {
-        //     this.toastr.error('データベースエラー','商品グループ' + this.gdssrv.grpcd + 'の変更保存ができませんでした',
-        //                       {closeButton: true,disableTimeOut: true,tapToDismiss: false});
-        //     console.log('error insert_msgoods', error);            
-
-        //   });        
-        // }                
-
-
-      // console.log(this.form.get('mtbl'));
     }else{//新規登録
       ggroup.created_at = ggroup.updated_at;
       ggroup.created_by = this.usrsrv.staff.code;    

@@ -86,7 +86,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="suu">
-        <th mat-header-cell *matHeaderCellDef>数量</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">数量</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
             <input type="number" [tabIndex]="hidx + i * mcols + 2" matInput formControlName="suu" class="i_num" (change)="calcMei(getIdx(i))">
@@ -103,13 +103,13 @@
       </ng-container>
 
       <ng-container matColumnDef="rate">
-        <th mat-header-cell *matHeaderCellDef>掛率</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">掛率</th>
         <td mat-cell *matCellDef="let row; let i =index">
           {{ getKkrt(getIdx(i)) | percent }}
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka">
-        <th mat-header-cell *matHeaderCellDef>単価</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">単価</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
             <input matInput numInput [tabIndex]="hidx + i * mcols + 3" formControlName="tanka" class="i_num" (change)="calcMei(getIdx(i))">
@@ -117,7 +117,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="money">
-        <th mat-header-cell *matHeaderCellDef>金額</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">金額</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
             <input matInput [value]="frmVal(getIdx(i),'money') | number" class="i_num" disabled>
@@ -155,7 +155,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="zaiko">
-        <th mat-header-cell *matHeaderCellDef>在庫数</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">在庫数</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
             <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['zaiko'] | number" class="i_num" disabled>
@@ -163,7 +163,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="jyuzan">
-        <th mat-header-cell *matHeaderCellDef>受注残</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">受注残</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
             <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['jyuzan'] | number" class="i_num" disabled>
@@ -171,7 +171,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka1">
-        <th mat-header-cell *matHeaderCellDef>定価</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">定価</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
             <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['tanka1'] | number" class="i_num" disabled>
@@ -191,7 +191,7 @@
         </td>
       </ng-container>     
       <ng-container matColumnDef="taxmoney">
-        <th mat-header-cell *matHeaderCellDef>消費税金額</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">消費税金額</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)" (change)="changeTax(getIdx(i),$event.target.value)">
           <mat-form-field style="width:6em;">
             <input matInput formControlName="taxmoney" numInput class="i_num">
@@ -199,7 +199,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="genka">
-        <th mat-header-cell *matHeaderCellDef>原価</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">原価</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
             <input matInput formControlName="genka" class="i_num">
@@ -240,7 +240,7 @@
       </td>
     </ng-container> -->
       <ng-container matColumnDef="tinmoney">
-        <th mat-header-cell *matHeaderCellDef>税込み金額</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">税込み金額</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
             <input matInput [value]="frmVal(getIdx(i),'tinmoney') | number" disabled class="i_num">
@@ -260,7 +260,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="taxrate">
-        <th mat-header-cell *matHeaderCellDef>消費税率</th>
+        <th mat-header-cell *matHeaderCellDef class="i_num">消費税率</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
             <mat-select #msel3 formControlName="taxrate" required (keydown.enter)="msel3.close()" class="i_num">

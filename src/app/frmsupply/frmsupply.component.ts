@@ -150,7 +150,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
             this.form.patchValue(hatden);
             this.form.patchValue(hatden.msvendor[0]);
             this.usrsrv.setTmstmp(hatden);
-            this.hmisrv.hatmei=result.trhatmeis;
+            this.hmisrv.hatmei=hatden.trhatmeis;
             this.hmeitbl.set_hatmei();
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             this.denno=denno;
@@ -341,7 +341,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       this.hmisrv.ins_hatden(trhatden,hatmei)
       .then(result => {
         console.log('insert_trhat',result);
-        this.toastr.success('発注伝票' + this.denno + 'の変更を保存しました');
+        this.toastr.success('発注伝票' + this.denno + 'を新規登録しました');
         this.form.markAsPristine();
         this.cancel();
        }).catch(error => {

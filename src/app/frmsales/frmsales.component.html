@@ -52,7 +52,7 @@
       <mat-card-title>
         {{mode|modetxt}}基本情報
       </mat-card-title>
-      <mat-form-field >
+      <mat-form-field>
         <mat-label>受注伝票ステータス</mat-label>
         <mat-select [value]="form.value.jdstatus" disabled>
           <mat-option *ngFor="let sval of bunsrv.jdstatus" [value]="sval.value">
@@ -125,7 +125,7 @@
           </mat-form-field>
           <mat-form-field style="width: 3em;" *ngIf="form.value.nsaki=='2'">
             <mat-label>別納先枝番</mat-label>
-            <input matInput formControlName="nadr" required  (change)="changeEda($event.target.value)">
+            <input matInput formControlName="nadr" required (change)="changeEda($event.target.value)">
           </mat-form-field>
           <button mat-button (click)="diaBetsu()" *ngIf="form.value.nsaki=='2'">
             <mat-icon>local_shipping</mat-icon>
@@ -391,7 +391,7 @@
       <mat-form-field>
         <mat-label>納品先住所</mat-label>
         <textarea matInput [value]="jmisrv.address" matTextareaAutosize disabled></textarea>
-      </mat-form-field>      
+      </mat-form-field>
       <qr-code [value]="qrurl" [size]="100"></qr-code>
     </div>
   </mat-expansion-panel>
@@ -400,33 +400,62 @@
       <mat-card-title>
         受注明細
       </mat-card-title>
-      <mat-form-field style="width:6em;">
+      <mat-form-field style="width:6em;" class="i_num">
         <mat-label>商品計</mat-label>
-        <input matInput [value]="form.value.gtotal | number" class="i_num" disabled>
+        <input matInput [value]="form.value.gtotalzn | number" class="i_num" disabled>
       </mat-form-field>
-      <mat-form-field style="width:6em;">
+      <mat-form-field style="width:6em;" class="i_num">
         <mat-label>送料計</mat-label>
-        <input matInput [value]="form.value.souryou | number" class="i_num" disabled>
+        <input matInput [value]="form.value.souryouzn | number" class="i_num" disabled>
       </mat-form-field>
-      <mat-form-field style="width:6em;">
+      <mat-form-field style="width:6em;" class="i_num">
         <mat-label>手数料</mat-label>
-        <input matInput [value]="form.value.tesuu | number" class="i_num" disabled>
+        <input matInput [value]="form.value.tesuuzn | number" class="i_num" disabled>
       </mat-form-field>
-      <mat-form-field style="width:6em;">
+      <mat-form-field style="width:6em;" class="i_num">
         <mat-label>値引計</mat-label>
-        <input matInput [value]="form.value.nebiki | number" class="i_num" disabled>
+        <input matInput [value]="form.value.nebikizn | number" class="i_num" disabled>
       </mat-form-field>
-      <mat-form-field style="width:6em;">
-        <mat-label>小計</mat-label>
-        <input matInput [value]="form.value.syoukei | number" class="i_num" disabled>
-      </mat-form-field>
-      <mat-form-field style="width:6em;">
+        <mat-form-field style="width:6em;" class="i_num fw_b">
+          <mat-label>税抜合計額</mat-label>
+          <input matInput #sumTotal
+            [value]="+form.value.gtotalzn + +form.value.souryouzn + +form.value.tesuuzn + +form.value.nebikizn | number"
+            class="i_num" disabled>
+        </mat-form-field>
+      <mat-form-field style="width:6em;" class="i_num">
         <mat-label>消費税</mat-label>
         <input matInput [value]="form.value.taxtotal | number" class="i_num" disabled>
       </mat-form-field>
-      <mat-form-field style="width:6em;">
+      <mat-form-field style="width:6em;" class="i_num fw_b">
         <mat-label>税込合計額</mat-label>
-        <input matInput [value]="form.value.syoukei | number" class="i_num" disabled>
+        <input matInput [value]="form.value.total | number" class="i_num" disabled>
+      </mat-form-field>
+      <mat-form-field style="width:6em;" class="i_num">
+        <mat-label>商品原価</mat-label>
+        <input matInput [value]="form.value.genka | number" class="i_num" disabled>
+      </mat-form-field>
+      <mat-form-field style="width:6em;" class="i_num">
+        <mat-label>配送原価</mat-label>
+        <input matInput numInput formControlName="hgenka" class="i_num">
+      </mat-form-field>
+      <mat-form-field style="width:6em;" class="i_num">
+        <mat-label>その他原価</mat-label>
+        <input matInput numInput formControlName="egenka" class="i_num">
+      </mat-form-field>
+      <mat-form-field style="width:6em;" class="i_num fw_b">
+        <mat-label>原価計</mat-label>
+        <input matInput #sumGenka [value]="+form.value.genka + +form.value.hgenka + +form.value.egenka | number"
+          class="i_num" disabled>
+      </mat-form-field>
+      <mat-form-field style="width:6em;" class="i_num fw_b">
+        <mat-label>粗利</mat-label>
+        <input matInput #arari [value]="usrsrv.convNumber(sumTotal.value) - usrsrv.convNumber(sumGenka.value) | number"
+          class="i_num" disabled>
+      </mat-form-field>
+      <mat-form-field style="width:6em;" class="i_num fw_b">
+        <mat-label>粗利率</mat-label>
+        <input matInput [value]="usrsrv.convNumber(arari.value) / usrsrv.convNumber(sumTotal.value) | percent"
+          class="i_num" disabled>
       </mat-form-field>
     </mat-card-header>
     <mat-card-content>
