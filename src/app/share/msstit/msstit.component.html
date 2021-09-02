@@ -1,0 +1,27 @@
+<mat-toolbar color="primary" class="toolbar" style="width:77%;">
+    <div class="icon-area" fxLayout="row wrap">
+      <button mat-button (click)="modeToCre()">
+        <mat-icon>add_box</mat-icon>
+        新規
+      </button>
+      <button mat-button (click)="modeToUpd()" *ngIf="mode==3">
+        <mat-icon>edit</mat-icon>
+        編集
+      </button>
+      <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
+        <span class="material-icons">save</span>
+        保存
+      </button>
+      <button mat-button (click)="cancel()" *ngIf="mode!=3">
+        <span class="material-icons">cancel</span>
+        中止
+      </button>
+    </div>
+</mat-toolbar>
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>{{mcode}} 刺繍データ</h1>
+
+<mat-dialog-content>
+</mat-dialog-content>    
+<mat-dialog-actions>
+    <button class="mat-raised-button" (click)="close()">閉じる</button>
+</mat-dialog-actions>

@@ -16,7 +16,6 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     ordering
     send
     gskbn
-    zkbn
     msgtankas(limit:1,where: {day: {_lt: $day}}, order_by: {day: desc_nulls_last}) {
       cost
       currency
@@ -54,6 +53,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     scode
     pcode
     hcode
+    jcode
     mtax
     sscode
     tcode1

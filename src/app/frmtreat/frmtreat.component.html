@@ -45,7 +45,7 @@
             <th mat-header-cell *matHeaderCellDef style="width:5em">タイプ</th>
             <td mat-cell *matCellDef="let row; let i = index">
                 <mat-select [(ngModel)]="row.trttype" disabled>
-                    <mat-option *ngFor="let sval of bunsrv.trttype" [value]="sval.value">
+                    <mat-option *ngFor="let sval of bunsrv.kbn.trttype" [value]="sval.value">
                     {{sval.viewval}}
                     </mat-option>
                 </mat-select>
@@ -55,7 +55,7 @@
             <th mat-header-cell *matHeaderCellDef style="width:8em">ジャンル</th>
             <td mat-cell *matCellDef="let row; let i = index">
                 <mat-select [(ngModel)]="row.genre" disabled>
-                    <mat-option *ngFor="let sval of bunsrv.genre" [value]="sval.value">
+                    <mat-option *ngFor="let sval of bunsrv.kbn.genre" [value]="sval.value">
                     {{sval.viewval}}
                     </mat-option>
                 </mat-select>

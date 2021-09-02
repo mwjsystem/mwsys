@@ -96,7 +96,7 @@ export class AddressComponent implements OnInit {
       obikou:this.usrsrv.editFrmval(form.get(this.formName),'obikou'),
       del:this.usrsrv.editFrmval(form.get(this.formName),'del'),
       ftel:this.usrsrv.editFtel(form.get(this.formName),'tel','fax','tel2','tel3'),
-      target:this.usrsrv.editFrmval(form.get(this.formName),'target')
+      target:Boolean(form.get(this.formName).value.target)
     }
     if(mode==2){      
       this.apollo.mutate<any>({

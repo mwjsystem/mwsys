@@ -43,8 +43,7 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
       gtext
       tkbn
       weight
-      zkbn
-      msgtankas(order_by: {day: desc}) {
+      msgtankas(limit:1,order_by: {day: desc}) {
         day
         tanka1
         tanka2
@@ -101,7 +100,6 @@ mutation upd_ggroup($id: smallint!, $grpcd: String!,$_set: msggroup_set_input!,$
     weight,
     unit,
     tkbn,
-    zkbn,
     gtext,
     max,
     send,

@@ -61,6 +61,7 @@ query get_member($id: smallint!,$mcode:Int!) {
     scode
     pcode
     hcode
+    jcode
     mtax
     sscode
     tcode1

@@ -47,7 +47,7 @@
       <mat-form-field>
         <mat-label>発注伝票ステータス</mat-label>
         <mat-select [value]="form.getRawValue().hdstatus" disabled>
-          <mat-option *ngFor="let sval of bunsrv.hdstatus" [value]="sval.value">
+          <mat-option *ngFor="let sval of bunsrv.kbn.hdstatus" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
         </mat-select>
@@ -100,7 +100,7 @@
         <mat-form-field style="width: 5em;">
           <mat-label>仕入先ﾏｽﾀ税区分</mat-label>
           <mat-select #msel2 formControlName="mtax" required (keydown.enter)="msel2.close()">
-            <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.mtax" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>

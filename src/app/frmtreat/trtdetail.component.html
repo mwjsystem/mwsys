@@ -37,7 +37,7 @@
   <mat-form-field>
     <mat-label>ジャンル</mat-label>
     <mat-select  formControlName="genre">
-      <mat-option *ngFor="let sval of bunsrv.genre" [value]="sval.value">
+      <mat-option *ngFor="let sval of bunsrv.kbn.genre" [value]="sval.value">
       {{sval.viewval}}
       </mat-option>
     </mat-select>
@@ -45,7 +45,7 @@
   <mat-form-field>
     <mat-label>タイプ</mat-label>
     <mat-select  formControlName="trttype">
-      <mat-option *ngFor="let sval of bunsrv.trttype" [value]="sval.value">
+      <mat-option *ngFor="let sval of bunsrv.kbn.trttype" [value]="sval.value">
       {{sval.viewval}}
       </mat-option>
     </mat-select>

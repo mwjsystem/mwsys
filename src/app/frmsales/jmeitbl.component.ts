@@ -180,13 +180,16 @@ export class JmeitblComponent implements OnInit {
     let calc:{ [key: string]: number; } = {};
     let sour:{ [key: string]: number; } = {};
     let kogu:number = 0;
+    let mall:number = 0;
     this.frmArr.controls.forEach(control => {
       // console.log(control.value.gcode,i);
-      if(!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02')){
+      if(!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02') || control.value.gcode=='MALL'){
         forDel.push(i);
         // console.log(control.value.gcode,i);
       } else if (control.value.zkbn=='0'){
-        if(control.value.koguchi){
+        if (/^CB.*SV$/.test(control.value.gcode)){
+          mall += +control.value.suu;
+        }else if (control.value.koguchi){
           if (sour[control.value.send]>0){
             sour[control.value.send] += +control.value.suu; 
           } else{
@@ -206,12 +209,13 @@ export class JmeitblComponent implements OnInit {
     forDel.reverse().forEach(fordel => {
       this.frmArr.removeAt(fordel);
     })
-    console.log(calc,sour);
+    
     let j:number = this.edasrv.adrs.findIndex(obj => obj.eda == this.parentForm.value.nadr);
     let sufi:string="";
-    if(this.edasrv.adrs[j].region=='北海道'){
+    // console.log(this.edasrv.adrs,j);
+    if(!this.edasrv.adrs[j].region.indexOf('北海道')){
       sufi='-01';
-    } else if (this.edasrv.adrs[j].region=='沖縄県'){
+    } else if (!this.edasrv.adrs[j].region.indexOf('沖縄県')){
       sufi='-47';
     }
     for (let kbn in calc) {
@@ -231,10 +235,12 @@ export class JmeitblComponent implements OnInit {
       }
       this.insRows([lcgcd + "\t" + sour[kbn]],false);
     }
-    if( this.parentForm.value.pcode=='9'){
+    if (this.parentForm.value.pcode=='9') {
       this.insRows(["Z02" + "\t" + "1"],false);
     }
-
+    if (mall > 0){
+      this.insRows(["MALL" + "\t" + mall],false);
+    }
     this.auto_fil();
     this.parentForm.get('okurisuu').setValue(kogu);
   }
@@ -332,7 +338,7 @@ export class JmeitblComponent implements OnInit {
       taxrate:[jyumei?.taxrate],
       code:[jyumei?.code],
       gkbn:[jyumei?.gkbn],
-      zkbn:[jyumei?.zkbn],
+      // zkbn:[jyumei?.zkbn],
       spdet:[jyumei?.spdet],
       ordering:[jyumei?.ordering],
       vcode:[jyumei?.vcode],
@@ -385,7 +391,7 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue({souko:this.parentForm.value.souko});
           let lctanka:number=0;
           let lcgenka:number=0;
-          console.log(value,msgds);
+          // console.log(value,msgds);
           if(msgds.msgtankas[0].currency=="USD"){
             lcgenka = Math.round((msgds.msgtankas[0].genka + msgds.msgtankas[0].cost) * this.usrsrv.system.currate);
           }else{
@@ -481,7 +487,7 @@ export class JmeitblComponent implements OnInit {
             currency:null,
             code:null,
             gkbn:null,
-            zkbn:null,
+            gskbn:null,
             spdet:null,
             ordering:null,
             vcode:null,

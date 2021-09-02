@@ -1,6 +1,6 @@
 <mat-toolbar color="primary" class="toolbar" style="width:77%;">
   <div class="icon-area" fxLayout="row wrap">
-    <button mat-button (click)="modeToCre()" *ngIf="mode!=1">
+    <button mat-button (click)="modeToCre()">
       <mat-icon>add_box</mat-icon>
       新規
     </button>
@@ -22,13 +22,13 @@
     <input matInput [value]="eda" (ngModelChange)="eda=$event" (keyup.enter)="onEnter()" (keydown.f4)="edaHelp()"
       (blur)="refresh()" disabled>
     <!-- <div [style.display]="edasrv.adrs.length>0 ? 'inline' : 'none'"> -->
-    <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode!=1">
+    <button mat-button mat-icon-button matSuffix (click)="setNext()">
       <mat-icon>keyboard_arrow_up</mat-icon>
     </button>
-    <button mat-button mat-icon-button matSuffix (click)="setPrev()" *ngIf="mode!=1">
+    <button mat-button mat-icon-button matSuffix (click)="setPrev()">
       <mat-icon>keyboard_arrow_down</mat-icon>
     </button>
-    <button mat-button mat-icon-button matSuffix (click)="edaHelp()" *ngIf="mode!=1">
+    <button mat-button mat-icon-button matSuffix (click)="edaHelp()">
       <mat-icon>find_replace</mat-icon>
     </button>
     <!-- </div> -->

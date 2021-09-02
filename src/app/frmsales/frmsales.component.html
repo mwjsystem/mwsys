@@ -55,7 +55,7 @@
       <mat-form-field>
         <mat-label>受注伝票ステータス</mat-label>
         <mat-select [value]="form.value.jdstatus" disabled>
-          <mat-option *ngFor="let sval of bunsrv.jdstatus" [value]="sval.value">
+          <mat-option *ngFor="let sval of bunsrv.kbn.jdstatus" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
         </mat-select>
@@ -63,7 +63,7 @@
       <mat-form-field *ngIf="form.value.skbn != 1">
         <mat-label>受注伝票出荷ステータス</mat-label>
         <mat-select [value]="form.value.jdshsta" disabled>
-          <mat-option *ngFor="let sval of bunsrv.jdshsta" [value]="sval.value">
+          <mat-option *ngFor="let sval of bunsrv.kbn.jdshsta" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
         </mat-select>
@@ -118,13 +118,16 @@
             <mat-label>納品先選択</mat-label>
             <mat-select #msel01 tabIndex="4" formControlName="nsaki" (selectionChange)="selBetsu($event.value)"
               (keydown.enter)="msel01.close()" required>
-              <mat-option value="0">基本住所</mat-option>
+              <mat-option *ngFor="let sval of nskVal" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+              <!-- <mat-option value="0">基本住所</mat-option>
               <mat-option value="1">その他住所</mat-option>
-              <mat-option value="2">別納</mat-option>
+              <mat-option value="2">別納</mat-option> -->
             </mat-select>
           </mat-form-field>
-          <mat-form-field style="width: 3em;" *ngIf="form.value.nsaki=='2'">
-            <mat-label>別納先枝番</mat-label>
+          <mat-form-field style="width: 3em;">
+            <mat-label>枝番</mat-label>
             <input matInput formControlName="nadr" required (change)="changeEda($event.target.value)">
           </mat-form-field>
           <button mat-button (click)="diaBetsu()" *ngIf="form.value.nsaki=='2'">
@@ -208,7 +211,7 @@
         <mat-form-field>
           <mat-label>出荷対象区分</mat-label>
           <mat-select #msel3 tabIndex="13" formControlName="skbn" (keydown.enter)="msel3.close()" required>
-            <mat-option *ngFor="let sval of bunsrv.skbn" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.skbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -216,7 +219,7 @@
         <mat-form-field>
           <mat-label>受注方法</mat-label>
           <mat-select #msel4 tabIndex="14" formControlName="jcode" (keydown.enter)="msel4.close()" required>
-            <mat-option *ngFor="let sval of bunsrv.jucd" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.jcode" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -224,7 +227,7 @@
         <mat-form-field>
           <mat-label>入金予定</mat-label>
           <mat-select #msel5 tabIndex="15" formControlName="pcode" (keydown.enter)="msel5.close()" required>
-            <mat-option *ngFor="let sval of bunsrv.pay" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.pay" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -249,7 +252,7 @@
           </mat-form-field>
           <span class="ybtxt">{{form.value.hday | jdate}}</span>
         </div>
-        <mat-form-field style="width: 7em;">
+        <mat-form-field style="width: 8em;">
           <mat-label>配送希望時間</mat-label>
           <mat-select #msel7 tabIndex="18" formControlName="htime" (keydown.enter)="msel7.close()">
             <mat-option *ngFor="let sval of hktval" [value]="sval.value">
@@ -268,9 +271,14 @@
           <mat-label>送り状番号</mat-label>
           <input tabIndex="20" matInput formControlName="okurino">
           <button mat-button mat-icon-button matSuffix (click)="openOkuri(form.value.hcode,form.value.okurino)"
-            *ngIf="form.value.okurino">
+            *ngIf="form.value.okurino && form.value.hcode">
             <mat-icon>web_asset</mat-icon>
           </button>
+          <button mat-button mat-icon-button matSuffix (click)="setOkrno()"
+            *ngIf="okrsrv.get_hinfo(form.value.hcode).numbering">
+            <mat-icon>calculate</mat-icon>
+          </button>
+          <!-- <button mat-flat-button matSuffix (click)="setOkrno()" *ngIf="okrsrv.get_hinfo(form.value.hcode).numbering">採番</button> -->
         </mat-form-field>
       </div>
       <div fxLafxLayout="row wrap" fxLayoutGap="5px">
@@ -314,7 +322,7 @@
         <mat-form-field style="width:8em">
           <mat-label>顧客税区分</mat-label>
           <mat-select [value]="jmisrv.mtax" disabled>
-            <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.mtax" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -324,7 +332,7 @@
         <mat-form-field style="width:10em">
           <mat-label>大分類</mat-label>
           <mat-select formControlName="daibunrui" required>
-            <mat-option *ngFor="let sval of bunsrv.daib" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.daibunrui" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -332,7 +340,7 @@
         <mat-form-field style="width:10em">
           <mat-label>中分類</mat-label>
           <mat-select formControlName="chubunrui" required>
-            <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.chubunrui" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -340,7 +348,7 @@
         <mat-form-field style="width:10em">
           <mat-label>小分類</mat-label>
           <mat-select formControlName="shobunrui">
-            <mat-option *ngFor="let sval of bunsrv.bmon" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.shobunrui" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -358,7 +366,7 @@
         <mat-form-field style="width:10em">
           <mat-label>顧客単価区分</mat-label>
           <mat-select [value]="jmisrv.tankakbn" disabled>
-            <mat-option *ngFor="let sval of bunsrv.tanka" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.tankakbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -366,7 +374,7 @@
         <mat-form-field style="width:10em">
           <mat-label>特別単価区分</mat-label>
           <mat-select [value]="jmisrv.sptnkbn" disabled>
-            <mat-option *ngFor="let sval of bunsrv.sptnkbn" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.sptnkbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -416,12 +424,12 @@
         <mat-label>値引計</mat-label>
         <input matInput [value]="form.value.nebikizn | number" class="i_num" disabled>
       </mat-form-field>
-        <mat-form-field style="width:6em;" class="i_num fw_b">
-          <mat-label>税抜合計額</mat-label>
-          <input matInput #sumTotal
-            [value]="+form.value.gtotalzn + +form.value.souryouzn + +form.value.tesuuzn + +form.value.nebikizn | number"
-            class="i_num" disabled>
-        </mat-form-field>
+      <mat-form-field style="width:6em;" class="i_num fw_b">
+        <mat-label>税抜合計額</mat-label>
+        <input matInput #sumTotal
+          [value]="+form.value.gtotalzn + +form.value.souryouzn + +form.value.tesuuzn + +form.value.nebikizn | number"
+          class="i_num" disabled>
+      </mat-form-field>
       <mat-form-field style="width:6em;" class="i_num">
         <mat-label>消費税</mat-label>
         <input matInput [value]="form.value.taxtotal | number" class="i_num" disabled>

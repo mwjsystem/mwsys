@@ -93,7 +93,7 @@ declare namespace mwI {
     currency:string;
     code:string;
     gkbn:string;
-    zkbn:string;
+    gskbn:string;
     spdet:string;
     ordering:boolean;
     vcode:string;

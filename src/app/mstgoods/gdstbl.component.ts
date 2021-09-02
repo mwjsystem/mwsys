@@ -24,7 +24,7 @@ export class GdstblComponent implements OnInit,AfterViewInit {
   // @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   @Output() action = new EventEmitter();
   dataSource = new MatTableDataSource();
-  displayedColumns =['action','gcode','gtext','size','color','unit','gskbn','jan','weight','tkbn','zkbn','max','send','ordering','koguchi','lot'];
+  displayedColumns =['action','gcode','gtext','size','color','unit','gskbn','jan','weight','tkbn','max','send','ordering','koguchi','lot'];
   hidx=6; //tabindex用ヘッダ項目数
   mcols=11; //tabindex用明細列数  
   constructor(private cdRef:ChangeDetectorRef,
@@ -145,7 +145,7 @@ export class GdstblComponent implements OnInit,AfterViewInit {
       jan:[goods?.jan],
       weight:[goods?.weight],
       tkbn:[goods?.tkbn ?? '0'],
-      zkbn:[goods?.zkbn ?? '0'],
+      // zkbn:[goods?.zkbn ?? '0'],
       max:[goods?.max],
       send:[goods?.send],
       ordering:[goods?.ordering],

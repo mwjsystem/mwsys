@@ -192,6 +192,11 @@ export class UserService {
     return parseInt(janstr + chkNum.toString());
   }
 
+  addCheckDigit7(okrno:number):string{
+    const chkNum:number = okrno % 7 ;
+    return okrno.toString() + chkNum.toString();
+  }
+
   editFrmval(frm:AbstractControl,fld:string):any{
     // console.log(frm,fld);
     let val:any;  

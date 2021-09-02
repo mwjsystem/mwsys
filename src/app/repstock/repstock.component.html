@@ -95,7 +95,7 @@
     <mat-form-field style="width:8em;">
       <mat-label>数量区分</mat-label>
       <mat-select  [value]="stcsrv.stgds.gskbn" disabled class="selreadonly">
-        <mat-option *ngFor="let sval of bunsrv.gskbn" [value]="sval.value">
+        <mat-option *ngFor="let sval of bunsrv.kbn.gskbn" [value]="sval.value">
           {{sval.viewval}}
         </mat-option>
       </mat-select>

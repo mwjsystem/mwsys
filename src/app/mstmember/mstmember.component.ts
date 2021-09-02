@@ -21,6 +21,7 @@ import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { EdaService } from './../share/adreda/eda.service';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { AddressComponent } from './../share/address/address.component';
+import { MsstitComponent } from './../share/msstit/msstit.component';
 
 @Component({
   selector: 'app-mstmember',
@@ -73,6 +74,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       tankakbn: new FormControl('', Validators.required),
       pcode: new FormControl(''),
       hcode: new FormControl(''),
+      jcode: new FormControl(''),
       mtax: new FormControl('', Validators.required),
       daibunrui: new FormControl(''),
       chubunrui: new FormControl(''),
@@ -95,7 +97,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       site: new FormControl(''),
       inday: new FormControl(''),
       scode: new FormControl(''),  
-      sscode: new FormControl('', Validators.required),    
+      sscode: new FormControl(''),    
     // }));
     // this.form.addControl('mail', new FormGroup({
       mail: new FormControl('', Validators.email),
@@ -147,6 +149,17 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         flg: false
       };
       let dialogRef = this.dialog.open(AdredaComponent, dialogConfig);
+    }
+  }
+  diaStit():void {
+    if( this.checkMcode(this.mcd) ){
+      let dialogConfig = new MatDialogConfig();
+      dialogConfig.autoFocus = true;
+      dialogConfig.data = {
+        mcode: this.mcd +'(' + this.memsrv.get_mcdtxt(this.mcd) + ')',
+        mode: this.mode
+      };
+      let dialogRef = this.dialog.open(MsstitComponent, dialogConfig);
     }
   }
   mcdHelp(): void {
@@ -361,7 +374,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       mail3: this.usrsrv.editFrmval(this.form.get('base'),'mail3'),
       mail4: this.usrsrv.editFrmval(this.form.get('base'),'mail4'),
       mail5: this.usrsrv.editFrmval(this.form.get('base'),'mail5'),
-      torikbn: this.usrsrv.editFrmval(this.form.get('base'),'torikbn'),
+      torikbn: Boolean(this.form.get('base').value.torikbn),
       sime: this.usrsrv.editFrmval(this.form.get('base'),'sime'),
       site: this.usrsrv.editFrmval(this.form.get('base'),'site'),
       inday: this.usrsrv.editFrmval(this.form.get('base'),'inday'),
@@ -370,24 +383,25 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       // inbikou: this.usrsrv.editFrmval(this.form.get('base'),'inbikou'),
       pcode: this.usrsrv.editFrmval(this.form.get('base'),'pcode'),
       hcode: this.usrsrv.editFrmval(this.form.get('base'),'hcode'),
+      jcode: this.usrsrv.editFrmval(this.form.get('base'),'jcode'),
       mtax: this.usrsrv.editFrmval(this.form.get('base'),'mtax'),
       sscode: this.usrsrv.editFrmval(this.form.get('base'),'sscode'),
       daibunrui: this.usrsrv.editFrmval(this.form.get('base'),'daibunrui'),
-      bumon: this.usrsrv.editFrmval(this.form.get('base'),'bumon'),
+      chubunrui: this.usrsrv.editFrmval(this.form.get('base'),'chubunrui'),
       shobunrui: this.usrsrv.editFrmval(this.form.get('base'),'shobunrui'),
       tcode1: this.usrsrv.editFrmval(this.form.get('base'),'tcode1'),
       tcode: this.usrsrv.editFrmval(this.form.get('base'),'tcode'),
-      del: this.usrsrv.editFrmval(this.form.get('base'),'del'),
+      del: Boolean(this.form.get('base').value.del),
       sptnkbn: this.usrsrv.editFrmval(this.form.get('base'),'sptnkbn'),
       ntype: this.usrsrv.editFrmval(this.form.get('base'),'ntype'),
       tntype: this.usrsrv.editFrmval(this.form.get('base'),'tntype'),
       webid: this.usrsrv.editFrmval(this.form.get('base'),'webid'),
       ryoate: this.usrsrv.editFrmval(this.form.get('base'),'ryoate'),
-      mtgt1: this.usrsrv.editFrmval(this.form.get('base'),'mtgt1'),
-      mtgt2: this.usrsrv.editFrmval(this.form.get('base'),'mtgt2'),
-      mtgt3: this.usrsrv.editFrmval(this.form.get('base'),'mtgt3'),
-      mtgt4: this.usrsrv.editFrmval(this.form.get('base'),'mtgt4'),
-      mtgt5: this.usrsrv.editFrmval(this.form.get('base'),'mtgt5'),
+      mtgt1: this.form.get('base').value.mtgt1,
+      mtgt2: this.form.get('base').value.mtgt2,
+      mtgt3: this.form.get('base').value.mtgt3,
+      mtgt4: this.form.get('base').value.mtgt4,
+      mtgt5: this.form.get('base').value.mtgt5,
       updated_at:new Date(),
       updated_by:this.usrsrv.staff.code
     }

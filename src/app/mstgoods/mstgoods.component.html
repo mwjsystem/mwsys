@@ -70,7 +70,7 @@
           <mat-form-field style="width:8em">
             <mat-label>商品区分</mat-label>
             <mat-select tabIndex="3" #msel01 formControlName="gkbn" required (keydown.enter)="msel01.close()">
-              <mat-option *ngFor="let sval of bunsrv.gkbn" [value]="sval.value">
+              <mat-option *ngFor="let sval of bunsrv.kbn.gkbn" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
@@ -78,7 +78,7 @@
           <mat-form-field>
             <mat-label>ジャンル</mat-label>
             <mat-select tabIndex="4" #msel02 formControlName="genre" required (keydown.enter)="msel02.close()">
-              <mat-option *ngFor="let sval of bunsrv.genre" [value]="sval.value">
+              <mat-option *ngFor="let sval of bunsrv.kbn.genre" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>

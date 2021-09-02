@@ -49,7 +49,7 @@
         <mat-form-field style="width:5em">
           <mat-label>税区分</mat-label>
           <mat-select #msel2 formControlName="mtax" required (keydown.enter)="msel2.close()">
-            <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.mtax" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>

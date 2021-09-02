@@ -10,6 +10,7 @@ import { EdahelpComponent } from './../share/adreda/edahelp.component';
 import { EdatblComponent } from './../share/adreda/edatbl.component';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { McdtblComponent } from './../share/mcdhelp/mcdtbl.component';
+import { MsstitComponent } from '../share/msstit/msstit.component';
 // import { UserService } from './../services/user.service';
 
 
@@ -22,6 +23,7 @@ import { McdtblComponent } from './../share/mcdhelp/mcdtbl.component';
     McdtblComponent,
     EdahelpComponent,
     EdatblComponent,
+    MsstitComponent,
   ],
   imports: [
     CommonModule,

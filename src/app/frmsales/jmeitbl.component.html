@@ -3,13 +3,14 @@
   <mat-form-field style="width: 10em;" *ngIf="frmArr.enabled">
     <mat-label>在庫状態一括設定</mat-label>
     <mat-select [(ngModel)]="jmeikbn">
-      <mat-option *ngFor="let sval of bunsrv.jmeikbn" [value]="sval.value">
+      <mat-option *ngFor="let sval of bunsrv.kbn.jmeikbn" [value]="sval.value">
         {{sval.viewval}}
       </mat-option>
     </mat-select>
   </mat-form-field>
   <button mat-flat-button color="primary" (click)="setJmeikbn(jmeikbn)" *ngIf="frmArr.enabled">一括設定</button>
-  <button mat-flat-button color="accent" (click)="setKoguchi()" *ngIf="frmArr.enabled">個口送料計算</button>
+  <button mat-flat-button color="accent" (click)="setKoguchi()" [disabled]="parentForm.invalid"
+    *ngIf="frmArr.enabled" matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
   <button mat-flat-button color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
   <mat-menu #cnp="matMenu">
     <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
@@ -89,7 +90,8 @@
         <th mat-header-cell *matHeaderCellDef class="i_num">数量</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
-            <input type="number" [tabIndex]="hidx + i * mcols + 2" matInput formControlName="suu" class="i_num" (change)="calcMei(getIdx(i))">
+            <input type="number" [tabIndex]="hidx + i * mcols + 2" matInput formControlName="suu" class="i_num"
+              (change)="calcMei(getIdx(i))">
           </mat-form-field>
         </td>
       </ng-container>
@@ -112,7 +114,8 @@
         <th mat-header-cell *matHeaderCellDef class="i_num">単価</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
-            <input matInput numInput [tabIndex]="hidx + i * mcols + 3" formControlName="tanka" class="i_num" (change)="calcMei(getIdx(i))">
+            <input matInput numInput [tabIndex]="hidx + i * mcols + 3" formControlName="tanka" class="i_num"
+              (change)="calcMei(getIdx(i))">
           </mat-form-field>
         </td>
       </ng-container>
@@ -177,22 +180,24 @@
             <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['tanka1'] | number" class="i_num" disabled>
           </mat-form-field>
         </td>
-      </ng-container> 
+      </ng-container>
       <ng-container matColumnDef="mtax">
         <th mat-header-cell *matHeaderCellDef>税区分</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
-            <mat-select #msel2 formControlName="mtax" required (keydown.enter)="msel2.close()" (selectionChange)="calcMei(getIdx(i))">
-              <mat-option *ngFor="let sval of bunsrv.mtax" [value]="sval.value">
+            <mat-select #msel2 formControlName="mtax" required (keydown.enter)="msel2.close()"
+              (selectionChange)="calcMei(getIdx(i))">
+              <mat-option *ngFor="let sval of bunsrv.kbn.mtax" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
           </mat-form-field>
         </td>
-      </ng-container>     
+      </ng-container>
       <ng-container matColumnDef="taxmoney">
         <th mat-header-cell *matHeaderCellDef class="i_num">消費税金額</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)" (change)="changeTax(getIdx(i),$event.target.value)">
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)"
+          (change)="changeTax(getIdx(i),$event.target.value)">
           <mat-form-field style="width:6em;">
             <input matInput formControlName="taxmoney" numInput class="i_num">
           </mat-form-field>
@@ -264,7 +269,7 @@
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
             <mat-select #msel3 formControlName="taxrate" required (keydown.enter)="msel3.close()" class="i_num">
-              <mat-option *ngFor="let sval of bunsrv.taxrt" [value]="sval.value">
+              <mat-option *ngFor="let sval of bunsrv.kbn.taxrate" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>

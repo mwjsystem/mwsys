@@ -92,7 +92,7 @@
           <mat-form-field style="width:8em;">
             <mat-select [tabIndex]="hidx + i * mcols + 7" #msel11 formControlName="gskbn" required
               (keydown.enter)="msel11.close()">
-              <mat-option *ngFor="let sval of bunsrv.gskbn" [value]="sval.value">
+              <mat-option *ngFor="let sval of bunsrv.kbn.gskbn" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
@@ -125,26 +125,26 @@
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:5em;">
             <mat-select #msel12 formControlName="tkbn" required (keydown.enter)="msel12.close()">
-              <mat-option *ngFor="let sval of bunsrv.tkbn" [value]="sval.value">
+              <mat-option *ngFor="let sval of bunsrv.kbn.tkbn" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
           </mat-form-field>
         </td>
       </ng-container>
-      <ng-container matColumnDef="zkbn">
+      <!-- <ng-container matColumnDef="zkbn">
         <th mat-header-cell *matHeaderCellDef>在庫管理</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:5em;">
             <mat-select [tabIndex]="hidx + i * mcols + 9" #msel13 formControlName="zkbn" required
               (keydown.enter)="msel13.close()">
-              <mat-option *ngFor="let sval of bunsrv.zkbn" [value]="sval.value">
+              <mat-option *ngFor="let sval of bunsrv.kbn.zkbn" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
           </mat-form-field>
         </td>
-      </ng-container>
+      </ng-container> -->
       <ng-container matColumnDef="max">
         <th mat-header-cell *matHeaderCellDef>１個口最大</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">

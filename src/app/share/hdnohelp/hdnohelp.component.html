@@ -35,7 +35,7 @@
             <mat-form-field style="width:20em;">
                 <mat-label>発注伝票ｽﾃｰﾀｽ</mat-label>
                 <mat-select [(ngModel)]="fhdst" [ngModelOptions]="{standalone: true}" multiple>
-                    <mat-option *ngFor="let sval of bunsrv.hdstatus" [value]="sval.value">
+                    <mat-option *ngFor="let sval of bunsrv.kbn.hdstatus" [value]="sval.value">
                         {{sval.viewval}}
                     </mat-option>
                 </mat-select>

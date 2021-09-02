@@ -160,7 +160,7 @@
         <th mat-header-cell *matHeaderCellDef>消費税率</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-select [tabIndex]="hidx + i * mcols + 13" #msel23 formControlName="taxrate" (keydown.enter)="msel23.close()">
-            <mat-option *ngFor="let sval of bunsrv.taxrt" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.taxrate" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>

@@ -42,7 +42,8 @@ declare namespace mwI {
   interface Haisou {
     code: number;
     name: string;
-    url:  string;   
+    url:  string; 
+    numbering:boolean;  
   }
 
   interface Hktime {
@@ -132,6 +133,7 @@ declare namespace mwI {
     scode:number;
     pcode:string;
     hcode:string;
+    jcode:string;
     mtax:string;
     sscode:number;
     tcode1:string;
@@ -189,7 +191,6 @@ declare namespace mwI {
     weight:number;
     unit:string;
     tkbn:number;
-    zkbn:number;
     gtext:string;
     max:number;
     send:string;
@@ -223,8 +224,8 @@ declare namespace mwI {
   
   interface Bunrui {
     kubun:number;
-    code:string;
-    name:string;
+    value:string;
+    viewval:string;
     memo:string;
   }
   interface Staff {

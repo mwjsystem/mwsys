@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
+import { OkuriService } from './../services/okuri.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
@@ -125,7 +126,8 @@ export class JyumeiService {
       }
     }`;
   
-  constructor(private usrsrv: UserService,         
+  constructor(private usrsrv: UserService,  
+              private okrsrv: OkuriService,       
               private apollo: Apollo,
               private toastr: ToastrService) { }
   
@@ -236,5 +238,31 @@ export class JyumeiService {
     let ret:string="";
     
     return ret;
+  }
+
+  async check_amazon(hcode,pOkrno:string):Promise<string> {  
+    const CheckOkrno = gql`
+      query get_jyuden($okrno: String!) {
+        trjyuden(where: {id: {_eq: 1}, mcode: {_eq: "408223"}, okurino: {_eq: $okrno}}) {
+          denno
+        }
+      }`;
+    return new Promise( resolve => {
+      this.apollo.watchQuery<any>({
+        query :CheckOkrno,
+        variables: {
+          okrno: pOkrno
+        },
+      })
+      .valueChanges
+      .subscribe(({ data }) => { 
+        // console.log(pOkrno,data); 
+        if(data.trjyuden.length==0){
+          return resolve(pOkrno);
+        }else{
+          this.okrsrv.set_okurino(hcode).then(value => this.check_amazon(hcode,value));         
+        }
+      });
+    });
   }
 }

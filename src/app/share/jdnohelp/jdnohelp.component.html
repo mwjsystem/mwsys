@@ -55,7 +55,7 @@
             <mat-form-field style="width:7em;">
                 <mat-label>ｽﾃｰﾀｽ(受注伝票)</mat-label>
                 <mat-select [value]="fjdst">
-                    <mat-option *ngFor="let sval of bunsrv.jdstatus" [value]="sval.value">
+                    <mat-option *ngFor="let sval of bunsrv.kbn.jdstatus" [value]="sval.value">
                         {{sval.viewval}}
                     </mat-option>
                 </mat-select>
@@ -63,7 +63,7 @@
             <mat-form-field style="width:7em;">
                 <mat-label>ｽﾃｰﾀｽ(出荷)</mat-label>
                 <mat-select [value]="fjsst">
-                    <mat-option *ngFor="let sval of bunsrv.jdshsta" [value]="sval.value">
+                    <mat-option *ngFor="let sval of bunsrv.kbn.jdshsta" [value]="sval.value">
                         {{sval.viewval}}
                     </mat-option>
                 </mat-select>

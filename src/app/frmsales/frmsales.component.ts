@@ -48,6 +48,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   getden:number;
   gdsttl:number=0;
   stit:mwI.Stit[]=[];
+  nskVal:mwI.Sval[]=[];
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -189,8 +190,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     if(value=="2"){
       // console.log(this.form.get('nadr'));
       this.form.get('nadr').setValue('');
+      this.form.get('nadr').enable();
+      this.form.get('bunsho').setValue(this.jmisrv.tntype);
     } else {
-      this.form.get('nadr').setValue(+value); 
+      this.form.get('nadr').setValue(+value);
+      this.form.get('nadr').disable(); 
+      this.form.get('bunsho').setValue(this.jmisrv.ntype);
       this.changeEda(+value);
     }
   }
@@ -285,45 +290,6 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           this.overlayRef.detach();
         }
       );
-      // this.apollo.watchQuery<any>({
-      //   query: Query.GetJyuden, 
-      //     variables: { 
-      //       id : this.usrsrv.compid,
-      //       dno: denno
-      //     },
-      // })
-      // .valueChanges      
-      // .subscribe(({ data }) => {
-      //   this.form.reset();
-      //   this.jmisrv.jyumei=[];
-      //   if (data.trjyuden_by_pk == null){
-      //     this.toastr.info("受注伝票番号" + denno + "は登録されていません");
-      //     history.replaceState('','','./frmsales');
-      //   } else {
-      //     let jyuden:mwI.Jyuden=data.trjyuden_by_pk;
-      //     if(jyuden.nadr>1){
-      //       this.form.get('nsaki').setValue("2");
-      //     } else { 
-      //       this.form.get('nsaki').setValue(jyuden.nadr.toString());  
-      //     }
-      //     this.form.patchValue(jyuden);
-      //     this.jmisrv.edit_jyumei(data.trjyuden_by_pk.trjyumeis);
-      //     this.jmeitbl.set_jyumei();
-      //     this.usrsrv.setTmstmp(jyuden);
-      //     this.jmisrv.denno=denno;
-      //     this.get_member(+jyuden.mcode,false);
-      //     this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
-      //     history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
-      //   }
-      //   this.refresh();
-      //   this.overlayRef.detach();
-      // },(error) => {
-      //   console.log('error query GetJyuden', error);
-      //   this.toastr.info("受注伝票読込エラー");
-      //   this.form.reset();
-      //   history.replaceState('','','./frmsales');
-      //   this.overlayRef.detach();
-      // });
     }
     this.overlayRef.detach();
     this.cdRef.detectChanges();
@@ -391,6 +357,15 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     }
   }
 
+  async setOkrno(){
+    let okrno:string = await this.okrsrv.set_okurino(this.form.value.hcode);
+    // console.log(okrno);
+    if(this.usrsrv.compid == 1 && this.form.value.mcode==408223){
+      okrno = await this.jmisrv.check_amazon(this.form.value.hcode,okrno);
+    }
+    this.form.get('okurino').setValue(okrno);
+  }
+
   get_member(mcode:number,flg:boolean){
     this.apollo.watchQuery<any>({
       query: Query.GetMember, 
@@ -418,8 +393,13 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         this.edasrv.mcode = mcode ;
         this.edasrv.edas=[];
         this.edasrv.adrs=[];
+        this.nskVal=[];
+        this.nskVal.push({value:"0",viewval:"基本住所"});
         for (let j=0;j<msmadrs.length;j++){          
           this.edasrv.adrs.push(msmadrs[j]);
+          if(msmadrs[j].eda==1){
+            this.nskVal.push({value:"1",viewval:"その他住所"});
+          }
           if (msmadrs[j].eda > 1){
             this.edasrv.edas.push({
               eda:msmadrs[j].eda,
@@ -434,6 +414,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             });
           }
         }
+        this.nskVal.push({value:"2",viewval:"別納"});
         this.changeEda(this.form.value.nadr);
         this.cdRef.detectChanges();
       }
@@ -589,7 +570,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       genka: this.usrsrv.editFrmval(this.form,'genka'),
       hgenka: this.usrsrv.editFrmval(this.form,'hgenka'),
       egenka: this.usrsrv.editFrmval(this.form,'egenka'),
-      torikbn: this.usrsrv.editFrmval(this.form,'torikbn'),
+      torikbn: Boolean(this.usrsrv.editFrmval(this.form,'torikbn')),
       mcode: this.usrsrv.editFrmval(this.form,'mcode'),
       scode: this.usrsrv.editFrmval(this.form,'scode'),
       jcode: this.usrsrv.editFrmval(this.form,'jcode'),
@@ -598,7 +579,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       chubunrui: this.usrsrv.editFrmval(this.form,'chubunrui'),
       shobunrui: this.usrsrv.editFrmval(this.form,'shobunrui'),
       tcode1: this.usrsrv.editFrmval(this.form,'tcode1'),
-      del: this.usrsrv.editFrmval(this.form,'del'),
+      // del: Boolean(this.usrsrv.editFrmval(this.form,'del')),
       daibiki: this.usrsrv.editFrmval(this.form,'daibiki'),
       ryoate: this.usrsrv.editFrmval(this.form,'ryoate'),
       updated_at:new Date(),
