@@ -290,7 +290,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
           weight: this.usrsrv.editFrmval(control,'weight'),
           unit: this.usrsrv.editFrmval(control,'unit'),
           tkbn: this.usrsrv.editFrmval(control,'tkbn'),
-          zkbn: this.usrsrv.editFrmval(control,'zkbn'),
+          // zkbn: this.usrsrv.editFrmval(control,'zkbn'),
           gtext: this.usrsrv.editFrmval(control,'gtext'),
           max: this.usrsrv.editFrmval(control,'max'),
           send: this.usrsrv.editFrmval(control,'send'),
