@@ -48,13 +48,18 @@ export class GdstblComponent implements OnInit,AfterViewInit {
   
   del_row(row:number){
     this.frmArr.removeAt(row);
-    this.action.emit({flg:false,row:row});
+    this.action.emit({flg:false,row:row});//mstgoods.componentのメソッドins_throwに渡す引数
     this.refresh();
   }
-  ins_row(row:number){
-    // console.log(row);
-    this.frmArr.insert(row,this.createRow(false));
-    this.action.emit({flg:true,row:row});
+  ins_row(flg:boolean,row:number){
+    console.log(this.frmArr.controls[row].value);
+    if(flg){
+      this.frmArr.insert(row,this.createRow(false,this.frmArr.controls[row-1].value));
+    }else{
+      this.frmArr.insert(row,this.createRow(false));
+    }
+    
+    this.action.emit({flg:true,row:row,value:true});//mstgoods.componentのメソッドins_throwに渡す引数
     // (this.parentForm.get('mtbl2') as FormArray).insert(row,this.gdssrv.createRow());
     // console.log(this.frmArr);
     // console.log((this.parentForm.get('mtbl2') as FormArray));

@@ -327,7 +327,7 @@ export class HmeitblComponent implements OnInit {
           genka: this.usrsrv.editFrmval(control,'genka'),
           money: this.usrsrv.editFrmval(control,'money'),
           taxrate: this.usrsrv.editFrmval(control,'taxrate'),
-          unit: this.usrsrv.editFrmval(control,'unit'),
+          // unit: this.usrsrv.editFrmval(control,'unit'),
           mbiko: this.usrsrv.editFrmval(control,'mbiko'),
           spec: this.usrsrv.editFrmval(control,'spec'),
           jdenno: this.usrsrv.editFrmval(control,'jdenno'),

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -11,9 +11,13 @@ import { BunruiService } from './../services/bunrui.service';
   templateUrl: './gtnktbl.component.html',
   styleUrls: ['./gdstbl.component.scss']
 })
-export class GtnktblComponent implements OnInit {
+export class GtnktblComponent implements OnInit,AfterViewInit {
   @Input() parentForm: FormGroup;
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  private paginator: MatPaginator;
+  @ViewChild(MatPaginator, {static: false}) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.dataSource.paginator = this.paginator;
+  }
   dataSource = new MatTableDataSource();
   displayedColumns =['gcode','day','tanka1',
                       'tanka2','tnk2',
@@ -32,23 +36,30 @@ export class GtnktblComponent implements OnInit {
               private fb:     FormBuilder,
               public usrsrv: UserService,
               public gdssrv: GoodsService
-    ) {}
+    ) {
+                this.dataSource.paginator = this.paginator;
+
+    }
 
   ngOnInit(): void {
     this.add_rows(1);
     this.refresh();
+    this.dataSource.paginator = this.paginator;
   }
-  // ngAfterViewChecked(): void {
-  //   setTimeout(() => {
-  //     this.cdRef.detectChanges();
-  //   });
-  // }
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    // console.log(this.paginator);
+  }
   del_row(row:number){
     this.frmArr.removeAt(row);
     this.refresh();
   }
-  ins_row(row:number){
-    this.frmArr.insert(row,this.createRow());
+  ins_row(row:number,value?){
+    if(value){
+      this.frmArr.insert(row,this.createRow(this.frmArr.controls[row-1].value));
+    } else {
+      this.frmArr.insert(row,this.createRow());
+    }
     this.refresh();
   }
   add_rows(rows:number){
@@ -76,27 +87,7 @@ export class GtnktblComponent implements OnInit {
       taxrate:[gtanka?.taxrate]
     });
   }
-  // createRow(){
-  //   return this.fb.group({
-  //     action:['ins'],
-  //     gcode:[''],
-  //     day:[''],
-  //     tanka1:[''],
-  //     tanka2:[''],
-  //     tanka3:[''],
-  //     tanka4:[''],
-  //     tanka5:[''],
-  //     tanka6:[''],
-  //     tanka7:[''],
-  //     tanka8:[''],
-  //     tanka9:[''],
-  //     cost:[''],
-  //     genka:[''],
-  //     taxrate:[''],
-  //     currency:['']
-  //   });
-  // }  
-
+ 
   get frmArr():FormArray {    
     return this.parentForm.get('mtbl2') as FormArray;
   }  
@@ -107,8 +98,8 @@ export class GtnktblComponent implements OnInit {
 
   get_teika(i:number):number{
     // console.log(this.frmArr.getRawValue()[this.getIdx(i)]['tanka1']*(+this.usrsrv.system.mtax)/(100 + +this.frmArr.getRawValue()[this.getIdx(i)]['taxrate'])*10);
-    return this.frmArr.getRawValue()[this.getIdx(i)]['tanka1'] -
-          (this.frmArr.getRawValue()[this.getIdx(i)]['tanka1']*(+this.usrsrv.system.mtax)/(100 + +this.frmArr.getRawValue()[this.getIdx(i)]['taxrate'])*10);
+    return this.frmArr.getRawValue()[i]['tanka1'] -
+          (this.frmArr.getRawValue()[i]['tanka1']*(+this.usrsrv.system.mtax)/(100 + +this.frmArr.getRawValue()[i]['taxrate'])*10);
   }
   set_gtanka(){
     this.frmArr.clear();
@@ -129,9 +120,7 @@ export class GtnktblComponent implements OnInit {
     }
   }
   refresh(): void {
-    this.dataSource.data = this.frmArr.controls;
     this.dataSource.paginator = this.paginator;
-    // this.cdRef.detectChanges();
-    // console.log("tnk"+flg, this.frmArr.controls);
+    this.dataSource.data = this.frmArr.controls;
   }
 }

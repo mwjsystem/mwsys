@@ -6,7 +6,7 @@
         <th mat-header-cell *matHeaderCellDef>商品コード</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:10em;">
-            <input matInput [value]="frmArr.getRawValue()[i]['gcode']" disabled>
+            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['gcode']" disabled>
           </mat-form-field>
         </td>
       </ng-container>
@@ -39,7 +39,7 @@
       <ng-container matColumnDef="tnk2">
         <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
         <td mat-cell *matCellDef="let i =index">
-          {{frmArr.getRawValue()[getIdx(i)]['tanka2']/get_teika(i) | percent}}
+          {{frmArr.getRawValue()[getIdx(i)]['tanka2']/get_teika(getIdx(i)) | percent}}
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka3">
@@ -53,7 +53,7 @@
       <ng-container matColumnDef="tnk3">
         <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
         <td mat-cell *matCellDef="let i =index">
-          {{frmArr.getRawValue()[getIdx(i)]['tanka3']/get_teika(i) | percent}}
+          {{frmArr.getRawValue()[getIdx(i)]['tanka3']/get_teika(getIdx(i)) | percent}}
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka4">
@@ -67,7 +67,7 @@
       <ng-container matColumnDef="tnk4">
         <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
         <td mat-cell *matCellDef="let i =index">
-          {{frmArr.getRawValue()[getIdx(i)]['tanka4']/get_teika(i) | percent}}
+          {{frmArr.getRawValue()[getIdx(i)]['tanka4']/get_teika(getIdx(i)) | percent}}
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka5">
@@ -81,7 +81,7 @@
       <ng-container matColumnDef="tnk5">
         <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
         <td mat-cell *matCellDef="let i =index">
-          {{frmArr.getRawValue()[getIdx(i)]['tanka5']/get_teika(i) | percent}}
+          {{frmArr.getRawValue()[getIdx(i)]['tanka5']/get_teika(getIdx(i)) | percent}}
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka6">
@@ -95,7 +95,7 @@
       <ng-container matColumnDef="tnk6">
         <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
         <td mat-cell *matCellDef="let i =index">
-          {{frmArr.getRawValue()[getIdx(i)]['tanka6']/get_teika(i) | percent}}
+          {{frmArr.getRawValue()[getIdx(i)]['tanka6']/get_teika(getIdx(i)) | percent}}
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka7">
@@ -109,7 +109,7 @@
       <ng-container matColumnDef="tnk7">
         <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
         <td mat-cell *matCellDef="let i =index">
-          {{frmArr.getRawValue()[getIdx(i)]['tanka7']/get_teika(i) | percent}}
+          {{frmArr.getRawValue()[getIdx(i)]['tanka7']/get_teika(getIdx(i)) | percent}}
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka8">
@@ -119,11 +119,11 @@
             <input [tabIndex]="hidx + i * mcols + 9" matInput formControlName="tanka8" numInput class="i_num">
           </mat-form-field>
         </td>
-      </ng-container> 
-           <ng-container matColumnDef="tnk8">
+      </ng-container>
+      <ng-container matColumnDef="tnk8">
         <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
         <td mat-cell *matCellDef="let i =index">
-          {{frmArr.getRawValue()[getIdx(i)]['tanka8']/get_teika(i) | percent}}
+          {{frmArr.getRawValue()[getIdx(i)]['tanka8']/get_teika(getIdx(i)) | percent}}
         </td>
       </ng-container>
       <ng-container matColumnDef="tanka9">
@@ -137,7 +137,7 @@
       <ng-container matColumnDef="tnk9">
         <th mat-header-cell *matHeaderCellDef style="display:none;">rate</th>
         <td mat-cell *matCellDef="let i =index">
-          {{frmArr.getRawValue()[getIdx(i)]['tanka9']/get_teika(i) | percent}}
+          {{frmArr.getRawValue()[getIdx(i)]['tanka9']/get_teika(getIdx(i)) | percent}}
         </td>
       </ng-container>
       <ng-container matColumnDef="cost">
@@ -159,7 +159,8 @@
       <ng-container matColumnDef="taxrate">
         <th mat-header-cell *matHeaderCellDef>消費税率</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
-          <mat-select [tabIndex]="hidx + i * mcols + 13" #msel23 formControlName="taxrate" (keydown.enter)="msel23.close()">
+          <mat-select [tabIndex]="hidx + i * mcols + 13" #msel23 formControlName="taxrate"
+            (keydown.enter)="msel23.close()">
             <mat-option *ngFor="let sval of bunsrv.kbn.taxrate" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -170,7 +171,8 @@
         <th mat-header-cell *matHeaderCellDef>原価通貨</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
-            <mat-select [tabIndex]="hidx + i * mcols + 14" #msel24 formControlName="currency" (keydown.enter)="msel24.close()">
+            <mat-select [tabIndex]="hidx + i * mcols + 14" #msel24 formControlName="currency"
+              (keydown.enter)="msel24.close()">
               <mat-option value="JPY">JPY</mat-option>
               <mat-option value="USD">USD</mat-option>
             </mat-select>
@@ -181,6 +183,5 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   </ng-container>
-  <mat-paginator [length]="dataSource?.data.length" [pageIndex]="0" [pageSize]="10"
-    [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+  <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
 </div>

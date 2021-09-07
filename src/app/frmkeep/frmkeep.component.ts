@@ -94,7 +94,7 @@ export class FrmkeepComponent implements OnInit {
         query: this.GetLog, 
           variables: { 
             id : this.usrsrv.compid,
-            typ: 'KEEP',
+            typ: '8',
             kcd: this.keycode,
             sts: this.status
         },
@@ -161,7 +161,7 @@ export class FrmkeepComponent implements OnInit {
         {query: this.GetLog, 
           variables: { 
             id : this.usrsrv.compid,
-            typ: 'KEEP',
+            typ: '8',
             kcd: this.keycode,
             sts: this.status},
         }],  

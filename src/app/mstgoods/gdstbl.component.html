@@ -5,13 +5,16 @@
       <ng-container matColumnDef="action">
         <th mat-header-cell fxLayout="row" *matHeaderCellDef style="border-bottom-style:none;">
           <span *ngIf="frmArr.enabled">行挿入</span>
-          <button mat-icon-button (click)="ins_row(getIdx(0))" *ngIf="frmArr.enabled">
+          <button mat-icon-button (click)="ins_row(false,getIdx(0))" *ngIf="frmArr.enabled">
             <mat-icon>add_circle</mat-icon>
           </button>
         </th>
         <td mat-cell fxLayout="row" *matCellDef="let row; let i = index" style="border-bottom-style:none;">
-          <button mat-icon-button matPrefix (click)="ins_row(getIdx(i)+1)" *ngIf="frmArr.enabled">
+          <button mat-icon-button matPrefix (click)="ins_row(false,getIdx(i)+1)" *ngIf="frmArr.enabled">
             <mat-icon>add_circle</mat-icon>
+          </button>
+          <button mat-icon-button matPrefix (click)="ins_row(true,getIdx(i)+1)" *ngIf="frmArr.enabled">
+            <mat-icon>content_copy</mat-icon>
           </button>
           <button mat-icon-button matPrefix (click)="del_row(getIdx(i))"
             *ngIf="frmArr.enabled && !frmArr.getRawValue()[getIdx(i)]['ins']">
@@ -25,7 +28,7 @@
           <mat-form-field style="width:10em;">
             <input [tabIndex]="hidx + i * mcols + 1" matInput formControlName="gcode"
               (change)="updGds(getIdx(i),$event.target.value)" [readonly]="frmArr.getRawValue()[getIdx(i)]['ins']">
-              <!-- [disabled]="frmArr.getRawValue()[getIdx(i)]['ins']"> -->
+            <!-- [disabled]="frmArr.getRawValue()[getIdx(i)]['ins']"> -->
           </mat-form-field>
         </td>
       </ng-container>
@@ -96,8 +99,7 @@
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
-            <button mat-flat-button matSuffix (click)="diaGzai()"
-              *ngIf="frmArr.getRawValue()[getIdx(i)]['gskbn']==1"
+            <button mat-flat-button matSuffix (click)="diaGzai()" *ngIf="frmArr.getRawValue()[getIdx(i)]['gskbn']==1"
               matTooltip="{{getGzai(frmArr.getRawValue()[i]['gcode'])}}" matTooltipClass="ttips">内訳</button>
           </mat-form-field>
         </td>
@@ -157,7 +159,8 @@
         <th mat-header-cell *matHeaderCellDef>送料区分</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
-            <mat-select [tabIndex]="hidx + i * mcols + 10" #msel14 formControlName="send" (keydown.enter)="msel14.close()">
+            <mat-select [tabIndex]="hidx + i * mcols + 10" #msel14 formControlName="send"
+              (keydown.enter)="msel14.close()">
               <mat-option value=""></mat-option>
               <mat-option value="A">A</mat-option>
               <mat-option value="B">B</mat-option>
@@ -200,7 +203,8 @@
         </td>
       </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
-      <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;" [style.background]="setBgcolor(frmArr.getRawValue()[getIdx(i)]['tkbn'])"></tr>
+      <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;"
+        [style.background]="setBgcolor(frmArr.getRawValue()[getIdx(i)]['tkbn'])"></tr>
     </table>
   </ng-container>
   <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>

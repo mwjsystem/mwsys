@@ -237,7 +237,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     this.form.reset();
     this.frmArr.clear();
     this.frmArr2.clear();
-    this.gdstbl.ins_row(0);
+    this.gdstbl.ins_row(false,0);
     this.refresh();
     // this.gdssrv.grpcd="新規登録"; 
   }
@@ -435,7 +435,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   }
   ins_tnkrow(emitParam:any){
     if(emitParam.flg){
-      this.gtnktbl.ins_row(emitParam.row);
+      this.gtnktbl.ins_row(emitParam.row,emitParam.value);
     }else{
       this.gtnktbl.del_row(emitParam.row);
     }

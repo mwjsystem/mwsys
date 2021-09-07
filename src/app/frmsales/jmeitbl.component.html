@@ -9,8 +9,8 @@
     </mat-select>
   </mat-form-field>
   <button mat-flat-button color="primary" (click)="setJmeikbn(jmeikbn)" *ngIf="frmArr.enabled">一括設定</button>
-  <button mat-flat-button color="accent" (click)="setKoguchi()" [disabled]="parentForm.invalid"
-    *ngIf="frmArr.enabled" matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
+  <button mat-flat-button color="accent" (click)="setKoguchi()" [disabled]="parentForm.invalid" *ngIf="frmArr.enabled"
+    matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
   <button mat-flat-button color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
   <mat-menu #cnp="matMenu">
     <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
