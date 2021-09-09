@@ -15,7 +15,8 @@
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>受注伝票番号</mat-label>
       <input matInput [(ngModel)]="jmisrv.denno" tabIndex="1" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()"
-        maxlength="10" (blur)="onEnter()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
+        maxlength="10" (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
+        [disabled]="mode==1 || (mode==2 && form.dirty)">
       <button mat-button mat-icon-button matSuffix (click)="dennoHelp()" *ngIf="mode==3">
         <mat-icon>find_replace</mat-icon>
       </button>

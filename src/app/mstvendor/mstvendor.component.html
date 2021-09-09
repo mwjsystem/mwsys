@@ -15,7 +15,7 @@
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>仕入先コード</mat-label>
       <input matInput [(ngModel)]="vcd" (keydown.enter)="refresh()" maxlength="12" (keydown.f4)="vcdHelp()"
-        (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
+        (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)">
       <button mat-button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode==3">
         <mat-icon>find_replace</mat-icon>
       </button>

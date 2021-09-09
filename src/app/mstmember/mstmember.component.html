@@ -15,7 +15,8 @@
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>顧客コード</mat-label>
       <input matInput [(ngModel)]="mcd" (keyup.enter)="get_member(this.mcd)" maxlength="12" (keydown.f4)="mcdHelp()"
-        (blur)="get_member(this.mcd)" [ngModelOptions]="{standalone: true}" [disabled]="mode==1">
+        (blur)="get_member(this.mcd)" [ngModelOptions]="{standalone: true}"
+        [disabled]="mode==1 || (mode==2 && form.dirty)">
       <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode==3">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
