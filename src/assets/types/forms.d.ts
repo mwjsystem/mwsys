@@ -128,7 +128,7 @@ declare namespace mwI {
     memo:string;
     created_by:string;
     created_at:Date;
-    status:number;
+    status:string;
     updated_by:string;
     updated_at:Date;
   }

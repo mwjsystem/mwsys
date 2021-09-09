@@ -52,7 +52,7 @@ export class GdstblComponent implements OnInit,AfterViewInit {
     this.refresh();
   }
   ins_row(flg:boolean,row:number){
-    console.log(this.frmArr.controls[row].value);
+    // console.log(this.frmArr.controls[row].value);
     if(flg){
       this.frmArr.insert(row,this.createRow(false,this.frmArr.controls[row-1].value));
     }else{

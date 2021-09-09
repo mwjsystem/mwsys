@@ -7,6 +7,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
+import { BunruiService } from './../services/bunrui.service';
 import { DownloadService } from './../services/download.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
@@ -46,11 +47,12 @@ export class FrmkeepComponent implements OnInit {
         updated_at
       }
     }`;
-  private keycode :string[];  
-  private status :string[];
+  private keycode :string[]=null;  
+  private status :string[]=null;
   constructor(public usrsrv: UserService,
               public cdRef: ChangeDetectorRef, 
-              public stfsrv: StaffService,         
+              public stfsrv: StaffService, 
+              public bunsrv: BunruiService,        
               private apollo: Apollo,
               private toastr: ToastrService,
               private dwlsrv:DownloadService,
@@ -60,18 +62,23 @@ export class FrmkeepComponent implements OnInit {
   ngOnInit(): void {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));    
     // this.stfsrv.get_staff();
+    // console.log('start');
     this.route.paramMap.subscribe((params: ParamMap)=>{
+      // console.log('param',params);
       if (params.get('denno') !== null){
         this.denno = +params.get('denno');
         this.get_opelog({denno:params.get('denno')}).subscribe(value => {
+          console.log(value);
           this.dataSource= new MatTableDataSource<mwI.Tropelog>(value);
           this.overlayRef.detach();
           this.cdRef.detectChanges();
         });
       } else {
         this.get_opelog({status:"依頼中"}).subscribe(value => {
+          console.log(value);
           this.denno = 0;
           this.dataSource= new MatTableDataSource<mwI.Tropelog>(value);
+          console.log('after',this.dataSource);
           this.overlayRef.detach();
           this.cdRef.detectChanges();
         });          
@@ -87,7 +94,7 @@ export class FrmkeepComponent implements OnInit {
     if( param['status']){
       this.status=[param['status']];
     }
-    // console.log(lckeycode,lcstatus);
+    console.log(this.keycode,this.status);
     // return new Promise( resolve => {
     let observable:Observable<mwI.Tropelog[]> = new Observable<mwI.Tropelog[]>(observer => {
       this.apollo.watchQuery<any>({
@@ -101,6 +108,7 @@ export class FrmkeepComponent implements OnInit {
       })
       .valueChanges
       .subscribe(({ data }) => {
+        // console.log(data.tropelog);
         observer.next(data.tropelog);
         // return resolve(data.tropelog);
         // observer.complete();

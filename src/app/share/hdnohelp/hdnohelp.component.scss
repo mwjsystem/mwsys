@@ -25,3 +25,7 @@ tr.mat-row {
 tr.mat-header-row {
     height:20px;
 }
+//mat-selectの▼を非表示に
+::ng-deep mat-select.noArrow .mat-select-arrow  {
+    border: none;
+} 

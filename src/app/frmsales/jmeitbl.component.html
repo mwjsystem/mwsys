@@ -139,14 +139,15 @@
       <ng-container matColumnDef="spec">
         <th mat-header-cell *matHeaderCellDef>在庫状態</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
-          <mat-form-field>
-            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['spec'] | bunrui:'jmeikbn'" disabled>
-          </mat-form-field>
-          <!-- <mat-select #msel4 formControlName="spec" required (keydown.enter)="msel4.close()">
-            <mat-option *ngFor="let sval of bunsrv.jmeikbn" [value]="sval.value">
+          <!-- <mat-form-field>
+            <input matInput [value]="bunsrv.get_name(frmArr.getRawValue()[getIdx(i)]['spec'],'jmeikbn') | async"
+              disabled>
+          </mat-form-field> -->
+          <mat-select #msel4 formControlName="spec" (keydown.enter)="msel4.close()">
+            <mat-option *ngFor="let sval of bunsrv.kbn.jmeikbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
-          </mat-select> -->
+          </mat-select>
         </td>
       </ng-container>
       <ng-container matColumnDef="spdet">

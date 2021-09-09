@@ -16,7 +16,6 @@ import { PortalModule } from '@angular/cdk/portal';
 import { StaffPipe } from './pipes/staff.pipe';
 import { JdatePipe } from './pipes/jdate.pipe';
 import { McdtxtPipe } from './pipes/mcdtxt.pipe';
-import { BunruiPipe } from './pipes/bunrui.pipe';
 import { VcdtxtPipe } from './pipes/vcdtxt.pipe';
 import { ModetxtPipe } from './pipes/modetxt.pipe';
 
@@ -31,7 +30,6 @@ registerLocaleData(localeJa);
     StaffPipe,
     JdatePipe,
     McdtxtPipe,
-    BunruiPipe,
     VcdtxtPipe,
     ModetxtPipe
   ],
@@ -52,7 +50,6 @@ registerLocaleData(localeJa);
     StaffPipe,
     JdatePipe,
     McdtxtPipe,
-    BunruiPipe,
     VcdtxtPipe,
     ModetxtPipe,
     TmstmpComponent,

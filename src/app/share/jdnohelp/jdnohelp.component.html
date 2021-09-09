@@ -148,7 +148,13 @@
             </ng-container>
             <ng-container matColumnDef="pcode">
                 <th mat-header-cell *matHeaderCellDef>入金予定コード</th>
-                <td mat-cell *matCellDef="let row">{{row.pcode | bunrui:'pay'}}</td>
+                <td mat-cell *matCellDef="let row">
+                    <mat-select [value]="row.pcode" class="noArrow">
+                        <mat-option *ngFor="let sval of bunsrv.kbn.pay" [value]="sval.value">
+                            {{sval.viewval}}
+                        </mat-option>
+                    </mat-select>
+                </td>
             </ng-container>
             <ng-container matColumnDef="tcode1 ">
                 <th mat-header-cell *matHeaderCellDef>営業担当</th>

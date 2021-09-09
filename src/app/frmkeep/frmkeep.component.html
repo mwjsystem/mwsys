@@ -31,7 +31,8 @@
       </ng-container>
       <ng-container matColumnDef="extype">
         <th mat-header-cell *matHeaderCellDef>タイプ</th>
-        <td mat-cell *matCellDef="let row;">{{row.extype | bunrui:'extype' }}</td>
+        <td mat-cell *matCellDef="let row;">{{row.extype}}</td>
+        <!-- <td mat-cell *matCellDef="let row;">{{bunsrv.get_name(row.extype,'extype') | async}}</td> -->
       </ng-container>
       <ng-container matColumnDef="created_by">
         <th mat-header-cell *matHeaderCellDef>登録者</th>

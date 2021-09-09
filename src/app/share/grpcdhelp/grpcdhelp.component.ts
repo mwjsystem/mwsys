@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import { UserService } from './../../services/user.service';
+import { BunruiService } from './../../services/bunrui.service';
 import { Ggrp,GoodsService } from './../../services/goods.service';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -30,6 +31,7 @@ export class GrpcdhelpComponent implements OnInit {
   constructor(private dialogRef: MatDialogRef<GrpcdhelpComponent>,
               public usrsrv: UserService,
               public gdssrv: GoodsService,
+              public bunsrv: BunruiService,
               private apollo: Apollo,
               private overlay: Overlay) {
                 this.dataSource= new MatTableDataSource<Ggrp>(this.gdssrv.ggrps);

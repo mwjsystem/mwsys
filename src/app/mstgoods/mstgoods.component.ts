@@ -340,6 +340,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
             },
           }],
       }).subscribe(({ data }) => {
+        // console.log(data);
         this.toastr.success('商品グループ' + this.gdssrv.grpcd + 'の変更を保存しました');
         this.mode=3;
         this.form.disable();
