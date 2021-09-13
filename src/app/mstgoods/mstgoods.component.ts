@@ -252,9 +252,12 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     if (this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
       if(this.mode==1){
         this.gdssrv.grpcd='';
+        this.mode=3;
+        this.refresh();
+      }else{
+        this.mode=3;
+        this.get_ggroup(this.gdssrv.grpcd);
       }
-      this.mode=3;
-      this.refresh();
       this.form.markAsPristine();
       history.replaceState('','','./mstgoods/' + this.mode + '/' + this.gdssrv.grpcd);
     }

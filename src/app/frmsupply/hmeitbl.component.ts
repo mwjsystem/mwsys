@@ -67,7 +67,7 @@ export class HmeitblComponent implements OnInit {
 
   calcTot(){
     let lcgtotal:number=0;
-    let lcttotal:number=0;
+    // let lcttotal:number=0;
     let lctax:number=0;
     this.frmArr.controls
       .forEach(control => {
@@ -76,13 +76,13 @@ export class HmeitblComponent implements OnInit {
           control.patchValue({money:lcmoney});
           lcgtotal += lcmoney;
           if(control.value.mtax=='0'){
-            lcttotal += lcmoney;
+            // lcttotal += lcmoney;
             lctax += (lcmoney * +control.value.taxrate / 100)
             // console.log(lctax);
           }
         }
       })
-    this.parentForm.patchValue({gtotal:lcgtotal,ttotal:lcttotal,tax:lctax,total:lcgtotal + lctax});
+    this.parentForm.patchValue({gtotal:lcgtotal,tax:lctax,total:lcgtotal + lctax});
     this.hmisrv.subject.next(true);
     this.hmisrv.subject.complete();
     this.refresh();

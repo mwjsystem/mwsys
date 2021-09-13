@@ -1,109 +1,110 @@
-
-    <mat-toolbar class="toolbar mat-elevation-z8" color="primary">
-      <div class="icon-area" fxLayout="row" fxLayoutGap="5px" fxShow="true" fxHide.lt-md="true">
-        <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
-            <mat-label>商品ｺｰﾄﾞ</mat-label>
-            <input matInput [ngModel]="gcode" gcdInput (ngModelChange)="gcode=$event" (keyup.enter)="onEnter()" (keydown.f4)="gcdHelp()"
-            (blur)="refresh()" [ngModelOptions]="{standalone: true}">
-            <button mat-button mat-icon-button matSuffix (click)="gcdHelp()" >
-              <mat-icon>find_replace</mat-icon>
-            </button>
-        </mat-form-field>
-        <button mat-button (click)="setNext()">
-          <mat-icon>keyboard_arrow_up</mat-icon>
-          次の商品
-        </button>
-        <button mat-button (click)="setPrev()">
-          <mat-icon>keyboard_arrow_down</mat-icon>
-          前の商品
-        </button>  
-        <button mat-button (click)="gcdHelp()">
-          <mat-icon>find_replace</mat-icon>
-          商品検索
-        </button>
-        <button mat-button (click)="refresh()">
-          <mat-icon>autorenew</mat-icon>
-          再表示
-        </button>
-        <button  mat-button (click)="showChart()">
-          <mat-icon>poll</mat-icon>
-          月別出荷数
-        </button>
-        <button  mat-button (click)="outputCsv($event)">
-          <mat-icon>cloud_download</mat-icon>
-          ダウンロード
-        </button>
-        <a id="csv-donwload" data-type="text/csv"></a>
-        <button mat-button><a mat-button href="https://mwj001.sharepoint.com/:b:/s/mwjapan/ERnyHwK29VVAtLlVtTd2fI4Buh5_43qaAwHsZPV0GJPsYA?e=fOeYl8" target="_blank">
-          <mat-icon>help</mat-icon>
-          ヘルプ
-        </a></button>      
-      </div>
-      <div class="icon-area" fxLayout="row" fxShow="true" fxHide.gt-sm="true">
-        <button mat-button (click)="setNext()">
-          <mat-icon>keyboard_arrow_up</mat-icon>
-        </button>
-        <button mat-button (click)="setPrev()">
-          <mat-icon>keyboard_arrow_down</mat-icon>
-        </button>  
-        <button mat-button (click)="gcdHelp()">
-          <mat-icon>find_replace</mat-icon>
-        </button>
-        <button mat-button (click)="refresh()">
-          <mat-icon>autorenew</mat-icon>
-        </button>
-        <button  mat-button (click)="showChart()">
-          <mat-icon>poll</mat-icon>
-        </button>
-        <!-- <button type="button" class="btn btn1" (click)="outputCsv($event)">CSV出力</button>
+<mat-toolbar class="toolbar mat-elevation-z8" color="primary">
+  <div class="icon-area" fxLayout="row" fxLayoutGap="5px" fxShow="true" fxHide.lt-md="true">
+    <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
+      <mat-label>商品ｺｰﾄﾞ</mat-label>
+      <input matInput [ngModel]="gcode" gcdInput (ngModelChange)="gcode=$event" (keyup.enter)="onEnter()"
+        (keydown.f4)="gcdHelp()" (blur)="refresh()" [ngModelOptions]="{standalone: true}">
+      <button mat-button mat-icon-button matSuffix (click)="gcdHelp()">
+        <mat-icon>find_replace</mat-icon>
+      </button>
+    </mat-form-field>
+    <button mat-button (click)="setNext()">
+      <mat-icon>keyboard_arrow_up</mat-icon>
+      次の商品
+    </button>
+    <button mat-button (click)="setPrev()">
+      <mat-icon>keyboard_arrow_down</mat-icon>
+      前の商品
+    </button>
+    <button mat-button (click)="gcdHelp()">
+      <mat-icon>find_replace</mat-icon>
+      商品検索
+    </button>
+    <button mat-button (click)="refresh()">
+      <mat-icon>autorenew</mat-icon>
+      再表示
+    </button>
+    <button mat-button (click)="showChart()">
+      <mat-icon>poll</mat-icon>
+      月別出荷数
+    </button>
+    <button mat-button (click)="outputCsv($event)">
+      <mat-icon>cloud_download</mat-icon>
+      ダウンロード
+    </button>
+    <a id="csv-donwload" data-type="text/csv"></a>
+    <button mat-button><a mat-button
+        href="https://mwj001.sharepoint.com/:b:/s/mwjapan/ERnyHwK29VVAtLlVtTd2fI4Buh5_43qaAwHsZPV0GJPsYA?e=fOeYl8"
+        target="_blank">
+        <mat-icon>help</mat-icon>
+        ヘルプ
+      </a></button>
+  </div>
+  <div class="icon-area" fxLayout="row" fxShow="true" fxHide.gt-sm="true">
+    <button mat-button (click)="setNext()">
+      <mat-icon>keyboard_arrow_up</mat-icon>
+    </button>
+    <button mat-button (click)="setPrev()">
+      <mat-icon>keyboard_arrow_down</mat-icon>
+    </button>
+    <button mat-button (click)="gcdHelp()">
+      <mat-icon>find_replace</mat-icon>
+    </button>
+    <button mat-button (click)="refresh()">
+      <mat-icon>autorenew</mat-icon>
+    </button>
+    <button mat-button (click)="showChart()">
+      <mat-icon>poll</mat-icon>
+    </button>
+    <!-- <button type="button" class="btn btn1" (click)="outputCsv($event)">CSV出力</button>
         <a id="csv-donwload"></a> -->
-      </div>
-  </mat-toolbar>
-  <mat-card>
+  </div>
+</mat-toolbar>
+<mat-card>
   <mat-card-content fxLayout="row wrap" fxLayoutGap="5px">
     <fieldset fxLayout="row wrap" fxLayoutGap="5px">
-      <legend>共通情報</legend>  
-  <mat-form-field>
-    <mat-label>商品名</mat-label>
-    <input matInput [value]="stcsrv.stgds.gtext" disabled>
-  </mat-form-field>
-    <div *ngIf="stcsrv.stgds.gskbn=='0'">  
-      <mat-form-field style="width:7em">
-        <mat-label>入荷予定日</mat-label>
-        <input matInput [value]="stcsrv.stgds.ndate" disabled>
+      <legend>共通情報</legend>
+      <mat-form-field>
+        <mat-label>商品名</mat-label>
+        <input matInput [value]="stcsrv.stgds.gtext" disabled>
+      </mat-form-field>
+      <div *ngIf="stcsrv.stgds.gskbn=='0'">
+        <mat-form-field style="width:7em">
+          <mat-label>{{stcsrv.stgds.ydtxt}}</mat-label>
+          <input matInput [value]="stcsrv.stgds.yday" disabled>
+        </mat-form-field>
+        <mat-form-field style="width:4em">
+          <mat-label>入荷予定数</mat-label>
+          <input matInput [value]="stcsrv.stgds.suu" disabled class="i_num">
+        </mat-form-field>
+        <mat-form-field style="width:4em">
+          <mat-label>発注残</mat-label>
+          <input matInput [value]="stcsrv.stgds.htzan" disabled class="i_num">
+        </mat-form-field>
+      </div>
+      <mat-form-field style="width:6em">
+        <mat-label>月平均出荷数</mat-label>
+        <input matInput [value]="stcsrv.stgds.moavg | number:'1.2-2'" disabled class="i_num">
       </mat-form-field>
       <mat-form-field style="width:4em">
-        <mat-label>入荷予定数</mat-label>
-        <input matInput [value]="stcsrv.stgds.incnt" disabled class="i_num">
+        <input matInput [value]="stcsrv.stgds.unit" disabled>
       </mat-form-field>
-      <mat-form-field style="width:4em">
-        <mat-label>発注残</mat-label>
-        <input matInput [value]="stcsrv.stgds.htzan" disabled class="i_num">
+      <mat-form-field style="width:6em">
+        <mat-label>出荷数昨対</mat-label>
+        <input matInput [value]="stcsrv.stgds.motai" disabled class="i_num">
       </mat-form-field>
-    </div>
-    <mat-form-field style="width:6em">
-      <mat-label>月平均出荷数</mat-label>
-      <input matInput [value]="stcsrv.stgds.moavg | number:'1.2-2'" disabled class="i_num">
-    </mat-form-field>
-    <mat-form-field style="width:4em">
-      <input matInput [value]="stcsrv.stgds.iriunit" disabled>
-    </mat-form-field>
-    <mat-form-field style="width:6em">
-      <mat-label>出荷数昨対</mat-label>
-      <input matInput [value]="stcsrv.stgds.motai" disabled class="i_num">
-    </mat-form-field>
-    <mat-form-field style="width:8em;">
-      <mat-label>数量区分</mat-label>
-      <mat-select  [value]="stcsrv.stgds.gskbn" disabled class="selreadonly">
-        <mat-option *ngFor="let sval of bunsrv.kbn.gskbn" [value]="sval.value">
-          {{sval.viewval}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </fieldset> 
+      <mat-form-field style="width:8em;">
+        <mat-label>数量区分</mat-label>
+        <mat-select [value]="stcsrv.stgds.gskbn" disabled class="selreadonly">
+          <mat-option *ngFor="let sval of bunsrv.kbn.gskbn" [value]="sval.value">
+            {{sval.viewval}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </fieldset>
   </mat-card-content>
-  </mat-card>
-  <mat-card style="padding: 10px;" fxLayout="column">
+</mat-card>
+<mat-card style="padding: 10px;" fxLayout="column">
   <!-- <div fxLayout="row wrap" fxLayoutAlign="start baseline">
   <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox>
   <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
@@ -117,40 +118,42 @@
   </div> -->
   <mat-card-content fxLayout="row wrap" fxLayoutAlign="start baseline" fxLayoutGap="5px">
     <fieldset>
-      <legend>  <div fxLayout="row wrap" fxLayoutAlign="start baseline">
-        <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox>
-        <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
-          <mat-label>倉庫</mat-label>
-          <mat-select [(value)]="scode" (openedChange)="refresh()" [disabled]="!chSok">
-            <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
-              {{sval.viewval}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>  
-        </div></legend>  
-    <div *ngIf="stcsrv.stgds.gskbn=='0'">
-      <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;">
+      <legend>
+        <div fxLayout="row wrap" fxLayoutAlign="start baseline">
+          <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox>
+          <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
+            <mat-label>倉庫</mat-label>
+            <mat-select [(value)]="scode" (openedChange)="refresh()" [disabled]="!chSok">
+              <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </legend>
+      <div *ngIf="stcsrv.stgds.gskbn=='0'">
+        <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;">
+          <mat-label>受注可能数</mat-label>
+          <input matInput numberInput value="{{stcsrv.stc.stock - stcsrv.stc.juzan}}" disabled class="i_num">
+        </mat-form-field>
+        <mat-form-field style="width:4em">
+          <input matInput [value]="stcsrv.stgds.unit" disabled>
+        </mat-form-field>
+        <mat-form-field style="width:4em">
+          <mat-label>在庫数</mat-label>
+          <input matInput numberInput [value]="stcsrv.stc.stock" disabled class="i_num">
+        </mat-form-field>
+        <mat-form-field style="width:4em">
+          <mat-label>受注残</mat-label>
+          <input matInput numberInput [value]="stcsrv.stc.juzan" disabled class="i_num">
+        </mat-form-field>
+      </div>
+      <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;" *ngIf="stcsrv.stgds.gskbn=='1'">
         <mat-label>受注可能数</mat-label>
-        <input matInput numberInput value="{{stcsrv.stc.stock - stcsrv.stc.juzan}}" disabled class="i_num">
+        <input matInput numberInput value="{{stcsrv.get_paabl()}}" disabled class="i_num">
       </mat-form-field>
-      <mat-form-field style="width:4em">
-        <input matInput [value]="stcsrv.stgds.iriunit" disabled>
-      </mat-form-field>
-      <mat-form-field style="width:4em">
-        <mat-label>在庫数</mat-label>
-        <input matInput numberInput [value]="stcsrv.stc.stock" disabled class="i_num">
-      </mat-form-field>
-      <mat-form-field style="width:4em">
-        <mat-label>受注残</mat-label>
-        <input matInput numberInput [value]="stcsrv.stc.juzan" disabled class="i_num">
-      </mat-form-field>
-    </div>
-    <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;" *ngIf="stcsrv.stgds.gskbn=='1'">
-      <mat-label>受注可能数</mat-label>
-      <input matInput numberInput value="{{stcsrv.get_paabl()}}"disabled class="i_num">
-    </mat-form-field>
-  </fieldset>  
+    </fieldset>
   </mat-card-content>
-  
- 
-  </mat-card>
+
+
+</mat-card>

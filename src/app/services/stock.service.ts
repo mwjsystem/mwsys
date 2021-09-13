@@ -19,15 +19,17 @@ export class StGds {
   gcode: string;
   gtext: string;
   gskbn: string;
-  ndate: Date;
-  incnt: number;
+  yday: Date;
+  suu: number;
   htzan: number;
   moavg: number;
-  iriunit: string; 
+  unit: string; 
   motai: string;
+  ydtxt:string;
   stcks:Stock[];
-  constructor(init?:Partial<Stock>) {
+  constructor(init?:Partial<StGds>) {
     Object.assign(this, init);
+    this.ydtxt='入荷予定日';
   }
 }
 
@@ -68,12 +70,26 @@ export class StockService {
   }
 
   get_shcount(gcd:string){
+    this.stgds=new StGds();
     const GetTran = gql`
     query get_shcount($id: smallint!, $gcode: String!, $fr: String!, $to: String!) {
       vshukka(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, to_char: {_gte: $fr, _lte: $to}}, order_by: {to_char: asc}) {
         gcode
         to_char
         sum
+      }
+      trhatmei(where: {hatzan: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
+        gcode
+        yday
+        ydaykbn
+        hatzan
+      }
+      trhatmei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
+        aggregate {
+          sum {
+            hatzan
+          }
+        }
       }
     }`;
     this.apollo.watchQuery<any>({
@@ -87,6 +103,7 @@ export class StockService {
       })
       .valueChanges
       .subscribe(({ data }) => {
+        console.log(data);
         for(let i=0;i<12;i++){
           const j:number= data.vshukka.findIndex(obj => obj.to_char == this.shcym[i]);
           if(j>-1){
@@ -106,8 +123,26 @@ export class StockService {
         if(las==0){
           this.stgds.motai = '－';
         } else {
-          this.stgds.motai = this.shcnt.reduce((a,b)=>{return a+b;}) / las * 100 + '％';
+          this.stgds.motai = Math.round(this.shcnt.reduce((a,b)=>{return a+b;}) / las * 1000 ) / 10 + '％';
         }
+        if(data.trhatmei.length>0){
+          this.stgds.yday = data.trhatmei[0]?.yday;
+          this.stgds.suu = data.trhatmei[0]?.hatzan;
+          if(data.trhatmei[0]?.ydaykbn==0){
+            this.stgds.ydtxt='入荷予定日(確定)';
+          } else if(data.trhatmei[0]?.ydaykbn==1){
+            this.stgds.ydtxt='入荷予定日(仮確定)';
+          } else if(data.trhatmei[0]?.ydaykbn==2){
+            this.stgds.ydtxt='暫定入荷予定日';
+          } else {
+            this.stgds.ydtxt='入荷予定日';
+          }
+        }else{
+          this.stgds.yday = null;
+          this.stgds.suu = 0;
+          this.stgds.ydtxt='入荷予定日';
+        }
+        this.stgds.htzan=data.trhatmei_aggregate.aggregate.sum.hatzan;
         // console.log(this.shcnt,this.shlas);
       },(error) => {
         console.log('error query get_shcount', error);
@@ -115,7 +150,7 @@ export class StockService {
 
   }
 
-  get_stcscds(gcd:string,scd?:string){
+  get_stcscds(gcd:string,scd?:string):Promise<Stock[]>{
     const GetTran = gql`
     query get_trgtana($id: smallint!, $gcode: String!,$scode: [String!]) {
       trgtana(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_in:$scode}}, distinct_on: [gcode, scode], order_by: {gcode: asc, scode: asc, day: desc}) {
@@ -124,52 +159,55 @@ export class StockService {
         day
       }
     }`;
-    let observable:Observable<StGds> = new Observable<StGds>(observer => {
-          let lcscd :string[];
-          if(scd){
-            lcscd=[scd];
-          }
-          this.apollo.watchQuery<any>({
-          query: GetTran, 
-            variables: { 
-              id : this.usrsrv.compid,
-              gcode:gcd,
-              scode:lcscd
-            },
-          })
-          .valueChanges
-          .subscribe(({ data }) => {
-            console.log(data);
-            this.soksrv.scds.forEach(element => {
-              let i:number=data.trgtana.findIndex(obj => obj.scode == element.value);
-              if(i > -1 ){
-                this.get_tana(gcd,element.value,data.trgtana[i].day,data.trgtana[i].tana).subscribe(value => {
-                  this.stcs.push(value);
-                });
-              }
-
-              
-
-              
+    return new Promise( resolve => {
+    // let observable:Observable<StGds> = new Observable<StGds>(observer => {
+      let lcscd :string[];
+      let lcstcs:Stock[]=[];
+      if(scd){
+        lcscd=[scd];
+      }
+      this.apollo.watchQuery<any>({
+      query: GetTran, 
+        variables: { 
+          id : this.usrsrv.compid,
+          gcode:gcd,
+          scode:lcscd
+        },
+      })
+      .valueChanges
+      .subscribe(({ data }) => {
+        // console.log(data);
+        this.soksrv.scds.forEach(element => {
+          let i:number=data.trgtana.findIndex(obj => obj.scode == element.value);
+          if(i > -1 ){
+            this.get_tana(gcd,element.value,data.trgtana[i].day,data.trgtana[i].tana).then(value => {
+              lcstcs.push(value);
             });
-            
-            data.trgtana.forEach(element => {
-              
-            });;
+          }
+
+          
+
+          
+        });
+        // console.log(lcstcs);
+        // data.trgtana.forEach(element => {
+          
+        // });;
 
 
 
-
-          },(error) => {
-            console.log('error query get_system', error);
-          });
+        return resolve(lcstcs);
+      },(error) => {
+        console.log('error query trgtana', error);
+        return resolve([]);
+      });
 
         
     });
-    return observable;
+    // return observable;
 
   }
-  get_tana(gcd:string,scd:string,day:Date,i:number) {
+  get_tana(gcd:string,scd:string,day:Date,i:number):Promise<Stock>  {
     const GetTran = gql`
     query get_trgtana($id: smallint!, $gcode: String!, $scode: String!, $day: date!) {
       trgtana(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, del: {_is_null: true}, scode: {_eq: $scode}, day: {_eq: $day}}) {
@@ -205,7 +243,8 @@ export class StockService {
     }`;    
     
     
-    let observable:Observable<Stock> = new Observable<Stock>(observer => {
+    // let observable:Observable<Stock> = new Observable<Stock>(observer => {
+    return new Promise<Stock>( resolve => {
       this.apollo.watchQuery<any>({
         query: GetTran, 
           variables: { 
@@ -217,19 +256,17 @@ export class StockService {
       })
       .valueChanges
       .subscribe(({ data }) => {
-
-
-
-
-        observer.next(data.tropelog);
+        return resolve(data.trgtana);
+        // observer.next(data.trgtana);
+        // observer.complete();
         // console.log(data.tropelog);
       },(error) => {
         console.log('error query get_opelog', error);
-        observer.next();
-        observer.complete();
+        // observer.next();
+        // observer.complete();
       });
     });
-    return observable;
+    // return observable;
   }
 
   get_paabl():number {

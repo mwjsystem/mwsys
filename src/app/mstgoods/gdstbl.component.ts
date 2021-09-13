@@ -21,7 +21,6 @@ export class GdstblComponent implements OnInit,AfterViewInit {
     this.paginator = mp;
     this.dataSource.paginator = this.paginator;
   }
-  // @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   @Output() action = new EventEmitter();
   dataSource = new MatTableDataSource();
   displayedColumns =['action','gcode','gtext','size','color','unit','gskbn','jan','weight','tkbn','max','send','ordering','koguchi','lot'];
@@ -34,16 +33,13 @@ export class GdstblComponent implements OnInit,AfterViewInit {
               public usrsrv:UserService,
               public gdssrv:GoodsService,
               public bunsrv:BunruiService) {
-                this.dataSource.paginator = this.paginator;
-                // console.log(this.paginator);
+                // this.dataSource.paginator = this.paginator;
   }
 
   ngOnInit(): void {
     this.add_rows(1);
     this.refresh();
-    this.dataSource.paginator = this.paginator;
-    // console.log(this.paginator);
-    // console.log(this.bunsrv.gskbn);
+    // this.dataSource.paginator = this.paginator;
   }
   
   del_row(row:number){
@@ -52,19 +48,13 @@ export class GdstblComponent implements OnInit,AfterViewInit {
     this.refresh();
   }
   ins_row(flg:boolean,row:number){
-    // console.log(this.frmArr.controls[row].value);
     if(flg){
       this.frmArr.insert(row,this.createRow(false,this.frmArr.controls[row-1].value));
     }else{
       this.frmArr.insert(row,this.createRow(false));
     }
-    
     this.action.emit({flg:true,row:row,value:true});//mstgoods.componentのメソッドins_throwに渡す引数
-    // (this.parentForm.get('mtbl2') as FormArray).insert(row,this.gdssrv.createRow());
-    // console.log(this.frmArr);
-    // console.log((this.parentForm.get('mtbl2') as FormArray));
-    // this.gdssrv.subTnk.next(true);
-    // this.gdssrv.subTnk.complete();
+    this.parentForm.markAsDirty();
     this.refresh();
   }
 
@@ -125,14 +115,14 @@ export class GdstblComponent implements OnInit,AfterViewInit {
                 if(control.get('gcode').value == value && j != i){
 
                   this.toastr.error( value + 'は重複しています(' + (j+1) + '行目)','商品コード入力エラー',
-                                  {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+                                  {closeButton: true,disableTimeOut: true,tapToDismiss: false,positionClass: 'toast-top-left'});
                   this.frmArr.controls[i].get('gcode').setErrors({'exist': true});
                 }
                 j+=1;
               });
           } else {
             this.toastr.error( value + 'は商品ｸﾞﾙｰﾌﾟ' + data.msgoods[0].msggroup.code + 'で登録済です','商品コード入力エラー',
-                      {closeButton: true,disableTimeOut: true,tapToDismiss: false});
+                      {closeButton: true,disableTimeOut: true,tapToDismiss: false,positionClass: 'toast-top-left'});
             this.frmArr.controls[i].get('gcode').setErrors({'exist': true});
           }
       });  

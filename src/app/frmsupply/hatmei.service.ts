@@ -21,7 +21,6 @@ export class HatmeiService {
         tcode
         autoproc
         gtotal
-        ttotal
         jdenno
         total
         dbiko
@@ -41,7 +40,6 @@ export class HatmeiService {
           gcode
           gtext
           inday
-          iriunit
           jdenno
           jline
           line

@@ -74,7 +74,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       dbiko: new FormControl(''),
       inbiko: new FormControl(''),
       gtotal: new FormControl(''),
-      ttotal: new FormControl(''),
+      // ttotal: new FormControl(''),
       tax: new FormControl(''),
       total: new FormControl(''),
       jdenno: new FormControl(''),
@@ -200,7 +200,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     head['sextend'] = soko.extend;
     head['stel'] = soko.tel;
     head['sfax'] = soko.fax;
-    const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl,['line','gcode','gtext','suu','iriunit','jdenno','mbikou']);
+    const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl,['line','gcode','gtext','suu','unit','jdenno','mbikou']);
     this.dwlsrv.dl_png('staff/',this.form.getRawValue().tcode.toString() + ".png",this.denno + format + ".png");
     this.dwlsrv.dl_csv(head,this.denno + format + "H.csv");
     this.dwlsrv.dl_csv(det,this.denno + format + "M.csv");
@@ -304,7 +304,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       dbiko: this.usrsrv.editFrmval(this.form,'dbiko'),
       inbiko: this.usrsrv.editFrmval(this.form,'inbiko'),
       gtotal: this.usrsrv.editFrmval(this.form,'gtotal'),
-      ttotal: this.usrsrv.editFrmval(this.form,'ttotal'),
+      // ttotal: this.usrsrv.editFrmval(this.form,'ttotal'),
       tax: this.usrsrv.editFrmval(this.form,'tax'),
       total: this.usrsrv.editFrmval(this.form,'total'),
       updated_at:new Date(),

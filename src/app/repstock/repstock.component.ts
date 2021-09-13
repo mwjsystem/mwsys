@@ -50,7 +50,7 @@ export class RepstockComponent implements OnInit {
 
   }
   onEnter(): void {
-    this.elementRef.nativeElement.querySelector('button').focus();
+    this.refresh();
   } 
 
   gcdHelp(): void {
@@ -111,7 +111,7 @@ export class RepstockComponent implements OnInit {
       msgoods_by_pk(id:$id, gcode:$gcode) {
         gtext
         gskbn
-        iriunit
+        unit
       }
     }`;
 
@@ -129,9 +129,11 @@ export class RepstockComponent implements OnInit {
         .subscribe(({ data }) => {
           this.stcsrv.stgds.gtext=data.msgoods_by_pk.gtext;
           this.stcsrv.stgds.gskbn=data.msgoods_by_pk.gskbn;
-          this.stcsrv.stgds.iriunit=data.msgoods_by_pk.iriunit;
+          this.stcsrv.stgds.unit=data.msgoods_by_pk.unit;
           if(this.stcsrv.stgds.gskbn=="0"){
-            this.stcsrv.get_stcscds(this.gcode,this.scode).subscribe();
+            this.stcsrv.get_stcscds(this.gcode,this.scode).then(
+              
+            );
           } else {
 
           }
