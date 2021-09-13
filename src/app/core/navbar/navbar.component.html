@@ -115,8 +115,12 @@
                     href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5XVMJM"
                     target="_blank">初期設定Manual</a>
                 <a mat-menu-item href="assets/mwjexe.reg" download="mwjexe.reg">初期設定①</a>
-                <a mat-menu-item href="assets/psqlodbc_x86.msi" download="psqlodbc_x86.msi">初期設定②</a>
-                <a mat-menu-item href="{{usrsrv.system.imgurl + 'postgresql-12.3-1-windows-x64.exe'}}" download="postgresql-12.3-1-windows-x64.exe">初期設定③</a>
+                <a mat-menu-item href="{{usrsrv.system.imgurl + 'psqlodbc_x86.msi'}}"
+                    download="psqlodbc_x86.msi">初期設定②</a>
+                <a mat-menu-item href="{{usrsrv.system.imgurl + 'psqlodbc_x64.msi'}}"
+                    download="psqlodbc_x64.msi">初期設定②'</a>
+                <a mat-menu-item href="{{usrsrv.system.imgurl + 'postgresql-12.3-1-windows-x64.exe'}}"
+                    download="postgresql-12.3-1-windows-x64.exe">初期設定③</a>
             </mat-menu>
             <button mat-menu-item [matMenuTriggerFor]="colormenu">
                 <mat-icon>palette</mat-icon>テーマカラー
@@ -148,7 +152,7 @@
                 <mat-icon>exit_to_app</mat-icon>
                 <span>ログアウト</span>
             </button>
-            
+
         </form>
     </mat-menu>
 </mat-toolbar>
