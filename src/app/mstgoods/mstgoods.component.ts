@@ -122,6 +122,13 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     );    
   }  
 
+  canEnter(e:KeyboardEvent):void{
+    let element = e.target as HTMLElement;
+    // console.log(element,element.tagName);
+    if(element.tagName !=='TEXTAREA'){
+      e.preventDefault();
+    }
+  }
   vcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
@@ -438,8 +445,9 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     }
   }
   ins_tnkrow(emitParam:any){
+    // console.log(emitParam);
     if(emitParam.flg){
-      this.gtnktbl.ins_row(emitParam.row,emitParam.value);
+      this.gtnktbl.ins_row(emitParam.row,emitParam.flgCP);
     }else{
       this.gtnktbl.del_row(emitParam.row);
     }

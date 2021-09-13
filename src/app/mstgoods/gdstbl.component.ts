@@ -47,13 +47,13 @@ export class GdstblComponent implements OnInit,AfterViewInit {
     this.action.emit({flg:false,row:row});//mstgoods.componentのメソッドins_throwに渡す引数
     this.refresh();
   }
-  ins_row(flg:boolean,row:number){
-    if(flg){
+  ins_row(flgCP:boolean,row:number){
+    if(flgCP){
       this.frmArr.insert(row,this.createRow(false,this.frmArr.controls[row-1].value));
     }else{
       this.frmArr.insert(row,this.createRow(false));
     }
-    this.action.emit({flg:true,row:row,value:true});//mstgoods.componentのメソッドins_throwに渡す引数
+    this.action.emit({flg:true,row:row,flgCP:flgCP});//mstgoods.componentのメソッドins_throwに渡す引数
     this.parentForm.markAsDirty();
     this.refresh();
   }
