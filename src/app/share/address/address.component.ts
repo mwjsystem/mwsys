@@ -72,7 +72,7 @@ export class AddressComponent implements OnInit {
     this.parent.form.get(this.formName).get(fldnm).setValue(val);
   }
 
-  saveMadr(mcode:string|number,eda:string|number,mode:number):Subject<string|number> {
+  saveMadr(mcode:string,eda:string|number,mode:number):Subject<string|number> {
     // console.log(this.formName,eda);
     const form = this.parent.form;
     let neweda:Subject<string|number>=new Subject();

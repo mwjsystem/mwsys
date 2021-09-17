@@ -17,7 +17,7 @@ import { AddressComponent } from './../address/address.component';
 export class AdredaComponent implements OnInit, AfterViewInit {
   @ViewChild( AddressComponent, {static: false} )
     private child: AddressComponent;
-  mcode: number;
+  mcode: string="";
   mode:number=3;
   form: FormGroup;
   eda:number|string;

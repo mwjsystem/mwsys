@@ -42,7 +42,7 @@ query get_members($id: smallint!) {
 }`;
 
 export const GetMast1 = gql`
-query get_member($id: smallint!,$mcode:Int!) {
+query get_member($id: smallint!,$mcode:String!) {
   msmember_by_pk(id: $id, mcode:$mcode) {
     mcode
     sei
@@ -132,18 +132,18 @@ query get_system($id: smallint!){
     maxmcd
   }
 }`;
-export const GetMast5 = gql`
-query get_mcode($id: smallint!,$maxmcd: Int){
-  msmember_aggregate(where: {id: {_eq: $id}, mcode: {_lt: $maxmcd}}) {
-    aggregate {
-      max {
-        mcode
-      }
-    }
-  }
-}`;
+// export const GetMast5 = gql`
+// query get_mcode($id: smallint!,$maxmcd: Int){
+//   msmember_aggregate(where: {id: {_eq: $id}, mcode: {_lt: $maxmcd}}) {
+//     aggregate {
+//       max {
+//         mcode
+//       }
+//     }
+//   }
+// }`;
 export const GetMast6 = gql`
-query get_eda($id: smallint!,$mcode: Int!){
+query get_eda($id: smallint!,$mcode: String!){
   msmadr_aggregate(where: {id: {_eq: $id}, mcode: {_eq: $mcode}}) {
     aggregate {
       max {
@@ -165,13 +165,13 @@ mutation ins_madr($object: [msmadr_insert_input!]!) {
   }
 }`;
 export const UpdateMast1 = gql`
-mutation upd_member($id: smallint!, $mcode: Int!,$_set: msmember_set_input!) {
+mutation upd_member($id: smallint!, $mcode: String!,$_set: msmember_set_input!) {
   update_msmember(where: {id: {_eq: $id},mcode: {_eq:$mcode}}, _set: $_set)  {
     affected_rows
   }
 }`;
 export const UpdateMast2 = gql`
-mutation upd_madr($id: smallint!, $mcode: Int!, $eda: Int!,$_set: msmadr_set_input!) {
+mutation upd_madr($id: smallint!, $mcode: String!, $eda: Int!,$_set: msmadr_set_input!) {
   update_msmadr(where: {id: {_eq: $id},mcode: {_eq:$mcode},eda: {_eq:$eda}}, _set: $_set)  {
     affected_rows
   }

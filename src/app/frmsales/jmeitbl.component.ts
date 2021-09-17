@@ -34,30 +34,30 @@ export class JmeitblComponent implements OnInit {
   mall:boolean=false;
   hidx=20; //tabindex用ヘッダ項目数
   mcols=4; //tabindex用明細列数
-  displayedColumns = ['chk',
-                      'line',
-                      'gcode',
-                      'gtext',
-                      'suu',
-                      'unit',
-                      'rate',
-                      'tanka',
-                      // 'tintanka',
-                      // 'touttanka',
-                      'tinmoney',
-                      // 'toutmoney',
-                      'spec',
-                      'spdet',
-                      'mbikou',
-                      'zaiko',
-                      'jyuzan',
-                      'genka',
-                      'souko',
-                      'tanka1',
-                      'money',
-                      'mtax',
-                      'taxmoney',
-                      'taxrate'];
+  displayedColumns:string[];
+  flgCol:boolean=false;
+  defCol = ['chk',
+             'line',
+             'gcode',
+             'gtext',
+             'suu',
+             'unit',
+             'rate',
+             'tanka',
+             'tinmoney',
+             'mbikou',
+             'pable',
+             'spec',
+             'spdet'];
+  addCol = ['genka',
+            'souko',
+            'sday',
+            'tanka1',
+            'money',
+            'mtax',
+            'tgenka',
+            'taxmoney',
+            'taxrate'];
 
   constructor(private cdRef:ChangeDetectorRef,
               private elementRef: ElementRef,
@@ -73,58 +73,47 @@ export class JmeitblComponent implements OnInit {
               public jmisrv: JyumeiService) {}
 
   ngOnInit(): void {
+    this.displayedColumns=this.defCol;
     this.add_rows(1);
     this.refresh();
     // console.log(this.parentForm);
   }
 
   calcTot(){
-    // let lcgtotal:number=0;
-    // let lcsouryou:number=0;
-    // let lctesuu:number=0;
-    // let lcnebiki:number=0;
-    // let lcttotal:number=0;
-    // let lctax:number=0;
-    // let lcsyoukei:number=0;
-    // let lctotal:number=0;
-    // let lcuttotal:number=0;
-    // let lcutax:number=0;
-    // let lchttotal:number=0;
     let lcgtotalzn:number=0;
     let lcsouryouzn:number=0;
     let lctesuuzn:number=0;
     let lcnebikizn:number=0;
     let lctaxtotal:number=0;
+    let lctotal:number=0;
     let lcgenka:number=0;
-    // let lchgenka:number=0;
-    // let lcegenka:number=0;
-
-    this.frmArr.controls
-      .forEach(control => {
-        switch (control.value.gkbn) {
-          case '0' :
-            lcgtotalzn += control.value.tinmoney;
-          　break;
-          case '1' :
-            lcsouryouzn += control.value.tinmoney;
-          　break;
-          case '2' :
-            lctesuuzn += control.value.tinmoney;
-          　break;     
-          case '3' :
-            lcnebikizn += control.value.tinmoney;
-          　break;     
-        }
-        lctaxtotal += control.value.taxmoney; 
-        lcgenka += control.value.genka;
-      })
-    // lctotal =  lcgtotalzn + lcsouryouzn + lctesuuzn + lcnebikizn + lctaxtotal;
+    const arr=this.frmArr.getRawValue();
+    for(let i=0;i<arr.length;i++){
+      // console.log(arr[i]['tinmoney']);
+      switch (arr[i]['gkbn']) {
+        case '0' :
+          lcgtotalzn += arr[i]['tinmoney'];
+        　break;
+        case '1' :
+          lcsouryouzn += arr[i]['tinmoney'];
+        　break;
+        case '2' :
+          lctesuuzn += arr[i]['tinmoney'];
+        　break;     
+        case '3' :
+          lcnebikizn += arr[i]['tinmoney'];
+        　break;     
+      }
+      lctaxtotal += arr[i]['taxmoney'];;
+      lcgenka += arr[i]['tgenka'];
+    }
+    lctotal =  lcgtotalzn + lcsouryouzn + lctesuuzn + lcnebikizn + lctaxtotal;
     this.parentForm.patchValue({gtotalzn:lcgtotalzn,
                                 souryouzn:lcsouryouzn,
                                 tesuuzn:lctesuuzn,
                                 nebikizn:lcnebikizn,
                                 taxtotal:lctaxtotal,
-                                // total:lctotal,
+                                total:lctotal,
                                 genka:lcgenka});
     this.jmisrv.subject.next(true);
     this.jmisrv.subject.complete();
@@ -132,38 +121,39 @@ export class JmeitblComponent implements OnInit {
     // console.log(this.frmArr,this.parentForm);
   }
   calcMei(i: number):void {
-    const lcmoney:number = this.frmArr.controls[i].value.tanka * this.frmArr.controls[i].value.suu;
+    const ctrl=this.frmArr.controls[i].value;
+    const lcmoney:number = ctrl.tanka * ctrl.suu;
     const lctaxrate:number = +this.frmArr.getRawValue()[i]['taxrate'] / 100;
     let lctaxmoney:number=0;
-    let lctoutmoney:number=0;
+    // let lctoutmoney:number=0;
     let lctinmoney:number=0;
     let lcgenka:number=0;
     switch (this.frmArr.getRawValue()[i]['mtax']) {
       case '0' :
-        lctaxmoney = Math.round(this.frmArr.controls[i].value.tanka * lctaxrate) * this.frmArr.controls[i].value.suu;
-        lctoutmoney = lcmoney;  
+        lctaxmoney = Math.round(ctrl.tanka * lctaxrate) * ctrl.suu;
+        // lctoutmoney = lcmoney;  
         lctinmoney = lcmoney + lctaxmoney;
       　break;
       case '1' :
-        lctaxmoney = Math.floor(this.frmArr.controls[i].value.tanka * (1 + lctaxrate)) * this.frmArr.controls[i].value.suu;
+        lctaxmoney = Math.floor(ctrl.tanka * (1 + lctaxrate)) * ctrl.suu;
         lctinmoney = lcmoney;
-        lctoutmoney = lcmoney - lctaxmoney;  
+        // lctoutmoney = lcmoney - lctaxmoney;  
       　break;
       case '2' :
         lctaxmoney=0;
-        lctoutmoney = lcmoney;
+        // lctoutmoney = lcmoney;
         lctinmoney = lcmoney;
       　break;     
     }
-    lcgenka = Math.round(this.frmArr.controls[i].value.genka * this.frmArr.controls[i].value.suu);
+    lcgenka = Math.round(ctrl.genka * ctrl.suu);
     this.frmArr.controls[i].patchValue({
       money:lcmoney,
-      genka:lcgenka,
+      tgenka:lcgenka,
       taxmoney:lctaxmoney,
-      toutmoney:lctoutmoney,
+      // toutmoney:lctoutmoney,
       tinmoney:lctinmoney
     });
-
+    this.calcTot();
   }
   setAll(chked:boolean){
     this.frmArr.controls
@@ -314,37 +304,33 @@ export class JmeitblComponent implements OnInit {
     return this.fb.group({
       chk:[''],
       line:[{value:i,disabled:true}],
-      sday:[jyumei?.sday],
-      souko:[jyumei?.souko],
       gcode:[jyumei?.gcode, Validators.required],
       gtext:[jyumei?.gtext],
       suu:[jyumei?.suu],
       unit:[jyumei?.unit],
-      tanka1:[{value:jyumei?.tanka1,disabled:true}],
       tanka:[jyumei?.tanka],
+      tinmoney:[{value:jyumei?.tinmoney,disabled:true}],
+      mbikou:[jyumei?.mbikou],
+      spec:[jyumei?.spec],
+      spdet:[jyumei?.spdet],
+      pable:[{value:jyumei?.pable,disabled:true}],
+      genka:[jyumei?.genka],
+      souko:[jyumei?.souko],
+      sday:[jyumei?.sday],
+      tanka1:[{value:jyumei?.tanka1,disabled:true}],
       money:[{value:jyumei?.money,disabled:true}],
       mtax:[jyumei?.mtax],
-      mbikou:[jyumei?.mbikou],
-      zaiko:[{value:jyumei?.zaiko,disabled:true}],
-      jyuzan:[{value:jyumei?.jyuzan,disabled:true}],
-      genka:[jyumei?.genka],
-      spec:[jyumei?.spec],
-      tintanka:[jyumei?.tintanka],
-      touttanka:[jyumei?.touttanka],
-      taxtanka:[jyumei?.taxtanka],
-      tinmoney:[{value:jyumei?.tinmoney,disabled:true}],
-      toutmoney:[jyumei?.toutmoney],
+      tgenka:[{value:jyumei?.tgenka,disabled:true}],
       taxmoney:[jyumei?.taxmoney],
       taxrate:[jyumei?.taxrate],
-      code:[jyumei?.code],
-      gkbn:[jyumei?.gkbn],
-      // zkbn:[jyumei?.zkbn],
-      spdet:[jyumei?.spdet],
-      ordering:[jyumei?.ordering],
-      vcode:[jyumei?.vcode],
+      gskbn:[jyumei?.gskbn],
       max:[jyumei?.max],
-      send:[jyumei?.send], 
       koguchi:[jyumei?.koguchi],
+      ordering:[jyumei?.ordering],
+      send:[jyumei?.send], 
+      vcode:[jyumei?.vcode],
+      gkbn:[jyumei?.gkbn],
+      code:[jyumei?.code],
       msgzais:this.fb.array([])   
     });
   }
@@ -391,11 +377,12 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue({souko:this.parentForm.value.souko});
           let lctanka:number=0;
           let lcgenka:number=0;
-          // console.log(value,msgds);
           if(msgds.msgtankas[0].currency=="USD"){
-            lcgenka = Math.round((msgds.msgtankas[0].genka + msgds.msgtankas[0].cost) * this.usrsrv.system.currate);
+            lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate);
+            // lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate) + msgds.msgtankas[0].cost;
           }else{
-            lcgenka = msgds.msgtankas[0].genka + msgds.msgtankas[0].cost;
+            lcgenka = msgds.msgtankas[0].genka;
+            // lcgenka = msgds.msgtankas[0].genka + msgds.msgtankas[0].cost;
           }
           let j:number = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn );
           if(j>-1){
@@ -404,6 +391,7 @@ export class JmeitblComponent implements OnInit {
             lctanka=msgds.msgtankas[0]['tanka' + this.jmisrv.tankakbn];
           }
           // console.log(this.jmisrv.souko);
+          // console.log(lctanka,lcgenka);
           this.frmArr.controls[i].patchValue({mtax:this.jmisrv.mtax,
                                               tanka1:msgds.msgtankas[0]['tanka1'],
                                               tanka:lctanka,
@@ -414,8 +402,9 @@ export class JmeitblComponent implements OnInit {
               this.hatden.push(msgds.msggroup.vcode);
             }
           }
+          // console.log(this.frmArr.controls[i].value,this.frmArr.getRawValue()[i]);
           this.calcMei(i);
-          this.calcTot();
+          // this.calcTot();
           // this.jmisrv.subject.complete();
         }
         this.jmisrv.subject.next(true);
@@ -434,6 +423,19 @@ export class JmeitblComponent implements OnInit {
     return this.parentForm.get('mtbl') as FormArray;
   }  
   
+  toggleCols(){
+    // console.log(this.flgCol,this.displayedColumns);
+    if(this.flgCol){
+      this.displayedColumns=this.defCol;
+      this.flgCol=false;
+
+    } else {
+      this.displayedColumns=this.defCol.concat(this.addCol);
+      this.flgCol=true;
+    } 
+    this.refresh();
+  }
+
   frmVal(i:number,fld:string):string {
     return this.frmArr.getRawValue()[i][fld];
   }
@@ -462,38 +464,34 @@ export class JmeitblComponent implements OnInit {
       if(col[0]!=""){
         let jmei:mwI.Jyumei= {
             line:i,
-            sday:null,
-            souko:this.parentForm.get('souko').value,
             gcode:col[0],
             gtext:'',
             suu:+col[1],
             unit:null,
-            tanka1:0,
             tanka:(col[2] ?? +col[2]),
+            tinmoney:0,
+            mbikou:null,
+            spec:null,
+            spdet:null,
+            pable:0,
+            genka:0,
+            souko:this.parentForm.get('souko').value,
+            sday:null,
+            tanka1:0,
             money:0,
             mtax:null,
-            mbikou:null,
-            zaiko:0,
-            jyuzan:0,
-            genka:0,
-            spec:null,
-            tintanka:0,
-            touttanka:0,
-            taxtanka:0,
-            tinmoney:0,
-            toutmoney:0,
+            tgenka:0,
             taxmoney:0,
             taxrate:null,
             currency:null,
-            code:null,
-            gkbn:null,
             gskbn:null,
-            spdet:null,
-            ordering:null,
-            vcode:null,
             max:null,
-            send:null,
             koguchi:null,
+            ordering:null,
+            send:null,
+            vcode:null,
+            gkbn:null,
+            code:null,
             msgzais:[]
           } 
           this.frmArr.push(this.createRow(i+1,jmei));
@@ -504,7 +502,7 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
   copyData() {
-    this.copyToClipboard = this.objectToArray(this.displayedColumns);
+    this.copyToClipboard = this.objectToArray(this.defCol.concat(this.addCol));
     this.frmArr.getRawValue().forEach(row => {
       if(row.gcode !=='' ){
         this.copyToClipboard += this.objectToArray(row);
@@ -532,6 +530,7 @@ export class JmeitblComponent implements OnInit {
     let i:number=0;
     this.jmisrv.jyumei.forEach(e => {
       this.frmArr.push(this.createRow(i+1,e));
+      // this.calcMei(i);
       i+=1;
     });
     this.refresh();
@@ -580,26 +579,23 @@ export class JmeitblComponent implements OnInit {
           id: this.usrsrv.compid,
           denno:dno,
           line: this.usrsrv.editFrmval(control,'line'),
-          sday: this.usrsrv.editFrmval(control,'sday'),
-          souko: this.usrsrv.editFrmval(control,'souko'),
           gcode: this.usrsrv.editFrmval(control,'gcode'),
           gtext: this.usrsrv.editFrmval(control,'gtext'),
           suu: this.usrsrv.editFrmval(control,'suu'),
-          tanka1: this.usrsrv.editFrmval(control,'tanka1'),
           tanka: this.usrsrv.editFrmval(control,'tanka'),
+          tinmoney: this.usrsrv.editFrmval(control,'tinmoney'),
+          mbikou: this.usrsrv.editFrmval(control,'mbikou'),
+          spec: this.usrsrv.editFrmval(control,'spec'),
+          spdet: this.usrsrv.editFrmval(control,'spdet'),
+          genka: this.usrsrv.editFrmval(control,'genka'),
+          souko: this.usrsrv.editFrmval(control,'souko'),
+          sday: this.usrsrv.editFrmval(control,'sday'),
+          tanka1: this.usrsrv.editFrmval(control,'tanka1'),
           money: this.usrsrv.editFrmval(control,'money'),
           mtax: this.usrsrv.editFrmval(control,'mtax'),
-          mbikou: this.usrsrv.editFrmval(control,'mbikou'),
-          genka: this.usrsrv.editFrmval(control,'genka'),
-          spec: this.usrsrv.editFrmval(control,'spec'),
-          // tintanka: this.usrsrv.editFrmval(control,'tintanka'),
-          // touttanka: this.usrsrv.editFrmval(control,'touttanka'),
-          // taxtanka: this.usrsrv.editFrmval(control,'taxtanka'),
-          tinmoney: this.usrsrv.editFrmval(control,'tinmoney'),
-          toutmoney: this.usrsrv.editFrmval(control,'toutmoney'),
+          tgenka: this.usrsrv.editFrmval(control,'tgenka'),
           taxmoney: this.usrsrv.editFrmval(control,'taxmoney'),
-          taxrate: this.usrsrv.editFrmval(control,'taxrate'),
-          specdet: this.usrsrv.editFrmval(control,'specdet')
+          taxrate: this.usrsrv.editFrmval(control,'taxrate')
         });
       });
       return jyumei;

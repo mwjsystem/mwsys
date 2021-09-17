@@ -7,7 +7,7 @@ import { MembsService } from './../../services/membs.service';
 export class McdtxtPipe implements PipeTransform {
   constructor(private memsrv: MembsService) {}
 
-  transform(value: number): string {
+  transform(value: string): string {
     return this.memsrv.get_mcdtxt(value);  
   }
 

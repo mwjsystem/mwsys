@@ -22,9 +22,9 @@ interface Jyuden {
   sday:Date;
   uday:Date;
   nday:Date;
-  mcode:number;
-  scode:number;
-  ncode:number;
+  mcode:string;
+  scode:string;
+  ncode:string;
   nadr:number;
   souko:string;
   tcode:number;
@@ -78,7 +78,7 @@ export class JdnohelpComponent implements OnInit {
     'ncode'
   ]; 
   fmcdfld:string="mcode";
-  fmcd:number;
+  fmcd:string="";
   fdayfld:string="day";
   fday:Date=new Date();
   ftcd:string="";
@@ -132,7 +132,7 @@ export class JdnohelpComponent implements OnInit {
   // }
   get_jyuden():void{
     let varWh: {[k: string]: any}={"where" : {"_and":[{"id": {"_eq": this.usrsrv.compid}}]}};
-    if (this.fmcd>0){
+    if (this.fmcd){
       let fldobj: {[k: string]: any}={};
       fldobj[this.fmcdfld]={"_eq": this.fmcd};
       varWh.where._and.push(fldobj);

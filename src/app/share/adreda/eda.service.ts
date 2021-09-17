@@ -17,7 +17,7 @@ export interface Edahlp {
   providedIn: 'root'
 })
 export class EdaService {
-  public mcode:number|string;
+  public mcode:string;
   public edas:Edahlp[]=[];
   public selro:Edahlp;
   public adrs:mwI.Adrs[]=[];

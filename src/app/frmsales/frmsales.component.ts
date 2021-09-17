@@ -87,6 +87,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.form = this.fb.group({
+      jdstatus: new FormControl(''),
+      jdshsta: new FormControl(''),
+      torikbn: new FormControl(''),
       mcode: new FormControl(''),
       scode: new FormControl(''),
       ncode: new FormControl(''),
@@ -98,25 +101,23 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       sday: new FormControl(''),
       uday: new FormControl(''),
       nday: new FormControl(''),
-      hday: new FormControl(''),
-      htime: new FormControl(''),
-      hcode: new FormControl(''),
-      okurisuu: new FormControl(''),
-      okurino: new FormControl(''),
-      souko: new FormControl(''),
       tcode: new FormControl(''),
+      souko: new FormControl(''),
+      skbn: new FormControl('', Validators.required),
       jcode: new FormControl('', Validators.required),
       pcode: new FormControl('', Validators.required),
-      skbn: new FormControl('', Validators.required),
+      hcode: new FormControl(''),
+      hday: new FormControl(''),
+      htime: new FormControl(''),
+      okurisuu: new FormControl(''),
+      okurino: new FormControl(''),      
       bikou: new FormControl(''),
       nbikou: new FormControl(''),
       sbikou: new FormControl(''),
       obikou: new FormControl(''),
-      inbikou: new FormControl(''),
-      torikbn: new FormControl(''),
       cusden: new FormControl(''),
-      daibiki: new FormControl(''),
       ryoate: new FormControl(''),
+      daibiki: new FormControl(''),
       daibunrui: new FormControl(''),
       chubunrui: new FormControl(''),
       shobunrui: new FormControl(''),
@@ -127,22 +128,11 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       nebikizn: new FormControl(''),
       taxtotal: new FormControl(''),
       total: new FormControl(''),
-      // ttotal: new FormControl(''),
-      jdstatus: new FormControl(''),
-      jdshsta: new FormControl(''),
       genka: new FormControl(''),
       hgenka: new FormControl(''),
       egenka: new FormControl(''),
       mtbl: this.rows 
     });
-    // this.memsrv.get_members().then(result => {
-      // this.setMcdtxt();
-      // this.setScdtxt();
-      // this.setNcdtxt();
-      // this.overlayRef.detach(); 
-      // this.cdRef.detectChanges();     
-    // });
-    // this.gcdsrv.get_goods();
     this.bnssrv.get_bunsho();
     this.okrsrv.get_haisou();
     this.okrsrv.get_hokuri();
@@ -205,7 +195,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     
     
     let head = this.dwlsrv.pickObj(this.form.getRawValue(),['yday','mcode','ncode','nadr']);
-    const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl,['line','gcode','gtext','suu','iriunit','mbikou','spec'])
+    const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl,['line','gcode','gtext','suu','unit','mbikou','spec'])
     head['mcdtxt'] = this.memsrv.get_mcdtxt(this.form.value.mcode);
     head['adrname'] = this.edasrv.get_name(+this.form.getRawValue().nadr);
     head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
@@ -276,7 +266,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             this.jmeitbl.set_jyumei();
             this.usrsrv.setTmstmp(jyuden);
             this.jmisrv.denno=denno;
-            this.get_member(+jyuden.mcode,false);
+            this.get_member(jyuden.mcode,false);
             this.qrurl="https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
             history.replaceState('','','./frmsales/' + this.mode + '/' + this.jmisrv.denno);
           }
@@ -329,9 +319,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 
   }
   changeMcd(){
-    let lcmcode;
+    let lcmcode:string="";
     if (this.form.value.mcode != null){
-      lcmcode = this.usrsrv.convNumber(this.form.value.mcode);
+      lcmcode = this.usrsrv.convUpper(this.form.value.mcode);
     }else{
       lcmcode = ""; 
     }
@@ -366,7 +356,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.form.get('okurino').setValue(okrno);
   }
 
-  get_member(mcode:number,flg:boolean){
+  get_member(mcode:string,flg:boolean){
     this.apollo.watchQuery<any>({
       query: Query.GetMember, 
         variables: { 
@@ -432,7 +422,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   diaBetsu():void {
-    let ncd:number=this.form.value.ncode;
+    let ncd:string=this.form.value.ncode;
     if( this.checkMcode(ncd) ){
       let dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
@@ -462,9 +452,6 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     if( i > -1 ){
       flg = true;
     } else {
-      // if( mcode.toString().indexOf('未登録') == -1 && mcode.toString().indexOf('読込') == -1 && mcode !== '' ){
-      //   this.mcd = mcode + '　未登録';
-      // }
       flg = false;       
     }
     return flg;
@@ -527,63 +514,49 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   async save() {
     
     let jyuden:any={
+      torikbn: Boolean(this.usrsrv.editFrmval(this.form,'torikbn')),
+      updated_at:new Date(),
+      updated_by:this.usrsrv.staff.code,
+      mcode: this.usrsrv.editFrmval(this.form,'mcode'),
+      scode: this.usrsrv.editFrmval(this.form,'scode'),
+      ncode: this.usrsrv.editFrmval(this.form,'ncode'),
+      nadr: this.usrsrv.editFrmval(this.form,'nadr'),
+      bunsho: this.usrsrv.editFrmval(this.form,'bunsho'),
       day: this.usrsrv.editFrmval(this.form,'day'),
       yday: this.usrsrv.editFrmval(this.form,'yday'),
       sday: this.usrsrv.editFrmval(this.form,'sday'),
       uday: this.usrsrv.editFrmval(this.form,'uday'),
       nday: this.usrsrv.editFrmval(this.form,'nday'),
+      tcode: this.usrsrv.editFrmval(this.form,'tcode'),
+      souko: this.usrsrv.editFrmval(this.form,'souko'),
+      skbn: this.usrsrv.editFrmval(this.form,'skbn'),
+      jcode: this.usrsrv.editFrmval(this.form,'jcode'),
+      pcode: this.usrsrv.editFrmval(this.form,'pcode'),
+      hcode: this.usrsrv.editFrmval(this.form,'hcode'),
       hday: this.usrsrv.editFrmval(this.form,'hday'),
       htime: this.usrsrv.editFrmval(this.form,'htime'),
-      hcode: this.usrsrv.editFrmval(this.form,'hcode'),
-      ncode: this.usrsrv.editFrmval(this.form,'ncode'),
-      nadr: this.usrsrv.editFrmval(this.form,'nadr'),
-      souko: this.usrsrv.editFrmval(this.form,'souko'),
-      tcode: this.usrsrv.editFrmval(this.form,'tcode'),
-      bunsho: this.usrsrv.editFrmval(this.form,'bunsho'),
-      bikou: this.usrsrv.editFrmval(this.form,'bikou'),
-      nbikou: this.usrsrv.editFrmval(this.form,'nbikou'),
-      sbikou: this.usrsrv.editFrmval(this.form,'sbikou'),
-      obikou: this.usrsrv.editFrmval(this.form,'obikou'),
-      keep: this.usrsrv.editFrmval(this.form,'keep'),
       okurisuu: this.usrsrv.editFrmval(this.form,'okurisuu'),
       okurino: this.usrsrv.editFrmval(this.form,'okurino'),
+      bikou: this.usrsrv.editFrmval(this.form,'bikou'),
+      nbikou: this.usrsrv.editFrmval(this.form,'nbikou'),
+      obikou: this.usrsrv.editFrmval(this.form,'obikou'),
+      sbikou: this.usrsrv.editFrmval(this.form,'sbikou'),
       cusden: this.usrsrv.editFrmval(this.form,'cusden'),
-      inbikou: this.usrsrv.editFrmval(this.form,'inbikou'),
-      // gtotal: this.usrsrv.editFrmval(this.form,'gtotal'),
-      // souryou: this.usrsrv.editFrmval(this.form,'souryou'),
-      // tesuu: this.usrsrv.editFrmval(this.form,'tesuu'),
-      // nebiki: this.usrsrv.editFrmval(this.form,'nebiki'),
-      // ttotal: this.usrsrv.editFrmval(this.form,'ttotal'),
-      // tax: this.usrsrv.editFrmval(this.form,'tax'),
-      // syoukei: this.usrsrv.editFrmval(this.form,'syoukei'),
-      total: this.usrsrv.editFrmval(this.form,'total'),
-      okurinusi: this.usrsrv.editFrmval(this.form,'okurinusi'),
-      skbn: this.usrsrv.editFrmval(this.form,'skbn'),
-      // uttotal: this.usrsrv.editFrmval(this.form,'uttotal'),
-      // utax: this.usrsrv.editFrmval(this.form,'utax'),
-      // httotal: this.usrsrv.editFrmval(this.form,'httotal'),
+      ryoate: this.usrsrv.editFrmval(this.form,'ryoate'),
+      daibiki: this.usrsrv.editFrmval(this.form,'daibiki'),
+      daibunrui: this.usrsrv.editFrmval(this.form,'daibunrui'),
+      chubunrui: this.usrsrv.editFrmval(this.form,'chubunrui'),
+      shobunrui: this.usrsrv.editFrmval(this.form,'shobunrui'),
+      tcode1: this.usrsrv.editFrmval(this.form,'tcode1'),
       gtotalzn: this.usrsrv.editFrmval(this.form,'gtotalzn'),
       souryouzn: this.usrsrv.editFrmval(this.form,'souryouzn'),
       tesuuzn: this.usrsrv.editFrmval(this.form,'tesuuzn'),
       nebikizn: this.usrsrv.editFrmval(this.form,'nebikizn'),
       taxtotal: this.usrsrv.editFrmval(this.form,'taxtotal'),
+      total: this.usrsrv.editFrmval(this.form,'total'),
       genka: this.usrsrv.editFrmval(this.form,'genka'),
       hgenka: this.usrsrv.editFrmval(this.form,'hgenka'),
       egenka: this.usrsrv.editFrmval(this.form,'egenka'),
-      torikbn: Boolean(this.usrsrv.editFrmval(this.form,'torikbn')),
-      mcode: this.usrsrv.editFrmval(this.form,'mcode'),
-      scode: this.usrsrv.editFrmval(this.form,'scode'),
-      jcode: this.usrsrv.editFrmval(this.form,'jcode'),
-      pcode: this.usrsrv.editFrmval(this.form,'pcode'),
-      daibunrui: this.usrsrv.editFrmval(this.form,'daibunrui'),
-      chubunrui: this.usrsrv.editFrmval(this.form,'chubunrui'),
-      shobunrui: this.usrsrv.editFrmval(this.form,'shobunrui'),
-      tcode1: this.usrsrv.editFrmval(this.form,'tcode1'),
-      // del: Boolean(this.usrsrv.editFrmval(this.form,'del')),
-      daibiki: this.usrsrv.editFrmval(this.form,'daibiki'),
-      ryoate: this.usrsrv.editFrmval(this.form,'ryoate'),
-      updated_at:new Date(),
-      updated_by:this.usrsrv.staff.code
     }
 
     if(this.mode==2){ 
@@ -609,6 +582,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
              jdstatus:this.jmisrv.get_jdsta(jyumei)}
         ,...jyuden,
       }]
+      console.log(trjyuden,jyumei);
       this.jmisrv.ins_jyuden(trjyuden,jyumei)
       .then(result => {
         console.log('insert_trjyu',result);

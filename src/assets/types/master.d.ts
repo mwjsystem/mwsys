@@ -53,7 +53,7 @@ declare namespace mwI {
     bunrui: string;   
   }
   interface Mcode {
-    mcode:number;
+    mcode:string;
     sei:string;
     mei:string;
     del:boolean;
@@ -82,7 +82,7 @@ declare namespace mwI {
   }
   interface Stit {
     id:number;
-    mcode:number;
+    mcode:string;
     patno:number;
     seq:number;
     stitype:string;
@@ -116,7 +116,7 @@ declare namespace mwI {
     target:boolean;
   }
   interface Member {
-    mcode:number;
+    mcode:string;
     sei:string;
     mei:string;
     kana:string;
@@ -130,12 +130,12 @@ declare namespace mwI {
     sime:number;
     site:string;
     inday:number;
-    scode:number;
+    scode:string;
     pcode:string;
     hcode:string;
     jcode:string;
     mtax:string;
-    sscode:number;
+    sscode:string;
     tcode1:string;
     tcode:string;
     del:boolean;

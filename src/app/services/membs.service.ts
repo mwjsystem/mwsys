@@ -39,7 +39,7 @@ export class MembsService {
     });  
   }
 
-  get_mcdtxt(mcd:number):string{
+  get_mcdtxt(mcd:string):string{
     const i:number = this.membs.findIndex(obj => obj.mcode == mcd);
     let mcdtxt:string="";
     if(i > -1 ){

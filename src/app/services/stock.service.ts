@@ -9,7 +9,10 @@ export class Stock {
   gcode: string;
   scode: string;
   stock: number;
+  hikat: number;
   juzan: number;
+  today: number;
+  keepd: number;
   constructor(init?:Partial<Stock>) {
     Object.assign(this, init);
   }
@@ -150,28 +153,24 @@ export class StockService {
 
   }
 
-  get_stcscds(gcd:string,scd?:string):Promise<Stock[]>{
+  get_stcscds(gcd:string):Promise<Stock[]>{
     const GetTran = gql`
-    query get_trgtana($id: smallint!, $gcode: String!,$scode: [String!]) {
-      trgtana(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_in:$scode}}, distinct_on: [gcode, scode], order_by: {gcode: asc, scode: asc, day: desc}) {
+    query get_trgtana($id: smallint!, $gcode: String!) {
+      trgtana(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}, distinct_on: [gcode, scode], order_by: {scode: asc, day: desc}) {
         gcode
         scode
         day
+        suu
       }
     }`;
     return new Promise( resolve => {
     // let observable:Observable<StGds> = new Observable<StGds>(observer => {
-      let lcscd :string[];
       let lcstcs:Stock[]=[];
-      if(scd){
-        lcscd=[scd];
-      }
       this.apollo.watchQuery<any>({
       query: GetTran, 
         variables: { 
           id : this.usrsrv.compid,
-          gcode:gcd,
-          scode:lcscd
+          gcode:gcd
         },
       })
       .valueChanges
@@ -179,11 +178,18 @@ export class StockService {
         // console.log(data);
         this.soksrv.scds.forEach(element => {
           let i:number=data.trgtana.findIndex(obj => obj.scode == element.value);
+          let lcday;
+          let lczai:number=0;
           if(i > -1 ){
-            this.get_tana(gcd,element.value,data.trgtana[i].day,data.trgtana[i].tana).then(value => {
-              lcstcs.push(value);
-            });
+            lcday=data.trgtana[i].day;
+            lczai=data.trgtana[i].suu;
+          } else{
+            lcday='2000-01-01';
+            lczai=0;
           }
+          this.get_zaiko(gcd,element.value,lcday,lczai).then(value => {
+            lcstcs.push(value);
+          });
 
           
 
@@ -207,27 +213,14 @@ export class StockService {
     // return observable;
 
   }
-  get_tana(gcd:string,scd:string,day:Date,i:number):Promise<Stock>  {
+  get_zaiko(gcd:string,scd:string,day:Date,stc:number):Promise<Stock>  {
     const GetTran = gql`
     query get_trgtana($id: smallint!, $gcode: String!, $scode: String!, $day: date!) {
-      trgtana(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, del: {_is_null: true}, scode: {_eq: $scode}, day: {_eq: $day}}) {
-        gcode
-        scode
-        day
-        tana
-        created_at
-        created_by
-        updated_at
-        updated_by
-        memo
-        del
-      }
+
       trzaiko_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, day: {_gt: $day}}) {
         aggregate {
           sum {
             haki
-            hatu
-            henp
             hnyu
             jyut
             movi
@@ -236,12 +229,23 @@ export class StockService {
             syuk
             teni
             teno
+            hkat
           }
         }
-      }
-      
+      }      
     }`;    
-    
+    // trgtana(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, del: {_is_null: true}, scode: {_eq: $scode}, day: {_eq: $day}}) {
+    //   gcode
+    //   scode
+    //   day
+    //   tana
+    //   created_at
+    //   created_by
+    //   updated_at
+    //   updated_by
+    //   memo
+    //   del
+    // }   
     
     // let observable:Observable<Stock> = new Observable<Stock>(observer => {
     return new Promise<Stock>( resolve => {
@@ -256,7 +260,17 @@ export class StockService {
       })
       .valueChanges
       .subscribe(({ data }) => {
-        return resolve(data.trgtana);
+        const lcsum = data.trzaiko_aggregate.sum;
+        let lcstcs:Stock={
+          gcode: gcd,
+          scode: scd,
+          stock: stc + lcsum.hnyu + lcsum.movi - lcsum.movo + lcsum.nyuk - lcsum.syuk + lcsum.teni - lcsum.teno - lcsum.haki,
+          hikat: lcsum.hkat - lcsum.syuk,
+          juzan: lcsum.jyut - lcsum.syuk,
+          today:0,
+          keepd:0
+        }
+        return resolve(lcstcs);
         // observer.next(data.trgtana);
         // observer.complete();
         // console.log(data.tropelog);

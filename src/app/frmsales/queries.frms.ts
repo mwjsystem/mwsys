@@ -43,7 +43,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
   }
 }`;
 export const GetMember = gql`
-query get_member($id: smallint!,$mcode:Int!) {
+query get_member($id: smallint!,$mcode:String!) {
   msmember_by_pk(id: $id, mcode:$mcode) {
     mcode
     sei
@@ -123,120 +123,109 @@ query get_member($id: smallint!,$mcode:Int!) {
 //   } 
 // }`;
 
-export const GetMast1 = gql`
-query get_denno($id: smallint!,$maxdno: Int){
-  trjyuden_aggregate(where: {id: {_eq: $id}, denno: {_lt: $maxdno}}) {
-    aggregate {
-      max {
-        denno
-      }
-    }
-  }
-}`;
+// export const GetMast1 = gql`
+// query get_denno($id: smallint!,$maxdno: Int){
+//   trjyuden_aggregate(where: {id: {_eq: $id}, denno: {_lt: $maxdno}}) {
+//     aggregate {
+//       max {
+//         denno
+//       }
+//     }
+//   }
+// }`;
 
-export const GetJyuden = gql`
-query get_jyuden($id: smallint!,$dno: Int!) {
-  trjyuden_by_pk(denno: $dno, id: $id) {
-    denno
-    day
-    yday
-    sday
-    uday
-    nday
-    hday
-    htime
-    hcode
-    ncode
-    nadr
-    souko
-    tcode
-    bunsho
-    bikou
-    nbikou
-    sbikou
-    obikou
-    keep
-    okurisuu
-    okurino
-    cusden
-    gtotal
-    souryou
-    tesuu
-    nebiki
-    ttotal
-    tax
-    syoukei
-    total
-    okurinusi
-    skbn
-    uttotal
-    utax
-    httotal
-    gtotalzn
-    souryouzn
-    tesuuzn
-    nebikizn
-    taxtotal
-    genka
-    hgenka
-    egenka
-    torikbn
-    mcode
-    scode
-    jcode
-    pcode
-    daibunrui
-    chubunrui
-    shobunrui
-    tcode1
-    del
-    created_at
-    created_by
-    updated_at
-    updated_by
-    daibiki
-    ryoate
-    trjyumeis(order_by: {line: asc}) {
-      line
-      sday
-      souko
-      gcode
-      gtext
-      suu
-      tanka
-      tanka1
-      money
-      mtax
-      mbikou
-      genka
-      spec
-      tintanka
-      touttanka
-      taxtanka
-      tinmoney
-      toutmoney
-      taxmoney
-      taxrate
-      msgood {
-        max
-        koguchi
-        ordering
-        send
-        zkbn
-        unit
-        msggroup {
-          vcode
-          gkbn
-          code
-        }
-        msgzais {
-          zcode
-          irisu
-        }
-      }
-    }
-  }
-}`;
+// export const GetJyuden = gql`
+// query get_jyuden($id: smallint!,$dno: Int!) {
+//   trjyuden_by_pk(denno: $dno, id: $id) {
+//     denno
+//     jdstatus
+//     jdshsta
+//     torikbn
+//     created_at
+//     created_by
+//     updated_at
+//     updated_by
+//     mcode
+//     scode
+//     ncode
+//     nadr
+//     bunsho
+//     day
+//     yday
+//     sday
+//     uday
+//     nday
+//     tcode
+//     souko
+//     skbn
+//     jcode
+//     pcode
+//     hcode
+//     hday
+//     htime
+//     okurisuu
+//     okurino
+//     bikou
+//     nbikou
+//     obikou
+//     sbikou
+//     cusden
+//     ryoate
+//     daibiki
+//     daibunrui
+//     chubunrui
+//     shobunrui
+//     tcode1
+//     gtotalzn
+//     souryouzn
+//     tesuuzn
+//     nebikizn
+//     taxtotal
+//     total
+//     genka
+//     hgenka
+//     egenka
+//     trjyumeis(order_by: {line: asc}) {
+//       line
+//       sday
+//       souko
+//       gcode
+//       gtext
+//       suu
+//       tanka
+//       tanka1
+//       money
+//       mtax
+//       mbikou
+//       genka
+//       spec
+//       tintanka
+//       touttanka
+//       taxtanka
+//       tinmoney
+//       toutmoney
+//       taxmoney
+//       taxrate
+//       msgood {
+//         max
+//         koguchi
+//         ordering
+//         send
+//         zkbn
+//         unit
+//         msggroup {
+//           vcode
+//           gkbn
+//           code
+//         }
+//         msgzais {
+//           zcode
+//           irisu
+//         }
+//       }
+//     }
+//   }
+// }`;
 
 // export const InsertMast1 = gql`
 // mutation ins_member($object: [msmember_insert_input!]!) {

@@ -1,30 +1,49 @@
 <div class="mat-elevation-z8">
-    <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;">
-      <button class="mat-raised-button"(click)="filterMcd()">検索</button>
-      <mat-form-field>
-        <mat-label>顧客名(姓、名)</mat-label>
-        <input matInput (input)="fname=$event.target.value">
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>ﾌﾘｶﾞﾅ 半角ｶﾀｶﾅのみく</mat-label>
-        <input matInput (input)="fkana=$event.target.value">
-      </mat-form-field>      
-      <mat-form-field>
-        <mat-label>メール1～5</mat-label>
-        <input matInput type="url" (input)="fmail=$event.target.value">
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>建物、道場名、宛名</mat-label>
-        <input matInput (input)="fadrnm=$event.target.value">
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
-        <input matInput type="number" (input)="ftel=$event.target.value">
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Web会員ID</mat-label>
-        <input matInput (input)="fwebid=$event.target.value">
-      </mat-form-field>
+    <mat-toolbar fxLayout="row" style="font-size: 12px;height:80px;padding-top:0px">
+        <button class="mat-raised-button" (click)="filterMcd()">検索</button>
+        <div fxLayout="row wrap" fxLayoutGap="5px">
+            <mat-form-field>
+                <mat-label>顧客名(姓、名)</mat-label>
+                <input matInput (input)="fname=$event.target.value">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>ﾌﾘｶﾞﾅ</mat-label>
+                <input matInput (input)="fkana=usrsrv.convKana($event.target.value)">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>メール1～5</mat-label>
+                <input matInput type="url" (input)="fmail=$event.target.value">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>建物、道場名、宛名</mat-label>
+                <input matInput (input)="fadrnm=$event.target.value">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
+                <input matInput type="number" (input)="ftel=$event.target.value">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>内勤担当</mat-label>
+                <!-- <input matInput (input)="ftcd=$event.target.value"> -->
+                <mat-select [(ngModel)]="ftcd">
+                    <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+                        {{sval.viewval}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>営業担当</mat-label>
+                <mat-select [(ngModel)]="ftcd1">
+                    <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+                        {{sval.viewval}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>Web会員ID</mat-label>
+                <input matInput (input)="fwebid=$event.target.value">
+            </mat-form-field>
+        </div>
     </mat-toolbar>
     <table mat-table [dataSource]="dataSource" aria-label="Elements">
         <ng-container matColumnDef="mcode">
@@ -94,9 +113,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setMcd(row)"></tr>
     </table>
-    <mat-paginator #paginators
-        [length]="dataSource?.data.length"
-        [pageIndex]="0"
+    <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"
         [pageSizeOptions]="[20, 50, 100, 250, 1000]">
     </mat-paginator>
 </div>

@@ -8,6 +8,7 @@ import { MatSpinner } from '@angular/material/progress-spinner';
 import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
+import { StaffService } from './../../services/staff.service';
 
 @Component({
   selector: 'app-mcdtbl',
@@ -30,6 +31,8 @@ export class McdtblComponent implements OnInit {
   fadrnm:string="";
   ftel:string="";
   fwebid:string="";
+  ftcd1:string="";
+  ftcd:string="";
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -37,12 +40,14 @@ export class McdtblComponent implements OnInit {
   });
   constructor(public mcdsrv:McdService,
               public usrsrv: UserService,
+              public stfsrv: StaffService,
               private overlay: Overlay,
               private apollo: Apollo) {
     this.dataSource= new MatTableDataSource<Mcd>(this.mcdsrv.mcds);
   }
 
   ngOnInit(): void {
+    this.ftcd=this.usrsrv.staff.code;
     this.dataSource.paginator = this.paginator;    
     this.mcdsrv.observe.subscribe(() => this.refresh());
     // this.dataSource.filterPredicate = (data: Mcd, filtersJson: string) => {
@@ -100,6 +105,12 @@ export class McdtblComponent implements OnInit {
       }
 
     }
+    if (this.ftcd!==""){
+      varWh.where._and.push({"tcode" : {"_eq": this.ftcd}});
+    }
+    if (this.ftcd1!==""){
+      varWh.where._and.push({"tcode1" : {"_eq": this.ftcd1}});
+    }
     // {
     //   "where": {"_and":[
     //             {"id": {"_eq": 1}},
@@ -118,7 +129,7 @@ export class McdtblComponent implements OnInit {
       })
       .valueChanges
       .subscribe(({ data }) => {
-        // console.log(data);
+        console.log(data);
         for(let i=0;i<data.msmember.length;i++){
           for(let j=0;j<data.msmember[i].msmadrs.length;j++){
             this.mcdsrv.mcds.push({  
@@ -143,7 +154,7 @@ export class McdtblComponent implements OnInit {
           }
         }
         this.mcdsrv.subject.next();
-        this.mcdsrv.subject.complete();
+        // this.mcdsrv.subject.complete();
         this.overlayRef.detach();
       },(error) => {
         console.log('error query get_members', error);

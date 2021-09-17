@@ -34,7 +34,8 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   @ViewChildren( AddressComponent)
     private children: QueryList<AddressComponent>;
   form: FormGroup;
-  mcd:  number=0;
+  // mcd:  number=0;
+  mcd:  string="";
   mode: number=3;
   flgadr1:number=1; //その他住所フラグ 1：未登録、2：登録済
   overlayRef = this.overlay.create({
@@ -132,9 +133,9 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         this.refresh();
       }else{
         //１件分だけ先に読込
-        this.mcd = +params.get('mcd');
+        this.mcd = params.get('mcd');
         // console.log("ngoninit",+this.mcd);
-        this.get_member(+this.mcd);
+        this.get_member(this.mcd);
       }
     });
   }
@@ -177,7 +178,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         if(typeof data != 'undefined'){
           this.mcd = data.mcode;
         }
-        this.get_member(+this.mcd);
+        this.get_member(this.mcd);
       }
     );
   }
@@ -194,10 +195,12 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     this.cdRef.detectChanges();
   }
 
-  checkMcode(mcode:number):boolean {
+  checkMcode(mcode:string):boolean {
     let flg:boolean;
-    if (mcode>0){
-      let lcmcode = this.usrsrv.convNumber(mcode);
+    if (mcode==""){  
+      flg=false;
+    }else{
+      let lcmcode:string = this.usrsrv.convUpper(mcode);
       let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == lcmcode);
       if( i > -1 ){
         this.mcd = lcmcode;
@@ -211,18 +214,16 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         history.replaceState('','','./mstmember'); 
         flg = false;       
       }
-    }else{  
-      flg=false;
     } 
     return flg;
   }
 
-  get_member(mcode:number){
+  get_member(mcode:string){
     // this.mcd += '　読込中';
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
-    // if(this.checkMcode(mcode)){
+    if(this.checkMcode(mcode)){
       this.apollo.watchQuery<any>({
         query: Query.GetMast1, 
           variables: { 
@@ -287,7 +288,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         history.replaceState('','','./mstmember');
         this.overlayRef.detach();
       });
-    // }
+    }
   }
   updKana(value: string){
     let val:string =this.usrsrv.convKana(value);
@@ -339,7 +340,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     this.mode=1;
     this.form.reset();
     this.form.enable();
-    this.mcd=0; 
+    this.mcd=""; 
   }
 
   modeToUpd():void {
@@ -352,7 +353,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
 
   cancel():void {
     if(this.mode==1){
-      this.mcd=0;
+      this.mcd="";
       this.form.reset();
     }1
     this.mode=3;
@@ -434,7 +435,8 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       let membs:any[]=[];
       // this.usrsrv.getNumber('mcode',1)
       //   .subscribe(value => {
-      this.mcd=await this.usrsrv.getNumber('mcode',1);
+      let lcmcd:number=await this.usrsrv.getNumber('mcode',1);
+      this.mcd=lcmcd.toString();
       member.mcode = this.mcd;
       if (!member.sscode) {
         member.sscode = this.mcd;

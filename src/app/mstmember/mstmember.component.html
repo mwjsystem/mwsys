@@ -98,7 +98,7 @@
         <mat-form-field style="width:8em">
           <mat-label>入金予定初期値</mat-label>
           <mat-select #msel3 tabIndex="6" formControlName="pcode" (keydown.enter)="msel3.close()">
-            <mat-option *ngFor="let sval of bunsrv.kbn.pay" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn.pcode" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>

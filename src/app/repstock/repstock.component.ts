@@ -117,6 +117,7 @@ export class RepstockComponent implements OnInit {
 
     // console.log("refresh",this.stcsrv.stgds);
     if( this.gcode ){
+      this.gcode=this.usrsrv.convUpper(this.gcode);
       this.stcsrv.get_shcount(this.gcode);
       this.apollo.watchQuery<any>({
         query: GetMast, 
@@ -131,7 +132,7 @@ export class RepstockComponent implements OnInit {
           this.stcsrv.stgds.gskbn=data.msgoods_by_pk.gskbn;
           this.stcsrv.stgds.unit=data.msgoods_by_pk.unit;
           if(this.stcsrv.stgds.gskbn=="0"){
-            this.stcsrv.get_stcscds(this.gcode,this.scode).then(
+            this.stcsrv.get_stcscds(this.gcode).then(
               
             );
           } else {

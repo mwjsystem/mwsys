@@ -12,12 +12,12 @@ import { Apollo } from 'apollo-angular';
 export class JyumeiService {
   public jyumei: mwI.Jyumei[]=[]; //読込時にfrmsales⇒jmeitblコンポーネントへ渡すときのみ使用
   public denno:number=0;
-  public mtax:string;
-  public tankakbn:string;
-  public sptnkbn:string;
+  public mtax:string;             //顧客マスタ「税区分」
+  public tankakbn:string;         //顧客マスタ「単価区分」
+  public sptnkbn:string;          //顧客マスタ「特別単価区分」
   // public souko:string;
-  public ntype:number;
-  public tntype:number;
+  public ntype:number;            //顧客マスタ「納品書タイプ」
+  public tntype:number;           //顧客マスタ「直送納品書タイプ」
   public address:string="";
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
@@ -26,92 +26,79 @@ export class JyumeiService {
     query get_jyuden($id: smallint!,$dno: Int!) {
       trjyuden_by_pk(denno: $dno, id: $id) {
         denno
+        jdstatus
+        jdshsta
+        torikbn
+        created_at
+        created_by
+        updated_at
+        updated_by
+        mcode
+        scode
+        ncode
+        nadr
+        bunsho
         day
         yday
         sday
         uday
         nday
+        tcode
+        souko
+        skbn
+        jcode
+        pcode
+        hcode
         hday
         htime
-        hcode
-        ncode
-        nadr
-        souko
-        tcode
-        bunsho
-        bikou
-        nbikou
-        sbikou
-        obikou
-        keep
         okurisuu
         okurino
+        bikou
+        nbikou
+        obikou
+        sbikou
         cusden
-        gtotal
-        souryou
-        tesuu
-        nebiki
-        ttotal
-        tax
-        syoukei
-        total
-        okurinusi
-        skbn
-        uttotal
-        utax
-        httotal
+        ryoate
+        daibiki
+        daibunrui
+        chubunrui
+        shobunrui
+        tcode1
         gtotalzn
         souryouzn
         tesuuzn
         nebikizn
         taxtotal
+        total
         genka
         hgenka
         egenka
-        torikbn
-        mcode
-        scode
-        jcode
-        pcode
-        daibunrui
-        chubunrui
-        shobunrui
-        tcode1
-        del
-        created_at
-        created_by
-        updated_at
-        updated_by
-        daibiki
-        ryoate
         trjyumeis(order_by: {line: asc}) {
           line
-          sday
-          souko
           gcode
           gtext
           suu
           tanka
+          tinmoney
+          mbikou
+          spec
+          spdet
+          genka
+          souko
+          sday
           tanka1
           money
           mtax
-          mbikou
-          genka
-          spec
-          tintanka
-          touttanka
-          taxtanka
-          tinmoney
-          toutmoney
+          tgenka
           taxmoney
           taxrate
           msgood {
+            gskbn
+            unit
             max
             koguchi
             ordering
             send
-            zkbn
-            unit
             msggroup {
               vcode
               gkbn
