@@ -172,7 +172,7 @@ export class JmeitblComponent implements OnInit {
     let kogu:number = 0;
     let mall:number = 0;
     this.frmArr.controls.forEach(control => {
-      // console.log(control.value.gcode,i);
+      // console.log(control.value);
       if(!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02') || control.value.gcode=='MALL'){
         forDel.push(i);
         // console.log(control.value.gcode,i);
@@ -199,10 +199,10 @@ export class JmeitblComponent implements OnInit {
     forDel.reverse().forEach(fordel => {
       this.frmArr.removeAt(fordel);
     })
-    
-    let j:number = this.edasrv.adrs.findIndex(obj => obj.eda == this.parentForm.value.nadr);
+    console.log(calc,sour);
+    let j:number = this.edasrv.adrs.findIndex(obj => obj.eda == this.parentForm.getRawValue()['nadr']);
     let sufi:string="";
-    // console.log(this.edasrv.adrs,j);
+    // console.log(this.parentForm.value,j);
     if(!this.edasrv.adrs[j].region.indexOf('北海道')){
       sufi='-01';
     } else if (!this.edasrv.adrs[j].region.indexOf('沖縄県')){
