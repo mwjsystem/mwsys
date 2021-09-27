@@ -50,6 +50,7 @@ export class StockService {
   private shcym:string[]=[];
   private shlym:string[]=[];
   public paabl:number = 0;
+  public gcode:string;
   // // public subject = new Subject<Stock[]>();
   // public subject = new Subject<Stock>();
   // public observe = this.subject.asObservable();  
@@ -72,8 +73,9 @@ export class StockService {
     // console.log(this.shcym,this.shlym);
   }
 
-  get_shcount(gcd:string){
-    this.stgds=new StGds();
+  get_shcount(gcd:string):Promise<Stock[]>{
+    this.gcode=gcd;
+    
     const GetTran = gql`
     query get_shcount($id: smallint!, $gcode: String!, $fr: String!, $to: String!) {
       vshukka(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, to_char: {_gte: $fr, _lte: $to}}, order_by: {to_char: asc}) {
@@ -95,6 +97,7 @@ export class StockService {
         }
       }
     }`;
+    this.stgds=new StGds();
     this.apollo.watchQuery<any>({
       query: GetTran, 
         variables: { 
@@ -106,7 +109,7 @@ export class StockService {
       })
       .valueChanges
       .subscribe(({ data }) => {
-        console.log(data);
+        // console.log(data);
         for(let i=0;i<12;i++){
           const j:number= data.vshukka.findIndex(obj => obj.to_char == this.shcym[i]);
           if(j>-1){
@@ -151,73 +154,55 @@ export class StockService {
         console.log('error query get_shcount', error);
       });
 
-  }
-
-  get_stcscds(gcd:string):Promise<Stock[]>{
-    const GetTran = gql`
-    query get_trgtana($id: smallint!, $gcode: String!) {
-      trgtana(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}, distinct_on: [gcode, scode], order_by: {scode: asc, day: desc}) {
+    const GetMast = gql`
+    query get_gcdscd($id:smallint!,$gcode:String!) {
+      vgstana(where:{id:{_eq:$id},gcode: {_eq:$gcode}}) {
+        code
         gcode
-        scode
+        gskbn
+        gtext
+        unit
+        tana
         day
-        suu
       }
     }`;
     return new Promise( resolve => {
-    // let observable:Observable<StGds> = new Observable<StGds>(observer => {
-      let lcstcs:Stock[]=[];
       this.apollo.watchQuery<any>({
-      query: GetTran, 
-        variables: { 
-          id : this.usrsrv.compid,
-          gcode:gcd
-        },
-      })
-      .valueChanges
-      .subscribe(({ data }) => {
-        // console.log(data);
-        this.soksrv.scds.forEach(element => {
-          let i:number=data.trgtana.findIndex(obj => obj.scode == element.value);
-          let lcday;
-          let lczai:number=0;
-          if(i > -1 ){
-            lcday=data.trgtana[i].day;
-            lczai=data.trgtana[i].suu;
-          } else{
-            lcday='2000-01-01';
-            lczai=0;
-          }
-          this.get_zaiko(gcd,element.value,lcday,lczai).then(value => {
-            lcstcs.push(value);
+        query: GetMast, 
+          variables: { 
+            id : this.usrsrv.compid,
+            gcode:gcd
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => { 
+          // console.log(data);
+          this.stgds.gtext=data.vgstana[0].gtext;
+          this.stgds.gskbn=data.vgstana[0].gskbn;
+          this.stgds.unit=data.vgstana[0].unit;
+          this.stcs=[];
+          Promise.all(data.vgstana.map(async item => {
+            // console.log(item);
+            let lcday:Date = item.day ?? new Date('2000-01-01');
+            let lctana:number = item.tana ?? 0;          
+            let lcstc= await this.get_zaiko(gcd,item.code,lcday,lctana);
+            this.stcs.push(lcstc); 
+          })).then(() => {
+            return resolve(this.stcs);
           });
-
-          
-
-          
-        });
-        // console.log(lcstcs);
-        // data.trgtana.forEach(element => {
-          
-        // });;
-
-
-
-        return resolve(lcstcs);
-      },(error) => {
-        console.log('error query trgtana', error);
-        return resolve([]);
+        },(error) => {
+          console.log('error query get_shcount', error);
+          return resolve(this.stcs);
+        }); 
       });
-
-        
-    });
-    // return observable;
+ 
 
   }
-  get_zaiko(gcd:string,scd:string,day:Date,stc:number):Promise<Stock>  {
+
+  async get_zaiko(gcd:string,scd:string,day:Date,stc:number):Promise<Stock>  {
     const GetTran = gql`
     query get_trgtana($id: smallint!, $gcode: String!, $scode: String!, $day: date!) {
-
-      trzaiko_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, day: {_gt: $day}}) {
+      trzaiko_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}}) {
         aggregate {
           sum {
             haki
@@ -234,20 +219,7 @@ export class StockService {
         }
       }      
     }`;    
-    // trgtana(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, del: {_is_null: true}, scode: {_eq: $scode}, day: {_eq: $day}}) {
-    //   gcode
-    //   scode
-    //   day
-    //   tana
-    //   created_at
-    //   created_by
-    //   updated_at
-    //   updated_by
-    //   memo
-    //   del
-    // }   
-    
-    // let observable:Observable<Stock> = new Observable<Stock>(observer => {
+
     return new Promise<Stock>( resolve => {
       this.apollo.watchQuery<any>({
         query: GetTran, 
@@ -260,27 +232,22 @@ export class StockService {
       })
       .valueChanges
       .subscribe(({ data }) => {
-        const lcsum = data.trzaiko_aggregate.sum;
+        const lcsum = data.trzaiko_aggregate.aggregate.sum;
         let lcstcs:Stock={
           gcode: gcd,
           scode: scd,
-          stock: stc + lcsum.hnyu + lcsum.movi - lcsum.movo + lcsum.nyuk - lcsum.syuk + lcsum.teni - lcsum.teno - lcsum.haki,
-          hikat: lcsum.hkat - lcsum.syuk,
-          juzan: lcsum.jyut - lcsum.syuk,
+          stock: stc + lcsum?.hnyu + lcsum?.movi - lcsum?.movo + lcsum?.nyuk - lcsum?.syuk + lcsum?.teni - lcsum?.teno - lcsum?.haki,
+          hikat: lcsum?.hkat - lcsum?.syuk,
+          juzan: lcsum?.jyut - lcsum?.syuk,
           today:0,
           keepd:0
         }
         return resolve(lcstcs);
-        // observer.next(data.trgtana);
-        // observer.complete();
-        // console.log(data.tropelog);
+
       },(error) => {
-        console.log('error query get_opelog', error);
-        // observer.next();
-        // observer.complete();
+        console.log('error query get_zaiko', error);
       });
     });
-    // return observable;
   }
 
   get_paabl():number {

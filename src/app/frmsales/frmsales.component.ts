@@ -280,6 +280,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           this.overlayRef.detach();
         }
       );
+    } else {
+      this.form.reset();
+      this.jmeitbl.frmArr.clear();
+      this.jmeitbl.add_rows(1);
     }
     this.overlayRef.detach();
     this.cdRef.detectChanges();
@@ -463,10 +467,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.jmisrv.denno=0; 
     this.form.get('tcode').setValue(this.usrsrv.staff.code);
     this.form.get('day').setValue(new Date());
-    this.form.get('souko').setValue("01");
-    // this.jmisrv.souko="01";
+    this.form.get('souko').setValue(this.usrsrv.staff.scode);
     this.form.get('skbn').setValue("0");
-    this.form.get('tcode').setValue(this.usrsrv.staff?.code);
     this.jmeitbl.frmArr.clear(); 
     this.refresh(); 
     this.jmeitbl.add_rows(1);

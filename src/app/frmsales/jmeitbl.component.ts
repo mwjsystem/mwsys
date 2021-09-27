@@ -76,7 +76,7 @@ export class JmeitblComponent implements OnInit {
     this.displayedColumns=this.defCol;
     this.add_rows(1);
     this.refresh();
-    // console.log(this.parentForm);
+    // console.log(this.frmArr.getRawValue()[this.getIdx(0)]);
   }
 
   calcTot(){
@@ -172,11 +172,11 @@ export class JmeitblComponent implements OnInit {
     let kogu:number = 0;
     let mall:number = 0;
     this.frmArr.controls.forEach(control => {
-      // console.log(control.value);
+      console.log(control.value);
       if(!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02') || control.value.gcode=='MALL'){
         forDel.push(i);
         // console.log(control.value.gcode,i);
-      } else if (control.value.zkbn=='0'){
+      } else if (control.value.gskbn=='0'){
         if (/^CB.*SV$/.test(control.value.gcode)){
           mall += +control.value.suu;
         }else if (control.value.koguchi){
@@ -553,6 +553,7 @@ export class JmeitblComponent implements OnInit {
     } else{
       return index;
     }
+    console.log(index);
   }
   getKkrt(i : number):number {
     const lcteika:number = +this.frmArr.getRawValue()[i]['tanka1'];

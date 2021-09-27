@@ -86,6 +86,7 @@ export class UserService {
         code
         sei
         mei
+        scode
       }
     }`;
     this.auth.user$.subscribe(user => {

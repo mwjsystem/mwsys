@@ -233,5 +233,6 @@ declare namespace mwI {
     mail:string;
     sei:string;
     mei:string;
+    scode:string;
   }
 }

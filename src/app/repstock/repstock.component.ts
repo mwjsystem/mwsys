@@ -30,7 +30,7 @@ export class RepstockComponent implements OnInit {
               public bunsrv: BunruiService,
               public stcsrv: StockService,
               public usrsrv: UserService) { 
-                title.setTitle('在庫一覧(MWSystem)'); 
+                title.setTitle('現在庫確認(MWSystem)'); 
               }
 
   ngOnInit(): void {    
@@ -40,17 +40,27 @@ export class RepstockComponent implements OnInit {
         if(params.gcode !== null){
           this.gcode= params.gcode;
         }
+        console.log(params.scode);
         if(params.scode !== null){
           this.scode= params.scode;
+          this.chSok=true;
+        }else{
+          this.chSok=false;
         }
-        this.refresh();
+        this.get_zinfo(this.gcode);
        });
   }
   onChange(): void {
-
+    if (this.chSok == false){
+      this.scode="";
+      history.replaceState('','','./repstock?gcode=' + this.gcode);
+    }else{
+      history.replaceState('','','./repstock?gcode=' + this.gcode + '&scode=' + this.scode);
+    }
+    this.sel_scd(this.stcsrv.stcs);
   }
   onEnter(): void {
-    this.refresh();
+    this.get_zinfo(this.gcode);
   } 
 
   gcdHelp(): void {
@@ -63,7 +73,7 @@ export class RepstockComponent implements OnInit {
           if(typeof data != 'undefined'){
             this.gcode=data.gcode;
             this.stcsrv.stgds.gtext=data.gtext;
-            this.refresh();
+            this.get_zinfo(this.gcode);
           }
       }
     );
@@ -104,52 +114,87 @@ export class RepstockComponent implements OnInit {
   public outputCsv(event: any) {
     
   }
-
-  refresh():void {
-    const GetMast = gql`
-    query get_goods($id: smallint!, $gcode: String!) {
-      msgoods_by_pk(id:$id, gcode:$gcode) {
-        gtext
-        gskbn
-        unit
-      }
-    }`;
-
-    // console.log("refresh",this.stcsrv.stgds);
-    if( this.gcode ){
-      this.gcode=this.usrsrv.convUpper(this.gcode);
-      this.stcsrv.get_shcount(this.gcode);
-      this.apollo.watchQuery<any>({
-        query: GetMast, 
-          variables: { 
-            id : this.usrsrv.compid,
-            gcode:this.gcode
-          },
-        })
-        .valueChanges
-        .subscribe(({ data }) => {
-          this.stcsrv.stgds.gtext=data.msgoods_by_pk.gtext;
-          this.stcsrv.stgds.gskbn=data.msgoods_by_pk.gskbn;
-          this.stcsrv.stgds.unit=data.msgoods_by_pk.unit;
-          if(this.stcsrv.stgds.gskbn=="0"){
-            this.stcsrv.get_stcscds(this.gcode).then(
-              
-            );
-          } else {
-
-          }
-          if(this.scode){
-            history.replaceState('','','./repstock?gcode=' + this.gcode + '&scode=' + this.scode);
-          }else{
-            history.replaceState('','','./repstock?gcode=' + this.gcode);
-          }
-          this.cdRef.detectChanges();
-
-        },(error) => {
-          console.log('error query get_system', error);
-        });
-
+  sel_scd(pStcs){
+    // console.log(pStcs,this.scode);
+    if(this.scode){
+      let i:number = pStcs.findIndex(obj => obj.scode == this.scode);
+      this.stcsrv.stc.stock=pStcs[i].stock;
+      this.stcsrv.stc.juzan=pStcs[i].juzan;
+    } else {
+      this.stcsrv.stc.stock=pStcs.reduce((prev, current) => {
+        return prev + current.stock;
+      }, 0);
+      this.stcsrv.stc.juzan=pStcs.reduce((prev, current) => {
+        return prev + current.juzan;
+      }, 0);
     }
   }
+  async get_zinfo(gcd:string){
+
+    if( this.gcode ){
+      this.gcode=this.usrsrv.convUpper(this.gcode);
+      if (this.gcode != this.stcsrv.gcode){
+        let lcstcs = await this.stcsrv.get_shcount(this.gcode);
+        this.sel_scd(lcstcs);
+      }
+    }
+    this.cdRef.detectChanges();
+  }
+  // refresh():void {
+  //   const GetMast = gql`
+  //   query get_goods($id: smallint!, $gcode: String!) {
+  //     msgoods_by_pk(id:$id, gcode:$gcode) {
+  //       gtext
+  //       gskbn
+  //       unit
+  //     }
+  //   }`;
+
+  //   // console.log("refresh",this.stcsrv.stgds);
+  //   if( this.gcode ){
+  //     this.gcode=this.usrsrv.convUpper(this.gcode);
+  //     this.stcsrv.get_shcount(this.gcode);
+  //     this.apollo.watchQuery<any>({
+  //       query: GetMast, 
+  //         variables: { 
+  //           id : this.usrsrv.compid,
+  //           gcode:this.gcode
+  //         },
+  //       })
+  //       .valueChanges
+  //       .subscribe(({ data }) => {
+  //         this.stcsrv.stgds.gtext=data.msgoods_by_pk.gtext;
+  //         this.stcsrv.stgds.gskbn=data.msgoods_by_pk.gskbn;
+  //         this.stcsrv.stgds.unit=data.msgoods_by_pk.unit;
+  //         if(this.stcsrv.stgds.gskbn=="0"){
+  //           this.stcsrv.get_stcscds(this.gcode).then(value => {
+  //             if(this.scode){
+  //               let i:number=value.findIndex(obj => obj.scode == this.scode);
+  //               console.log(value,i);
+  //               this.stcsrv.stc.stock = value[i].stock;
+  //               this.stcsrv.stc.juzan = value[i].juzan;
+  //               this.stcsrv.stc.stock = value[i].stock;
+  //               // this.stcsrv.stc.stock = value[i].stock;
+
+  //             }else{
+
+  //             }
+  //           });
+  //         } else {
+
+  //         }
+  //         if(this.scode){
+  //           history.replaceState('','','./repstock?gcode=' + this.gcode + '&scode=' + this.scode);
+  //         }else{
+  //           history.replaceState('','','./repstock?gcode=' + this.gcode);
+  //         }
+  //         this.cdRef.detectChanges();
+
+  //       },(error) => {
+  //         console.log('error query get_system', error);
+  //       });
+  //   }
+  //   this.cdRef.detectChanges();
+  // }
 
 }
