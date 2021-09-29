@@ -8,6 +8,7 @@ import { Subject, Observable } from 'rxjs';
 export class Stock {
   gcode: string;
   scode: string;
+  yestr: number;
   stock: number;
   hikat: number;
   juzan: number;
@@ -236,6 +237,7 @@ export class StockService {
         let lcstcs:Stock={
           gcode: gcd,
           scode: scd,
+          yestr: 0,
           stock: stc + lcsum?.hnyu + lcsum?.movi - lcsum?.movo + lcsum?.nyuk - lcsum?.syuk + lcsum?.teni - lcsum?.teno - lcsum?.haki,
           hikat: lcsum?.hkat - lcsum?.syuk,
           juzan: lcsum?.jyut - lcsum?.syuk,

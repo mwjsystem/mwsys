@@ -141,23 +141,27 @@
         </mat-form-field>
         <div fxLayout="row wrap">
           <mat-form-field style="width:4em">
-            <mat-label>当日最終在庫数</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.stock" disabled class="i_num">
-          </mat-form-field>
-          <mat-form-field style="width:4em">
-            <mat-label>翌日以降受注残</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.juzan" disabled class="i_num">
-          </mat-form-field>
-          <mat-form-field style="width:4em">
-            <mat-label>翌日以降引当済</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.hikat" disabled class="i_num">
+            <mat-label>前日最終</mat-label>
+            <input matInput numberInput [value]="stcsrv.stc.yestr" disabled class="i_num">
           </mat-form-field>
           <mat-form-field style="width:4em">
             <mat-label>当日出荷</mat-label>
             <input matInput numberInput [value]="stcsrv.stc.today" disabled class="i_num">
           </mat-form-field>
           <mat-form-field style="width:4em">
-            <mat-label>翌日以降キープ済</mat-label>
+            <mat-label>当日最終在庫数</mat-label>
+            <input matInput numberInput [value]="stcsrv.stc.stock" disabled class="i_num">
+          </mat-form-field>
+          <mat-form-field style="width:4em">
+            <mat-label>受注残</mat-label>
+            <input matInput numberInput [value]="stcsrv.stc.juzan" disabled class="i_num">
+          </mat-form-field>
+          <mat-form-field style="width:4em">
+            <mat-label>引当済</mat-label>
+            <input matInput numberInput [value]="stcsrv.stc.hikat" disabled class="i_num">
+          </mat-form-field>
+          <mat-form-field style="width:4em">
+            <mat-label>キープ済</mat-label>
             <input matInput numberInput [value]="stcsrv.stc.keepd" disabled class="i_num">
           </mat-form-field>
         </div>
