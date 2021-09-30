@@ -17,7 +17,7 @@ export class HatmeiService {
       trhatden_by_pk(denno: $dno, id: $id) {
         vcode
         day
-        soko
+        scode
         tcode
         autoproc
         gtotal

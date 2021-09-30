@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
-import { SoukoService } from './../services/souko.service';
+import { StoreService } from './../services/store.service';
 import { VendsService } from './../services/vends.service';
 import { DownloadService } from './../services/download.service';
 import { HatmeiService } from './hatmei.service';
@@ -51,7 +51,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
               private apollo: Apollo,
               public dwlsrv:DownloadService,
               public bunsrv: BunruiService,
-              public soksrv: SoukoService,
+              public strsrv: StoreService,
               public stfsrv: StaffService,
               public hmisrv: HatmeiService,
               private vensrv: VendsService,
@@ -65,7 +65,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.form = this.fb.group({
       vcode: new FormControl('', Validators.required),
       day: new FormControl('', Validators.required),
-      soko: new FormControl('', Validators.required),
+      scode: new FormControl('', Validators.required),
       tcode: new FormControl('', Validators.required),
       autoproc: new FormControl(''),
       mtax: new FormControl(''),
@@ -83,7 +83,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     
       // this.cdRef.detectChanges(); 
 
-    this.soksrv.get_souko();
+    this.strsrv.get_store();
     this.bunsrv.get_bunrui();
     // this.stfsrv.get_staff();
   }
@@ -185,21 +185,21 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   }
 
   async download_csv(format:string){
-    let head = this.dwlsrv.pickObj(this.form.getRawValue(),['day','vcode','soko','biko']);
+    let head = this.dwlsrv.pickObj(this.form.getRawValue(),['day','vcode','store','biko']);
     // head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
     const vend = this.vensrv.get_vendor(this.form.getRawValue().vcode);
     head['adrname'] = vend.name;
     head['tel'] = vend.tel;
     head['fax'] = vend.fax;
-    const soko = await this.soksrv.get_sokoadr(this.form.getRawValue().soko);
-    head['sname'] = soko.name;
-    head['szip'] = soko.zip;
-    head['sregion'] = soko.region;
-    head['slocal'] = soko.local;
-    head['sstreet'] = soko.street;
-    head['sextend'] = soko.extend;
-    head['stel'] = soko.tel;
-    head['sfax'] = soko.fax;
+    const store = await this.strsrv.get_stradr(this.form.getRawValue().scode);
+    head['sname'] = store.name;
+    head['szip'] = store.zip;
+    head['sregion'] = store.region;
+    head['slocal'] = store.local;
+    head['sstreet'] = store.street;
+    head['sextend'] = store.extend;
+    head['stel'] = store.tel;
+    head['sfax'] = store.fax;
     const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl,['line','gcode','gtext','suu','unit','jdenno','mbikou']);
     this.dwlsrv.dl_png('staff/',this.form.getRawValue().tcode.toString() + ".png",this.denno + format + ".png");
     this.dwlsrv.dl_csv(head,this.denno + format + "H.csv");
@@ -266,7 +266,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.denno=0; 
     this.form.get('tcode').setValue(this.usrsrv.staff?.code);
     this.form.get('day').setValue(new Date());
-    this.form.get('soko').setValue("01"); 
+    this.form.get('store').setValue("01"); 
     this.form.get('hdstatus').setValue("0"); 
     this.hmeitbl.frmArr.clear();
     // console.log(this.hmeitbl.frmArr);
@@ -297,7 +297,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       // denno: this.denno,
       vcode: this.usrsrv.editFrmval(this.form,'vcode'),
       day: this.usrsrv.editFrmval(this.form,'day'),
-      soko: this.usrsrv.editFrmval(this.form,'soko'),
+      store: this.usrsrv.editFrmval(this.form,'store'),
       tcode: this.usrsrv.editFrmval(this.form,'tcode'),
       autoproc: this.usrsrv.editFrmval(this.form,'autoproc'),
       // mtax: this.usrsrv.editFrmval(this.form,'mtax'),

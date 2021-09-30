@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
-import { SoukoService } from './souko.service';
+import { StoreService } from './store.service';
 import { Subject, Observable } from 'rxjs';
 
 export class Stock {
@@ -56,7 +56,7 @@ export class StockService {
   // public subject = new Subject<Stock>();
   // public observe = this.subject.asObservable();  
   constructor(public usrsrv: UserService,
-              public soksrv: SoukoService,
+              public strsrv: StoreService,
               private apollo: Apollo) {
                 this.make_yyyymm();
              }

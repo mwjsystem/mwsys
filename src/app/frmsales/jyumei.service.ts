@@ -44,7 +44,7 @@ export class JyumeiService {
         uday
         nday
         tcode
-        souko
+        scd
         skbn
         jcode
         pcode
@@ -84,7 +84,7 @@ export class JyumeiService {
           spec
           spdet
           genka
-          souko
+          scode
           sday
           tanka1
           money

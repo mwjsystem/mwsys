@@ -203,8 +203,8 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>倉庫</mat-label>
-          <mat-select #msel2 tabIndex="12" formControlName="souko" (keydown.enter)="msel2.close()" required>
-            <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
+          <mat-select #msel2 tabIndex="12" formControlName="scd" (keydown.enter)="msel2.close()" required>
+            <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>

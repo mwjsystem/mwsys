@@ -6,7 +6,7 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
-import { SoukoService } from './../services/souko.service';
+import { StoreService } from './../services/store.service';
 import { GoodsService } from './../services/goods.service';
 import { EdaService } from './../share/adreda/eda.service';
 import { JyumeiService } from './jyumei.service';
@@ -50,7 +50,7 @@ export class JmeitblComponent implements OnInit {
              'spec',
              'spdet'];
   addCol = ['genka',
-            'souko',
+            'scode',
             'sday',
             'tanka1',
             'money',
@@ -67,7 +67,7 @@ export class JmeitblComponent implements OnInit {
               private toastr: ToastrService,
               public usrsrv: UserService,
               public bunsrv: BunruiService,
-              public soksrv: SoukoService,
+              public strsrv: StoreService,
               public gdssrv: GoodsService,
               public edasrv: EdaService,
               public jmisrv: JyumeiService) {}
@@ -315,7 +315,7 @@ export class JmeitblComponent implements OnInit {
       spdet:[jyumei?.spdet],
       pable:[{value:jyumei?.pable,disabled:true}],
       genka:[jyumei?.genka],
-      souko:[jyumei?.souko],
+      scode:[jyumei?.scode],
       sday:[jyumei?.sday],
       tanka1:[{value:jyumei?.tanka1,disabled:true}],
       money:[{value:jyumei?.money,disabled:true}],
@@ -374,7 +374,7 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msggroup);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
-          this.frmArr.controls[i].patchValue({souko:this.parentForm.value.souko});
+          this.frmArr.controls[i].patchValue({scode:this.parentForm.value.scode});
           let lctanka:number=0;
           let lcgenka:number=0;
           if(msgds.msgtankas[0].currency=="USD"){
@@ -390,7 +390,7 @@ export class JmeitblComponent implements OnInit {
           }else{
             lctanka=msgds.msgtankas[0]['tanka' + this.jmisrv.tankakbn];
           }
-          // console.log(this.jmisrv.souko);
+          // console.log(this.jmisrv.scode);
           // console.log(lctanka,lcgenka);
           this.frmArr.controls[i].patchValue({mtax:this.jmisrv.mtax,
                                               tanka1:msgds.msgtankas[0]['tanka1'],
@@ -475,7 +475,7 @@ export class JmeitblComponent implements OnInit {
             spdet:null,
             pable:0,
             genka:0,
-            souko:this.parentForm.get('souko').value,
+            scode:this.parentForm.get('scode').value,
             sday:null,
             tanka1:0,
             money:0,
@@ -589,7 +589,7 @@ export class JmeitblComponent implements OnInit {
           spec: this.usrsrv.editFrmval(control,'spec'),
           spdet: this.usrsrv.editFrmval(control,'spdet'),
           genka: this.usrsrv.editFrmval(control,'genka'),
-          souko: this.usrsrv.editFrmval(control,'souko'),
+          scode: this.usrsrv.editFrmval(control,'scode'),
           sday: this.usrsrv.editFrmval(control,'sday'),
           tanka1: this.usrsrv.editFrmval(control,'tanka1'),
           money: this.usrsrv.editFrmval(control,'money'),

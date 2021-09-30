@@ -6,7 +6,7 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
-import { SoukoService } from './../services/souko.service';
+import { StoreService } from './../services/store.service';
 import { HatmeiService } from './hatmei.service';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
@@ -57,7 +57,7 @@ export class HmeitblComponent implements OnInit {
               public usrsrv: UserService,
               public bunsrv: BunruiService,
               public hmisrv: HatmeiService,
-              public soksrv: SoukoService) { }
+              public strsrv: StoreService) { }
 
   ngOnInit(): void {
     this.add_rows(1);

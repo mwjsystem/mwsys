@@ -6,7 +6,7 @@ import { UserService } from './user.service';
 @Injectable({
   providedIn: 'root'
 })
-export class SoukoService {
+export class StoreService {
 
   public scds: mwI.Sval[]=[];
   constructor(private usrsrv: UserService,
@@ -14,11 +14,11 @@ export class SoukoService {
                 // this.get_souko();
               }
 
-  get_souko():void {
+  get_store():void {
     if (this.scds.length==0){
       const GetMast = gql`
       query get_souko($id: smallint!) {
-        mssouko(where: {id: {_eq: $id}},order_by: {sort: asc}) {
+        msstore(where: {id: {_eq: $id}},order_by: {sort: asc}) {
           code
           subname
         }
@@ -32,19 +32,19 @@ export class SoukoService {
         })
         .valueChanges
         .subscribe(({ data }) => {
-          data.mssouko.forEach(e => {
+          data.msstore.forEach(e => {
             this.scds.push({value:e.code,viewval:e.subname}); 
           });
         },(error) => {
-          console.log('error query get_souko', error);
+          console.log('error query get_store', error);
         });
     }
   }
 
-  async get_sokoadr(scd):Promise<any> {
+  async get_stradr(scd):Promise<any> {
     const GetMast = gql`
     query get_souko($id: smallint!,$scd: String!) {
-      mssouko_by_pk(id:$id,code:$scd) {
+      msstore_by_pk(id:$id,code:$scd) {
         name
         zip
         region
@@ -65,9 +65,9 @@ export class SoukoService {
         })
         .valueChanges
         .subscribe(({ data }) => {
-          return  resolve(data.mssouko_by_pk);
+          return  resolve(data.msstore_by_pk);
         },(error) => {
-          console.log('error query get_sokoadr', error);
+          console.log('error query get_stradr', error);
           return resolve(error);
         });
     });

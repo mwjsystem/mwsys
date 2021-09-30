@@ -124,7 +124,7 @@
           <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
             <mat-label>倉庫</mat-label>
             <mat-select [(value)]="scode" (openedChange)="sel_scd(stcsrv.stcs)" [disabled]="!chSok">
-              <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
+              <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>

@@ -6,7 +6,7 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
-import { SoukoService } from './../services/souko.service';
+import { StoreService } from './../services/store.service';
 import { Stock, StockService } from './../services/stock.service';
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 // import * as Query from './queries.frms';
@@ -26,7 +26,7 @@ export class RepstockComponent implements OnInit {
               private apollo: Apollo,
               private elementRef: ElementRef,
               public cdRef: ChangeDetectorRef,
-              public soksrv: SoukoService,
+              public strsrv: StoreService,
               public bunsrv: BunruiService,
               public stcsrv: StockService,
               public usrsrv: UserService) { 
@@ -35,7 +35,7 @@ export class RepstockComponent implements OnInit {
 
   ngOnInit(): void {    
     this.bunsrv.get_bunrui();
-    this.soksrv.get_souko();
+    this.strsrv.get_store();
     this.route.queryParams.subscribe(params => { 
         if(params.gcode !== null){
           this.gcode= params.gcode;

@@ -21,7 +21,7 @@ declare namespace mwI {
     uday:Date;
     nday:Date;
     tcode:string;
-    souko:string;
+    scd:string;
     skbn:string;
     jcode:string;
     pcode:string;
@@ -77,7 +77,7 @@ declare namespace mwI {
     spdet:string;
     pable:number;
     genka:number;
-    souko:string;
+    scode:string;
     sday:string;
     tanka1:number;
     money:number;
@@ -149,7 +149,7 @@ declare namespace mwI {
     denno:number;
     vcode:number;
     day:Date;
-    soko:string;
+    scode:string;
     tcode:string;
     dbiko:string;
     inbiko:string;

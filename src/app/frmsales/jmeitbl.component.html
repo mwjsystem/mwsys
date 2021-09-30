@@ -156,7 +156,7 @@
       <ng-container matColumnDef="spdet">
         <th mat-header-cell *matHeaderCellDef>在庫状態詳細
           <button mat-icon-button (click)="toggleCols()">
-            <mat-icon>{{flgCol ? 'double_arrow':'arrow_back'}}</mat-icon>
+            <mat-icon>{{flgCol ? 'arrow_back':'double_arrow'}}</mat-icon>
           </button>
         </th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
@@ -174,12 +174,12 @@
           </mat-form-field>
         </td>
       </ng-container>
-      <ng-container matColumnDef="souko">
+      <ng-container matColumnDef="scode">
         <th mat-header-cell *matHeaderCellDef>出荷倉庫</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field>
-            <mat-select formControlName="souko">
-              <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
+            <mat-select formControlName="scode">
+              <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>

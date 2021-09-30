@@ -16,7 +16,7 @@ import { BunruiService } from './../services/bunrui.service';
 import { BunshoService } from './../services/bunsho.service';
 import { OkuriService } from './../services/okuri.service';
 import { StaffService } from './../services/staff.service';
-import { SoukoService } from './../services/souko.service';
+import { StoreService } from './../services/store.service';
 import { McdService } from './../share/mcdhelp/mcd.service';
 import { MembsService } from './../services/membs.service';
 // import { GoodsService } from './../services/goods.service';
@@ -68,7 +68,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               public stfsrv: StaffService,
               public okrsrv: OkuriService,
               public memsrv: MembsService,
-              public soksrv: SoukoService,
+              public strsrv: StoreService,
               // public gdssrv: GoodsService,
               // public gcdsrv: GcdService,
               public jmisrv:JyumeiService,
@@ -102,7 +102,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       uday: new FormControl(''),
       nday: new FormControl(''),
       tcode: new FormControl(''),
-      souko: new FormControl(''),
+      scd: new FormControl(''),
       skbn: new FormControl('', Validators.required),
       jcode: new FormControl('', Validators.required),
       pcode: new FormControl('', Validators.required),
@@ -137,7 +137,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.okrsrv.get_haisou();
     this.okrsrv.get_hokuri();
     this.okrsrv.get_hktime();
-    this.soksrv.get_souko();
+    this.strsrv.get_store();
     this.bunsrv.get_bunrui();
     // this.stfsrv.get_staff();
   }
@@ -467,7 +467,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.jmisrv.denno=0; 
     this.form.get('tcode').setValue(this.usrsrv.staff.code);
     this.form.get('day').setValue(new Date());
-    this.form.get('souko').setValue(this.usrsrv.staff.scode);
+    this.form.get('scd').setValue(this.usrsrv.staff.scode);
     this.form.get('skbn').setValue("0");
     this.jmeitbl.frmArr.clear(); 
     this.refresh(); 
@@ -530,7 +530,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       uday: this.usrsrv.editFrmval(this.form,'uday'),
       nday: this.usrsrv.editFrmval(this.form,'nday'),
       tcode: this.usrsrv.editFrmval(this.form,'tcode'),
-      souko: this.usrsrv.editFrmval(this.form,'souko'),
+      scd: this.usrsrv.editFrmval(this.form,'scd'),
       skbn: this.usrsrv.editFrmval(this.form,'skbn'),
       jcode: this.usrsrv.editFrmval(this.form,'jcode'),
       pcode: this.usrsrv.editFrmval(this.form,'pcode'),
