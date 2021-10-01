@@ -140,16 +140,16 @@
           <input matInput [value]="stcsrv.stgds.unit" disabled>
         </mat-form-field>
         <div fxLayout="row wrap">
-          <mat-form-field style="width:4em">
+          <!-- <mat-form-field style="width:4em">
             <mat-label>前日最終</mat-label>
             <input matInput numberInput [value]="stcsrv.stc.yestr" disabled class="i_num">
-          </mat-form-field>
+          </mat-form-field> -->
           <mat-form-field style="width:4em">
             <mat-label>当日出荷</mat-label>
             <input matInput numberInput [value]="stcsrv.stc.today" disabled class="i_num">
           </mat-form-field>
           <mat-form-field style="width:4em">
-            <mat-label>当日最終在庫数</mat-label>
+            <mat-label>最終在庫数</mat-label>
             <input matInput numberInput [value]="stcsrv.stc.stock" disabled class="i_num">
           </mat-form-field>
           <mat-form-field style="width:4em">

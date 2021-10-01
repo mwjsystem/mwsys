@@ -8,7 +8,7 @@ import { Subject, Observable } from 'rxjs';
 export class Stock {
   gcode: string;
   scode: string;
-  yestr: number;
+  // yestr: number;
   stock: number;
   hikat: number;
   juzan: number;
@@ -84,13 +84,13 @@ export class StockService {
         to_char
         sum
       }
-      trhatmei(where: {hatzan: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
+      vhatzan(where: {hatzan: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
         gcode
         yday
         ydaykbn
         hatzan
       }
-      trhatmei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
+      vhatzan_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
         aggregate {
           sum {
             hatzan
@@ -132,14 +132,14 @@ export class StockService {
         } else {
           this.stgds.motai = Math.round(this.shcnt.reduce((a,b)=>{return a+b;}) / las * 1000 ) / 10 + '％';
         }
-        if(data.trhatmei.length>0){
-          this.stgds.yday = data.trhatmei[0]?.yday;
-          this.stgds.suu = data.trhatmei[0]?.hatzan;
-          if(data.trhatmei[0]?.ydaykbn==0){
+        if(data.vhatzan.length>0){
+          this.stgds.yday = data.vhatzan[0]?.yday;
+          this.stgds.suu = data.vhatzan[0]?.hatzan;
+          if(data.vhatzan[0]?.ydaykbn==0){
             this.stgds.ydtxt='入荷予定日(確定)';
-          } else if(data.trhatmei[0]?.ydaykbn==1){
+          } else if(data.vhatzan[0]?.ydaykbn==1){
             this.stgds.ydtxt='入荷予定日(仮確定)';
-          } else if(data.trhatmei[0]?.ydaykbn==2){
+          } else if(data.vhatzan[0]?.ydaykbn==2){
             this.stgds.ydtxt='暫定入荷予定日';
           } else {
             this.stgds.ydtxt='入荷予定日';
@@ -149,7 +149,7 @@ export class StockService {
           this.stgds.suu = 0;
           this.stgds.ydtxt='入荷予定日';
         }
-        this.stgds.htzan=data.trhatmei_aggregate.aggregate.sum.hatzan;
+        this.stgds.htzan=data.vhatzan_aggregate.aggregate.sum.hatzan;
         // console.log(this.shcnt,this.shlas);
       },(error) => {
         console.log('error query get_shcount', error);
@@ -202,23 +202,23 @@ export class StockService {
 
   async get_zaiko(gcd:string,scd:string,day:Date,stc:number):Promise<Stock>  {
     const GetTran = gql`
-    query get_trgtana($id: smallint!, $gcode: String!, $scode: String!, $day: date!) {
-      trzaiko_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}}) {
-        aggregate {
-          sum {
-            haki
-            hnyu
-            jyut
-            movi
-            movo
-            nyuk
-            syuk
-            teni
-            teno
-            hkat
-          }
-        }
-      }      
+    query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!) {
+      siire:trsiimei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, inday: {_gt: $day}}) {
+        aggregate { sum { suu }}}
+      movin: trmovden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, incode: {_eq: $scode}, day: {_gt: $day}}) {
+        aggregate { sum { suu }}}
+      tensaki: trtenden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}, kubun: {_eq: "1"}}) {
+        aggregate { sum { suu }}}
+      hatgai: trhgnden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}}) {
+        aggregate { sum { suu }}}
+      shukka:trjyumei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_gt: $day}, del: {_is_null: true}}) {
+        aggregate { sum { suu }}}
+      movout: trmovden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, outcode: {_eq: $scode}, day: {_gt: $day}}) {
+        aggregate { sum { suu }}}
+      tenmoto: trtenden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}, kubun: {_eq: "0"}}) {
+        aggregate { sum { suu }}}
+      haki: trhakden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}}) {
+        aggregate { sum { suu }}}
     }`;    
 
     return new Promise<Stock>( resolve => {
@@ -233,14 +233,20 @@ export class StockService {
       })
       .valueChanges
       .subscribe(({ data }) => {
-        const lcsum = data.trzaiko_aggregate.aggregate.sum;
         let lcstcs:Stock={
           gcode: gcd,
           scode: scd,
-          yestr: 0,
-          stock: stc + lcsum?.hnyu + lcsum?.movi - lcsum?.movo + lcsum?.nyuk - lcsum?.syuk + lcsum?.teni - lcsum?.teno - lcsum?.haki,
-          hikat: lcsum?.hkat - lcsum?.syuk,
-          juzan: lcsum?.jyut - lcsum?.syuk,
+          // yestr: 0,
+          stock: stc + (data.siire.aggregate.sum.suu || 0)
+                     + (data.movin.aggregate.sum.suu || 0)
+                     + (data.tensaki.aggregate.sum.suu || 0)
+                     + (data.hatgai.aggregate.sum.suu || 0)
+                     - (data.shukka.aggregate.sum.suu || 0)
+                     - (data.movout.aggregate.sum.suu || 0)
+                     - (data.tenmoto.aggregate.sum.suu || 0)
+                     - (data.haki.aggregate.sum.suu || 0),
+          hikat:0,
+          juzan:0,
           today:0,
           keepd:0
         }

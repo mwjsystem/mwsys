@@ -40,7 +40,7 @@ export class RepstockComponent implements OnInit {
         if(params.gcode !== null){
           this.gcode= params.gcode;
         }
-        console.log(params.scode);
+        // console.log(params.scode);
         if(params.scode !== null){
           this.scode= params.scode;
           this.chSok=true;
