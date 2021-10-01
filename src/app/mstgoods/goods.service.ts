@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+// import { Subject } from 'rxjs';
 import { Apollo } from 'apollo-angular';
-// import { AbstractControl } from '@angular/forms';
+// // import { AbstractControl } from '@angular/forms';
 import gql from 'graphql-tag';
-import { UserService } from './user.service';
-import { FormBuilder } from '@angular/forms';
+import { UserService } from './../services/user.service';
+// import { FormBuilder } from '@angular/forms';
 
 export interface Ggrp {
   code:string;
@@ -32,8 +32,9 @@ export class GoodsService {
   // // public obserGds = this.subGds.asObservable();
   // public observe = this.subject.asObservable();
 
+  // constructor(){}
   constructor(private usrsrv: UserService,
-              private fb:     FormBuilder,
+              // private fb:     FormBuilder,
               private apollo: Apollo) {}
 
   get_ggroups():Promise<Boolean> {

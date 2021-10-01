@@ -26,7 +26,7 @@ interface Jyuden {
   scode:string;
   ncode:string;
   nadr:number;
-  souko:string;
+  scd:string;
   tcode:number;
   tcode1:number;
   jdstatus:string;
@@ -62,7 +62,7 @@ export class JdnohelpComponent implements OnInit {
     'nday',
     'mcode',
     'nadr',
-    'souko',
+    'scd',
     'tcode',
     'keep',
     'okurino',
@@ -162,7 +162,7 @@ export class JdnohelpComponent implements OnInit {
         hcode
         ncode
         nadr
-        souko
+        scd
         tcode
         keep
         okurino

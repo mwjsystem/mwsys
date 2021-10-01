@@ -9,17 +9,18 @@
 <mat-dialog-content style="max-height: 85vh;">
     <div class="mat-elevation-z8">
         <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;">
+            <button class="mat-raised-button" (click)="filterGcd()">検索</button>
             <mat-form-field>
                 <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
-                <input matInput (keyup)="updateFilter('code',$event.target.value)">
+                <input matInput (input)="code=$event.target.value">
             </mat-form-field>
             <mat-form-field>
-                <mat-label>ﾌﾘｶﾞﾅ 半角ｶﾀｶﾅのみく</mat-label>
-                <input matInput (keyup)="updateFilter('kana',$event.target.value)">
+                <mat-label>ﾌﾘｶﾞﾅ</mat-label>
+                <input matInput (input)="kana=usrsrv.convKana($event.target.value)">
             </mat-form-field>
             <mat-form-field>
                 <mat-label>名称</mat-label>
-                <input matInput (keyup)="updateFilter('name',$event.target.value)">
+                <input matInput (input)="name=$event.target.value">
             </mat-form-field>
         </mat-toolbar>
         <table mat-table [dataSource]="dataSource" aria-label="Elements">

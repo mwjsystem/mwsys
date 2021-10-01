@@ -6,7 +6,7 @@ import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstg';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
-import { GoodsService } from './../services/goods.service';
+import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
 
 @Component({

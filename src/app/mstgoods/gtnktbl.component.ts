@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@ang
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { UserService } from './../services/user.service';
-import { GoodsService } from './../services/goods.service';
+import { GoodsService } from './/goods.service';
 import { BunruiService } from './../services/bunrui.service';
 
 @Component({

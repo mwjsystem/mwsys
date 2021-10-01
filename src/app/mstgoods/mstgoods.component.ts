@@ -15,7 +15,7 @@ import { GrpcdhelpComponent } from './../share/grpcdhelp/grpcdhelp.component';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 import { GdsimageComponent } from './../share/gdsimage/gdsimage.component';
 import { UserService } from './../services/user.service';
-import { GoodsService } from './../services/goods.service';
+import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
 import { VendsService } from './../services/vends.service';
 // import { StaffService } from './../services/staff.service';

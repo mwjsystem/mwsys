@@ -52,7 +52,7 @@
         </ng-container>
         <ng-container matColumnDef="sei">
             <th mat-header-cell *matHeaderCellDef>名前</th>
-            <td mat-cell *matCellDef="let row">{{row.sei + row.mei}}</td>
+            <td mat-cell *matCellDef="let row">{{row.sei + (row.mei || '') }}</td>
         </ng-container>
         <ng-container matColumnDef="kana">
             <th mat-header-cell *matHeaderCellDef>カナ</th>

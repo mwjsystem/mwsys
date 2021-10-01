@@ -7,7 +7,7 @@ import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
-import { GoodsService } from './../services/goods.service';
+// import { GoodsService } from './../services/goods.service';
 import { EdaService } from './../share/adreda/eda.service';
 import { JyumeiService } from './jyumei.service';
 import { Apollo } from 'apollo-angular';
@@ -68,7 +68,7 @@ export class JmeitblComponent implements OnInit {
               public usrsrv: UserService,
               public bunsrv: BunruiService,
               public strsrv: StoreService,
-              public gdssrv: GoodsService,
+              // public gdssrv: GoodsService,
               public edasrv: EdaService,
               public jmisrv: JyumeiService) {}
 
