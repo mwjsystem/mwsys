@@ -11,6 +11,7 @@
         <a mat-menu-item>ＤＭ抽出</a>
         <a mat-menu-item>ＤＭリスト</a>
         <a mat-menu-item routerLink="/frmtreat">問合せ・対応</a>
+        <button mat-menu-item (click)="dl_kick('TRN-TREAT_')">問合せ一括更新</button>
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="depo">売上入金</button>
     <mat-menu #depo="matMenu">
@@ -83,9 +84,9 @@
             ﾏｽﾀﾒﾝﾃﾅﾝｽ(一括更新)
         </button>
         <mat-menu #mstmenu="matMenu">
-            <button mat-menu-item (click)="dl_kick('BUNRUI_')">分類ﾏｽﾀﾒﾝﾃ</button>
-            <button mat-menu-item (click)="dl_kick('GOODS_')">商品ﾏｽﾀﾒﾝﾃ</button>
-            <button mat-menu-item (click)="dl_kick('MEMBER_')">顧客ﾏｽﾀﾒﾝﾃ</button>
+            <button mat-menu-item (click)="dl_kick('MST-BUNRUI_')">分類ﾏｽﾀﾒﾝﾃ</button>
+            <button mat-menu-item (click)="dl_kick('MST-GOODS_')">商品ﾏｽﾀﾒﾝﾃ</button>
+            <button mat-menu-item (click)="dl_kick('MST-MEMBER_')">顧客ﾏｽﾀﾒﾝﾃ</button>
         </mat-menu>
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="syst">システム</button>

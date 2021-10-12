@@ -103,7 +103,7 @@
 
       <ng-container matColumnDef="rate">
         <th mat-header-cell *matHeaderCellDef class="i_num">掛率</th>
-        <td mat-cell *matCellDef="let row; let i =index" class="i_num">
+        <td mat-cell *matCellDef="let row; let i =index" class="i_num" [formGroupName]="getIdx(i)">
           {{ getKkrt(getIdx(i)) | percent }}
         </td>
       </ng-container>

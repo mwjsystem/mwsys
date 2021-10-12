@@ -59,9 +59,13 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
         currency
         cost
       }
-      msgzais(order_by: {gcode: asc}) {
+      msgzais(order_by: {zcode: asc}) {
         irisu
         zcode
+        msgoods{
+          gtext
+          unit
+        }
       }
     }
   }

@@ -18,6 +18,10 @@
                     </button>
                 </mat-form-field>
                 <mat-form-field>
+                    <mat-label>商品コード</mat-label>
+                    <input matInput (input)="gcode=$event.target.value">
+                </mat-form-field>
+                <mat-form-field>
                     <mat-label>商品名称</mat-label>
                     <input matInput (input)="gtext=$event.target.value">
                 </mat-form-field>
@@ -27,7 +31,11 @@
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>中止区分</mat-label>
-                    <input matInput (input)="tkbn=$event.target.value">
+                    <mat-select [(ngModel)]="tkbn" [ngModelOptions]="{standalone: true}">
+                        <mat-option *ngFor="let sval of bunsrv.kbn.tkbn" [value]="sval.value">
+                            {{sval.viewval}}
+                        </mat-option>
+                    </mat-select>
                 </mat-form-field>
             </div>
         </mat-toolbar>
@@ -56,25 +64,29 @@
                 <th mat-header-cell *matHeaderCellDef>JANコード</th>
                 <td mat-cell *matCellDef="let row">{{row.jan}}</td>
             </ng-container>
-            <ng-container matColumnDef="irisu">
-                <th mat-header-cell *matHeaderCellDef>入り数</th>
-                <td mat-cell *matCellDef="let row">{{row.irisu}}</td>
-            </ng-container>
-            <ng-container matColumnDef="iriunit">
-                <th mat-header-cell *matHeaderCellDef>入り数単位</th>
-                <td mat-cell *matCellDef="let row">{{row.iriunit}}</td>
+            <ng-container matColumnDef="unit">
+                <th mat-header-cell *matHeaderCellDef>単位</th>
+                <td mat-cell *matCellDef="let row">{{row.unit}}</td>
             </ng-container>
             <ng-container matColumnDef="gskbn">
                 <th mat-header-cell *matHeaderCellDef>数量区分</th>
-                <td mat-cell *matCellDef="let row">{{row.gskbn}}</td>
+                <td mat-cell *matCellDef="let row">
+                    <mat-select [value]="row.gskbn" class="noArrow" style="width:7em;">
+                        <mat-option *ngFor="let sval of bunsrv.kbn.gskbn" [value]="sval.value">
+                            {{sval.viewval}}
+                        </mat-option>
+                    </mat-select>
+                </td>
             </ng-container>
             <ng-container matColumnDef="tkbn">
                 <th mat-header-cell *matHeaderCellDef>中止区分</th>
-                <td mat-cell *matCellDef="let row">{{row.tkbn}}</td>
-            </ng-container>
-            <ng-container matColumnDef="zkbn">
-                <th mat-header-cell *matHeaderCellDef>在庫区分</th>
-                <td mat-cell *matCellDef="let row">{{row.zkbn}}</td>
+                <td mat-cell *matCellDef="let row">
+                    <mat-select [value]="row.tkbn" class="noArrow" style="width:7em;">
+                        <mat-option *ngFor="let sval of bunsrv.kbn.tkbn" [value]="sval.value">
+                            {{sval.viewval}}
+                        </mat-option>
+                    </mat-select>
+                </td>
             </ng-container>
             <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setGcd(row)"></tr>

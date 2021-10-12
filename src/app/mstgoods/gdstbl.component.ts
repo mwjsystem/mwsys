@@ -2,12 +2,14 @@ import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChil
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstg';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
 import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
+import { GzaiComponent } from './../share/gzai/gzai.component';
 
 @Component({
   selector: 'app-gdstbl',
@@ -28,6 +30,7 @@ export class GdstblComponent implements OnInit,AfterViewInit {
   mcols=11; //tabindex用明細列数  
   constructor(private cdRef:ChangeDetectorRef,
               private fb:     FormBuilder,
+              private dialog: MatDialog,
               private apollo: Apollo,
               private toastr: ToastrService,
               public usrsrv:UserService,
@@ -84,8 +87,14 @@ export class GdstblComponent implements OnInit,AfterViewInit {
   async setJan(i:number){
     this.frmArr.controls[i].get('jan').setValue(this.usrsrv.addCheckDigit(await this.usrsrv.getNumber('jan',1)));
   }
-  diaGzai(){
-    
+  diaGzai(i:number){
+    let dialogConfig = new MatDialogConfig();
+    const gcd:string=this.frmArr.controls[i].value.gcode;
+    dialogConfig.data = {
+      gcode: gcd
+    };
+    dialogConfig.autoFocus = true;
+    let dialogRef = this.dialog.open(GzaiComponent, dialogConfig);     
   }
 
   get frmArr():FormArray {    
@@ -97,6 +106,8 @@ export class GdstblComponent implements OnInit,AfterViewInit {
   }
 
 　updGds(i: number,value: string){
+    let val:string =this.usrsrv.convUpper(value);  //小文字全角→大文字半角変換
+    this.frmArr.controls[i].get('gcode').setValue(val);
     this.apollo.watchQuery<any>({
       query: Query.GetMast2, 
         variables: { 

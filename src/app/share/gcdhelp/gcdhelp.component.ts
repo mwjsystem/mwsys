@@ -5,6 +5,7 @@ import { MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dial
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
+import { BunruiService } from './../../services/bunrui.service';
 import { GrpcdhelpComponent } from './../grpcdhelp/grpcdhelp.component';
 import { Subject } from 'rxjs';
 // import { Gcd,GcdService } from './gcd.service';
@@ -16,8 +17,7 @@ import { Subject } from 'rxjs';
     size:string;
     color:string;
     jan:string;
-    irisu:number;
-    iriunit:string;
+    unit:string;
     gskbn:number;
     tkbn:number;
     zkbn:number;
@@ -31,10 +31,11 @@ import { Subject } from 'rxjs';
 export class GcdhelpComponent implements OnInit {
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   dataSource:MatTableDataSource<Gcd>;
-  displayedColumns = ['code','gcode','gtext','size','color','jan','irisu','iriunit','gskbn','tkbn','zkbn'];
+  displayedColumns = ['code','gcode','gtext','size','color','jan','unit','gskbn','tkbn'];
   public gcds:Gcd[];
   public code:string="";
   public jan:string="";
+  public gcode:string="";
   public gtext:string="";
   public tkbn:string="0";
   public subject = new Subject<Gcd[]>();
@@ -42,6 +43,7 @@ export class GcdhelpComponent implements OnInit {
   constructor(private dialogRef: MatDialogRef<GcdhelpComponent>,
               private dialog: MatDialog,
               public usrsrv: UserService,
+              public bunsrv: BunruiService,
               public cdRef: ChangeDetectorRef,
               // public gcdsrv: GcdService,
               private apollo: Apollo) {
@@ -49,8 +51,8 @@ export class GcdhelpComponent implements OnInit {
                  }
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource= new MatTableDataSource<Gcd>(this.gcds);
+    // this.dataSource.paginator = this.paginator;
+    // this.dataSource= new MatTableDataSource<Gcd>(this.gcds);
     this.observe.subscribe(() => this.refresh());
   }
   filterGcd(){
@@ -64,6 +66,9 @@ export class GcdhelpComponent implements OnInit {
     if (this.jan!==""){
       varWh.where._and.push({"jan" : {"_like":"%" + this.jan + "%"}});
     }    
+    if (this.gcode!==""){
+      varWh.where._and.push({"gcode" : {"_like":"%" + this.gcode + "%"}});
+    }
     if (this.gtext!==""){
       varWh.where._and.push({"gtext" : {"_like":"%" + this.gtext + "%"}});
     }
@@ -82,7 +87,6 @@ export class GcdhelpComponent implements OnInit {
       unit
       gskbn
       tkbn
-      zkbn
       }
     }`;
     // console.log(varWh);
@@ -92,9 +96,10 @@ export class GcdhelpComponent implements OnInit {
       })
       .valueChanges
       .subscribe(({ data }) => {
+        console.log(data);
         this.gcds=data.msgoods;
         this.subject.next();
-        this.subject.complete();
+        // this.subject.complete();
       },(error) => {
         console.log('error query get_goods', error);
       });

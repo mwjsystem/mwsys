@@ -11,6 +11,7 @@ import * as Query from './queries.mstg';
 import { ToastrService } from 'ngx-toastr';
 import { GdstblComponent } from './gdstbl.component';
 import { GtnktblComponent } from './gtnktbl.component';
+import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { GrpcdhelpComponent } from './../share/grpcdhelp/grpcdhelp.component';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 import { GdsimageComponent } from './../share/gdsimage/gdsimage.component';
@@ -120,8 +121,25 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
         }
       }
     );    
-  }  
+  } 
 
+  gcdHelp(): void {
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.width  = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass= 'full-screen-modal';
+    let dialogRef = this.dialog.open(GcdhelpComponent, dialogConfig);
+    
+    dialogRef.afterClosed().subscribe(
+      data=>{
+          if(typeof data != 'undefined'){
+            this.gdssrv.grpcd = data.gcode;
+            this.get_ggroup(this.gdssrv.grpcd);
+          }
+      }
+    );
+  }
+  
   canEnter(e:KeyboardEvent):void{
     let element = e.target as HTMLElement;
     // console.log(element,element.tagName);

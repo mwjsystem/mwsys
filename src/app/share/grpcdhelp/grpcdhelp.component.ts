@@ -111,7 +111,7 @@ export class GrpcdhelpComponent implements OnInit {
     .subscribe(({ data }) => {
       this.ggrps=data.msggroup;
       this.subject.next();
-      this.subject.complete();
+      // this.subject.complete();
     },(error) => {
       console.log('error query get_ggroup', error);
     });

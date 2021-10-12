@@ -181,6 +181,8 @@ declare namespace mwI {
   interface Gzai {
     zcode:string;
     irisu:number;
+    msgoods:{gtext:string;
+             unit:string;};
   }
   interface Goods {
     gcode:string;

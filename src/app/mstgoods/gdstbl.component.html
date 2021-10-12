@@ -99,7 +99,8 @@
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
-            <button mat-flat-button matSuffix (click)="diaGzai()" *ngIf="frmArr.getRawValue()[getIdx(i)]['gskbn']==1"
+            <button mat-flat-button matSuffix (click)="diaGzai(getIdx(i))"
+              *ngIf="frmArr.getRawValue()[getIdx(i)]['gskbn']==1"
               matTooltip="{{getGzai(frmArr.getRawValue()[i]['gcode'])}}" matTooltipClass="ttips">内訳</button>
           </mat-form-field>
         </td>
