@@ -120,12 +120,20 @@ export class RepstockComponent implements OnInit {
       let i:number = pStcs.findIndex(obj => obj.scode == this.scode);
       this.stcsrv.stc.stock=pStcs[i].stock;
       this.stcsrv.stc.juzan=pStcs[i].juzan;
+      this.stcsrv.stc.today=pStcs[i].today;
+      this.stcsrv.stc.keepd=pStcs[i].keepd;
     } else {
       this.stcsrv.stc.stock=pStcs.reduce((prev, current) => {
         return prev + current.stock;
       }, 0);
       this.stcsrv.stc.juzan=pStcs.reduce((prev, current) => {
         return prev + current.juzan;
+      }, 0);
+      this.stcsrv.stc.today=pStcs.reduce((prev, current) => {
+        return prev + current.today;
+      }, 0);
+      this.stcsrv.stc.keepd=pStcs.reduce((prev, current) => {
+        return prev + current.keepd;
       }, 0);
     }
   }

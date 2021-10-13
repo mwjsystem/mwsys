@@ -202,7 +202,7 @@ export class StockService {
 
   async get_zaiko(gcd:string,scd:string,day:Date,stc:number):Promise<Stock>  {
     const GetTran = gql`
-    query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!) {
+    query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!, $today: date!) {
       siire:trsiimei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, inday: {_gt: $day}}) {
         aggregate { sum { suu }}}
       movin: trmovden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, incode: {_eq: $scode}, day: {_gt: $day}}) {
@@ -219,6 +219,12 @@ export class StockService {
         aggregate { sum { suu }}}
       haki: trhakden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}}) {
         aggregate { sum { suu }}}
+      today:trjyumei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $today}, del: {_is_null: true}}) {
+        aggregate { sum { suu }}}
+      keepd:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+        aggregate { sum { suu }}}
+      juzan:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+        aggregate { sum { suu }}}          
     }`;    
 
     return new Promise<Stock>( resolve => {
@@ -228,7 +234,8 @@ export class StockService {
             id : this.usrsrv.compid,
             gcode: gcd,
             scode: scd,
-            day: day
+            day: day,
+            today:new Date()
         },
       })
       .valueChanges
@@ -246,9 +253,9 @@ export class StockService {
                      - (data.tenmoto.aggregate.sum.suu || 0)
                      - (data.haki.aggregate.sum.suu || 0),
           hikat:0,
-          juzan:0,
-          today:0,
-          keepd:0
+          juzan:data.juzan.aggregate.sum.suu || 0,
+          today:data.today.aggregate.sum.suu || 0,
+          keepd:data.keepd.aggregate.sum.suu || 0
         }
         return resolve(lcstcs);
 

@@ -139,6 +139,14 @@
         <mat-form-field style="width:4em">
           <input matInput [value]="stcsrv.stgds.unit" disabled>
         </mat-form-field>
+        <mat-form-field style="width:4em">
+          <mat-label>当日最終在庫</mat-label>
+          <input matInput numberInput [value]="stcsrv.stc.stock" disabled class="i_num">
+        </mat-form-field>
+        <mat-form-field style="width:4em">
+          <mat-label>引当済</mat-label>
+          <input matInput numberInput [value]="stcsrv.stc.hikat" disabled class="i_num">
+        </mat-form-field>
         <div fxLayout="row wrap">
           <!-- <mat-form-field style="width:4em">
             <mat-label>前日最終</mat-label>
@@ -149,23 +157,14 @@
             <input matInput numberInput [value]="stcsrv.stc.today" disabled class="i_num">
           </mat-form-field>
           <mat-form-field style="width:4em">
-            <mat-label>最終在庫数</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.stock" disabled class="i_num">
+            <mat-label>キープ済</mat-label>
+            <input matInput numberInput [value]="stcsrv.stc.keepd" disabled class="i_num">
           </mat-form-field>
           <mat-form-field style="width:4em">
             <mat-label>受注残</mat-label>
             <input matInput numberInput [value]="stcsrv.stc.juzan" disabled class="i_num">
           </mat-form-field>
-          <mat-form-field style="width:4em">
-            <mat-label>引当済</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.hikat" disabled class="i_num">
-          </mat-form-field>
-          <mat-form-field style="width:4em">
-            <mat-label>キープ済</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.keepd" disabled class="i_num">
-          </mat-form-field>
         </div>
-
       </div>
       <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;" *ngIf="stcsrv.stgds.gskbn=='1'">
         <mat-label>受注可能数</mat-label>
