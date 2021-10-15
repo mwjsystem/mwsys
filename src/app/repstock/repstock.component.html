@@ -123,7 +123,7 @@
           <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox>
           <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
             <mat-label>倉庫</mat-label>
-            <mat-select [(value)]="scode" (openedChange)="sel_scd(stcsrv.stcs)" [disabled]="!chSok">
+            <mat-select [(value)]="scode" (openedChange)="onChange()" [disabled]="!chSok">
               <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -134,7 +134,7 @@
       <div *ngIf="stcsrv.stgds.gskbn=='0'">
         <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;">
           <mat-label>受注可能数</mat-label>
-          <input matInput numberInput value="{{stcsrv.stc.stock - stcsrv.stc.juzan}}" disabled class="i_num">
+          <input matInput numberInput value="{{stcsrv.stc.stock - stcsrv.stc.hikat}}" disabled class="i_num">
         </mat-form-field>
         <mat-form-field style="width:4em">
           <input matInput [value]="stcsrv.stgds.unit" disabled>

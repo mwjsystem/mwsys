@@ -74,9 +74,8 @@ export class StockService {
     // console.log(this.shcym,this.shlym);
   }
 
-  get_shcount(gcd:string):Promise<Stock[]>{
+  set_shcount(gcd:string){
     this.gcode=gcd;
-    
     const GetTran = gql`
     query get_shcount($id: smallint!, $gcode: String!, $fr: String!, $to: String!) {
       vshukka(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, to_char: {_gte: $fr, _lte: $to}}, order_by: {to_char: asc}) {
@@ -154,10 +153,13 @@ export class StockService {
       },(error) => {
         console.log('error query get_shcount', error);
       });
+  }
 
+  get_shcount(gcd:string,scd?:string):Promise<Stock[]>{
+    let scodes :string[]=null;
     const GetMast = gql`
-    query get_gcdscd($id:smallint!,$gcode:String!) {
-      vgstana(where:{id:{_eq:$id},gcode: {_eq:$gcode}}) {
+    query get_gcdscd($id:smallint!,$gcode:String!,$scode:[String!]) {
+      vgstana(where:{id:{_eq:$id},gcode: {_eq:$gcode}, code:{_in:$scode}}) {
         code
         gcode
         gskbn
@@ -167,12 +169,16 @@ export class StockService {
         day
       }
     }`;
+    if(scd){
+      scodes = [scd];
+    }
     return new Promise( resolve => {
       this.apollo.watchQuery<any>({
         query: GetMast, 
           variables: { 
             id : this.usrsrv.compid,
-            gcode:gcd
+            gcode:gcd,
+            scode:scodes
           },
         })
         .valueChanges
@@ -200,7 +206,7 @@ export class StockService {
 
   }
 
-  async get_zaiko(gcd:string,scd:string,day:Date,stc:number):Promise<Stock>  {
+  async get_zaiko(gcd:string,scd:string,day:Date,stc:number):Promise<Stock> {
     const GetTran = gql`
     query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!, $today: date!) {
       siire:trsiimei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, inday: {_gt: $day}}) {
@@ -222,6 +228,8 @@ export class StockService {
       today:trjyumei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $today}, del: {_is_null: true}}) {
         aggregate { sum { suu }}}
       keepd:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+          aggregate { sum { suu }}}
+      hikat:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "1"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
       juzan:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}          
@@ -252,7 +260,7 @@ export class StockService {
                      - (data.movout.aggregate.sum.suu || 0)
                      - (data.tenmoto.aggregate.sum.suu || 0)
                      - (data.haki.aggregate.sum.suu || 0),
-          hikat:0,
+          hikat:data.hikat.aggregate.sum.suu || 0,
           juzan:data.juzan.aggregate.sum.suu || 0,
           today:data.today.aggregate.sum.suu || 0,
           keepd:data.keepd.aggregate.sum.suu || 0

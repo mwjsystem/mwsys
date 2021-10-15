@@ -7,6 +7,7 @@ import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
+import { StockService } from './../services/stock.service';
 // import { GoodsService } from './../services/goods.service';
 import { EdaService } from './../share/adreda/eda.service';
 import { JyumeiService } from './jyumei.service';
@@ -68,6 +69,7 @@ export class JmeitblComponent implements OnInit {
               public usrsrv: UserService,
               public bunsrv: BunruiService,
               public strsrv: StoreService,
+              public stcsrv: StockService,
               // public gdssrv: GoodsService,
               public edasrv: EdaService,
               public jmisrv: JyumeiService) {}
@@ -402,6 +404,11 @@ export class JmeitblComponent implements OnInit {
               this.hatden.push(msgds.msggroup.vcode);
             }
           }
+          this.stcsrv.get_shcount(val,this.frmArr.controls[i].value.scode).then(result =>{
+            this.frmArr.controls[i].patchValue({pable:(result[0].stock - result[0].hikat)});
+          });
+
+
           // console.log(this.frmArr.controls[i].value,this.frmArr.getRawValue()[i]);
           this.calcMei(i);
           // this.calcTot();
