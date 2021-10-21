@@ -64,6 +64,10 @@
   <mat-card-content fxLayout="row wrap" fxLayoutGap="5px">
     <fieldset fxLayout="row wrap" fxLayoutGap="5px">
       <legend>共通情報</legend>
+      <div *ngIf="stcsrv.isLoading" style="display: flex; justify-content: center; align-items: center">
+        <mat-progress-spinner color="primary" mode="indeterminate">
+        </mat-progress-spinner>
+      </div>
       <mat-form-field>
         <mat-label>商品名</mat-label>
         <input matInput [value]="stcsrv.stgds.gtext" disabled>

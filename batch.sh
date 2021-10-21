@@ -1,4 +1,4 @@
 #!/usr/bin/bash
 git add -A
-git commit -am "auto"
+git commit -am $1
 git push -u origin master

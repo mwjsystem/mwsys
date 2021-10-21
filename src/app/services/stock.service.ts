@@ -52,6 +52,7 @@ export class StockService {
   private shlym:string[]=[];
   public paabl:number = 0;
   public gcode:string;
+  public isLoading:boolean=true;
   // // public subject = new Subject<Stock[]>();
   // public subject = new Subject<Stock>();
   // public observe = this.subject.asObservable();  
@@ -149,6 +150,7 @@ export class StockService {
           this.stgds.ydtxt='入荷予定日';
         }
         this.stgds.htzan=data.vhatzan_aggregate.aggregate.sum.hatzan;
+        this.isLoading=false;
         // console.log(this.shcnt,this.shlas);
       },(error) => {
         console.log('error query get_shcount', error);
