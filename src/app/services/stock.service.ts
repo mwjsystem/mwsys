@@ -14,6 +14,7 @@ export class Stock {
   juzan: number;
   today: number;
   keepd: number;
+  tommo: number;
   constructor(init?:Partial<Stock>) {
     Object.assign(this, init);
   }

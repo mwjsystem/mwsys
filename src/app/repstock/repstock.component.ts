@@ -22,7 +22,7 @@ import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 export class RepstockComponent implements OnInit {
   public gcode:string="";
   public scode:string="";
-  public chSok:boolean=false;
+  // public chSok:boolean=false;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -60,13 +60,15 @@ export class RepstockComponent implements OnInit {
        });
   }
   onChange(): void {
-    if (this.chSok == false){
-      this.scode="";
-      history.replaceState('','','./repstock?gcode=' + this.gcode);
-    }else{
+    // if (this.chSok == false){
+    //   this.scode="";
+    //   history.replaceState('','','./repstock?gcode=' + this.gcode);
+    // }else{
+    if (this.scode){
       history.replaceState('','','./repstock?gcode=' + this.gcode + '&scode=' + this.scode);
+      this.sel_scd();
     }
-    this.sel_scd(this.stcsrv.stcs);
+    
   }
   onEnter(): void {
     this.get_zinfo(this.gcode);
@@ -123,33 +125,40 @@ export class RepstockComponent implements OnInit {
   public outputCsv(event: any) {
     
   }
-  sel_scd(pStcs){
+  sel_scd(){
     // this.get_zinfo(this.gcode);
     // console.log(pStcs,this.scode);
-    if(this.scode){
-      let i:number = pStcs.findIndex(obj => obj.scode == this.scode);
-      this.stcsrv.stc.stock=pStcs[i].stock;
-      this.stcsrv.stc.juzan=pStcs[i].juzan;
-      this.stcsrv.stc.today=pStcs[i].today;
-      this.stcsrv.stc.keepd=pStcs[i].keepd;
-      this.stcsrv.stc.hikat=pStcs[i].hikat;
+    // if(this.scode){
+
+    if (this.stcsrv.gcode) {
+      let i:number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
+      this.stcsrv.stc.stock=this.stcsrv.stcs[i].stock;
+      this.stcsrv.stc.juzan=this.stcsrv.stcs[i].juzan;
+      this.stcsrv.stc.today=this.stcsrv.stcs[i].today;
+      this.stcsrv.stc.keepd=this.stcsrv.stcs[i].keepd;
+      this.stcsrv.stc.hikat=this.stcsrv.stcs[i].hikat;
     } else {
-      this.stcsrv.stc.stock=pStcs.reduce((prev, current) => {
-        return prev + current.stock;
-      }, 0);
-      this.stcsrv.stc.juzan=pStcs.reduce((prev, current) => {
-        return prev + current.juzan;
-      }, 0);
-      this.stcsrv.stc.today=pStcs.reduce((prev, current) => {
-        return prev + current.today;
-      }, 0);
-      this.stcsrv.stc.keepd=pStcs.reduce((prev, current) => {
-        return prev + current.keepd;
-      }, 0);
-      this.stcsrv.stc.hikat=pStcs.reduce((prev, current) => {
-        return prev + current.hikat;
-      }, 0);  
+
+
+
     }
+      // } else {
+    //   this.stcsrv.stc.stock=pStcs.reduce((prev, current) => {
+    //     return prev + current.stock;
+    //   }, 0);
+    //   this.stcsrv.stc.juzan=pStcs.reduce((prev, current) => {
+    //     return prev + current.juzan;
+    //   }, 0);
+    //   this.stcsrv.stc.today=pStcs.reduce((prev, current) => {
+    //     return prev + current.today;
+    //   }, 0);
+    //   this.stcsrv.stc.keepd=pStcs.reduce((prev, current) => {
+    //     return prev + current.keepd;
+    //   }, 0);
+    //   this.stcsrv.stc.hikat=pStcs.reduce((prev, current) => {
+    //     return prev + current.hikat;
+    //   }, 0);  
+    // }
     this.cdRef.detectChanges();
   }
   async get_zinfo(gcd:string){

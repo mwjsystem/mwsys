@@ -124,10 +124,10 @@
     <fieldset>
       <legend>
         <div fxLayout="row wrap" fxLayoutAlign="start baseline">
-          <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox>
+          <!-- <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox> -->
           <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
             <mat-label>倉庫</mat-label>
-            <mat-select [(value)]="scode" (openedChange)="onChange()" [disabled]="!chSok">
+            <mat-select [(value)]="scode" (openedChange)="onChange()" required>
               <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -152,10 +152,6 @@
           <input matInput numberInput [value]="stcsrv.stc.hikat" disabled class="i_num">
         </mat-form-field>
         <div fxLayout="row wrap">
-          <!-- <mat-form-field style="width:4em">
-            <mat-label>前日最終</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.yestr" disabled class="i_num">
-          </mat-form-field> -->
           <mat-form-field style="width:4em">
             <mat-label>当日出荷</mat-label>
             <input matInput numberInput [value]="stcsrv.stc.today" disabled class="i_num">
@@ -168,6 +164,10 @@
             <mat-label>受注残</mat-label>
             <input matInput numberInput [value]="stcsrv.stc.juzan" disabled class="i_num">
           </mat-form-field>
+          <mat-form-field style="width:4em">
+            <mat-label>翌日出荷</mat-label>
+            <input matInput numberInput [value]="stcsrv.stc.tommo" disabled class="i_num">
+          </mat-form-field> -->
         </div>
       </div>
       <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;" *ngIf="stcsrv.stgds.gskbn=='1'">
