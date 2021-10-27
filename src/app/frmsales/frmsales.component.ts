@@ -91,7 +91,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       jdshsta: new FormControl(''),
       torikbn: new FormControl(''),
       mcode: new FormControl(''),
-      scode: new FormControl(''),
+      scde: new FormControl(''),
       ncode: new FormControl(''),
       nsaki: new FormControl(''),
       nadr: new FormControl(''),
@@ -102,7 +102,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       uday: new FormControl(''),
       nday: new FormControl(''),
       tcode: new FormControl(''),
-      scd: new FormControl(''),
+      scode: new FormControl(''),
       skbn: new FormControl('', Validators.required),
       jcode: new FormControl('', Validators.required),
       pcode: new FormControl('', Validators.required),
@@ -330,7 +330,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       lcmcode = ""; 
     }
     this.form.get('mcode').setValue(lcmcode);
-    this.form.get('scode').setValue(lcmcode);
+    this.form.get('scde').setValue(lcmcode);
     this.form.get('ncode').setValue(lcmcode);
     this.get_member(lcmcode,true);
   }
@@ -467,7 +467,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.jmisrv.denno=0; 
     this.form.get('tcode').setValue(this.usrsrv.staff.code);
     this.form.get('day').setValue(new Date());
-    this.form.get('scd').setValue(this.usrsrv.staff.scode);
+    this.form.get('scode').setValue(this.usrsrv.staff.scode);
     this.form.get('skbn').setValue("0");
     this.jmeitbl.frmArr.clear(); 
     this.refresh(); 
@@ -493,6 +493,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     let tooltip:string="";
     const ctrls0=this.form.controls;
   　for (const name in ctrls0){
+      if (name == 'yday'){
+        // console.log(ctrls0[name].errors);
+        if(ctrls0[name].errors?.matDatepickerFilter){
+          ctrls0[name].setErrors(null);
+        }
+      }
       if(ctrls0[name].invalid){
         if(name=='mtbl'){
           for(let i=0;i<this.frmArr.length;i++){ 
@@ -520,7 +526,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       updated_at:new Date(),
       updated_by:this.usrsrv.staff.code,
       mcode: this.usrsrv.editFrmval(this.form,'mcode'),
-      scode: this.usrsrv.editFrmval(this.form,'scode'),
+      scde: this.usrsrv.editFrmval(this.form,'scde'),
       ncode: this.usrsrv.editFrmval(this.form,'ncode'),
       nadr: this.usrsrv.editFrmval(this.form,'nadr'),
       bunsho: this.usrsrv.editFrmval(this.form,'bunsho'),
@@ -530,7 +536,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       uday: this.usrsrv.editFrmval(this.form,'uday'),
       nday: this.usrsrv.editFrmval(this.form,'nday'),
       tcode: this.usrsrv.editFrmval(this.form,'tcode'),
-      scd: this.usrsrv.editFrmval(this.form,'scd'),
+      scode: this.usrsrv.editFrmval(this.form,'scode'),
       skbn: this.usrsrv.editFrmval(this.form,'skbn'),
       jcode: this.usrsrv.editFrmval(this.form,'jcode'),
       pcode: this.usrsrv.editFrmval(this.form,'pcode'),

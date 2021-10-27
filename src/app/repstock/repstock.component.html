@@ -62,16 +62,37 @@
 </mat-toolbar>
 <mat-card>
   <mat-card-content fxLayout="row wrap" fxLayoutGap="5px">
-    <fieldset fxLayout="row wrap" fxLayoutGap="5px">
-      <legend>共通情報</legend>
-      <div *ngIf="stcsrv.isLoading" style="display: flex; justify-content: center; align-items: center">
-        <mat-progress-spinner color="primary" mode="indeterminate">
-        </mat-progress-spinner>
+    <fieldset fxLayout="column wrap" fxLayoutGap="5px">
+      <legend>倉庫共通情報</legend>
+      <div fxLayout="row wrap" fxLayoutGap="5px">
+        <div *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center">
+          <mat-progress-spinner color="primary" mode="indeterminate" [diameter]="50">
+          </mat-progress-spinner>
+        </div>
+        <mat-form-field>
+          <mat-label>商品名</mat-label>
+          <input matInput [value]="stcsrv.stgds.gtext" disabled>
+        </mat-form-field>
+        <mat-form-field style="width:6em">
+          <mat-label>月平均出荷数</mat-label>
+          <input matInput [value]="stcsrv.stgds.moavg | number:'1.2-2'" disabled class="i_num">
+        </mat-form-field>
+        <mat-form-field style="width:4em">
+          <input matInput [value]="stcsrv.stgds.unit" disabled>
+        </mat-form-field>
+        <mat-form-field style="width:6em">
+          <mat-label>出荷数昨対</mat-label>
+          <input matInput [value]="stcsrv.stgds.motai" disabled class="i_num">
+        </mat-form-field>
+        <mat-form-field style="width:8em;">
+          <mat-label>数量区分</mat-label>
+          <mat-select [value]="stcsrv.stgds.gskbn" disabled class="selreadonly">
+            <mat-option *ngFor="let sval of bunsrv.kbn.gskbn" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
-      <mat-form-field>
-        <mat-label>商品名</mat-label>
-        <input matInput [value]="stcsrv.stgds.gtext" disabled>
-      </mat-form-field>
       <div *ngIf="stcsrv.stgds.gskbn=='0'">
         <mat-form-field style="width:7em">
           <mat-label>{{stcsrv.stgds.ydtxt}}</mat-label>
@@ -86,25 +107,6 @@
           <input matInput [value]="stcsrv.stgds.htzan" disabled class="i_num">
         </mat-form-field>
       </div>
-      <mat-form-field style="width:6em">
-        <mat-label>月平均出荷数</mat-label>
-        <input matInput [value]="stcsrv.stgds.moavg | number:'1.2-2'" disabled class="i_num">
-      </mat-form-field>
-      <mat-form-field style="width:4em">
-        <input matInput [value]="stcsrv.stgds.unit" disabled>
-      </mat-form-field>
-      <mat-form-field style="width:6em">
-        <mat-label>出荷数昨対</mat-label>
-        <input matInput [value]="stcsrv.stgds.motai" disabled class="i_num">
-      </mat-form-field>
-      <mat-form-field style="width:8em;">
-        <mat-label>数量区分</mat-label>
-        <mat-select [value]="stcsrv.stgds.gskbn" disabled class="selreadonly">
-          <mat-option *ngFor="let sval of bunsrv.kbn.gskbn" [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
     </fieldset>
   </mat-card-content>
 </mat-card>
@@ -127,7 +129,7 @@
           <!-- <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox> -->
           <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
             <mat-label>倉庫</mat-label>
-            <mat-select [(value)]="scode" (openedChange)="onChange()" required>
+            <mat-select [(value)]="scode" (openedChange)="onChange()" [disabled]="!stcsrv.stcGcd" required>
               <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -135,40 +137,50 @@
           </mat-form-field>
         </div>
       </legend>
-      <div *ngIf="stcsrv.stgds.gskbn=='0'">
-        <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;">
-          <mat-label>受注可能数</mat-label>
-          <input matInput numberInput value="{{stcsrv.stc.stock - stcsrv.stc.hikat}}" disabled class="i_num">
-        </mat-form-field>
-        <mat-form-field style="width:4em">
-          <input matInput [value]="stcsrv.stgds.unit" disabled>
-        </mat-form-field>
-        <mat-form-field style="width:4em">
-          <mat-label>当日最終在庫</mat-label>
-          <input matInput numberInput [value]="stcsrv.stc.stock" disabled class="i_num">
-        </mat-form-field>
-        <mat-form-field style="width:4em">
-          <mat-label>引当済</mat-label>
-          <input matInput numberInput [value]="stcsrv.stc.hikat" disabled class="i_num">
-        </mat-form-field>
-        <div fxLayout="row wrap">
-          <mat-form-field style="width:4em">
-            <mat-label>当日出荷</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.today" disabled class="i_num">
+      <div *ngIf="stcsrv.stgds.gskbn=='0'" fxLayout="row" fxLayoutGap="5px">
+        <mat-progress-spinner *ngIf="isLoading2" color="primary" mode="indeterminate" [diameter]="50">
+        </mat-progress-spinner>
+        <div>
+          <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;">
+            <mat-label>受注可能数</mat-label>
+            <input matInput numberInput value="{{stcsrv.stc.stock - stcsrv.stc.hikat}}" disabled class="i_num">
           </mat-form-field>
           <mat-form-field style="width:4em">
-            <mat-label>キープ済</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.keepd" disabled class="i_num">
+            <input matInput [value]="stcsrv.stgds.unit" disabled>
           </mat-form-field>
           <mat-form-field style="width:4em">
-            <mat-label>受注残</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.juzan" disabled class="i_num">
+            <mat-label>当日最終在庫</mat-label>
+            <input matInput numberInput [value]="stcsrv.stc.stock" disabled class="i_num">
           </mat-form-field>
           <mat-form-field style="width:4em">
-            <mat-label>翌日出荷</mat-label>
-            <input matInput numberInput [value]="stcsrv.stc.tommo" disabled class="i_num">
-          </mat-form-field> -->
+            <mat-label>引当済</mat-label>
+            <input matInput numberInput [value]="stcsrv.stc.hikat" disabled class="i_num">
+          </mat-form-field>
+          <div fxLayout="row wrap">
+            <mat-form-field style="width:4em">
+              <mat-label>当日出荷</mat-label>
+              <input matInput numberInput [value]="stcsrv.stc.today" disabled class="i_num">
+            </mat-form-field>
+            <mat-form-field style="width:4em">
+              <mat-label>キープ済</mat-label>
+              <input matInput numberInput [value]="stcsrv.stc.keepd" disabled class="i_num">
+            </mat-form-field>
+            <mat-form-field style="width:4em">
+              <mat-label>受注残</mat-label>
+              <input matInput numberInput [value]="stcsrv.stc.juzan" disabled class="i_num">
+            </mat-form-field>
+            <mat-form-field style="width:4em">
+              <mat-label>翌日出荷</mat-label>
+              <input matInput numberInput [value]="stcsrv.stc.tommo" disabled class="i_num">
+            </mat-form-field>
+          </div>
         </div>
+        <div *ngIf="!stcsrv.stcGcd">
+          <mat-progress-spinner color="primary" mode="indeterminate" [diameter]="30">
+          </mat-progress-spinner>
+          全倉庫<br>在庫数<br>読込中
+        </div>
+        <button mat-flat-button (click)="showStcscds()" color="primary" *ngIf="stcsrv.stcGcd">全倉庫<br>在庫数</button>
       </div>
       <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;" *ngIf="stcsrv.stgds.gskbn=='1'">
         <mat-label>受注可能数</mat-label>

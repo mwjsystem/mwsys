@@ -91,15 +91,15 @@
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
             <mat-label>請求先</mat-label>
-            <input matInput formControlName="scode" required (keydown.f4)="mcdHelp('scode')">
-            <button mat-icon-button matSuffix (click)="mcdHelp('scode')" *ngIf="frmArr.enabled">
+            <input matInput formControlName="scde" required (keydown.f4)="mcdHelp('scde')">
+            <button mat-icon-button matSuffix (click)="mcdHelp('scde')" *ngIf="frmArr.enabled">
               <mat-icon>find_replace</mat-icon>
             </button>
-            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.scode)">
+            <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember',form.value.scde)">
               <mat-icon>open_in_new</mat-icon>
             </button>
           </mat-form-field>
-          <span class="nmtxt">{{form.getRawValue().scode | mcdtxt}}</span>
+          <span class="nmtxt">{{form.getRawValue().scde | mcdtxt}}</span>
         </div>
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
@@ -158,7 +158,8 @@
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
             <mat-label>出荷予定日</mat-label>
-            <input tabIndex="7" matInput [matDatepicker]="picker1" formControlName="yday">
+            <input tabIndex="7" matInput [matDatepickerFilter]="usrsrv.holidayFltr" [matDatepicker]="picker1"
+              formControlName="yday">
             <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
             <mat-datepicker #picker1></mat-datepicker>
           </mat-form-field>
@@ -167,7 +168,8 @@
         <div fxLayout="row wrap" fxLayoutAlign="start end">
           <mat-form-field style="width: 7em;">
             <mat-label>出荷日</mat-label>
-            <input tabIndex="8" matInput [matDatepicker]="picker2" formControlName="sday">
+            <input tabIndex="8" matInput [matDatepickerFilter]="usrsrv.holidayFltr" [matDatepicker]="picker2"
+              formControlName="sday">
             <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
             <mat-datepicker #picker2></mat-datepicker>
           </mat-form-field>
@@ -203,7 +205,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>倉庫</mat-label>
-          <mat-select #msel2 tabIndex="12" formControlName="scd" (keydown.enter)="msel2.close()" required>
+          <mat-select #msel2 tabIndex="12" formControlName="scode" (keydown.enter)="msel2.close()" required>
             <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>

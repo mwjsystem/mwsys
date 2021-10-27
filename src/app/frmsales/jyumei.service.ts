@@ -34,7 +34,7 @@ export class JyumeiService {
         updated_at
         updated_by
         mcode
-        scode
+        scde
         ncode
         nadr
         bunsho
@@ -44,7 +44,7 @@ export class JyumeiService {
         uday
         nday
         tcode
-        scd
+        scode
         skbn
         jcode
         pcode

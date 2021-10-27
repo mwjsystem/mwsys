@@ -8,6 +8,7 @@ import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { GrpcdhelpComponent } from './../grpcdhelp/grpcdhelp.component';
 import { Subject } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 // import { Gcd,GcdService } from './gcd.service';
 
  export interface Gcd {
@@ -45,6 +46,7 @@ export class GcdhelpComponent implements OnInit {
               public usrsrv: UserService,
               public bunsrv: BunruiService,
               public cdRef: ChangeDetectorRef,
+              private toastr: ToastrService,
               // public gcdsrv: GcdService,
               private apollo: Apollo) {
                 this.dataSource= new MatTableDataSource<Gcd>(this.gcds);
@@ -96,7 +98,8 @@ export class GcdhelpComponent implements OnInit {
       })
       .valueChanges
       .subscribe(({ data }) => {
-        console.log(data);
+        // console.log(data);
+        if (data.msgoods.length==0){ this.toastr.warning("条件に合うコードが見つかりませんでした");}
         this.gcds=data.msgoods;
         this.subject.next();
         // this.subject.complete();

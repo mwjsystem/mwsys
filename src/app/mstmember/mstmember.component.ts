@@ -97,7 +97,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       sime: new FormControl(''),
       site: new FormControl(''),
       inday: new FormControl(''),
-      scode: new FormControl(''),  
+      scde: new FormControl(''),  
       sscode: new FormControl(''),    
     // }));
     // this.form.addControl('mail', new FormGroup({
@@ -379,7 +379,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       sime: this.usrsrv.editFrmval(this.form.get('base'),'sime'),
       site: this.usrsrv.editFrmval(this.form.get('base'),'site'),
       inday: this.usrsrv.editFrmval(this.form.get('base'),'inday'),
-      scode: this.usrsrv.editFrmval(this.form.get('base'),'scode'),
+      scde: this.usrsrv.editFrmval(this.form.get('base'),'scde'),
       bikou: this.usrsrv.editFrmval(this.form.get('base'),'bikou'),
       // inbikou: this.usrsrv.editFrmval(this.form.get('base'),'inbikou'),
       pcode: this.usrsrv.editFrmval(this.form.get('base'),'pcode'),
@@ -441,8 +441,8 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       if (!member.sscode) {
         member.sscode = this.mcd;
       }
-      if (!member.scode) {
-        member.scode = this.mcd;
+      if (!member.scde) {
+        member.scde = this.mcd;
       }
       member.created_at = new Date();
       member.created_by = this.usrsrv.staff.code;

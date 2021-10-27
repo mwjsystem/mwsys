@@ -155,6 +155,9 @@ export class JmeitblComponent implements OnInit {
       // toutmoney:lctoutmoney,
       tinmoney:lctinmoney
     });
+    if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] > 10 && this.frmArr.getRawValue()[i]['spec'] == "") {
+      this.frmArr.controls[i].patchValue({spec:'1'});     
+    }
     this.calcTot();
   }
   setAll(chked:boolean){
@@ -404,8 +407,11 @@ export class JmeitblComponent implements OnInit {
               this.hatden.push(msgds.msggroup.vcode);
             }
           }
-          this.stcsrv.get_shcount(val,this.frmArr.controls[i].value.scode).then(result =>{
-            this.frmArr.controls[i].patchValue({pable:(result[0].stock - result[0].hikat)});
+          this.stcsrv.get_stock(val,this.frmArr.controls[i].value.scode).then(result =>{
+            console.log(result);
+            this.frmArr.controls[i].patchValue({pable:((result[0]?.stock - result[0]?.hikat) || 0)});
+            console.log(this.frmArr);
+            this.jmisrv.subject.next(true);
           });
 
 

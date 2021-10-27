@@ -230,6 +230,7 @@ declare namespace mwI {
     viewval:string;
     memo:string;
   }
+  
   interface Staff {
     code:string;
     mail:string;

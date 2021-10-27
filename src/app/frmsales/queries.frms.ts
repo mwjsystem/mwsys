@@ -50,7 +50,7 @@ query get_member($id: smallint!,$mcode:String!) {
     mei
     tankakbn
     torikbn
-    scode
+    scde
     pcode
     hcode
     jcode

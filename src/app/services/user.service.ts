@@ -53,6 +53,13 @@ export class UserService {
   tbldef:mwI.Tbldef[]=[];
   subject = new Subject<boolean>();
   observe = this.subject.asObservable();
+  holidays:String[]=[];
+  holidayFltr = (d: Date | null): boolean => {
+    const day = (d || new Date()).getDay();
+    // Prevent Saturday and Sunday from being selected.
+    const ret = !this.holidays.includes(this.formatDate(d));
+    return day !== 0 && day !== 6 && ret;
+  }
 
   constructor(public auth: AuthService,
               private apollo: Apollo,
@@ -80,15 +87,7 @@ export class UserService {
         tnk9txt
       }
     }`;
-    const GetMast2 = gql`
-    query get_staff($id: smallint!, $mail: String!) {
-      msstaff(where: {id: {_eq: $id}, mail: {_eq: $mail}}) {
-        code
-        sei
-        mei
-        scode
-      }
-    }`;
+
     this.auth.user$.subscribe(user => {
       this.userInfo = user;
       // console.log(this.userInfo);
@@ -105,19 +104,7 @@ export class UserService {
         },(error) => {
           console.log('error query get_system', error);
         });
-      this.apollo.watchQuery<any>({
-        query: GetMast2, 
-          variables: { 
-            id : this.compid,
-            mail : this.userInfo.email
-          },
-        })
-        .valueChanges
-        .subscribe(({ data }) => {
-          this.staff=data.msstaff[0];
-        },(error) => {
-          console.log('error query get_system', error);
-        });
+
       const color:string = localStorage.getItem(user.nickname + 'MWSYS_COLOR');
       // console.log(color);
       if ( color !== null ){
@@ -128,7 +115,9 @@ export class UserService {
             link.href = 'https://unpkg.com/@angular/material/prebuilt-themes/' + color + '.css';
           }
         }
-      }          
+      }
+      this.getHolidays(); 
+      this.getStaff(this.userInfo.email).then(result => this.staff = result);         
     });
     this.getTbldef();
   }
@@ -138,6 +127,33 @@ export class UserService {
     this.auth.logout({ returnTo: window.location.origin });
   }
 
+  async getStaff(mail:string):Promise<mwI.Staff>{
+    const GetMast = gql`
+    query get_staff($id: smallint!, $mail: String!) {
+      msstaff(where: {id: {_eq: $id}, mail: {_eq: $mail}}) {
+        code
+        sei
+        mei
+        scode
+      }
+    }`;
+    return new Promise( resolve => {
+      this.apollo.watchQuery<any>({
+        query: GetMast, 
+          variables: { 
+            id : this.compid,
+            mail : mail
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => {
+          return resolve(data.msstaff[0]);
+        },(error) => {
+          console.log('error query get_staff', error);
+          return resolve(this.staff);
+        });
+    });  
+  }
   async getNumber(type:string,inc:number,dno?:number):Promise<number>{
     const UpdateNumber = gql`
     mutation getNextnum($id: smallint!, $typ: String!, $inc: bigint!) {
@@ -216,6 +232,7 @@ export class UserService {
     }else{  
       val = frm.get(fld).value;
     }
+    console.log(frm.get(fld).value,val);
     return val;
   }
 
@@ -379,6 +396,10 @@ export class UserService {
     const url = this.router.createUrlTree(['/frmsupply','1',hdno]);
     window.open(url.toString() + '?stkey=' + jdkey ,null,'top=100,left=100');
   }
+  openRepstc(gcd,scd){
+    const url = this.router.createUrlTree(['/repstock'],{queryParams: {gcode: gcd, scode: scd}});
+    window.open(url.toString(),null,'top=100,left=100');
+  }
   confirmCan(dirty:boolean):boolean{
       let ret:boolean=false;
       if (dirty) {
@@ -434,5 +455,35 @@ export class UserService {
     }
     return ret;
   }
+  getHolidays() {
+    const GetMast = gql`
+      query get_msholiday($id: smallint!){
+        msholiday(where: {id: {_eq: $id}}) {
+          holiday
+        }
+      }`;
+    this.apollo.watchQuery<any>({
+        query: GetMast,
+        variables: {
+          id: this.compid
+        },
+    })
+    .valueChanges
+    .subscribe(({ data }) => {
+      data.msholiday.forEach(element => {
+        this.holidays.push(this.formatDate(new Date(element.holiday)));
+      });
+    },(error) => {
+      console.log('error query holiday', error);
+    });
+  }
+  getNextday(date:Date) {
+    date.setDate( date.getDate() + 1);
+    const day = date.getDay();
+    if  (this.holidays.includes(this.formatDate(date)) || day == 0 || day == 6){
+      this.getNextday(date);  
+    }
+    return date;
+  } 
 }
 

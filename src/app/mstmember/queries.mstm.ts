@@ -58,7 +58,7 @@ query get_member($id: smallint!,$mcode:String!) {
     sime
     site
     inday
-    scode
+    scde
     pcode
     hcode
     jcode

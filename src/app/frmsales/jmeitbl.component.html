@@ -138,6 +138,10 @@
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;"
             [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
+            <button mat-icon-button matPrefix *ngIf="frmArr.getRawValue()[getIdx(i)]['gcode']"
+              (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],frmArr.getRawValue()[getIdx(i)]['scode'])">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
             <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['pable'] | number" class="i_num" disabled>
           </mat-form-field>
         </td>
@@ -145,12 +149,14 @@
       <ng-container matColumnDef="spec">
         <th mat-header-cell *matHeaderCellDef>在庫状態</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
-          <mat-select #msel4 formControlName="spec" (keydown.enter)="msel4.close()"
-            [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
-            <mat-option *ngFor="let sval of bunsrv.kbn.jmeikbn" [value]="sval.value">
-              {{sval.viewval}}
-            </mat-option>
-          </mat-select>
+          <mat-form-field style="width:6em;">
+            <mat-select #msel4 formControlName="spec" (keydown.enter)="msel4.close()"
+              [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
+              <mat-option *ngFor="let sval of bunsrv.kbn.jmeikbn" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </td>
       </ng-container>
       <ng-container matColumnDef="spdet">
