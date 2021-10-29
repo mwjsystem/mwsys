@@ -1,13 +1,13 @@
 <mat-toolbar class="toolbar mat-elevation-z8" color="primary">
+  <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
+    <mat-label>商品ｺｰﾄﾞ</mat-label>
+    <input matInput [ngModel]="gcode" gcdInput (ngModelChange)="gcode=$event" (keyup.enter)="onEnter()"
+      (keydown.f4)="gcdHelp()" (blur)="onEnter()" [ngModelOptions]="{standalone: true}">
+    <button mat-button mat-icon-button matSuffix (click)="gcdHelp()">
+      <mat-icon>find_replace</mat-icon>
+    </button>
+  </mat-form-field>
   <div class="icon-area" fxLayout="row" fxLayoutGap="5px" fxShow="true" fxHide.lt-md="true">
-    <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
-      <mat-label>商品ｺｰﾄﾞ</mat-label>
-      <input matInput [ngModel]="gcode" gcdInput (ngModelChange)="gcode=$event" (keyup.enter)="onEnter()"
-        (keydown.f4)="gcdHelp()" (blur)="onEnter()" [ngModelOptions]="{standalone: true}">
-      <button mat-button mat-icon-button matSuffix (click)="gcdHelp()">
-        <mat-icon>find_replace</mat-icon>
-      </button>
-    </mat-form-field>
     <button mat-button (click)="setNext()">
       <mat-icon>keyboard_arrow_up</mat-icon>
       次の商品
@@ -65,46 +65,46 @@
     <fieldset fxLayout="column wrap" fxLayoutGap="5px">
       <legend>倉庫共通情報</legend>
       <div fxLayout="row wrap" fxLayoutGap="5px">
-        <div *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center">
-          <mat-progress-spinner color="primary" mode="indeterminate" [diameter]="50">
-          </mat-progress-spinner>
-        </div>
         <mat-form-field>
           <mat-label>商品名</mat-label>
-          <input matInput [value]="stcsrv.stgds.gtext" disabled>
-        </mat-form-field>
-        <mat-form-field style="width:6em">
-          <mat-label>月平均出荷数</mat-label>
-          <input matInput [value]="stcsrv.stgds.moavg | number:'1.2-2'" disabled class="i_num">
-        </mat-form-field>
-        <mat-form-field style="width:4em">
-          <input matInput [value]="stcsrv.stgds.unit" disabled>
-        </mat-form-field>
-        <mat-form-field style="width:6em">
-          <mat-label>出荷数昨対</mat-label>
-          <input matInput [value]="stcsrv.stgds.motai" disabled class="i_num">
+          <input matInput [value]="stgds.gtext" disabled>
         </mat-form-field>
         <mat-form-field style="width:8em;">
           <mat-label>数量区分</mat-label>
-          <mat-select [value]="stcsrv.stgds.gskbn" disabled class="selreadonly">
+          <mat-select [value]="stgds.gskbn" disabled class="selreadonly">
             <mat-option *ngFor="let sval of bunsrv.kbn.gskbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <div *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center">
+          <mat-progress-spinner color="primary" mode="indeterminate" [diameter]="50">
+          </mat-progress-spinner>
+        </div>
+        <mat-form-field style="width:6em">
+          <mat-label>月平均出荷数</mat-label>
+          <input matInput [value]="stgds.moavg | number:'1.2-2'" disabled class="i_num">
+        </mat-form-field>
+        <mat-form-field style="width:4em">
+          <input matInput [value]="stgds.unit" disabled>
+        </mat-form-field>
+        <mat-form-field style="width:6em">
+          <mat-label>出荷数昨対</mat-label>
+          <input matInput [value]="stgds.motai" disabled class="i_num">
+        </mat-form-field>
       </div>
-      <div *ngIf="stcsrv.stgds.gskbn=='0'">
+      <div *ngIf="stgds.gskbn=='0'">
         <mat-form-field style="width:7em">
-          <mat-label>{{stcsrv.stgds.ydtxt}}</mat-label>
-          <input matInput [value]="stcsrv.stgds.yday" disabled>
+          <mat-label>{{stgds.ydtxt}}</mat-label>
+          <input matInput [value]="stgds.yday" disabled>
         </mat-form-field>
         <mat-form-field style="width:4em">
           <mat-label>入荷予定数</mat-label>
-          <input matInput [value]="stcsrv.stgds.suu" disabled class="i_num">
+          <input matInput [value]="stgds.suu" disabled class="i_num">
         </mat-form-field>
         <mat-form-field style="width:4em">
           <mat-label>発注残</mat-label>
-          <input matInput [value]="stcsrv.stgds.htzan" disabled class="i_num">
+          <input matInput [value]="stgds.htzan" disabled class="i_num">
         </mat-form-field>
       </div>
     </fieldset>
@@ -137,16 +137,16 @@
           </mat-form-field>
         </div>
       </legend>
-      <div *ngIf="stcsrv.stgds.gskbn=='0'" fxLayout="row" fxLayoutGap="5px">
-        <mat-progress-spinner *ngIf="isLoading2" color="primary" mode="indeterminate" [diameter]="50">
-        </mat-progress-spinner>
+      <mat-progress-spinner *ngIf="isLoading2" color="primary" mode="indeterminate" [diameter]="50">
+      </mat-progress-spinner>
+      <div *ngIf="stgds.gskbn=='0'" fxLayout="row" fxLayoutGap="5px">
         <div>
           <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;">
             <mat-label>受注可能数</mat-label>
             <input matInput numberInput value="{{stcsrv.stc.stock - stcsrv.stc.hikat}}" disabled class="i_num">
           </mat-form-field>
           <mat-form-field style="width:4em">
-            <input matInput [value]="stcsrv.stgds.unit" disabled>
+            <input matInput [value]="stgds.unit" disabled>
           </mat-form-field>
           <mat-form-field style="width:4em">
             <mat-label>当日最終在庫</mat-label>
@@ -182,11 +182,14 @@
         </div>
         <button mat-flat-button (click)="showStcscds()" color="primary" *ngIf="stcsrv.stcGcd">全倉庫<br>在庫数</button>
       </div>
-      <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;" *ngIf="stcsrv.stgds.gskbn=='1'">
-        <mat-label>受注可能数</mat-label>
-        <input matInput numberInput value="{{stcsrv.get_paabl()}}" disabled class="i_num">
-      </mat-form-field>
-      <div *ngIf="stcsrv.stgds.gskbn=='2'">在庫管理できない、またはしない商品です！</div>
+      <div *ngIf="stgds.gskbn=='1'">
+        <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;">
+          <mat-label>受注可能数</mat-label>
+          <input matInput numberInput value="{{stcsrv.get_paabl(stcsrv.stcbs)}}" disabled class="i_num">
+        </mat-form-field>
+        <app-gzaitbl></app-gzaitbl>
+      </div>
+      <div *ngIf="stgds.gskbn=='2'">在庫管理できない、またはしない商品です！</div>
     </fieldset>
   </mat-card-content>
 

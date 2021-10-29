@@ -23,10 +23,10 @@ interface Jyuden {
   uday:Date;
   nday:Date;
   mcode:string;
-  scode:string;
+  scde:string;
   ncode:string;
   nadr:number;
-  scd:string;
+  scode:string;
   tcode:number;
   tcode1:number;
   jdstatus:string;
@@ -62,7 +62,7 @@ export class JdnohelpComponent implements OnInit {
     'nday',
     'mcode',
     'nadr',
-    'scd',
+    'scode',
     'tcode',
     'keep',
     'okurino',
@@ -74,7 +74,7 @@ export class JdnohelpComponent implements OnInit {
     'del',
     'updated_at',
     'updated_by',
-    'scode',
+    'scde',
     'ncode'
   ]; 
   fmcdfld:string="mcode";
@@ -162,7 +162,7 @@ export class JdnohelpComponent implements OnInit {
         hcode
         ncode
         nadr
-        scd
+        scode
         tcode
         keep
         okurino
@@ -170,7 +170,7 @@ export class JdnohelpComponent implements OnInit {
         skbn
         torikbn
         mcode
-        scode
+        scde
         pcode
         tcode1 
         del

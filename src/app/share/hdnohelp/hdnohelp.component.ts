@@ -19,7 +19,7 @@ interface Hatden {
   day:Date;
   hdstatus:string;
   vcode:string;
-  souko:string;
+  scode:string;
   tcode:number;
   del:boolean;
   updated_at:Date;
@@ -46,7 +46,7 @@ export class HdnohelpComponent implements OnInit {
     'day',
     'hdstatus',
     'vcode',
-    'soko',
+    'scode',
     'tcode',
     // 'del',
     'updated_at',
@@ -113,7 +113,7 @@ export class HdnohelpComponent implements OnInit {
         denno
         day
         hdstatus
-        soko
+        scode
         vcode
         tcode 
         updated_at

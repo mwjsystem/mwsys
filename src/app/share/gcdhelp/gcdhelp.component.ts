@@ -57,6 +57,7 @@ export class GcdhelpComponent implements OnInit {
     // this.dataSource= new MatTableDataSource<Gcd>(this.gcds);
     this.observe.subscribe(() => this.refresh());
   }
+
   filterGcd(){
     let varWh: {[k: string]: any}={"where" : {"_and":[
       {"id": {"_eq": this.usrsrv.compid}},

@@ -107,6 +107,9 @@ export class JyumeiService {
             msgzais {
               zcode
               irisu
+              msgoods {
+                gskbn
+              }
             }
           }
         }

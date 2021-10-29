@@ -39,6 +39,9 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     msgzais {
       zcode
       irisu
+      msgoods {
+        gskbn
+      }
     }
   }
 }`;

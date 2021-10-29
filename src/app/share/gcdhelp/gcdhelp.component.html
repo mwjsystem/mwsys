@@ -12,14 +12,16 @@
                 <button class="mat-raised-button" (click)="filterGcd()">検索</button>
                 <mat-form-field>
                     <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
-                    <input matInput [(ngModel)]="code" (keydown.f4)="grpcdHelp()" [ngModelOptions]="{standalone: true}">
-                    <button mat-button mat-icon-button matSuffix (click)="grpcdHelp()">
+                    <input matInput [(ngModel)]="code" (change)="code=usrsrv.convUpper($event.target.value)"
+                        (keydown.f4)="grpcdHelp()" [ngModelOptions]="{standalone: true}">
+                    <button mat-button mat-icon-button matSuffix (click)=" grpcdHelp()">
                         <mat-icon>find_replace</mat-icon>
                     </button>
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>商品コード</mat-label>
-                    <input matInput (input)="gcode=$event.target.value">
+                    <input matInput [(ngModel)]="gcode" (change)="gcode=usrsrv.convUpper($event.target.value)"
+                        [ngModelOptions]="{standalone: true}">
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>商品名称</mat-label>

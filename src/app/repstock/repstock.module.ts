@@ -8,6 +8,7 @@ import { RepstockRoutingModule } from './repstock-routing.module';
 import { RepstockComponent } from './repstock.component';
 import { GcdhelpComponent } from '../share/gcdhelp/gcdhelp.component';
 import { StcscdsComponent } from '../share/stcscds/stcscds.component';
+import { GzaitblComponent } from './gzaitbl.component';
 
 registerLocaleData(localeJa);
 
@@ -15,7 +16,8 @@ registerLocaleData(localeJa);
   declarations: [
     RepstockComponent,
     GcdhelpComponent,
-    StcscdsComponent
+    StcscdsComponent,
+    GzaitblComponent
   ],
   imports: [
     CommonModule,

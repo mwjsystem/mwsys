@@ -185,7 +185,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   }
 
   async download_csv(format:string){
-    let head = this.dwlsrv.pickObj(this.form.getRawValue(),['day','vcode','store','biko']);
+    let head = this.dwlsrv.pickObj(this.form.getRawValue(),['day','vcode','scode','biko']);
     // head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
     const vend = this.vensrv.get_vendor(this.form.getRawValue().vcode);
     head['adrname'] = vend.name;
@@ -266,10 +266,10 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.denno=0; 
     this.form.get('tcode').setValue(this.usrsrv.staff?.code);
     this.form.get('day').setValue(new Date());
-    this.form.get('store').setValue("01"); 
+    this.form.get('scode').setValue("01"); 
     this.form.get('hdstatus').setValue("0"); 
     this.hmeitbl.frmArr.clear();
-    // console.log(this.hmeitbl.frmArr);
+    console.log(this.hmeitbl.frmArr);
     this.hmeitbl.add_rows(1);
     this.refresh();
   }  
@@ -297,7 +297,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       // denno: this.denno,
       vcode: this.usrsrv.editFrmval(this.form,'vcode'),
       day: this.usrsrv.editFrmval(this.form,'day'),
-      store: this.usrsrv.editFrmval(this.form,'store'),
+      scode: this.usrsrv.editFrmval(this.form,'scode'),
       tcode: this.usrsrv.editFrmval(this.form,'tcode'),
       autoproc: this.usrsrv.editFrmval(this.form,'autoproc'),
       // mtax: this.usrsrv.editFrmval(this.form,'mtax'),

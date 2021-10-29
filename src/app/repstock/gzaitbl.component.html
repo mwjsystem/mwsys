@@ -1,0 +1,38 @@
+<div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" aria-label="Elements">
+        <ng-container matColumnDef="gcode">
+            <th mat-header-cell *matHeaderCellDef>内訳商品コード</th>
+            <td mat-cell *matCellDef="let row">{{row.gcode}}</td>
+        </ng-container>
+        <ng-container matColumnDef="irisu">
+            <th mat-header-cell *matHeaderCellDef>入り数</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.irisu}}</td>
+        </ng-container>
+        <ng-container matColumnDef="pable">
+            <th mat-header-cell *matHeaderCellDef>受注可</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{(row.stock - row.hikat) / row.irisu}}</td>
+        </ng-container>
+        <ng-container matColumnDef="stock">
+            <th mat-header-cell *matHeaderCellDef>在庫数</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.stock}}</td>
+        </ng-container>
+        <ng-container matColumnDef="hikat">
+            <th mat-header-cell *matHeaderCellDef>引当数</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.hikat}}</td>
+        </ng-container>
+        <ng-container matColumnDef="yday">
+            <th mat-header-cell *matHeaderCellDef>入荷予定</th>
+            <td mat-cell *matCellDef="let row">{{row.yday}}</td>
+        </ng-container>
+        <ng-container matColumnDef="suu">
+            <th mat-header-cell *matHeaderCellDef>予定数</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.suu}}</td>
+        </ng-container>
+        <ng-container matColumnDef="htzan">
+            <th mat-header-cell *matHeaderCellDef>発注残</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.htzan}}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</div>
