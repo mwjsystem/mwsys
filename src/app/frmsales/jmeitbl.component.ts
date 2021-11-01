@@ -155,7 +155,8 @@ export class JmeitblComponent implements OnInit {
       // toutmoney:lctoutmoney,
       tinmoney:lctinmoney
     });
-    if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] > 10 && this.frmArr.getRawValue()[i]['spec'] == "") {
+    // console.log(+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'],this.frmArr.getRawValue()[i]['spec'] == null);
+    if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] > 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({spec:'1'});     
     }
     this.calcTot();
@@ -177,7 +178,7 @@ export class JmeitblComponent implements OnInit {
     let kogu:number = 0;
     let mall:number = 0;
     this.frmArr.controls.forEach(control => {
-      console.log(control.value);
+      // console.log(control.value);
       if(!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02') || control.value.gcode=='MALL'){
         forDel.push(i);
         // console.log(control.value.gcode,i);
@@ -204,7 +205,7 @@ export class JmeitblComponent implements OnInit {
     forDel.reverse().forEach(fordel => {
       this.frmArr.removeAt(fordel);
     })
-    console.log(calc,sour);
+    // console.log(calc,sour);
     let j:number = this.edasrv.adrs.findIndex(obj => obj.eda == this.parentForm.getRawValue()['nadr']);
     let sufi:string="";
     // console.log(this.parentForm.value,j);
@@ -411,7 +412,7 @@ export class JmeitblComponent implements OnInit {
             this.stcsrv.get_stock(val,this.frmArr.controls[i].value.gskbn,this.frmArr.controls[i].value.scode).then(result =>{
               // console.log(result);
               this.frmArr.controls[i].patchValue({pable:((result[0]?.stock - result[0]?.hikat) || 0)});
-              console.log(this.frmArr);
+              // console.log(this.frmArr);
               this.jmisrv.subject.next(true);
             });
           } else if(this.frmArr.controls[i].value.gskbn=="1"){

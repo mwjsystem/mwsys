@@ -256,6 +256,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             history.replaceState('','','./frmsales');
           } else {
             let jyuden:mwI.Trjyuden=result;
+            console.log(jyuden);
             if(jyuden.nadr>1){
               this.form.get('nsaki').setValue("2");
             } else { 
@@ -520,7 +521,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   async save() {
-    
+    console.log(this.form.get('nadr'));
     let jyuden:any={
       torikbn: Boolean(this.usrsrv.editFrmval(this.form,'torikbn')),
       updated_at:new Date(),
@@ -528,7 +529,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       mcode: this.usrsrv.editFrmval(this.form,'mcode'),
       scde: this.usrsrv.editFrmval(this.form,'scde'),
       ncode: this.usrsrv.editFrmval(this.form,'ncode'),
-      nadr: this.usrsrv.editFrmval(this.form,'nadr'),
+      nadr: +this.form.getRawValue()['nadr'],
       bunsho: this.usrsrv.editFrmval(this.form,'bunsho'),
       day: this.usrsrv.editFrmval(this.form,'day'),
       yday: this.usrsrv.editFrmval(this.form,'yday'),
