@@ -232,7 +232,7 @@ export class UserService {
     }else{  
       val = frm.get(fld).value;
     }
-    console.log(frm.get(fld).value,val);
+    // console.log(frm.get(fld).value,val);
     return val;
   }
 

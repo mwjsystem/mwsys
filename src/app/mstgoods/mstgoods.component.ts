@@ -8,6 +8,7 @@ import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstg';
+import * as AutoKana from 'vanilla-autokana';
 import { ToastrService } from 'ngx-toastr';
 import { GdstblComponent } from './gdstbl.component';
 import { GtnktblComponent } from './gtnktbl.component';
@@ -97,6 +98,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       } 
     });
     this.refresh();
+    AutoKana.bind('#first-fld', '#kanafld',{katakana:true});
   }
 
 　diaImage(): void {

@@ -65,11 +65,13 @@
         <div fxLayoutGap="5px">
           <mat-form-field style="width:20em">
             <mat-label>グループ名</mat-label>
-            <input tabIndex="1" matInput formControlName="name" required id="first-fld">
+            <input tabIndex="1" matInput formControlName="name" required name="first-fld" id="first-fld"
+              (change)="updKana(kanafld.value)">
           </mat-form-field>
           <mat-form-field>
             <mat-label>フリガナ</mat-label>
-            <input tabIndex="2" matInput formControlName="kana" required (change)="updKana($event.target.value)">
+            <input #kanafld tabIndex="2" matInput formControlName="kana" required name="kanafld" id="kanafld"
+              (change)="updKana($event.target.value)">
           </mat-form-field>
           <mat-form-field style="width:8em">
             <mat-label>商品区分</mat-label>

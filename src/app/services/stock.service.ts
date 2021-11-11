@@ -27,6 +27,7 @@ export class Stcbs {
   scode: string;
   stock: number;
   hikat: number;
+  keepd: number;
   yday: Date;
   suu: number;
   htzan: number;
@@ -445,6 +446,8 @@ export class StockService {
       }
       hikat:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "1"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}  
+      keepd:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+        aggregate { sum { suu }}}
       vhatzan(where: {hatzan: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
         yday
         hatzan
@@ -485,6 +488,7 @@ export class StockService {
                      - (data.trzaiko_aggregate.aggregate.sum.teno || 0)
                      - (data.trzaiko_aggregate.aggregate.sum.haki || 0),
           hikat:data.hikat.aggregate.sum.suu || 0, 
+          keepd:data.keepd.aggregate.sum.suu || 0, 
           yday : data.vhatzan[0]?.yday,
           suu : data.vhatzan[0]?.hatzan,
           htzan:data.vhatzan_aggregate.aggregate.sum.hatzan
@@ -570,7 +574,7 @@ export class StockService {
   get_paabl(stcbs):number {
     let paabl:number=9999;
     for (let i=0; i < stcbs.length; i++ ){
-      const wAble = Math.floor((stcbs[i].stock - stcbs[i].hikat) / stcbs[i].irisu);
+      const wAble = Math.floor((stcbs[i].stock - stcbs[i].hikat - stcbs[i].keepd) / stcbs[i].irisu);
       if ( wAble < paabl ){
         paabl = wAble;
       }

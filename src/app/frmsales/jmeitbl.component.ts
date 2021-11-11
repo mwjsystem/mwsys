@@ -411,7 +411,7 @@ export class JmeitblComponent implements OnInit {
           if(this.frmArr.controls[i].value.gskbn=="0"){
             this.stcsrv.get_stock(val,this.frmArr.controls[i].value.gskbn,this.frmArr.controls[i].value.scode).then(result =>{
               // console.log(result);
-              this.frmArr.controls[i].patchValue({pable:((result[0]?.stock - result[0]?.hikat) || 0)});
+              this.frmArr.controls[i].patchValue({pable:((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0)});
               // console.log(this.frmArr);
               this.jmisrv.subject.next(true);
             });
@@ -554,6 +554,9 @@ export class JmeitblComponent implements OnInit {
       this.frmArr.push(this.createRow(i+1,e));
       // this.calcMei(i);
       i+=1;
+
+
+      
     });
     this.refresh();
   }
