@@ -375,6 +375,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
         this.mode=3;
         this.form.disable();
         this.form.markAsPristine();
+        history.replaceState('','','./mstgoods/3/' + this.gdssrv.grpcd);
       },(error) => {
         this.toastr.error('データベースエラー','商品グループ' + this.gdssrv.grpcd + 'の変更保存ができませんでした',
                           {closeButton: true,disableTimeOut: true,tapToDismiss: false});
@@ -402,6 +403,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
         this.mode=3;
         this.form.disable();
         this.form.markAsPristine();
+        history.replaceState('','','./mstgoods/3/' + this.gdssrv.grpcd);
       },(error) => {
         this.toastr.error('データベースエラー','商品グループ' + this.gdssrv.grpcd + 'の登録ができませんでした',
                           {closeButton: true,disableTimeOut: true,tapToDismiss: false});
