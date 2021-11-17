@@ -340,7 +340,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       // console.log(trhatden);
       this.hmisrv.ins_hatden(trhatden,hatmei)
       .then(result => {
-        console.log('insert_trhat',result);
+        // console.log('insert_trhat',result);
         this.toastr.success('発注伝票' + this.denno + 'を新規登録しました');
         this.form.markAsPristine();
         this.cancel();

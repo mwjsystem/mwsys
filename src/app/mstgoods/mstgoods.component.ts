@@ -114,6 +114,10 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   grpcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
+    dialogConfig.data = {
+      code: this.gdssrv.grpcd
+    };
+    // console.log(dialogConfig.data);
     let dialogRef = this.dialog.open(GrpcdhelpComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(
       data=>{
@@ -130,8 +134,10 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     dialogConfig.width  = '100vw';
     dialogConfig.height = '98%';
     dialogConfig.panelClass= 'full-screen-modal';
+    dialogConfig.data = {
+      gcode: this.gdssrv.grpcd
+    };  
     let dialogRef = this.dialog.open(GcdhelpComponent, dialogConfig);
-    
     dialogRef.afterClosed().subscribe(
       data=>{
           if(typeof data != 'undefined'){

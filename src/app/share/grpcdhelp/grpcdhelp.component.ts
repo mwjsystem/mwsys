@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
@@ -49,10 +49,14 @@ export class GrpcdhelpComponent implements OnInit {
               // public gdssrv: GoodsService,
               public bunsrv: BunruiService,
               private apollo: Apollo,
-              // private overlay: Overlay
-              ) {
+              @Inject(MAT_DIALOG_DATA) data) {
+                // console.log(data);
                 this.dataSource= new MatTableDataSource<Ggrp>(this.ggrps);
-               }
+                if(typeof data != 'undefined'){
+                  this.code= (data?.code ?? '');
+                  if (this.code){ this.filterGcd(); }
+                }
+              }
 
   ngOnInit(): void {
     this.dataSource.paginator = this.paginator;

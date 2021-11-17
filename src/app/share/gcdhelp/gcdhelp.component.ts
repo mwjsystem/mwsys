@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
@@ -38,7 +38,7 @@ export class GcdhelpComponent implements OnInit {
   public jan:string="";
   public gcode:string="";
   public gtext:string="";
-  public tkbn:string="0";
+  public tkbn:string[]=[];
   public subject = new Subject<Gcd[]>();
   public observe = this.subject.asObservable();  
   constructor(private dialogRef: MatDialogRef<GcdhelpComponent>,
@@ -48,9 +48,15 @@ export class GcdhelpComponent implements OnInit {
               public cdRef: ChangeDetectorRef,
               private toastr: ToastrService,
               // public gcdsrv: GcdService,
-              private apollo: Apollo) {
+              private apollo: Apollo,
+              @Inject(MAT_DIALOG_DATA) data) {
                 this.dataSource= new MatTableDataSource<Gcd>(this.gcds);
-                 }
+                if(typeof data != 'undefined'){
+                  this.gcode= (data?.gcode ?? '');
+                  this.tkbn= (data?.tkbn ?? '');
+                  if (this.gcode){ this.filterGcd(); }
+                }
+              }
 
   ngOnInit(): void {
     // this.dataSource.paginator = this.paginator;
@@ -59,9 +65,9 @@ export class GcdhelpComponent implements OnInit {
   }
 
   filterGcd(){
+    // console.log(this.tkbn);
     let varWh: {[k: string]: any}={"where" : {"_and":[
-      {"id": {"_eq": this.usrsrv.compid}},
-      {"tkbn": {"_eq": "0"}}
+      {"id": {"_eq": this.usrsrv.compid}}
     ]}};
     if (this.code!==""){
       varWh.where._and.push({"code" : {"_like":"%" + this.code + "%"}});
@@ -75,8 +81,8 @@ export class GcdhelpComponent implements OnInit {
     if (this.gtext!==""){
       varWh.where._and.push({"gtext" : {"_like":"%" + this.gtext + "%"}});
     }
-    if (this.tkbn!==""){
-      varWh.where._and.push({"tkbn" : {"_eq":this.tkbn}});
+    if (this.tkbn.length>0){
+      varWh.where._and.push({"tkbn" : {"_in":this.tkbn}});
     }
     const GetMast = gql`
     query get_goods($where:msgoods_bool_exp!) {

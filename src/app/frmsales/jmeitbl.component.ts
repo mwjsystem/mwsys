@@ -346,6 +346,10 @@ export class JmeitblComponent implements OnInit {
     dialogConfig.width  = '100vw';
     dialogConfig.height = '98%';
     dialogConfig.panelClass= 'full-screen-modal';
+    dialogConfig.data = {
+      gcode: this.frmArr.controls[i].value.gcode,
+      tkbn: ['0']
+    };
     let dialogRef = this.dialog.open(GcdhelpComponent, dialogConfig);
     
     dialogRef.afterClosed().subscribe(

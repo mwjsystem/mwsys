@@ -25,15 +25,15 @@
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>商品名称</mat-label>
-                    <input matInput (input)="gtext=$event.target.value">
+                    <input matInput [(ngModel)]="gtext" [ngModelOptions]="{standalone: true}">
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>Janコード</mat-label>
-                    <input matInput (input)="jan=$event.target.value">
+                    <input matInput [(ngModel)]="jan" [ngModelOptions]="{standalone: true}">
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>中止区分</mat-label>
-                    <mat-select [(ngModel)]="tkbn" [ngModelOptions]="{standalone: true}">
+                    <mat-select [(ngModel)]="tkbn" [ngModelOptions]="{standalone: true}" multiple>
                         <mat-option *ngFor="let sval of bunsrv.kbn.tkbn" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>

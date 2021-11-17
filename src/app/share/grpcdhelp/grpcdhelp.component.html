@@ -12,15 +12,17 @@
             <button class="mat-raised-button" (click)="filterGcd()">検索</button>
             <mat-form-field>
                 <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
-                <input matInput (input)="code=$event.target.value">
+                <input matInput [(ngModel)]="code" (change)="code=usrsrv.convUpper($event.target.value)"
+                    [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <mat-form-field>
                 <mat-label>ﾌﾘｶﾞﾅ</mat-label>
-                <input matInput (input)="kana=usrsrv.convKana($event.target.value)">
+                <input matInput [(ngModel)]="kana" (change)="kana=usrsrv.convKana($event.target.value)"
+                    [ngModelOptions]="{standalone: true}">
             </mat-form-field>
             <mat-form-field>
                 <mat-label>名称</mat-label>
-                <input matInput (input)="name=$event.target.value">
+                <input matInput [(ngModel)]="name" [ngModelOptions]="{standalone: true}">
             </mat-form-field>
         </mat-toolbar>
         <table mat-table [dataSource]="dataSource" aria-label="Elements">
