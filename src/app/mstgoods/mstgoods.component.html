@@ -82,16 +82,32 @@
             </mat-select>
           </mat-form-field>
           <mat-form-field>
+            <mat-label>カテゴリ</mat-label>
+            <mat-select tabIndex="4" #msel02 formControlName="category" required (keydown.enter)="msel02.close()">
+              <mat-option *ngFor="let sval of bunsrv.kbn.category" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>サブカテゴリ</mat-label>
+            <mat-select tabIndex="5" #msel03 formControlName="subcat" required (keydown.enter)="msel03.close()">
+              <mat-option *ngFor="let sval of bunsrv.getSubcat(msel02.value)" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <!-- <mat-form-field>
             <mat-label>ジャンル</mat-label>
             <mat-select tabIndex="4" #msel02 formControlName="genre" required (keydown.enter)="msel02.close()">
               <mat-option *ngFor="let sval of bunsrv.kbn.genre" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
-          </mat-form-field>
+          </mat-form-field>           -->
           <mat-form-field style="width: 7em;">
             <mat-label>仕入先</mat-label>
-            <input tabIndex="5" matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
+            <input tabIndex="6" matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
             <button mat-button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode!==3">
               <mat-icon>find_replace</mat-icon>
             </button>
@@ -100,14 +116,14 @@
           <span class="nmtxt">{{form.value.vcode | vcdtxt}}</span>
           <mat-form-field>
             <mat-label>素材</mat-label>
-            <input tabIndex="6" matInput formControlName="sozai">
+            <input tabIndex="7" matInput formControlName="sozai">
           </mat-form-field>
           <!-- <mat-checkbox formControlName="del">削除済</mat-checkbox> -->
         </div>
         <div fxLafxLayout="row wrap" fxLayoutGap="5px">
           <mat-form-field class="txtar">
             <mat-label>備考</mat-label>
-            <textarea tabIndex="7" matInput formControlName="bikou" matTextareaAutosize></textarea>
+            <textarea tabIndex="8" matInput formControlName="bikou" matTextareaAutosize></textarea>
           </mat-form-field>
         </div>
       </div>

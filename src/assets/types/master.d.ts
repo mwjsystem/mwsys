@@ -221,6 +221,8 @@ declare namespace mwI {
     tcode:string;
     specurl:string;
     genre:string;
+    category:string;
+    subcat:string;
     msgoods:Msgoods[];    
   }
   

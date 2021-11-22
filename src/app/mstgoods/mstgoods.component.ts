@@ -71,6 +71,8 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       vcode: new FormControl(''),
       genre: new FormControl(''),
       specurl: new FormControl(''),
+      category: new FormControl(''),
+      subcat: new FormControl(''),
       mtbl: this.rows,
       mtbl2: this.rows2 
     });

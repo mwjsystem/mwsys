@@ -56,6 +56,12 @@ export class BunruiService {
     
   }
 
+  getSubcat(cat:string){
+    return this.kbn.subcat.filter(obj => {
+      if(obj.value.slice(0,2)==cat){
+       return true;}
+      })
+  } 
   // async get_name(value: string, kubun: string):Promise<any>  {
   //   // this.bunsrv.get_bunrui();
   //   this.qry_bunrui().then((result) => {    

@@ -29,6 +29,8 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
     updated_at
     created_by
     updated_by
+    category
+    subcat
     msgoods(order_by: {gcode: asc}) {
       gcode
       color
