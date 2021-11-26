@@ -386,5 +386,12 @@ export class HmeitblComponent implements OnInit {
     // ((this.frmArr.at(i+1) as FormGroup).controls['gcode']as any).nativeElement = this.elementRef.nativeElement;
     // ((this.frmArr.at(i+1) as FormGroup).controls['gcode']as any).nativeElement.focus();
   }
-
+  getIdx(index : number)    {
+    if(this.paginator){
+      return index + this.paginator.pageSize * this.paginator.pageIndex;
+    } else{
+      return index;
+    }
+    // console.log(index);
+  }
 }

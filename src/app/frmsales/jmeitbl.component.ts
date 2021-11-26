@@ -582,7 +582,7 @@ export class JmeitblComponent implements OnInit {
     } else{
       return index;
     }
-    console.log(index);
+    // console.log(index);
   }
   getKkrt(i : number):number {
     const lcteika:number = +this.frmArr.getRawValue()[i]['tanka1'];
