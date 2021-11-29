@@ -310,7 +310,8 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       vcode: this.usrsrv.editFrmval(this.form,'vcode'),
       // tcode: this.usrsrv.editFrmval(this.form,'tcode'),
       specurl: this.usrsrv.editFrmval(this.form,'specurl'),
-      genre: this.usrsrv.editFrmval(this.form,'genre'),
+      category: this.usrsrv.editFrmval(this.form,'category'),
+      subcat: this.usrsrv.editFrmval(this.form,'subcat'),
       updated_at:new Date(),
       updated_by:this.usrsrv.staff.code
     };
