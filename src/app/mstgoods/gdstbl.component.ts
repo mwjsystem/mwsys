@@ -137,7 +137,7 @@ export class GdstblComponent implements OnInit,AfterViewInit {
             this.frmArr.controls[i].get('gcode').setErrors({'exist': true});
           }
       });  
-  (this.parentForm.get('mtbl2') as FormArray).controls[i].get('gcode').setValue(value);
+  (this.parentForm.get('mtbl2') as FormArray).controls[i].get('gcode').setValue(val);
   }
   createRow(flg:boolean,goods?:mwI.Goods){
     return this.fb.group({
