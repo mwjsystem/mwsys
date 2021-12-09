@@ -18,6 +18,7 @@ import { JdatePipe } from './pipes/jdate.pipe';
 import { McdtxtPipe } from './pipes/mcdtxt.pipe';
 import { VcdtxtPipe } from './pipes/vcdtxt.pipe';
 import { ModetxtPipe } from './pipes/modetxt.pipe';
+import { BlankPipe } from './pipes/blank.pipe';
 
 registerLocaleData(localeJa);
 
@@ -31,7 +32,8 @@ registerLocaleData(localeJa);
     JdatePipe,
     McdtxtPipe,
     VcdtxtPipe,
-    ModetxtPipe
+    ModetxtPipe,
+    BlankPipe
   ],
   imports: [
     CommonModule,
@@ -52,6 +54,7 @@ registerLocaleData(localeJa);
     McdtxtPipe,
     VcdtxtPipe,
     ModetxtPipe,
+    BlankPipe,
     TmstmpComponent,
     MaterialModule, 
     FormsModule,

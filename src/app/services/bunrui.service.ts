@@ -62,17 +62,12 @@ export class BunruiService {
        return true;}
       })
   } 
-  // async get_name(value: string, kubun: string):Promise<any>  {
-  //   // this.bunsrv.get_bunrui();
-  //   this.qry_bunrui().then((result) => {    
-  //     console.log(kubun, result);    
-  //     let i:number = result[kubun].findIndex(obj => obj.value == value);
-  //     // console.log(kubun, this.bunsrv.kbn);
-  //     let name:string="";
-  //     if( i > -1 ){
-  //       name = result[kubun][i]['viewval'];
-  //     }
-  //     return name;
-  //   })
-  // }
+  get_name(value: string, kubun: string):string  {
+    let i:number = this.kbn[kubun].findIndex(obj => obj.value == value);
+    let name:string="";
+    if( i > -1 ){
+      name = this.kbn[kubun][i]['viewval'];
+    }
+    return name;
+  }
 }

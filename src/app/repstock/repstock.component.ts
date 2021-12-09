@@ -11,6 +11,7 @@ import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
 import { StGds,Stock, StockService } from './../services/stock.service';
+import { Trans, TransService } from './trans.service';
 import { ToastrService } from 'ngx-toastr';
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { StcscdsComponent } from './../share/stcscds/stcscds.component';
@@ -28,6 +29,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
   
   public isLoading:boolean=false;
   public isLoading2:boolean=false;
+  public isLoading3:boolean=false;
   // public chSok:boolean=false;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -45,6 +47,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
               public strsrv: StoreService,
               public bunsrv: BunruiService,
               public stcsrv: StockService,
+              public trnsrv: TransService,
               public usrsrv: UserService) { 
                 title.setTitle('現在庫確認(MWSystem)'); 
               }
@@ -67,7 +70,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
         if(params.gcode != null){
           this.gcode= params.gcode;
           this.get_zinfo();
-        }
+        }  
         this.cdRef.detectChanges();  
       });
     });
@@ -181,6 +184,17 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           });
         }
       }
+      this.isLoading3=true;
+      this.trnsrv.get_trans(this.gcode,this.scode,new Date()).then(result => {
+        console.log(result);
+        this.trnsrv.tbldata=result;
+        this.trnsrv.subject.next(result);
+        this.isLoading3=false;
+      });
+
+
+
+
     } else if (this.stgds.gskbn=="1"){
       this.isLoading2=true;
       this.stcsrv.getSetZai(this.scode,this.stgds.msgzais).then(result => {
@@ -192,6 +206,9 @@ export class RepstockComponent implements OnInit, AfterViewInit {
         this.stcsrv.subject.next();
         this.isLoading2=false;
       });
+
+
+
     }
 
     if (this.gcode != this.stcsrv.shGcd){

@@ -484,6 +484,14 @@ export class UserService {
       this.getNextday(date);  
     }
     return date;
-  } 
+  }
+  getLastMonth(date:Date) {
+    date.setDate( date.getDate() - 30);
+    const day = date.getDay();
+    if  (this.holidays.includes(this.formatDate(date)) || day == 0 || day == 6){
+      this.getNextday(date);  
+    }
+    return date;
+  }  
 }
 

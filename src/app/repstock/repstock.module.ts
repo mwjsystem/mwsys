@@ -9,6 +9,7 @@ import { RepstockComponent } from './repstock.component';
 import { GcdhelpComponent } from '../share/gcdhelp/gcdhelp.component';
 import { StcscdsComponent } from '../share/stcscds/stcscds.component';
 import { GzaitblComponent } from './gzaitbl.component';
+import { TrantblComponent } from './trantbl.component';
 
 registerLocaleData(localeJa);
 
@@ -17,7 +18,8 @@ registerLocaleData(localeJa);
     RepstockComponent,
     GcdhelpComponent,
     StcscdsComponent,
-    GzaitblComponent
+    GzaitblComponent,
+    TrantblComponent
   ],
   imports: [
     CommonModule,

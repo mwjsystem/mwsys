@@ -122,14 +122,14 @@
     </mat-select>
   </mat-form-field>  
   </div> -->
-  <mat-card-content fxLayout="row wrap" fxLayoutAlign="start baseline" fxLayoutGap="5px">
+  <mat-card-content fxLayout="column" fxLayoutAlign="start baseline" fxLayoutGap="5px">
     <fieldset>
       <legend>
         <div fxLayout="row wrap" fxLayoutAlign="start baseline">
           <!-- <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox> -->
           <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
             <mat-label>倉庫</mat-label>
-            <mat-select [(value)]="scode" (openedChange)="onChange()" [disabled]="!stcsrv.stcGcd" required>
+            <mat-select [(value)]="scode" (openedChange)="onChange()" [disabled]="!stcsrv.stcGcd">
               <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -192,6 +192,11 @@
       </div>
       <div *ngIf="stgds.gskbn=='2'">在庫管理できない、またはしない商品です！</div>
     </fieldset>
+    <div *ngIf="stgds.gskbn=='0'">
+      <mat-progress-spinner *ngIf="isLoading3" color="primary" mode="indeterminate" [diameter]="50">
+      </mat-progress-spinner>
+      <app-trantbl></app-trantbl>
+    </div>
   </mat-card-content>
 
 

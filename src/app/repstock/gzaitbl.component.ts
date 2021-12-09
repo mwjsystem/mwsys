@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';;
+import { MatTableDataSource } from '@angular/material/table';
 import { Stcbs, StockService } from './../services/stock.service';
 
 @Component({
@@ -8,8 +8,8 @@ import { Stcbs, StockService } from './../services/stock.service';
   styleUrls: ['./gzaitbl.component.scss']
 })
 export class GzaitblComponent implements OnInit {
-  dataSource:MatTableDataSource<Stcbs>;
-  displayedColumns = ['gcode','irisu','pable','stock','hikat','yday','suu','htzan']; 
+  public dataSource:MatTableDataSource<Stcbs>;
+  public displayedColumns = ['gcode','irisu','pable','stock','hikat','yday','suu','htzan']; 
  
 
   constructor(public stcsrv: StockService,
