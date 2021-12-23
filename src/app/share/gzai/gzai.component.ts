@@ -138,7 +138,7 @@ export class GzaiComponent implements OnInit {
     this.frmArr.controls
     .forEach(control => {
       objGzai.push({
-        id: this.usrsrv.compid,
+        id: this.usrsrv.compid,
         gcode: this.gcode,
         zcode: this.usrsrv.editFrmval(control,'zcode'),
         irisu: this.usrsrv.editFrmval(control,'irisu'),

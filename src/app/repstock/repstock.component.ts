@@ -10,6 +10,7 @@ import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
+import { MembsService } from './../services/membs.service';
 import { StGds,Stock, StockService } from './../services/stock.service';
 import { Trans, TransService } from './trans.service';
 import { ToastrService } from 'ngx-toastr';
@@ -46,13 +47,15 @@ export class RepstockComponent implements OnInit, AfterViewInit {
               public cdRef: ChangeDetectorRef,
               public strsrv: StoreService,
               public bunsrv: BunruiService,
+              public memsrv: MembsService,
               public stcsrv: StockService,
               public trnsrv: TransService,
               public usrsrv: UserService) { 
                 title.setTitle('現在庫確認(MWSystem)'); 
               }
 
-  ngOnInit(): void {    
+  ngOnInit(): void {  
+    this.memsrv.get_members();
     this.bunsrv.get_bunrui();
     this.strsrv.get_store();
     this.stcsrv.getGoods();
@@ -88,7 +91,8 @@ export class RepstockComponent implements OnInit, AfterViewInit {
   }
   onEnter(): void {
     // console.log(this.gcode);
-    this.get_zinfo();
+    // this.get_zinfo();
+    this.trnsrv.subject.next();
     // console.log(this.gcode);
   } 
 

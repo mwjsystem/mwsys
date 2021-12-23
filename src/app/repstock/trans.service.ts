@@ -41,7 +41,8 @@ export class TransService {
   constructor(public usrsrv: UserService,
               public memsrv: MembsService,
               public bunsrv: BunruiService,          
-              private apollo: Apollo) { }
+              private apollo: Apollo) {                
+               }
 
   async get_trans(gcd:string,scd:string,day:Date):Promise<Trans[]> {
     const GetTran = gql`

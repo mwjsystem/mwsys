@@ -158,6 +158,7 @@ declare namespace mwI {
     mtgt3:boolean;
     mtgt4:boolean;
     mtgt5:boolean;
+    gadr:string;
     msmadrs:Adrs[];
     msmstits:Stit[];
   }

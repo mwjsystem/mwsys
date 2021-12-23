@@ -70,6 +70,7 @@ query get_member($id: smallint!,$mcode:String!) {
     ntype
     tntype
     ryoate
+    gadr
     msmadrs {
       eda
       zip

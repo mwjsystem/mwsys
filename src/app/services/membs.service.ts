@@ -48,6 +48,7 @@ export class MembsService {
     } else {
       mcdtxt="";  
     }
+    console.log(mcdtxt);
     return mcdtxt;
   }
 }

@@ -377,6 +377,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         let member:mwI.Member=data.msmember_by_pk;
         if(flg){
           this.form.patchValue(member);
+          this.form.get('nsaki').setValue(member.gadr);
         }
         this.jmisrv.mtax=member.mtax;
         this.jmisrv.tankakbn=member.tankakbn;
@@ -418,7 +419,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     });
   }
 
-　canEnter(e:KeyboardEvent):void{
+  canEnter(e:KeyboardEvent):void{
     let element = e.target as HTMLElement;
     // console.log(element,element.tagName);
     if(element.tagName !=='TEXTAREA'){
@@ -493,7 +494,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   getInvalid():string{
     let tooltip:string="";
     const ctrls0=this.form.controls;
-  　for (const name in ctrls0){
+    for (const name in ctrls0){
       if (name == 'yday'){
         // console.log(ctrls0[name].errors);
         if(ctrls0[name].errors?.matDatepickerFilter){
