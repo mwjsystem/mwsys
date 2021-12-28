@@ -118,7 +118,7 @@ export class JmeitblComponent implements OnInit {
                                 total:lctotal,
                                 genka:lcgenka});
     this.jmisrv.subject.next(true);
-    this.jmisrv.subject.complete();
+    // this.jmisrv.subject.complete();
     this.refresh();
     // console.log(this.frmArr,this.parentForm);
   }
@@ -428,7 +428,7 @@ export class JmeitblComponent implements OnInit {
 
 
 
-          // console.log(this.frmArr.controls[i].value,this.frmArr.getRawValue()[i]);
+          console.log(this.frmArr.controls[i].value,this.frmArr.getRawValue()[i]);
           this.calcMei(i);
           // this.calcTot();
           // this.jmisrv.subject.complete();

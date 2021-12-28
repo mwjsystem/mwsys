@@ -90,9 +90,13 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     
   }
   onEnter(): void {
-    // console.log(this.gcode);
-    // this.get_zinfo();
-    this.trnsrv.subject.next();
+    // console.log(this.usrsrv.staff.scode,this.scode != null);
+    if (this.scode != null){
+    }else{
+      this.scode = this.usrsrv.staff.scode;
+    }
+    this.get_zinfo();
+    // this.trnsrv.subject.next();
     // console.log(this.gcode);
   } 
 
@@ -190,7 +194,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       }
       this.isLoading3=true;
       this.trnsrv.get_trans(this.gcode,this.scode,new Date()).then(result => {
-        console.log(result);
+        // console.log(result);
         this.trnsrv.tbldata=result;
         this.trnsrv.subject.next(result);
         this.isLoading3=false;

@@ -288,12 +288,13 @@ export class StockService {
         });
     });  
   }
-  get_stock(gcd:string,gskbn:string,scd?:string):Promise<Stock[]>{
+  get_stock(gcd:string,gskbn:string,scd?:string,date?:Date):Promise<Stock[]>{
     // console.log(gcd,scd);
     let scodes :string[]=null;
+    let lcdate :Date;
     const GetMast = gql`
-    query get_gcdscd($id:smallint!,$gcode:String!,$scode:[String!]) {
-      vgstana(where:{id:{_eq:$id},gcode: {_eq:$gcode}, code:{_in:$scode}}) {
+    query get_gcdscd($id:smallint!,$gcode:String!,$scode:[String!],$date:date!) {
+      vgstana(where:{id:{_eq:$id},gcode: {_eq:$gcode}, code:{_in:$scode}, day: {_lt: $date}}) {
         code
         gcode
         tana
@@ -303,14 +304,21 @@ export class StockService {
     if(scd){
       scodes = [scd];
     }
+    if (date !=null ){
+      lcdate = new Date(date);
+    }else{
+      lcdate = new Date();
+    }
     let lcstcs=[];
     return new Promise( resolve => {
+      // console.log(lcdate);
       this.apollo.watchQuery<any>({
         query: GetMast, 
           variables: { 
             id : this.usrsrv.compid,
             gcode:gcd,
-            scode:scodes
+            scode:scodes,
+            date:lcdate
           },
         })
         .valueChanges
@@ -326,7 +334,7 @@ export class StockService {
             let lctana:number = item.tana ?? 0; 
             let lcstc
             if(gskbn=="0"){                     
-              lcstc= await this.get_zaiko(gcd,item.code,lcday,lctana);
+              lcstc= await this.get_zaiko(gcd,item.code,lcday,lctana,lcdate);
             } else if(gskbn=="1"){                     
               lcstc= await this.get_zaiko1(gcd,item.code,lcday,lctana);
             } 
@@ -357,10 +365,10 @@ export class StockService {
     });
   }
 
-  async get_zaiko(gcd:string,scd:string,day:Date,stc:number):Promise<Stock> {
+  async get_zaiko(gcd:string,scd:string,day:Date,stc:number,tdy:Date):Promise<Stock> {
     const GetTran = gql`
     query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!, $today: date!,$nextd: date!) {
-      trzaiko_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode},day: {_gt: $day,_lte: $today}, scode: {_eq: $scode}}) {
+      trzaiko_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode},day: {_gt: $day,_lt: $today}, scode: {_eq: $scode}}) {
         aggregate {
           sum {
             hnyu
@@ -395,8 +403,8 @@ export class StockService {
             gcode: gcd,
             scode: scd,
             day: day,
-            today:new Date(),       
-            nextd:this.usrsrv.getNextday(new Date())
+            today:tdy,       
+            nextd:this.usrsrv.getNextday(tdy)
         },
       })
       .valueChanges

@@ -220,7 +220,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
             this.usrsrv.setTmstmp(ggroup);
             this.gdssrv.goods=[];
             this.gdssrv.gtnks=[];
-      　　　　 for(let i=0;i<ggroup.msgoods.length;i++){
+            for(let i=0;i<ggroup.msgoods.length;i++){
               const {msgtankas,...good}=ggroup.msgoods[i];// ggroup.msgoods[i]からmsgtankasを除外して、goodに代入         
               this.gdssrv.goods.push(good);
               for(let j=0;j<ggroup.msgoods[i].msgtankas.length;j++){         
@@ -432,7 +432,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   getInvalid():string{
     let tooltip:string="";
     const ctrls0=this.form.controls;
-  　for (const name in ctrls0){
+    for (const name in ctrls0){
       if(ctrls0[name].invalid){
         if(name=='mtbl'){
           for(let i=0;i<this.frmArr.length;i++){ 

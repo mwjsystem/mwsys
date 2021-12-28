@@ -105,8 +105,9 @@ export class GdstblComponent implements OnInit,AfterViewInit {
     return this.frmArr.getRawValue()[i][fld];
   }
 
-　updGds(i: number,value: string){
+  updGds(i: number,value: string){
     let val:string =this.usrsrv.convUpper(value);  //小文字全角→大文字半角変換
+    this.frmArr.controls[i].get('gcode').setErrors(null);
     this.frmArr.controls[i].get('gcode').setValue(val);
     this.apollo.watchQuery<any>({
       query: Query.GetMast2, 
@@ -118,7 +119,6 @@ export class GdstblComponent implements OnInit,AfterViewInit {
       }).valueChanges
         .subscribe(({ data }) => {  
           if(data.msgoods.length==0){
-            this.frmArr.controls[i].get('gcode').setErrors(null);
             let j:number=0;
             this.frmArr.controls
               .forEach(control => {
