@@ -14,9 +14,9 @@
     </button>
     <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
       <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label>
-      <input matInput [ngModel]="gdssrv.grpcd" gcdInput (ngModelChange)="gdssrv.grpcd=$event" (keydown.f4)="grpcdHelp()"
-        [disabled]="mode==2 && form.dirty" (keyup.enter)="get_ggroup(gdssrv.grpcd)" (blur)="refresh()"
-        [ngModelOptions]="{standalone: true}">
+      <input matInput [ngModel]="gdssrv.grpcd" gcdInput (ngModelChange)="gdssrv.grpcd=usrsrv.convUpper($event)"
+        (keydown.f4)="grpcdHelp()" [disabled]="mode==2 && form.dirty" (keyup.enter)="get_ggroup(gdssrv.grpcd)"
+        (blur)="refresh()" [ngModelOptions]="{standalone: true}">
       <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" [style.display]="mode==3 ? 'inline-block' : 'none'">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>

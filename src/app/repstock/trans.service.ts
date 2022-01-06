@@ -75,7 +75,7 @@ export class TransService {
     })
     const GetTran = gql`
     query get_trans($id: smallint!, $gcd: String!, $scd: String!, $day: date!, $today: date!) {
-      shukka:trjyumei(where: {id: {_eq: $id}, gcode: {_eq: $gcd},sday: {_gt: $day,_lte: $today}, scode: {_eq: $scd}}) {
+      shukka:trjyumei(where: {id: {_eq: $id}, gcode: {_eq: $gcd},sday: {_gt: $day,_lte: $today}, scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"}}}) {
         sday
         denno
         line
