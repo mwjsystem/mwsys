@@ -193,4 +193,11 @@ declare namespace mwI {
   interface Trhatden extends Hatden{
     trhatmeis:Hatmei[];
   }
+
+  interface Zaiko{
+    scode:string;
+    gcode:string;
+    day:string;
+    suu:number;
+  }
 }

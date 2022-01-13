@@ -19,6 +19,7 @@ export class JyumeiService {
   public ntype:number;            //顧客マスタ「納品書タイプ」
   public tntype:number;           //顧客マスタ「直送納品書タイプ」
   public address:string="";
+  public trzaiko:mwI.Zaiko[]=[];
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
   
@@ -162,6 +163,53 @@ export class JyumeiService {
     });
     // console.log(this.jyumei);
   }
+
+  upd_zaiko(zai:any) {
+    const UpdateTran = gql`
+      mutation upd_zaiko($id:smallint!,$scd:String!,$gcd:String!,$day:date!,$inc: trzaiko_inc_input!) {
+        update_trzaiko(where:{id:{_eq:$id},scode:{_eq:$scd},gcode:{_eq:$gcd},day:{_eq:$day}}, _inc: $inc)  {
+          affected_rows
+        }
+    }`;
+    const InsertTran = gql`
+    mutation ins_zaiko($obj:[trzaiko_insert_input!]!) {
+      insert_trzaiko(objects: $obj) {
+        affected_rows
+      }
+    }`;
+    this.apollo.mutate<any>({
+      mutation: UpdateTran,
+      variables: {
+        id: this.usrsrv.compid,
+        scd: zai.scode,
+        gcd: zai.gcode,
+        day: zai.day,
+        inc: {syuk:zai.suu}
+      },
+    }).subscribe(({ data }) => { 
+        if(data.affected_rows == 0){
+          this.apollo.mutate<any>({
+            mutation: InsertTran,
+            variables: {
+              obj: [{
+                id: this.usrsrv.compid,
+                scd: zai.scode,
+                gcd: zai.gcode,
+                day: zai.day,
+                syuk:zai.suu
+              }]
+            },
+          }).subscribe(({ data }) => {
+            console.log(data);
+          },(error) => {
+            console.log('ins_zaiko error',error);
+          }); 
+        }          
+    },(error) => {
+      console.log('upd_zaiko error',error);
+    }); 
+  }
+
   upd_jyuden(denno,jyuden,jyumei):Promise<string>{
     const UpdateTran = gql`
       mutation upd_jyuden($id: smallint!, $hdno: Int!,$_set: trjyuden_set_input!,$obj:[trjyumei_insert_input!]!) {

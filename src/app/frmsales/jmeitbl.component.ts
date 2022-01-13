@@ -95,16 +95,16 @@ export class JmeitblComponent implements OnInit {
       switch (arr[i]['gkbn']) {
         case '0' :
           lcgtotalzn += arr[i]['tinmoney'];
-        　break;
+          break;
         case '1' :
           lcsouryouzn += arr[i]['tinmoney'];
-        　break;
+          break;
         case '2' :
           lctesuuzn += arr[i]['tinmoney'];
-        　break;     
+          break;     
         case '3' :
           lcnebikizn += arr[i]['tinmoney'];
-        　break;     
+          break;     
       }
       lctaxtotal += arr[i]['taxmoney'];;
       lcgenka += arr[i]['tgenka'];
@@ -135,17 +135,17 @@ export class JmeitblComponent implements OnInit {
         lctaxmoney = Math.round(ctrl.tanka * lctaxrate) * ctrl.suu;
         // lctoutmoney = lcmoney;  
         lctinmoney = lcmoney + lctaxmoney;
-      　break;
+        break;
       case '1' :
         lctaxmoney = Math.floor(ctrl.tanka * (1 + lctaxrate)) * ctrl.suu;
         lctinmoney = lcmoney;
         // lctoutmoney = lcmoney - lctaxmoney;  
-      　break;
+        break;
       case '2' :
         lctaxmoney=0;
         // lctoutmoney = lcmoney;
         lctinmoney = lcmoney;
-      　break;     
+        break;     
     }
     lcgenka = Math.round(ctrl.genka * ctrl.suu);
     this.frmArr.controls[i].patchValue({
@@ -262,14 +262,14 @@ export class JmeitblComponent implements OnInit {
     this.toastr.info(i + '件変更しました。まだ、保存されていません。');
   }
 
-　async toFrmsup() {
+  async toFrmsup() {
     this.jmisrv.denno = await this.jmisrv.get_denno();
     let hdno = await this.usrsrv.getNumber('hdenno',1);
     let jmei=[];
     this.frmArr.controls
       .forEach(control => {
           // console.log(control,this.hatden[0]);
-        console.log(control.get('spec').value=="3",control);
+        // console.log(control.get('spec').value=="3",control);
         if(control.get('spec').value=="3" && control.get('vcode').value==this.hatden[0]){
           jmei.push(control.value.gcode + "\t" + control.value.suu + "\t" 
                     + this.jmisrv.denno + "\t" + control.get('line').value);
@@ -307,6 +307,15 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
   createRow(i:number,jyumei?:mwI.Jyumei){
+    console.log(jyumei);
+    let lcArr=this.fb.array([]);
+    if(jyumei?.gskbn=="1"){
+      jyumei.msgzais.forEach(e=>{
+        if(e.msgoods.gskbn=="0"){
+          lcArr.push(this.fb.group({zcode:e.zcode,irisu:e.irisu}));
+        }
+      });
+    }
     return this.fb.group({
       chk:[''],
       line:[{value:i,disabled:true}],
@@ -337,8 +346,9 @@ export class JmeitblComponent implements OnInit {
       vcode:[jyumei?.vcode],
       gkbn:[jyumei?.gkbn],
       code:[jyumei?.code],
-      msgzais:this.fb.array([])   
+      msgzais:lcArr   
     });
+
   }
  
   gcdHelp(i: number): void {
@@ -424,11 +434,16 @@ export class JmeitblComponent implements OnInit {
               this.frmArr.controls[i].patchValue({pable:this.stcsrv.get_paabl(result)});
               this.jmisrv.subject.next(true);
             });
+            msgds.msgzais.forEach(e=>{
+              if(e.msgoods.gskbn=="0"){
+                this.mtblGzai(i).push(this.fb.group({zcode:e.zcode,irisu:e.irisu}));
+              }
+            });
           }
 
 
 
-          console.log(this.frmArr.controls[i].value,this.frmArr.getRawValue()[i]);
+          // console.log(this.frmArr.controls[i].value,this.frmArr.getRawValue()[i]);
           this.calcMei(i);
           // this.calcTot();
           // this.jmisrv.subject.complete();
@@ -448,7 +463,11 @@ export class JmeitblComponent implements OnInit {
   get frmArr():FormArray {    
     return this.parentForm.get('mtbl') as FormArray;
   }  
-  
+
+  mtblGzai(i:number):FormArray {    
+    return this.frmArr.controls[i].get('msgzais') as FormArray;
+  }  
+
   toggleCols(){
     // console.log(this.flgCol,this.displayedColumns);
     if(this.flgCol){
@@ -551,16 +570,37 @@ export class JmeitblComponent implements OnInit {
     this.dataSource.data =  this.frmArr.controls;
   }
 
-  set_jyumei(){
+  set_jyumei(skbn:string){
     this.frmArr.clear();
+    this.jmisrv.trzaiko=[];
     let i:number=0;
     this.jmisrv.jyumei.forEach(e => {
+      console.log(e);
       this.frmArr.push(this.createRow(i+1,e));
       // this.calcMei(i);
       i+=1;
-
-
-      
+      //trzaikoテーブル取り消し用データ作成
+      if (skbn != "1"){
+        if(e.gskbn == "0" && e.sday != null){
+          const lczaiko:mwI.Zaiko={
+            scode:e.scode,
+            gcode:e.gcode,
+            day:e.sday,
+            suu:e.suu * -1
+          }
+          this.jmisrv.trzaiko.push(lczaiko);
+        } else if(e.gskbn == "1" && e.sday != null) {
+          e.msgzais.forEach(zai => {
+            const lczai:mwI.Zaiko={
+              scode:e.scode,
+              gcode:zai.zcode,
+              day:e.sday,
+              suu:e.suu * zai.irisu * -1
+            }
+            this.jmisrv.trzaiko.push(lczai);
+          });
+        }  
+      }
     });
     this.refresh();
   }
@@ -591,13 +631,13 @@ export class JmeitblComponent implements OnInit {
     switch (this.frmArr.getRawValue()[i]['mtax']) {
       case '0' :
         return ((lctanka * (1 + lctaxrate)) / lcteika);
-      　break;
+        break;
       case '1' :
         return (lctanka/ lcteika); 
-      　break;
+        break;
       case '2' :
         return ((lctanka * (1 + lctaxrate)) / lcteika);
-      　break;     
+        break;     
     }    
 
   }
@@ -606,7 +646,7 @@ export class JmeitblComponent implements OnInit {
     this.frmArr.controls
       .forEach(control => {
         jyumei.push({
-          id: this.usrsrv.compid,
+          id:this.usrsrv.compid,
           denno:dno,
           line: this.usrsrv.editFrmval(control,'line'),
           gcode: this.usrsrv.editFrmval(control,'gcode'),

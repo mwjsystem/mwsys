@@ -249,14 +249,14 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     if(this.jmisrv.denno>0){
       this.jmisrv.qry_jyuden(denno).subscribe(
         result => {
-           this.form.reset();
+          this.form.reset();
           this.jmisrv.jyumei=[];
           if (result == null){
             this.toastr.info("受注伝票番号" + denno + "は登録されていません");
             history.replaceState('','','./frmsales');
           } else {
             let jyuden:mwI.Trjyuden=result;
-            console.log(jyuden);
+            // console.log(jyuden);
             if(jyuden.nadr>1){
               this.form.get('nsaki').setValue("2");
             } else { 
@@ -264,7 +264,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             }
             this.form.patchValue(jyuden);
             this.jmisrv.edit_jyumei(jyuden.trjyumeis);
-            this.jmeitbl.set_jyumei();
+            this.jmeitbl.set_jyumei(jyuden.skbn);
             this.usrsrv.setTmstmp(jyuden);
             this.jmisrv.denno=denno;
             this.get_member(jyuden.mcode,false);
@@ -522,7 +522,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   async save() {
-    console.log(this.form.get('nadr'));
+    // console.log(this.form.get('nadr'));
     let jyuden:any={
       torikbn: Boolean(this.usrsrv.editFrmval(this.form,'torikbn')),
       updated_at:new Date(),
@@ -574,6 +574,35 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       this.jmisrv.upd_jyuden(this.jmisrv.denno,{...jyuden,jdstatus:this.jmisrv.get_jdsta(jyumei)},jyumei)
       .then(result => {
         this.toastr.success('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
+        //  zaiko更新処理 (読込時分マイナス)
+        this.jmisrv.trzaiko.forEach(e=>{
+          this.jmisrv.upd_zaiko(e);
+        });
+        //  zaiko更新処理 (通常分プラス)
+        jyumei.forEach(e=>{
+          console.log(e,this.form);
+          if (jyuden.skbn != "1"){
+            if(e.gskbn == "0" && e.sday != null){
+              const lczaiko:mwI.Zaiko={
+                scode:e.scode,
+                gcode:e.gcode,
+                day:e.sday,
+                suu:e.suu * -1
+              }
+              this.jmisrv.upd_zaiko(lczaiko);
+            } else if(e.gskbn == "1" && e.sday != null) {
+              e.msgzais.forEach(zai => {
+                const lczai:mwI.Zaiko={
+                  scode:e.scode,
+                  gcode:zai.zcode,
+                  day:e.sday,
+                  suu:e.suu * zai.irisu * -1
+                }
+                this.jmisrv.upd_zaiko(lczai);
+              });
+            }  
+          }
+        });
         this.form.markAsPristine();
         this.cancel();
        }).catch(error => {
@@ -597,6 +626,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       .then(result => {
         console.log('insert_trjyu',result);
         this.toastr.success('受注伝票' + this.jmisrv.denno + 'を新規登録しました');
+        //  zaiko更新処理 　新規
+
+
+
         this.form.markAsPristine();
         this.cancel();
        }).catch(error => {

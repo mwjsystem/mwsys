@@ -183,17 +183,18 @@ declare namespace mwI {
     zcode:string;
     irisu:number;
     msgoods:{gtext:string;
-             unit:string;};
+             unit:string;
+             gskbn:string;};
   }
   interface Goods {
     gcode:string;
     size:string;
     color:string;
-    gskbn:number;
+    gskbn:string;
     jan:string;
     weight:number;
     unit:string;
-    tkbn:number;
+    tkbn:string;
     gtext:string;
     max:number;
     send:string;

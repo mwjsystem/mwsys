@@ -19,11 +19,10 @@ export class TrantblComponent implements OnInit {
 
   ngOnInit(): void {  
     this.trnsrv.observe.subscribe(() => {
-      console.log('ngoninit');
+      // console.log('ngoninit');
       this.refresh();
     });
   }
-  
 
   setColor(ttype:string): string {
     let color:string;
@@ -67,8 +66,8 @@ export class TrantblComponent implements OnInit {
     return color;
   }
   refresh(): void{
-    console.log(this.trnsrv.tbldata);
-    this.dataSource= new MatTableDataSource<Trans>(this.trnsrv.tbldata);
+    // console.log(this.trnsrv.tbldata);
+    this.dataSource= new MatTableDataSource<Trans>(this.trnsrv.sort_tblData(this.trnsrv.tbldata));
     this.dataSource.paginator = this.paginator;
     this.cdRef.detectChanges();
   }

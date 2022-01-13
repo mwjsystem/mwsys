@@ -289,12 +289,11 @@ export class StockService {
     });  
   }
   get_stock(gcd:string,gskbn:string,scd?:string,date?:Date):Promise<Stock[]>{
-    // console.log(gcd,scd);
     let scodes :string[]=null;
     let lcdate :Date;
-    const GetMast = gql`
-    query get_gcdscd($id:smallint!,$gcode:String!,$scode:[String!],$date:date!) {
-      vgstana(where:{id:{_eq:$id},gcode: {_eq:$gcode}, code:{_in:$scode}, day: {_lt: $date}}) {
+    const GetView = gql`
+    query get_gcdscd($id:smallint!,$gcode:String!,$scode:[String!]) {
+      vgstana(where:{id:{_eq:$id},gcode: {_eq:$gcode}, code:{_in:$scode}}) {
         code
         gcode
         tana
@@ -309,16 +308,17 @@ export class StockService {
     }else{
       lcdate = new Date();
     }
+    // console.log(date,lcdate);
     let lcstcs=[];
     return new Promise( resolve => {
       // console.log(lcdate);
       this.apollo.watchQuery<any>({
-        query: GetMast, 
+        query: GetView, 
           variables: { 
             id : this.usrsrv.compid,
             gcode:gcd,
             scode:scodes,
-            date:lcdate
+            // date:lcdate
           },
         })
         .valueChanges
@@ -332,7 +332,7 @@ export class StockService {
             // console.log(item);
             let lcday:Date = item.day ?? new Date('2000-01-01');
             let lctana:number = item.tana ?? 0; 
-            let lcstc
+            let lcstc;
             if(gskbn=="0"){                     
               lcstc= await this.get_zaiko(gcd,item.code,lcday,lctana,lcdate);
             } else if(gskbn=="1"){                     
@@ -347,10 +347,83 @@ export class StockService {
           return resolve(lcstcs);
         }); 
       });
- 
+  }
+  get_stocktrn(gcd:string,scd:string,date:Date):Promise<number>{
+    const GetTrans = gql`
+    query get_gcdscd($id:smallint!,$gcd:String!,$scd:String!,$date:date!) {
+      trgtana(where:{id:{_eq:$id},gcode:{_eq:$gcd},scode:{_eq:$scd},day:{_lt:$date}},order_by:{day:desc}) {
+        scode
+        gcode
+        tana
+        day
+      }
+    }`;
+    const GetTran2 = gql`
+    query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!, $today: date!) {
+      trzaiko_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode},day: {_gt: $day,_lt: $today}, scode: {_eq: $scode}}) {
+        aggregate {
+          sum {
+            hnyu
+            movi
+            teni
+            nyuk
+            syuk
+            movo
+            teno
+            haki
+          }
+        }
+      }
+    }`; 
+    return new Promise( resolve => {
+      this.apollo.watchQuery<any>({
+        query: GetTrans, 
+          variables: { 
+            id : this.usrsrv.compid,
+            gcd:gcd,
+            scd:scd,
+            date:date
+          },
+        })
+        .valueChanges
+        .subscribe(({ data }) => { 
+          let lcday:Date = data.trgtana[0]?.day ?? new Date('2000-01-01');
+          let lctana:number = data.trgtana[0]?.tana ?? 0; 
+          this.apollo.watchQuery<any>({
+            query: GetTran2, 
+              variables: { 
+                id : this.usrsrv.compid,
+                gcode: gcd,
+                scode: scd,
+                day: lcday,
+                today:date
+            },
+          })
+          .valueChanges
+          .subscribe(({ data }) => {
+              lctana = lctana + (data.trzaiko_aggregate.aggregate.sum.hnyu || 0)
+              + (data.trzaiko_aggregate.aggregate.sum.movi || 0)
+              + (data.trzaiko_aggregate.aggregate.sum.teni || 0)
+              + (data.trzaiko_aggregate.aggregate.sum.nyuk || 0)
+              - (data.trzaiko_aggregate.aggregate.sum.syuk || 0)
+              - (data.trzaiko_aggregate.aggregate.sum.movo || 0)
+              - (data.trzaiko_aggregate.aggregate.sum.teno || 0)
+              - (data.trzaiko_aggregate.aggregate.sum.haki || 0) ;       
+            },(error) => {
+              console.log('error query get_zaiko', error);
+            });
+            return resolve(lctana);          
+          // this.get_zaiko(gcd,scd,lcday,lctana,date).then(result => {
+          //   return resolve(result);
+          // });
+
+        },(error) => {
+          console.log('error query get_gcdscd', error);
+          // return resolve(let lcstc);
+        }); 
+      });
 
   }
-  
   getSetZai(scd:string,gzais):Promise<Stcbs[]>{
     return new Promise( resolve => {
       let lcstcs=[];
@@ -427,6 +500,7 @@ export class StockService {
           keepd:data.keepd.aggregate.sum.suu || 0,
           tommo:data.tommo.aggregate.sum.suu || 0
         }
+        // console.log(lcstcs);
         return resolve(lcstcs);
 
       },(error) => {

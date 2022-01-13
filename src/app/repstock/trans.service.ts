@@ -8,7 +8,6 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
 export class Trans {
-  cday:String;
   sday:String;
   ttype:String;
   denno:number;
@@ -47,13 +46,12 @@ export class TransService {
 
   async get_trans(gcd:string,scd:string,day:Date):Promise<Trans[]> {
     const lcmago=this.usrsrv.getLastMonth(day);
-    console.log(lcmago);
+    // console.log(lcmago);
     let lcprms1:Promise<Trans[]>=new Promise( resolve => {
-      this.stcsrv.get_stock(gcd,'0',scd,lcmago).then(e =>{
-        // console.log('前残');
+      this.stcsrv.get_stocktrn(gcd,scd,lcmago).then(e =>{
+        // console.log(e);
         let trans:Trans[]=[];  
           const tran:Trans={
-            cday:this.usrsrv.formatDate(lcmago),
             sday:this.usrsrv.formatDate(lcmago),
             ttype:'前残',
             denno:null,
@@ -63,9 +61,9 @@ export class TransService {
             yday:null,
             aitec:null,
             aiten:null,
-            insuu:e[0].stock,
+            insuu:e,
             ousuu:null,
-            zaisu:e[0].stock,
+            zaisu:e,
             yotei:null,
             wait:null
           };
@@ -151,7 +149,7 @@ export class TransService {
         suu
         tcode
       } 
-      hikat:trjyumei(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}], scode: {_eq: $scd}}) {
+      hikat:trjyumei(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}], scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"}}}) {
         sday
         denno
         line
@@ -168,6 +166,24 @@ export class TransService {
             mei
           }
         }
+      } 
+      hatme:trhatmei(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, scode: {_eq: $scd}, hatzn: {_gt: 0}}) {
+        denno
+        line
+        spec
+        mbikou
+        jdenno
+        jline
+        yday
+        ydaykbn
+        hatzn
+        trhatden{
+          tcode
+          vcode
+          msvendor {
+            adrname
+          }
+        }
       }                   
     }`; 
     let lcprms2:Promise<Trans[]>= new Promise( resolve => {
@@ -177,7 +193,7 @@ export class TransService {
             id : this.usrsrv.compid,
             gcd: gcd,
             scd: scd,
-            day: this.usrsrv.getLastMonth(new Date()),
+            day: lcmago,
             today:new Date()
         },
       })
@@ -187,7 +203,6 @@ export class TransService {
         let trans:Trans[]=[];
         data.shukka.forEach(e => {
           const tran:Trans={
-            cday:e.sday,
             sday:e.sday,
             ttype:'出荷',
             denno:e.denno,
@@ -207,7 +222,6 @@ export class TransService {
         });
         data.siire.forEach(e => {
           const tran:Trans={
-            cday:e.inday,
             sday:e.inday,
             ttype:'仕入',
             denno:e.denno,
@@ -227,7 +241,6 @@ export class TransService {
         });        
         data.movin.forEach(e => {
           const tran:Trans={
-            cday:e.day,
             sday:e.day,
             ttype:'移動入庫',
             denno:e.denno,
@@ -247,7 +260,6 @@ export class TransService {
         }); 
         data.movout.forEach(e => {
           const tran:Trans={
-            cday:e.day,
             sday:e.day,
             ttype:'移動入庫',
             denno:e.denno,
@@ -267,7 +279,6 @@ export class TransService {
         }); 
         data.tenmoto.forEach(e => {
           const tran:Trans={
-            cday:e.day,
             sday:e.day,
             ttype:'展開元',
             denno:e.denno,
@@ -287,7 +298,6 @@ export class TransService {
         }); 
         data.tensaki.forEach(e => {
           const tran:Trans={
-            cday:e.day,
             sday:e.day,
             ttype:'展開先',
             denno:e.denno,
@@ -307,8 +317,8 @@ export class TransService {
         });
         // console.log(data);
         data.hikat.forEach(e => {
+          // console.log(e.sday);
           const tran:Trans={
-            cday:e.trjyuden.yday,
             sday:e.sday,
             ttype:'引当済',
             denno:e.denno,
@@ -322,6 +332,26 @@ export class TransService {
             ousuu:e.suu,
             zaisu:null,
             yotei:null,
+            wait:null
+          };
+          trans.push(tran);
+        });
+        data.hatme.forEach(e => {
+          // console.log(e.sday);
+          const tran:Trans={
+            sday:null,
+            ttype:'入荷' + this.bunsrv.get_name(e.ydaykbn,'ydaykbn'),
+            denno:e.denno,
+            line:e.line,
+            biko:e.mbikou,
+            tcode:e.trhatden.tcode,
+            yday:e.yday,
+            aitec:e.trhatden.vcode,
+            aiten:e.trhatden.msvendor.adrname,
+            insuu:null,
+            ousuu:null,
+            zaisu:null,
+            yotei:e.hatzn,
             wait:null
           };
           trans.push(tran);
@@ -343,30 +373,49 @@ export class TransService {
       })
   }
 
-  sort_tblData(tbldata): Promise<Trans[]> {
-    return new Promise( resolve => {
+  sort_tblData(tbldata): Trans[] {
+    // return new Promise( resolve => {
       tbldata.sort(function(a, b) {
-        if (a.cday > b.cday) {
+        if (a == null && b == null) return 0;
+        if (a == null) return 1;
+        if (b == null) return -1;
+        if (a.sday > b.sday) {
           return 1;
         } else {
           return -1;
         } 
+        if (a.yday > b.yday) {
+          return 1;
+        } else {
+          return -1;
+        }         
       })
       let wGenz:number=0;
       for (let i=0; i < tbldata.length; i++ ){
-        wGenz += tbldata[i].insuu - tbldata[i].ousuu;
-        tbldata[i].zaisu = wGenz;
+        if (tbldata[i].sday != null){
+          wGenz += tbldata[i].insuu - tbldata[i].ousuu;
+          tbldata[i].zaisu = wGenz;
+        }
       }
       if (this.flg==-1) {
           tbldata.sort(function(a, b) {
-          if (a.cday < b.cday) {
+          if (a == null && b == null) return 0;
+          if (a == null) return 1;
+          if (b == null) return -1;
+          if (a.sday < b.sday) {
             return 1;
           } else {
             return -1;
           } 
+          if (a.yday > b.yday) {
+            return 1;
+          } else {
+            return -1;
+          }
         })
       }
-      return resolve(tbldata);
-    })
+      return tbldata;
+      // return resolve(tbldata);
+    // })
   } 
 }

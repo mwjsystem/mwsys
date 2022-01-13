@@ -161,12 +161,21 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     if (this.stgds.gskbn=="0"){
       if (this.gcode == this.stcsrv.stcGcd) {
         let i:number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
-        this.stcsrv.stc.stock=this.stcsrv.stcs[i].stock;
-        this.stcsrv.stc.juzan=this.stcsrv.stcs[i].juzan;
-        this.stcsrv.stc.today=this.stcsrv.stcs[i].today;
-        this.stcsrv.stc.keepd=this.stcsrv.stcs[i].keepd;
-        this.stcsrv.stc.hikat=this.stcsrv.stcs[i].hikat;
-        this.stcsrv.stc.tommo=this.stcsrv.stcs[i].tommo;
+        if(i>-1){         
+          this.stcsrv.stc.stock=this.stcsrv.stcs[i].stock;
+          this.stcsrv.stc.juzan=this.stcsrv.stcs[i].juzan;
+          this.stcsrv.stc.today=this.stcsrv.stcs[i].today;
+          this.stcsrv.stc.keepd=this.stcsrv.stcs[i].keepd;
+          this.stcsrv.stc.hikat=this.stcsrv.stcs[i].hikat;
+          this.stcsrv.stc.tommo=this.stcsrv.stcs[i].tommo;
+        } else{
+          this.stcsrv.stc.stock=0;
+          this.stcsrv.stc.juzan=0;
+          this.stcsrv.stc.today=0;
+          this.stcsrv.stc.keepd=0;
+          this.stcsrv.stc.hikat=0;
+          this.stcsrv.stc.tommo=0;
+        }
       } else {
         if(this.scode && this.gcode){
           this.isLoading2=true;
