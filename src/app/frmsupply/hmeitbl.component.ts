@@ -295,7 +295,7 @@ export class HmeitblComponent implements OnInit {
             yday:null,
             ydaykbn:'',
             inday:null,
-            mtax:'',
+            mtax:''
             // currency:''
         } 
         this.frmArr.push(this.createRow(i+1,hmei));
@@ -320,25 +320,25 @@ export class HmeitblComponent implements OnInit {
     this.frmArr.controls
       .forEach(control => {
         hatmei.push({
-          id: this.usrsrv.compid,
+          id:this.usrsrv.compid,
           denno:dno,
-          line: this.usrsrv.editFrmval(control,'line'),
-          day: this.usrsrv.editFrmval(control,'day'),
-          inday: this.usrsrv.editFrmval(control,'inday'),
-          gcode: this.usrsrv.editFrmval(control,'gcode'),
-          gtext: this.usrsrv.editFrmval(control,'gtext'),
-          suu: this.usrsrv.editFrmval(control,'suu'),
-          genka: this.usrsrv.editFrmval(control,'genka'),
-          money: this.usrsrv.editFrmval(control,'money'),
-          taxrate: this.usrsrv.editFrmval(control,'taxrate'),
-          // unit: this.usrsrv.editFrmval(control,'unit'),
-          mbiko: this.usrsrv.editFrmval(control,'mbiko'),
-          spec: this.usrsrv.editFrmval(control,'spec'),
-          jdenno: this.usrsrv.editFrmval(control,'jdenno'),
-          jline: this.usrsrv.editFrmval(control,'jline'),
-          yday: this.usrsrv.editFrmval(control,'yday'),
-          ydaykbn: this.usrsrv.editFrmval(control,'ydaykbn'),
-          mtax: this.usrsrv.editFrmval(control,'mtax')
+          line:this.usrsrv.editFrmval(control,'line'),
+          day:this.usrsrv.editFrmval(control,'day'),
+          inday:this.usrsrv.editFrmval(control,'inday'),
+          gcode:this.usrsrv.editFrmval(control,'gcode'),
+          gtext:this.usrsrv.editFrmval(control,'gtext'),
+          suu:this.usrsrv.editFrmval(control,'suu'),
+          genka:this.usrsrv.editFrmval(control,'genka'),
+          money:this.usrsrv.editFrmval(control,'money'),
+          taxrate:this.usrsrv.editFrmval(control,'taxrate'),
+          // unit:this.usrsrv.editFrmval(control,'unit'),
+          mbiko:this.usrsrv.editFrmval(control,'mbiko'),
+          spec:this.usrsrv.editFrmval(control,'spec'),
+          jdenno:this.usrsrv.editFrmval(control,'jdenno'),
+          jline:this.usrsrv.editFrmval(control,'jline'),
+          yday:this.usrsrv.editFrmval(control,'yday'),
+          ydaykbn:this.usrsrv.editFrmval(control,'ydaykbn'),
+          mtax:this.usrsrv.editFrmval(control,'mtax')
         });
       });
       return hatmei;

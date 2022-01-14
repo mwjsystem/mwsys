@@ -167,23 +167,16 @@ export class TransService {
           }
         }
       } 
-      hatme:trhatmei(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, scode: {_eq: $scd}, hatzn: {_gt: 0}}) {
+      hatzn:vhatzn(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, hatzn: {_gt: 0}}) {
         denno
         line
-        spec
-        mbikou
-        jdenno
-        jline
+        mbiko
         yday
         ydaykbn
         hatzn
-        trhatden{
-          tcode
-          vcode
-          msvendor {
-            adrname
-          }
-        }
+        tcode
+        vcode
+        adrname
       }                   
     }`; 
     let lcprms2:Promise<Trans[]>= new Promise( resolve => {
@@ -320,7 +313,7 @@ export class TransService {
           // console.log(e.sday);
           const tran:Trans={
             sday:e.sday,
-            ttype:'引当済',
+            ttype:this.bunsrv.get_name(e.spec,'jmeikbn'),
             denno:e.denno,
             line:e.line,
             biko:e.mbikou,
@@ -333,21 +326,21 @@ export class TransService {
             zaisu:null,
             yotei:null,
             wait:null
-          };
+          };  
           trans.push(tran);
         });
-        data.hatme.forEach(e => {
+        data.hatzn.forEach(e => {
           // console.log(e.sday);
           const tran:Trans={
             sday:null,
-            ttype:'入荷' + this.bunsrv.get_name(e.ydaykbn,'ydaykbn'),
+            ttype:'入荷予定',
             denno:e.denno,
             line:e.line,
             biko:e.mbikou,
-            tcode:e.trhatden.tcode,
+            tcode:e.tcode,
             yday:e.yday,
-            aitec:e.trhatden.vcode,
-            aiten:e.trhatden.msvendor.adrname,
+            aitec:e.vcode,
+            aiten:e.adrname,
             insuu:null,
             ousuu:null,
             zaisu:null,

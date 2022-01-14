@@ -334,7 +334,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
             //  trhatmeis:hatmei,
              created_at:new Date(),
              created_by:this.usrsrv.staff.code,
-             hdstatus:this.hmisrv.get_hdsta(hatmei)}
+             hdstatus:this.hmisrv.get_hdsta(hatmei),}
         ,...hatden,
       }]
       // console.log(trhatden);
@@ -355,7 +355,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   getInvalid():string{
     let tooltip:string="";
     const ctrls0=this.form.controls;
-  　for (const name in ctrls0){
+    for (const name in ctrls0){
       if(ctrls0[name].invalid){
         if(name=='mtbl'){
           for(let i=0;i<this.frmArr.length;i++){ 

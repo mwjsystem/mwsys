@@ -134,7 +134,6 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       }else{
         //１件分だけ先に読込
         this.mcd = params.get('mcd');
-        // console.log("ngoninit",+this.mcd);
         this.get_member(this.mcd);
       }
     });
@@ -200,26 +199,30 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     if (mcode==""){  
       flg=false;
     }else{
-      let lcmcode:string = this.usrsrv.convUpper(mcode);
-      let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == lcmcode);
-      if( i > -1 ){
-        this.mcd = lcmcode;
+      if (this.memsrv.membs.length==0){
         flg = true;
-      } else {
-        // if( mcode.toString().indexOf('未登録') == -1 && mcode.toString().indexOf('読込') == -1 && mcode !== '' ){
-        //   // this.mcd = lcmcode + '　未登録';
-        // }
-        this.toastr.info("顧客コード" + mcode + "は登録されていません");
-        this.form.reset();
-        history.replaceState('','','./mstmember'); 
-        flg = false;       
+      }else{
+        let lcmcode:string = this.usrsrv.convUpper(mcode);
+        let i:number = this.memsrv.membs.findIndex(obj => obj.mcode == lcmcode);
+        if( i > -1 ){
+          this.mcd = lcmcode;
+          flg = true;
+        } else {
+          // if( mcode.toString().indexOf('未登録') == -1 && mcode.toString().indexOf('読込') == -1 && mcode !== '' ){
+          //   // this.mcd = lcmcode + '  未登録';
+          // }
+          this.toastr.info("顧客コード" + mcode + "は登録されていません");
+          this.form.reset();
+          history.replaceState('','','./mstmember'); 
+          flg = false;       
+        }
       }
     } 
     return flg;
   }
 
   get_member(mcode:string){
-    // this.mcd += '　読込中';
+    // this.mcd += '  読込中';
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
@@ -304,28 +307,28 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     this.toastr.info('機能作成中');
     const invalid=[];
     const ctrls=this.form.controls;
-  　for (const name in ctrls){
+    for (const name in ctrls){
       if(ctrls[name].invalid){
         invalid.push(name,ctrls[name]);
       }
     }
     // console.log(this.form.controls,(this.form.controls['addr0'] as FormGroup).controls);  
     const ctrls0=(this.form.controls['base'] as FormGroup).controls;
-  　for (const name in ctrls0){
+    for (const name in ctrls0){
       if(ctrls0[name].invalid){
         // invalid.push(name + '_' + ctrls0[name].invalid);
         console.log('base',name);
       }
     }
     const ctrls1=(this.form.controls['addr0'] as FormGroup).controls;
-  　for (const name in ctrls1){
+    for (const name in ctrls1){
       if(ctrls1[name].invalid){
         // invalid.push(name + '_' + ctrls1[name].invalid);
         console.log('addr0',name);
       }
     }
     const ctrls2=(this.form.controls['addr1'] as FormGroup).controls;
-  　for (const name in ctrls2){
+    for (const name in ctrls2){
       if(ctrls2[name].invalid){
         // invalid.push(name + '_' + ctrls1[name].invalid);
         console.log('addr1',name);
@@ -492,7 +495,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   getInvalid():string{
     let tooltip:string="";
     const ctrls0=(this.form.controls['base'] as FormGroup).controls;
-  　for (const name in ctrls0){
+    for (const name in ctrls0){
       if(ctrls0[name].invalid){
         // invalid.push(name + '_' + ctrls0[name].invalid);
         tooltip += this.usrsrv.getColtxt('msmember',name) + '⇒' + this.usrsrv.getValiderr(ctrls0[name].errors) + '\n' ;
@@ -501,7 +504,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       }
     }
     const ctrls1=(this.form.controls['addr0'] as FormGroup).controls;
-  　for (const name in ctrls1){
+    for (const name in ctrls1){
       if(ctrls1[name].invalid){
         tooltip += this.usrsrv.getColtxt('msmadr',name) + '⇒' + this.usrsrv.getValiderr(ctrls1[name].errors) + '\n' ;
         // invalid.push(name + '_' + ctrls1[name].invalid);
@@ -509,7 +512,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       }
     }
     const ctrls2=(this.form.controls['addr1'] as FormGroup).controls;
-  　for (const name in ctrls2){
+    for (const name in ctrls2){
       if(ctrls2[name].invalid){
         tooltip += this.usrsrv.getColtxt('msmadr',name) + '⇒' + this.usrsrv.getValiderr(ctrls2[name].errors) + '\n' ;
         // invalid.push(name + '_' + ctrls1[name].invalid);

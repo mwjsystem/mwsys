@@ -155,16 +155,16 @@ export class StockService {
         to_char
         sum
       }
-      vhatzan(where: {hatzan: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
+      vhatzn(where: {hatzn: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
         gcode
         yday
         ydaykbn
-        hatzan
+        hatzn
       }
-      vhatzan_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
+      vhatzn_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
         aggregate {
           sum {
-            hatzan
+            hatzn
           }
         }
       }
@@ -204,14 +204,14 @@ export class StockService {
           } else {
             stgds.motai = Math.round(this.shcnt.reduce((a,b)=>{return a+b;}) / las * 1000 ) / 10 + '％';
           }
-          if(data.vhatzan.length>0){
-            stgds.yday = data.vhatzan[0]?.yday;
-            stgds.suu = data.vhatzan[0]?.hatzan;
-            if(data.vhatzan[0]?.ydaykbn==0){
+          if(data.vhatzn.length>0){
+            stgds.yday = data.vhatzn[0]?.yday;
+            stgds.suu = data.vhatzn[0]?.hatzan;
+            if(data.vhatzn[0]?.ydaykbn==0){
               stgds.ydtxt='入荷予定日(確定)';
-            } else if(data.vhatzan[0]?.ydaykbn==1){
+            } else if(data.vhatzn[0]?.ydaykbn==1){
               stgds.ydtxt='入荷予定日(仮確定)';
-            } else if(data.vhatzan[0]?.ydaykbn==2){
+            } else if(data.vhatzn[0]?.ydaykbn==2){
               stgds.ydtxt='暫定入荷予定日';
             } else {
               stgds.ydtxt='入荷予定日';
@@ -221,7 +221,7 @@ export class StockService {
             stgds.suu = 0;
             stgds.ydtxt='入荷予定日';
           }
-          stgds.htzan=data.vhatzan_aggregate.aggregate.sum.hatzan;
+          stgds.htzan=data.vhatzn_aggregate.aggregate.sum.hatzn;
           // this.isLoading=false;
           this.shGcd=gcd;
           return resolve(stgds);
@@ -387,6 +387,7 @@ export class StockService {
         })
         .valueChanges
         .subscribe(({ data }) => { 
+          console.log(data);
           let lcday:Date = data.trgtana[0]?.day ?? new Date('2000-01-01');
           let lctana:number = data.trgtana[0]?.tana ?? 0; 
           this.apollo.watchQuery<any>({
@@ -400,7 +401,8 @@ export class StockService {
             },
           })
           .valueChanges
-          .subscribe(({ data }) => {
+          .subscribe(({ data }) => { 
+              console.log(data);
               lctana = lctana + (data.trzaiko_aggregate.aggregate.sum.hnyu || 0)
               + (data.trzaiko_aggregate.aggregate.sum.movi || 0)
               + (data.trzaiko_aggregate.aggregate.sum.teni || 0)
@@ -530,11 +532,11 @@ export class StockService {
         aggregate { sum { suu }}}  
       keepd:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
-      vhatzan(where: {hatzan: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
+      vhatzn(where: {hatzan: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
         yday
         hatzan
       }
-      vhatzan_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
+      vhatzn_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
         aggregate {
           sum {
             hatzan
@@ -571,9 +573,9 @@ export class StockService {
                      - (data.trzaiko_aggregate.aggregate.sum.haki || 0),
           hikat:data.hikat.aggregate.sum.suu || 0, 
           keepd:data.keepd.aggregate.sum.suu || 0, 
-          yday : data.vhatzan[0]?.yday,
-          suu : data.vhatzan[0]?.hatzan,
-          htzan:data.vhatzan_aggregate.aggregate.sum.hatzan
+          yday : data.vhatzn[0]?.yday,
+          suu : data.vhatzn[0]?.hatzan,
+          htzan:data.vhatzn_aggregate.aggregate.sum.hatzan
         }
         return resolve(lcstcs);
 
