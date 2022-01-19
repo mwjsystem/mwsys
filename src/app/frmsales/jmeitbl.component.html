@@ -168,6 +168,9 @@
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
             <input matInput formControlName="spdet">
+            <button mat-icon-button matSuffix (click)="spdetHelp(getIdx(i))" *ngIf="frmArr.enabled">
+              <mat-icon>find_replace</mat-icon>
+            </button>
           </mat-form-field>
         </td>
       </ng-container>

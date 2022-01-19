@@ -392,8 +392,56 @@ export class UserService {
     const url = this.router.createUrlTree(['/'+func,'3',value]);
     window.open(url.toString(),null,'top=100,left=100');
   }
-  openFrmsup(hdno,jdkey){
-    const url = this.router.createUrlTree(['/frmsupply','1',hdno]);
+  openFrm(typ:string,dno){
+    let func:string;
+    switch(true){
+      case typ == "出荷":
+        func = '/frmsales';
+        break;
+      case  /引当/.test(typ):
+        func = '/frmsales';
+        break;  
+      case typ == "入荷予定":
+        func = '/frmsupply';
+        break;
+      // case "受注返品":
+      //   // color = 'slategray';
+      //   break;
+      // case "仕入":
+      //   // color = 'mediumblue';
+      //   break;
+      // case "仕入返品":
+      //   // color = 'navy';
+      //   break;
+      // case "展開先":
+      //   // color = 'darkorange';
+      //   break;
+      // case "展開元":
+      //   // color = 'orange';
+      //   break;
+      // case "移動入庫":
+      //   // color = 'blue';
+      //   break;
+      // case "移動出庫":
+      //   // color = 'royalblue';
+      //   break;
+      // case "破棄":
+      //   // color = 'red';
+      //   break;
+      // case "発注外入荷":
+      //   // color = 'green';
+      //   break;
+      // case "棚卸":
+      //   // color = 'magenta';
+      //   break;  
+      default:
+        // color = 'black';
+    } 
+    const url = this.router.createUrlTree([func,'3',dno]);
+    window.open(url.toString(),null,'top=100,left=100');
+  }
+  openFrmsup(dno,jdkey){
+    const url = this.router.createUrlTree(['/frmsupply','1',dno]);
     window.open(url.toString() + '?stkey=' + jdkey ,null,'top=100,left=100');
   }
   openRepstc(gcd,scd){

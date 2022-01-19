@@ -3,6 +3,8 @@ import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { Trans, TransService } from './trans.service';
+import { UserService } from './../services/user.service';
+
 
 @Component({
   selector: 'app-trantbl',
@@ -15,6 +17,7 @@ export class TrantblComponent implements OnInit {
   public displayedColumns = ['ttype','sday','yday','aitec','aiten','denno','mline','tcode','biko','insuu','ousuu','zaisu','yotei','wait'];
   
   constructor(public trnsrv:TransService,
+              public usrsrv: UserService, 
               public cdRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {  

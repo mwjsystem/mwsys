@@ -133,7 +133,7 @@ export class TransService {
           name
         }
       }
-      tenmoto:trtenden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, scode: {_eq: $scd}, kubun: {_eq: 0}}) {
+      tenmoto:trtenden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, scode: {_eq: $scd}, kubun: {_eq: 1}}) {
         day
         denno
         line
@@ -141,7 +141,7 @@ export class TransService {
         suu
         tcode
       } 
-      tensaki:trtenden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, scode: {_eq: $scd}, kubun: {_eq: 1}}) {
+      tensaki:trtenden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, scode: {_eq: $scd}, kubun: {_eq: 0}}) {
         day
         denno
         line

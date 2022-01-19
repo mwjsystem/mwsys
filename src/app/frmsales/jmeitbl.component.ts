@@ -307,7 +307,7 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
   createRow(i:number,jyumei?:mwI.Jyumei){
-    console.log(jyumei);
+    // console.log(jyumei);
     let lcArr=this.fb.array([]);
     if(jyumei?.gskbn=="1"){
       jyumei.msgzais.forEach(e=>{
@@ -371,7 +371,26 @@ export class JmeitblComponent implements OnInit {
       }
     );
   }
+  spdetHelp(i: number): void {
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.width  = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass= 'full-screen-modal';
+    dialogConfig.data = {
+      gcode: this.frmArr.controls[i].value.gcode,
+      tkbn: ['0']
+    };
+    let dialogRef = this.dialog.open(GcdhelpComponent, dialogConfig);
+    
+    dialogRef.afterClosed().subscribe(
+      data=>{
+          if(typeof data != 'undefined'){
+            this.updGds(i,data.gcode);
 
+          }
+      }
+    );
+  }
   updGds(i: number,value: string):void {
     let val:string =this.usrsrv.convUpper(value);
     this.frmArr.controls[i].get('gcode').setValue(val);

@@ -103,6 +103,10 @@ export class RepstockComponent implements OnInit, AfterViewInit {
   gcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
+    dialogConfig.data = {
+      gcode: this.gcode,
+      tkbn: ['0','1','2']
+    };
     let dialogRef = this.dialog.open(GcdhelpComponent, dialogConfig);
     
     dialogRef.afterClosed().subscribe(

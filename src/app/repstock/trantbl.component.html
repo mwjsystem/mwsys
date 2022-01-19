@@ -2,7 +2,15 @@
     <table mat-table [dataSource]="dataSource" matSort class="full-width-table" aria-label="Elements">
         <ng-container matColumnDef="ttype">
             <th mat-header-cell *matHeaderCellDef>区分</th>
-            <td mat-cell *matCellDef="let row" [ngStyle]="{'color': setColor(row.ttype)}">{{row.ttype}}</td>
+            <td mat-cell *matCellDef="let row">
+                <mat-form-field style="width:6em;">
+                    <input matInput value="{{row.ttype}}" disabled [ngStyle]="{'color': setColor(row.ttype)}">
+                    <button mat-icon-button matSuffix (click)="usrsrv.openFrm(row.ttype,row.denno)"
+                        *ngIf="row.ttype !='前残'">
+                        <mat-icon>open_in_new</mat-icon>
+                    </button>
+                </mat-form-field>
+            </td>
         </ng-container>
         <ng-container matColumnDef="sday">
             <th mat-header-cell *matHeaderCellDef>変動日</th>
