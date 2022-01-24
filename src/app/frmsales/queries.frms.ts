@@ -105,6 +105,20 @@ query get_member($id: smallint!,$mcode:String!) {
     } 
   }
 }`;
+export const GetTran = gql`
+query get_nymat($id: smallint!,$gcd: String!){
+  vnymat(where: {id: {_eq: $id}, gcode: {_eq: $gcd},hatzn: {_gt: 0}}) {
+    denno
+    line
+    yday
+    ydaykbn
+    suu
+    hatzn
+    nymat
+    matzn
+    mbiko
+  }
+}`;
 // export const GetMadr = gql`
 // query get_member($id: smallint!,$mcode:Int!) {
 //   msmadr(where: {id: {_eq: $id,}, mcode: {_eq: $mcode}}, order_by: {eda: asc}) {

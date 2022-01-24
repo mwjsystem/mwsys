@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
+import { SpdethelpComponent } from './../share/spdethelp/spdethelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
@@ -375,21 +376,37 @@ export class JmeitblComponent implements OnInit {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width  = '100vw';
     dialogConfig.height = '98%';
-    dialogConfig.panelClass= 'full-screen-modal';
-    dialogConfig.data = {
-      gcode: this.frmArr.controls[i].value.gcode,
-      tkbn: ['0']
-    };
-    let dialogRef = this.dialog.open(GcdhelpComponent, dialogConfig);
-    
-    dialogRef.afterClosed().subscribe(
-      data=>{
-          if(typeof data != 'undefined'){
-            this.updGds(i,data.gcode);
+    // dialogConfig.panelClass= 'full-screen-modal';
+    this.apollo.watchQuery<any>({
+      query: Query.GetTran, 
+        variables: { 
+          id : this.usrsrv.compid,           
+          gcd: this.frmArr.controls[i].value.gcode
+        },
+      })
+      .valueChanges
+      .subscribe(({ data }) => {
+        // console.log(data);
+        if(data.vnymat.length==0){
+          this.toastr.warning("入荷予定が見つかりません");
+        }else{
+          dialogConfig.data = {
+            nymat: data.vnymat
+          };
+          let dialogRef = this.dialog.open(SpdethelpComponent, dialogConfig);
+          
+          dialogRef.afterClosed().subscribe(
+            data=>{
+                if(typeof data != 'undefined'){
+                  console.log(data,data.denno || '_' || data.line);
+                  this.frmArr.controls[i].get('spdet').setValue(data.denno + '_' + data.line);
+                }
+            }
+          );
+        }
 
-          }
-      }
-    );
+      });
+    
   }
   updGds(i: number,value: string):void {
     let val:string =this.usrsrv.convUpper(value);
@@ -441,27 +458,7 @@ export class JmeitblComponent implements OnInit {
               this.hatden.push(msgds.msggroup.vcode);
             }
           }
-          if(this.frmArr.controls[i].value.gskbn=="0"){
-            this.stcsrv.get_stock(val,this.frmArr.controls[i].value.gskbn,this.frmArr.controls[i].value.scode).then(result =>{
-              // console.log(result);
-              this.frmArr.controls[i].patchValue({pable:((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0)});
-              // console.log(this.frmArr);
-              this.jmisrv.subject.next(true);
-            });
-          } else if(this.frmArr.controls[i].value.gskbn=="1"){
-            this.stcsrv.getSetZai(this.frmArr.controls[i].value.scode,msgds.msgzais).then(result => {
-              this.frmArr.controls[i].patchValue({pable:this.stcsrv.get_paabl(result)});
-              this.jmisrv.subject.next(true);
-            });
-            msgds.msgzais.forEach(e=>{
-              if(e.msgoods.gskbn=="0"){
-                this.mtblGzai(i).push(this.fb.group({zcode:e.zcode,irisu:e.irisu}));
-              }
-            });
-          }
-
-
-
+          this.setPable(i,val,msgds.msgzais);
           // console.log(this.frmArr.controls[i].value,this.frmArr.getRawValue()[i]);
           this.calcMei(i);
           // this.calcTot();
@@ -472,6 +469,28 @@ export class JmeitblComponent implements OnInit {
         console.log('error query get_good', error);
       });
   } 
+
+  setPable(i:number,gcd:string,msgzais:any){
+    // console.log(gcd,i);
+    if(this.frmArr.controls[i].value.gskbn=="0"){
+      this.stcsrv.get_stock(gcd,this.frmArr.controls[i].value.gskbn,this.frmArr.controls[i].value.scode).then(result =>{
+        // console.log(result);
+        this.frmArr.controls[i].patchValue({pable:((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0)});
+        // console.log(this.frmArr);
+        this.jmisrv.subject.next(true);
+      });
+    } else if(this.frmArr.controls[i].value.gskbn=="1"){
+      this.stcsrv.getSetZai(this.frmArr.controls[i].value.scode,msgzais).then(result => {
+        this.frmArr.controls[i].patchValue({pable:this.stcsrv.get_paabl(result)});
+        this.jmisrv.subject.next(true);
+      });
+      msgzais.forEach(e=>{
+        if(e.msgoods.gskbn=="0"){
+          this.mtblGzai(i).push(this.fb.group({zcode:e.zcode,irisu:e.irisu}));
+        }
+      });
+    }
+  }
 
   changeTax(i : number,value:number){
     if (this.frmArr.getRawValue()[i]['mtax']=="0") {
@@ -587,6 +606,8 @@ export class JmeitblComponent implements OnInit {
   refresh(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.data =  this.frmArr.controls;
+    this.jmisrv.subject.next(true);
+    // console.log(this.frmArr.controls);
   }
 
   set_jyumei(skbn:string){
@@ -594,9 +615,9 @@ export class JmeitblComponent implements OnInit {
     this.jmisrv.trzaiko=[];
     let i:number=0;
     this.jmisrv.jyumei.forEach(e => {
-      console.log(e);
+      // console.log(e);
       this.frmArr.push(this.createRow(i+1,e));
-      // this.calcMei(i);
+      this.setPable(i,e.gcode,e.msgzais);
       i+=1;
       //trzaikoテーブル取り消し用データ作成
       if (skbn != "1"){

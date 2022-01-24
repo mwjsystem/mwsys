@@ -1,0 +1,14 @@
+.mat-cell, .mat-footer-cell, .mat-header-cell{
+    padding: 5px;
+}
+
+.mat-table {
+    overflow-x: scroll;
+    display: table;
+    padding-top: 0px;
+}
+
+.i_num {
+    text-align: right;
+    margin:0px;
+}
