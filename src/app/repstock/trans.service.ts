@@ -73,7 +73,7 @@ export class TransService {
     })
     const GetTran = gql`
     query get_trans($id: smallint!, $gcd: String!, $scd: String!, $day: date!, $today: date!) {
-      shukka:trjyumei(where: {id: {_eq: $id}, gcode: {_eq: $gcd},sday: {_gt: $day,_lte: $today}, scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"}}}) {
+      shukka:vjmeizai(where: {id: {_eq: $id}, gcode: {_eq: $gcd},sday: {_gt: $day,_lte: $today}, scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"}}}) {
         sday
         denno
         line
@@ -149,7 +149,7 @@ export class TransService {
         suu
         tcode
       } 
-      hikat:trjyumei(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}], scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"}}}) {
+      hikat:vjmeizai(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}], scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"}}}) {
         sday
         denno
         line

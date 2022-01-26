@@ -570,7 +570,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     }
 
     if(this.mode==2){ 
-      let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno);     
+      let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno);  
+      console.log(jyuden,jyumei);   
       this.jmisrv.upd_jyuden(this.jmisrv.denno,{...jyuden,jdstatus:this.jmisrv.get_jdsta(jyumei)},jyumei)
       .then(result => {
         this.toastr.success('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
@@ -587,7 +588,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
                 scode:e.scode,
                 gcode:e.gcode,
                 day:e.sday,
-                suu:e.suu * -1
+                suu:e.suu
               }
               this.jmisrv.upd_zaiko(lczaiko);
             } else if(e.gskbn == "1" && e.sday != null) {
@@ -596,7 +597,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
                   scode:e.scode,
                   gcode:zai.zcode,
                   day:e.sday,
-                  suu:e.suu * zai.irisu * -1
+                  suu:e.suu * zai.irisu
                 }
                 this.jmisrv.upd_zaiko(lczai);
               });

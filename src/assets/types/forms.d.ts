@@ -65,6 +65,12 @@ declare namespace mwI {
     // total8:number;
     // total10:number;
   }
+    interface Jmzai {
+    gcode:string;
+    suu:number;
+    spec:string;
+    spdet:string;
+  }  
   interface Jyumei {
     line:number;
     gcode:string;
@@ -96,6 +102,7 @@ declare namespace mwI {
     gkbn:string;
     code:string;
     msgzais:Gzai[];
+    trjyumzais:Jmzai[];
   }
   // interface SalGds {
   //   gcode:string;

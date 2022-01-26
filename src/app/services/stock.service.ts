@@ -532,14 +532,14 @@ export class StockService {
         aggregate { sum { suu }}}  
       keepd:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
-      vhatzn(where: {hatzan: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
+      vhatzn(where: {hatzn: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
         yday
-        hatzan
+        hatzn
       }
       vhatzn_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
         aggregate {
           sum {
-            hatzan
+            hatzn
           }
         }
       }   
@@ -574,8 +574,8 @@ export class StockService {
           hikat:data.hikat.aggregate.sum.suu || 0, 
           keepd:data.keepd.aggregate.sum.suu || 0, 
           yday : data.vhatzn[0]?.yday,
-          suu : data.vhatzn[0]?.hatzan,
-          htzan:data.vhatzn_aggregate.aggregate.sum.hatzan
+          suu : data.vhatzn[0]?.hatzn,
+          htzan:data.vhatzn_aggregate.aggregate.sum.hatzn
         }
         return resolve(lcstcs);
 

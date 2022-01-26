@@ -113,6 +113,12 @@ export class JyumeiService {
               }
             }
           }
+          trjyumzais {
+            gcode
+            suu
+            spec
+            spdet
+          }
         }
       }
     }`;

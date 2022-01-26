@@ -156,10 +156,14 @@ export class JmeitblComponent implements OnInit {
       // toutmoney:lctoutmoney,
       tinmoney:lctinmoney
     });
+
+
     // console.log(+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'],this.frmArr.getRawValue()[i]['spec'] == null);
     if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] > 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({spec:'1'});     
     }
+
+
     this.calcTot();
   }
   setAll(chked:boolean){
@@ -308,12 +312,14 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
   createRow(i:number,jyumei?:mwI.Jyumei){
-    // console.log(jyumei);
+    console.log(jyumei);
     let lcArr=this.fb.array([]);
+    let lcAr2=this.fb.array([]);
     if(jyumei?.gskbn=="1"){
       jyumei.msgzais.forEach(e=>{
         if(e.msgoods.gskbn=="0"){
           lcArr.push(this.fb.group({zcode:e.zcode,irisu:e.irisu}));
+          lcAr2.push(this.fb.group({gcode:e.zcode,suu:e.irisu*jyumei?.suu}));
         }
       });
     }
@@ -347,7 +353,8 @@ export class JmeitblComponent implements OnInit {
       vcode:[jyumei?.vcode],
       gkbn:[jyumei?.gkbn],
       code:[jyumei?.code],
-      msgzais:lcArr   
+      msgzais:lcArr,     
+      trjyumzais:lcAr2     
     });
 
   }
@@ -458,12 +465,18 @@ export class JmeitblComponent implements OnInit {
               this.hatden.push(msgds.msggroup.vcode);
             }
           }
+          msgds.msgzais.forEach(e=>{
+            if(e.msgoods.gskbn=="0"){
+              this.getMtbl(i,'msgzais').push(this.fb.group({zcode:e.zcode,irisu:e.irisu}));
+              this.getMtbl(i,'trjyumzais').push(this.fb.group({gcode:e.zcode,suu:e.irisu,spec:null,spdet:null}));
+            }
+          });
           this.setPable(i,val,msgds.msgzais);
-          // console.log(this.frmArr.controls[i].value,this.frmArr.getRawValue()[i]);
           this.calcMei(i);
           // this.calcTot();
           // this.jmisrv.subject.complete();
         }
+        // console.log(this.frmArr);
         this.jmisrv.subject.next(true);
       },(error) => {
         console.log('error query get_good', error);
@@ -484,11 +497,6 @@ export class JmeitblComponent implements OnInit {
         this.frmArr.controls[i].patchValue({pable:this.stcsrv.get_paabl(result)});
         this.jmisrv.subject.next(true);
       });
-      msgzais.forEach(e=>{
-        if(e.msgoods.gskbn=="0"){
-          this.mtblGzai(i).push(this.fb.group({zcode:e.zcode,irisu:e.irisu}));
-        }
-      });
     }
   }
 
@@ -502,8 +510,8 @@ export class JmeitblComponent implements OnInit {
     return this.parentForm.get('mtbl') as FormArray;
   }  
 
-  mtblGzai(i:number):FormArray {    
-    return this.frmArr.controls[i].get('msgzais') as FormArray;
+  getMtbl(i:number,fnm:string):FormArray {    
+    return this.frmArr.controls[i].get(fnm) as FormArray;
   }  
 
   toggleCols(){
@@ -575,7 +583,8 @@ export class JmeitblComponent implements OnInit {
             vcode:null,
             gkbn:null,
             code:null,
-            msgzais:[]
+            msgzais:[],
+            trjyumzais:[]
           } 
           this.frmArr.push(this.createRow(i+1,jmei));
           this.updGds(i,col[0]);
@@ -630,12 +639,12 @@ export class JmeitblComponent implements OnInit {
           }
           this.jmisrv.trzaiko.push(lczaiko);
         } else if(e.gskbn == "1" && e.sday != null) {
-          e.msgzais.forEach(zai => {
+          e.trjyumzais.forEach(zai => {
             const lczai:mwI.Zaiko={
               scode:e.scode,
-              gcode:zai.zcode,
+              gcode:zai.gcode,
               day:e.sday,
-              suu:e.suu * zai.irisu * -1
+              suu:zai.suu * -1
             }
             this.jmisrv.trzaiko.push(lczai);
           });

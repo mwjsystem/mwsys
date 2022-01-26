@@ -75,7 +75,7 @@
     <mat-card-content fxLayout="row wrap">
       <div fxLayout="column">
         <div fxLayout="row wrap" fxLayoutAlign="start end">
-          <mat-form-field style="width: 7em;">
+          <mat-form-field style="width: 9em;">
             <mat-label>受注先</mat-label>
             <input tabIndex="3" matInput formControlName="mcode" required (change)="changeMcd()"
               (keydown.f4)="mcdHelp('mcode')">
@@ -89,7 +89,7 @@
           <span class="nmtxt">{{form.getRawValue().mcode | mcdtxt}}</span>
         </div>
         <div fxLayout="row wrap" fxLayoutAlign="start end">
-          <mat-form-field style="width: 7em;">
+          <mat-form-field style="width: 9em;">
             <mat-label>請求先</mat-label>
             <input matInput formControlName="scde" required (keydown.f4)="mcdHelp('scde')">
             <button mat-icon-button matSuffix (click)="mcdHelp('scde')" *ngIf="frmArr.enabled">
@@ -102,7 +102,7 @@
           <span class="nmtxt">{{form.getRawValue().scde | mcdtxt}}</span>
         </div>
         <div fxLayout="row wrap" fxLayoutAlign="start end">
-          <mat-form-field style="width: 7em;">
+          <mat-form-field style="width: 9em;">
             <mat-label>納品先</mat-label>
             <input matInput formControlName="ncode" required (keydown.f4)="mcdHelp('ncode')">
             <button mat-icon-button matSuffix (click)="mcdHelp('ncode')" *ngIf="frmArr.enabled">
