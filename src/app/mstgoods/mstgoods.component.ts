@@ -103,7 +103,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     AutoKana.bind('#first-fld', '#kanafld',{katakana:true});
   }
 
-　diaImage(): void {
+  diaImage(): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.data = {
         grpcd: this.gdssrv.grpcd,
@@ -319,7 +319,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     this.frmArr.controls
       .forEach(control => {
         gds.push({
-          id: this.usrsrv.compid,
+          id: this.usrsrv.compid,
           code: this.gdssrv.grpcd,
           gcode: this.usrsrv.editFrmval(control,'gcode'),
           size: this.usrsrv.editFrmval(control,'size'),
@@ -335,7 +335,8 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
           send: this.usrsrv.editFrmval(control,'send'),
           ordering: this.usrsrv.editFrmval(control,'ordering'),
           koguchi: this.usrsrv.editFrmval(control,'koguchi'),
-          lot: this.usrsrv.editFrmval(control,'lot')
+          lot: this.usrsrv.editFrmval(control,'lot'),
+          vgcode: this.usrsrv.editFrmval(control,'vgcode')
         });
       });
     let tnk=[];

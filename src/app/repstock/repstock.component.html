@@ -6,6 +6,9 @@
     <button mat-button mat-icon-button matSuffix (click)="gcdHelp()">
       <mat-icon>find_replace</mat-icon>
     </button>
+    <button mat-button mat-icon-button matSuffix (click)="usrsrv.openMst('mstgoods',gcode)">
+      <mat-icon>open_in_new</mat-icon>
+    </button>
   </mat-form-field>
   <div class="icon-area" fxLayout="row" fxLayoutGap="5px" fxShow="true" fxHide.lt-md="true">
     <button mat-button (click)="setNext()">

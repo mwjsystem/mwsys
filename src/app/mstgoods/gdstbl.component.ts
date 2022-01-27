@@ -25,7 +25,7 @@ export class GdstblComponent implements OnInit,AfterViewInit {
   }
   @Output() action = new EventEmitter();
   dataSource = new MatTableDataSource();
-  displayedColumns =['action','gcode','gtext','size','color','unit','gskbn','jan','weight','tkbn','max','send','ordering','koguchi','lot'];
+  displayedColumns =['action','gcode','gtext','size','color','unit','gskbn','jan','weight','tkbn','max','send','ordering','koguchi','lot','vgcode'];
   hidx=6; //tabindex用ヘッダ項目数
   mcols=11; //tabindex用明細列数  
   constructor(private cdRef:ChangeDetectorRef,
@@ -117,12 +117,12 @@ export class GdstblComponent implements OnInit,AfterViewInit {
           gcode: value
         },
       }).valueChanges
-        .subscribe(({ data }) => {  
+        .subscribe(({ data }) => { 
+          // console.log(data); 
           if(data.msgoods.length==0){
             let j:number=0;
             this.frmArr.controls
               .forEach(control => {
-                // console.log(control.get('gcode').value,control);
                 if(control.get('gcode').value == value && j != i){
 
                   this.toastr.error( value + 'は重複しています(' + (j+1) + '行目)','商品コード入力エラー',
@@ -156,7 +156,8 @@ export class GdstblComponent implements OnInit,AfterViewInit {
       send:[goods?.send],
       ordering:[goods?.ordering],
       koguchi:[goods?.koguchi],
-      lot:[goods?.lot]
+      lot:[goods?.lot],
+      vgcode:[goods?.vgcode]
     });
   }    
       

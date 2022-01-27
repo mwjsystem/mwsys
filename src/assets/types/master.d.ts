@@ -201,6 +201,7 @@ declare namespace mwI {
     ordering:boolean;
     koguchi:number;
     lot:number;
+    vgcode:string;
     msgzais:Gzai[];
   }
   

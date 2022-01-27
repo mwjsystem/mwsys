@@ -206,7 +206,7 @@ export class StockService {
           }
           if(data.vhatzn.length>0){
             stgds.yday = data.vhatzn[0]?.yday;
-            stgds.suu = data.vhatzn[0]?.hatzan;
+            stgds.suu = data.vhatzn[0]?.hatzn;
             if(data.vhatzn[0]?.ydaykbn==0){
               stgds.ydtxt='入荷予定日(確定)';
             } else if(data.vhatzn[0]?.ydaykbn==1){

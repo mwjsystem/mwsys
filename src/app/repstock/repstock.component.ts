@@ -219,7 +219,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     } else if (this.stgds.gskbn=="1"){
       this.isLoading2=true;
       this.stcsrv.getSetZai(this.scode,this.stgds.msgzais).then(result => {
-        console.log(result);
+        // console.log(result);
         this.stcsrv.stcbs=result.sort(function(a, b) {
           return (a.gcode < b.gcode) ? -1 : 1;  //オブジェクトの昇順ソート
         });
@@ -236,6 +236,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       this.isLoading=true;
       if (this.stgds.gskbn=="0"){
         this.stcsrv.get_shcount0(this.gcode).then(result=>{
+          // console.log(result);
           this.isLoading=false;
           this.stgds.moavg=result.moavg;
           this.stgds.motai=result.motai;

@@ -278,7 +278,7 @@
             <mat-icon>web_asset</mat-icon>
           </button>
           <button mat-button mat-icon-button matSuffix (click)="setOkrno()"
-            *ngIf="okrsrv.get_hinfo(form.value.hcode).numbering && mode!=3">
+            *ngIf="okrsrv.get_hinfo(form.value.hcode).numbering && mode!=3 && !form.value.okurino">
             <mat-icon>calculate</mat-icon>
           </button>
           <!-- <button mat-flat-button matSuffix (click)="setOkrno()" *ngIf="okrsrv.get_hinfo(form.value.hcode).numbering">採番</button> -->
