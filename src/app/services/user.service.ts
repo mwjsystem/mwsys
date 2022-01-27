@@ -529,13 +529,14 @@ export class UserService {
       console.log('error query holiday', error);
     });
   }
-  getNextday(date:Date) {
-    date.setDate( date.getDate() + 1);
-    const day = date.getDay();
-    if  (this.holidays.includes(this.formatDate(date)) || day == 0 || day == 6){
-      this.getNextday(date);  
+  getNextday(tdy:Date) {
+    let lcdate:Date=new Date(tdy);
+    lcdate.setDate(lcdate.getDate() + 1);
+    const day = lcdate.getDay();
+    if  (this.holidays.includes(this.formatDate(lcdate)) || day == 0 || day == 6){
+      this.getNextday(lcdate);  
     }
-    return date;
+    return lcdate;
   }
   getLastMonth(date:Date) {
     date.setDate( date.getDate() - 30);

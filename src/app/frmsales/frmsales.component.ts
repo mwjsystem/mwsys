@@ -628,9 +628,30 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         console.log('insert_trjyu',result);
         this.toastr.success('受注伝票' + this.jmisrv.denno + 'を新規登録しました');
         //  zaiko更新処理 　新規
-
-
-
+        jyumei.forEach(e=>{
+          console.log(e,this.form);
+          if (jyuden.skbn != "1"){
+            if(e.gskbn == "0" && e.sday != null){
+              const lczaiko:mwI.Zaiko={
+                scode:e.scode,
+                gcode:e.gcode,
+                day:e.sday,
+                suu:e.suu
+              }
+              this.jmisrv.upd_zaiko(lczaiko);
+            } else if(e.gskbn == "1" && e.sday != null) {
+              e.msgzais.forEach(zai => {
+                const lczai:mwI.Zaiko={
+                  scode:e.scode,
+                  gcode:zai.zcode,
+                  day:e.sday,
+                  suu:e.suu * zai.irisu
+                }
+                this.jmisrv.upd_zaiko(lczai);
+              });
+            }  
+          }
+        });
         this.form.markAsPristine();
         this.cancel();
        }).catch(error => {

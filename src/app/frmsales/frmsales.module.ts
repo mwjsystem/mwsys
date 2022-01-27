@@ -8,6 +8,7 @@ import { JmeitblComponent } from './jmeitbl.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 import { JdnohelpComponent } from '../share/jdnohelp/jdnohelp.component';
 import { SpdethelpComponent } from '../share/spdethelp/spdethelp.component';
+import { JmzaitblComponent } from './jmzaitbl.component';
 // import { UserService } from './../services/user.service';
 
 
@@ -16,7 +17,8 @@ import { SpdethelpComponent } from '../share/spdethelp/spdethelp.component';
     FrmsalesComponent,
     JmeitblComponent,
     JdnohelpComponent,
-    SpdethelpComponent
+    SpdethelpComponent,
+    JmzaitblComponent
   ],
   imports: [
     CommonModule,

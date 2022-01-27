@@ -441,6 +441,7 @@ export class StockService {
   }
 
   async get_zaiko(gcd:string,scd:string,day:Date,stc:number,tdy:Date):Promise<Stock> {
+    console.log(gcd + '_' + scd,day);
     const GetTran = gql`
     query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!, $today: date!,$nextd: date!) {
       trzaiko_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode},day: {_gt: $day,_lt: $today}, scode: {_eq: $scode}}) {
@@ -470,7 +471,7 @@ export class StockService {
     }`;    
 
     return new Promise<Stock>( resolve => {
-      // console.log(this.usrsrv.getNextday(new Date()));
+      
       this.apollo.watchQuery<any>({
         query: GetTran, 
           variables: { 
@@ -484,6 +485,7 @@ export class StockService {
       })
       .valueChanges
       .subscribe(({ data }) => {
+        // console.log(this.usrsrv.getNextday(tdy),data);
         let lcstcs:Stock={
           gcode: gcd,
           scode: scd,
