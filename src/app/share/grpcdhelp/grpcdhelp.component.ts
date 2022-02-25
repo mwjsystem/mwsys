@@ -13,14 +13,14 @@ import { Subject } from 'rxjs';
 // import { MatSpinner } from '@angular/material/progress-spinner';
 
 interface Ggrp {
-  code:string;
-  name:string;
-  kana:string;
-  gkbn:string;
-  sozai:string;
-  vcode:string;
-  tcode:string;
-} 
+  code: string;
+  name: string;
+  kana: string;
+  gkbn: string;
+  sozai: string;
+  vcode: string;
+  tcode: string;
+}
 
 @Component({
   selector: 'app-grpcdhelp',
@@ -28,39 +28,39 @@ interface Ggrp {
   styleUrls: ['./grpcdhelp.component.scss']
 })
 export class GrpcdhelpComponent implements OnInit {
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-  dataSource:MatTableDataSource<Ggrp>;
-  displayedColumns = ['code','name','kana','gkbn','sozai','vcode','tcode']; 
-  public ggrps:Ggrp[];
-  public code:string="";
-  public kana:string="";
-  public name:string="";
-  public tcode:string="";
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  dataSource: MatTableDataSource<Ggrp>;
+  displayedColumns = ['code', 'name', 'kana', 'gkbn', 'sozai', 'vcode', 'tcode'];
+  public ggrps: Ggrp[];
+  public code: string = "";
+  public kana: string = "";
+  public name: string = "";
+  public tcode: string = "";
   public subject = new Subject<Ggrp[]>();
-  public observe = this.subject.asObservable();  
+  public observe = this.subject.asObservable();
   // overlayRef = this.overlay.create({
   //   hasBackdrop: true,
   //   positionStrategy: this.overlay
   //     .position().global().centerHorizontally().centerVertically()
   // }); 
   constructor(private dialogRef: MatDialogRef<GrpcdhelpComponent>,
-              public usrsrv: UserService,
-              public cdRef: ChangeDetectorRef,
-              // public gdssrv: GoodsService,
-              public bunsrv: BunruiService,
-              private apollo: Apollo,
-              @Inject(MAT_DIALOG_DATA) data) {
-                // console.log(data);
-                this.dataSource= new MatTableDataSource<Ggrp>(this.ggrps);
-                if(typeof data != 'undefined'){
-                  this.code= (data?.code ?? '');
-                  if (this.code){ this.filterGcd(); }
-                }
-              }
+    public usrsrv: UserService,
+    public cdRef: ChangeDetectorRef,
+    // public gdssrv: GoodsService,
+    public bunsrv: BunruiService,
+    private apollo: Apollo,
+    @Inject(MAT_DIALOG_DATA) data) {
+    // console.log(data);
+    this.dataSource = new MatTableDataSource<Ggrp>(this.ggrps);
+    if (typeof data != 'undefined') {
+      this.code = (data?.code ?? '');
+      if (this.code) { this.filterGcd(); }
+    }
+  }
 
   ngOnInit(): void {
     this.dataSource.paginator = this.paginator;
-    this.dataSource= new MatTableDataSource<Ggrp>(this.ggrps);
+    this.dataSource = new MatTableDataSource<Ggrp>(this.ggrps);
     this.observe.subscribe(() => this.refresh());
     // if (this.gdssrv.ggrps.length == 0) {
     //   this.overlayRef.attach(new ComponentPortal(MatSpinner));
@@ -82,19 +82,23 @@ export class GrpcdhelpComponent implements OnInit {
     // this.dataSource.paginator = this.paginator;
 
   }
-  filterGcd(){
-    let varWh: {[k: string]: any}={"where" : {"_and":[
-      {"id": {"_eq": this.usrsrv.compid}}
-    ]}};
-    if (this.code!==""){
-      varWh.where._and.push({"code" : {"_like":"%" + this.code + "%"}});
+  filterGcd() {
+    let varWh: { [k: string]: any } = {
+      "where": {
+        "_and": [
+          { "id": { "_eq": this.usrsrv.compid } }
+        ]
+      }
+    };
+    if (this.code !== "") {
+      varWh.where._and.push({ "code": { "_like": "%" + this.code + "%" } });
     }
-    if (this.kana!==""){
-      varWh.where._and.push({"kana" : {"_like":"%" + this.kana + "%"}});
-    }    
-    if (this.name!==""){
-      varWh.where._and.push({"name" : {"_like":"%" + this.name + "%"}});
-    }    
+    if (this.kana !== "") {
+      varWh.where._and.push({ "kana": { "_like": "%" + this.kana + "%" } });
+    }
+    if (this.name !== "") {
+      varWh.where._and.push({ "name": { "_like": "%" + this.name + "%" } });
+    }
     const GetMast = gql`
     query get_ggroup($where:msggroup_bool_exp!) {
       msggroup(where:$where) {
@@ -108,17 +112,24 @@ export class GrpcdhelpComponent implements OnInit {
       }
     }`;
     this.apollo.watchQuery<any>({
-      query: GetMast, 
+      query: GetMast,
       variables: varWh
     })
-    .valueChanges
-    .subscribe(({ data }) => {
-      this.ggrps=data.msggroup;
-      this.subject.next();
-      // this.subject.complete();
-    },(error) => {
-      console.log('error query get_ggroup', error);
-    });
+      .valueChanges
+      .subscribe(({ data }) => {
+        // if(data.msggroup.length===0){
+        if (data.msggroup.length == 0) {
+          this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
+        } else {
+          this.ggrps = data.msggroup;
+          this.subject.next();
+        }
+        // }
+
+        // this.subject.complete();
+      }, (error) => {
+        console.log('error query get_ggroup', error);
+      });
   }
   // applyFilter():void {
   //   this.dataSource.filter = JSON.stringify(this.filters);
@@ -131,7 +142,7 @@ export class GrpcdhelpComponent implements OnInit {
   //   this.filters[i].value = filval;
   //   this.applyFilter();
   // }
-  setGrpcd(selected ) {
+  setGrpcd(selected) {
     // console.log("select",selected);
     // this.mcdsrv.mcds=[];
     this.dialogRef.close(selected);
@@ -144,7 +155,7 @@ export class GrpcdhelpComponent implements OnInit {
 
   refresh(): void {
     //tableのデータソース更新
-    this.dataSource= new MatTableDataSource<Ggrp>(this.ggrps);
+    this.dataSource = new MatTableDataSource<Ggrp>(this.ggrps);
     this.dataSource.paginator = this.paginator;
   }
 

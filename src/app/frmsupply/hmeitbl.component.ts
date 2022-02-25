@@ -10,7 +10,7 @@ import { StoreService } from './../services/store.service';
 import { HatmeiService } from './hatmei.service';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
-import { ToastrService } from 'ngx-toastr';
+// import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -20,44 +20,44 @@ import { take } from 'rxjs/operators';
 })
 export class HmeitblComponent implements OnInit {
   @Input() parentForm: FormGroup;
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChildren('gcdInputs') gcdInps: QueryList<ElementRef>;
   private el: HTMLInputElement;
   dataSource = new MatTableDataSource();
   copyToClipboard: string;
-  navCli=navigator.clipboard;
-  yday:Date;
+  navCli = navigator.clipboard;
+  yday: Date;
   displayedColumns = ['chk',
-                      'line',
-                      // 'soko',
-                      'gcode',
-                      'gtext',
-                      'suu',
-                      'genka',
-                      'money',
-                      'taxrate',
-                      'unit',
-                      'mbiko',
-                      'spec',
-                      'jdenno',
-                      'jline',
-                      'day',
-                      'yday',
-                      'ydaykbn',
-                      'inday',
-                      'mtax',
-                      // 'currency'
-                      ];
-  constructor(private cdRef:ChangeDetectorRef,
-              private elementRef: ElementRef,
-              private dialog: MatDialog,
-              private fb:     FormBuilder,
-              private apollo: Apollo,
-              private toastr: ToastrService,
-              public usrsrv: UserService,
-              public bunsrv: BunruiService,
-              public hmisrv: HatmeiService,
-              public strsrv: StoreService) { }
+    'line',
+    // 'soko',
+    'gcode',
+    'gtext',
+    'suu',
+    'genka',
+    'money',
+    'taxrate',
+    'unit',
+    'mbiko',
+    'spec',
+    'jdenno',
+    'jline',
+    'day',
+    'yday',
+    'ydaykbn',
+    'inday',
+    'mtax',
+    // 'currency'
+  ];
+  constructor(private cdRef: ChangeDetectorRef,
+    private elementRef: ElementRef,
+    private dialog: MatDialog,
+    private fb: FormBuilder,
+    private apollo: Apollo,
+    // private toastr: ToastrService,
+    public usrsrv: UserService,
+    public bunsrv: BunruiService,
+    public hmisrv: HatmeiService,
+    public strsrv: StoreService) { }
 
   ngOnInit(): void {
     this.add_rows(1);
@@ -65,51 +65,51 @@ export class HmeitblComponent implements OnInit {
     // console.log(this.parentForm);
   }
 
-  calcTot(){
-    let lcgtotal:number=0;
+  calcTot() {
+    let lcgtotal: number = 0;
     // let lcttotal:number=0;
-    let lctax:number=0;
+    let lctax: number = 0;
     this.frmArr.controls
       .forEach(control => {
-        if(control.value.gcode!==''){
-          const lcmoney:number = control.value.genka * control.value.suu;
-          control.patchValue({money:lcmoney});
+        if (control.value.gcode !== '') {
+          const lcmoney: number = control.value.genka * control.value.suu;
+          control.patchValue({ money: lcmoney });
           lcgtotal += lcmoney;
-          if(control.value.mtax=='0'){
+          if (control.value.mtax == '0') {
             // lcttotal += lcmoney;
             lctax += (lcmoney * +control.value.taxrate / 100)
             // console.log(lctax);
           }
         }
       })
-    this.parentForm.patchValue({gtotal:lcgtotal,tax:lctax,total:lcgtotal + lctax});
+    this.parentForm.patchValue({ gtotal: lcgtotal, tax: lctax, total: lcgtotal + lctax });
     this.hmisrv.subject.next(true);
-    this.hmisrv.subject.complete();
+    // this.hmisrv.subject.complete();
     this.refresh();
     // console.log(this.frmArr,this.parentForm);
   }
 
-  setAll(chked:boolean){
+  setAll(chked: boolean) {
     this.frmArr.controls
       .forEach(control => {
-        if(control.value.gcode!==''){
-          control.patchValue({chk:chked});
+        if (control.value.gcode !== '') {
+          control.patchValue({ chk: chked });
         }
       })
     this.refresh();
   }
 
-  setYday(ydkbn:string){
-    let i:number=0;
+  setYday(ydkbn: string) {
+    let i: number = 0;
     this.frmArr.controls
       .forEach(control => {
-        if(control.value.chk){
-          control.patchValue({yday:this.yday,ydaykbn:ydkbn});
-          i+=1;
+        if (control.value.chk) {
+          control.patchValue({ yday: this.yday, ydaykbn: ydkbn });
+          i += 1;
         }
       })
     this.refresh();
-    this.toastr.info(i + '件変更しました。まだ、保存されていません。');
+    this.usrsrv.toastInf(i + '件変更しました。まだ、保存されていません。');
   }
 
   // contxtMenu(i: number){
@@ -119,27 +119,27 @@ export class HmeitblComponent implements OnInit {
 
   gcdHelp(i: number): void {
     let dialogConfig = new MatDialogConfig();
-    dialogConfig.width  = '100vw';
+    dialogConfig.width = '100vw';
     dialogConfig.height = '98%';
-    dialogConfig.panelClass= 'full-screen-modal';
+    dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.data = {
       gcode: this.frmArr.controls[i].value.gcode,
-      tkbn: ['0','1']
+      tkbn: ['0', '1']
     };
     let dialogRef = this.dialog.open(GcdhelpComponent, dialogConfig);
-    
-    dialogRef.afterClosed().subscribe(
-      data=>{
-          if(typeof data != 'undefined'){
-            this.updGds(i,data.gcode);
 
-          }
+    dialogRef.afterClosed().subscribe(
+      data => {
+        if (typeof data != 'undefined') {
+          this.updGds(i, data.gcode);
+
+        }
       }
     );
   }
 
-  updGds(i: number,value: string):void {
-    let val:string =this.usrsrv.convUpper(value);
+  updGds(i: number, value: string): void {
+    let val: string = this.usrsrv.convUpper(value);
     // console.log(this.frmArr.controls[i]);
     this.frmArr.controls[i].get('gcode').setValue(val);
     const GetGood = gql`
@@ -164,99 +164,99 @@ export class HmeitblComponent implements OnInit {
       }
     }`;
     this.apollo.watchQuery<any>({
-      query: GetGood, 
-        variables: { 
-          id : this.usrsrv.compid,           
-          gds: val,
-          day: this.parentForm.get('day').value
-        },
-      })
+      query: GetGood,
+      variables: {
+        id: this.usrsrv.compid,
+        gds: val,
+        day: this.parentForm.get('day').value
+      },
+    })
       .valueChanges
       .subscribe(({ data }) => {
         let msgds = data.msgoods_by_pk;
-        
-        if(msgds == null){
-          this.toastr.warning("商品コード" + val+ "は登録されていません");
-          this.frmArr.controls[i].get('gcode').setErrors({'incorrect': true});
-        }else{
-        // console.log(msgds);
+
+        if (msgds == null) {
+          this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
+          this.frmArr.controls[i].get('gcode').setErrors({ 'incorrect': true });
+        } else {
+          // console.log(msgds);
           this.frmArr.controls[i].get('gcode').setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
-          this.frmArr.controls[i].patchValue({day:this.parentForm.get('day').value,mtax:this.parentForm.get('mtax').value});
+          this.frmArr.controls[i].patchValue({ day: this.parentForm.get('day').value, mtax: this.parentForm.get('mtax').value });
           this.calcTot();
         }
         this.hmisrv.subject.next(true);
-      },(error) => {
+      }, (error) => {
         console.log('error query get_good', error);
       });
-  } 
+  }
 
-  createRow(i:number,hatmei?:mwI.Hatmei){
+  createRow(i: number, hatmei?: mwI.Hatmei) {
     return this.fb.group({
-      chk:[''],
-      line:[{value:i,disabled:true}],
+      chk: [''],
+      line: [{ value: i, disabled: true }],
       // soko:[hatmei.soko],
-      gcode:[hatmei?.gcode, Validators.required],
-      gtext:[hatmei?.gtext],
-      suu:[hatmei?.suu, Validators.required],
-      genka:[hatmei?.genka],
-      money:[hatmei?.money],
-      taxrate:[hatmei?.taxrate],
-      unit:[hatmei?.unit],
-      mbiko:[hatmei?.mbiko],
-      spec:[hatmei?.spec],
-      jdenno:[hatmei?.jdenno],
-      jline:[hatmei?.jline],
-      day:[hatmei?.day],
-      yday:[hatmei?.yday],
-      ydaykbn:[hatmei?.ydaykbn],
-      inday:[hatmei?.inday],
-      mtax:[hatmei?.mtax],
+      gcode: [hatmei?.gcode, Validators.required],
+      gtext: [hatmei?.gtext],
+      suu: [hatmei?.suu, Validators.required],
+      genka: [hatmei?.genka],
+      money: [hatmei?.money],
+      taxrate: [hatmei?.taxrate],
+      unit: [hatmei?.msgood.unit],
+      mbiko: [hatmei?.mbiko],
+      spec: [hatmei?.spec],
+      jdenno: [hatmei?.jdenno],
+      jline: [hatmei?.jline],
+      day: [hatmei?.day],
+      yday: [hatmei?.yday],
+      ydaykbn: [hatmei?.ydaykbn],
+      inday: [hatmei?.inday],
+      mtax: [hatmei?.mtax],
       // currency:[hatmei?.currency]
     });
   }
 
-  del_row(row:number){
+  del_row(row: number) {
     this.frmArr.removeAt(row);
-    this.auto_fil();  
+    this.auto_fil();
   }
-  ins_row(row:number){
-    this.frmArr.insert(row,this.createRow(row));
-    this.auto_fil();  
+  ins_row(row: number) {
+    this.frmArr.insert(row, this.createRow(row));
+    this.auto_fil();
   }
-  auto_fil(){
-    let i:number=0;
+  auto_fil() {
+    let i: number = 0;
     this.frmArr.controls
       .forEach(control => {
-        control.patchValue({line:i+1});
-        i=i+1;
+        control.patchValue({ line: i + 1 });
+        i = i + 1;
       })
     this.refresh();
   }
-  add_rows(rows:number){
-    for (let i=0;i<rows;i++){
-      this.frmArr.push(this.createRow(i+1));
+  add_rows(rows: number) {
+    for (let i = 0; i < rows; i++) {
+      this.frmArr.push(this.createRow(i + 1));
     }
     this.refresh();
-  }  
-  get frmArr():FormArray {
+  }
+  get frmArr(): FormArray {
     // console.log(this.parentForm);    
     return this.parentForm.get('mtbl') as FormArray;
-  }  
-  
-  frmVal(i:number,fld:string):string {
+  }
+
+  frmVal(i: number, fld: string): string {
     return this.frmArr.getRawValue()[i][fld];
   }
-  pasteFromClipboard(flg:boolean){
+  pasteFromClipboard(flg: boolean) {
     // if(navigator.clipboard){
     navigator.clipboard.readText()
-    .then((text) => {
-      console.log(text);
+      .then((text) => {
+        console.log(text);
         let rowData = text.split("\n");
-        this.insRows(rowData,flg);
+        this.insRows(rowData, flg);
         this.parentForm.markAsDirty();
-    });
+      });
     // }
   }
   // pasteData(event: ClipboardEvent,flg:boolean) {
@@ -267,81 +267,81 @@ export class HmeitblComponent implements OnInit {
   //   this.parentForm.markAsDirty();
   //   // console.log(rowData);
   // }
-  insRows(rowData,flg:boolean){
-    let i:number=0;
-    if(flg){
+  insRows(rowData, flg: boolean) {
+    let i: number = 0;
+    if (flg) {
       this.frmArr.clear();
-    }else{
-      i=this.frmArr.length;
+    } else {
+      i = this.frmArr.length;
     }
     rowData.forEach(row => {
-      let col=row.split("\t");
-      if(col[0]!=""){
-        let hmei:mwI.Hatmei= {
-            line:i,
-            day:this.usrsrv.formatDate(),
-            // soko:this.parentForm.get('soko').value,
-            gcode:col[0],
-            gtext:'',
-            suu:+col[1],
-            genka:0,
-            money:0,
-            taxrate:'',
-            unit:'',
-            mbiko:'',
-            spec:'',
-            jdenno:+col?.[2],
-            jline:+col?.[3],
-            yday:null,
-            ydaykbn:'',
-            inday:null,
-            mtax:''
-            // currency:''
-        } 
-        this.frmArr.push(this.createRow(i+1,hmei));
+      let col = row.split("\t");
+      if (col[0] != "") {
+        let hmei: mwI.Hatmei = {
+          line: i,
+          day: this.usrsrv.formatDate(),
+          // soko:this.parentForm.get('soko').value,
+          gcode: col[0],
+          gtext: '',
+          suu: +col[1],
+          genka: 0,
+          money: 0,
+          taxrate: '',
+          msgood: { unit: '' },
+          mbiko: '',
+          spec: '',
+          jdenno: +col?.[2],
+          jline: +col?.[3],
+          yday: null,
+          ydaykbn: '',
+          inday: null,
+          mtax: ''
+          // currency:''
+        }
+        this.frmArr.push(this.createRow(i + 1, hmei));
         // console.log(this.updateRow(i+1,hmei));
-        this.updGds(i,col[0]);
-        i+=1;
+        this.updGds(i, col[0]);
+        i += 1;
       };
     });
-    this.refresh();  
+    this.refresh();
   }
   copyData() {
     this.copyToClipboard = this.objectToArray(this.displayedColumns);
     this.frmArr.getRawValue().forEach(row => {
-      if(row.gcode !=='' ){
+      if (row.gcode !== '') {
         this.copyToClipboard += this.objectToArray(row);
       }
     })
-    this.toastr.info('クリップボードにコピーしました');
+    this.usrsrv.toastInf('クリップボードにコピーしました');
   }
-  get_hatmei(dno){
-    let hatmei=[];
+  get_hatmei(dno) {
+    let hatmei = [];
     this.frmArr.controls
       .forEach(control => {
         hatmei.push({
-          id:this.usrsrv.compid,
-          denno:dno,
-          line:this.usrsrv.editFrmval(control,'line'),
-          day:this.usrsrv.editFrmval(control,'day'),
-          inday:this.usrsrv.editFrmval(control,'inday'),
-          gcode:this.usrsrv.editFrmval(control,'gcode'),
-          gtext:this.usrsrv.editFrmval(control,'gtext'),
-          suu:this.usrsrv.editFrmval(control,'suu'),
-          genka:this.usrsrv.editFrmval(control,'genka'),
-          money:this.usrsrv.editFrmval(control,'money'),
-          taxrate:this.usrsrv.editFrmval(control,'taxrate'),
+          id: this.usrsrv.compid,
+          denno: dno,
+          line: this.usrsrv.editFrmval(control, 'line'),
+          day: this.usrsrv.editFrmday(control, 'day'),
+          inday: this.usrsrv.editFrmval(control, 'inday'),
+          gcode: this.usrsrv.editFrmval(control, 'gcode'),
+          gtext: this.usrsrv.editFrmval(control, 'gtext'),
+          suu: this.usrsrv.editFrmval(control, 'suu'),
+          genka: this.usrsrv.editFrmval(control, 'genka'),
+          money: this.usrsrv.editFrmval(control, 'money'),
+          taxrate: this.usrsrv.editFrmval(control, 'taxrate'),
           // unit:this.usrsrv.editFrmval(control,'unit'),
-          mbiko:this.usrsrv.editFrmval(control,'mbiko'),
-          spec:this.usrsrv.editFrmval(control,'spec'),
-          jdenno:this.usrsrv.editFrmval(control,'jdenno'),
-          jline:this.usrsrv.editFrmval(control,'jline'),
-          yday:this.usrsrv.editFrmval(control,'yday'),
-          ydaykbn:this.usrsrv.editFrmval(control,'ydaykbn'),
-          mtax:this.usrsrv.editFrmval(control,'mtax')
+          mbiko: this.usrsrv.editFrmval(control, 'mbiko'),
+          spec: this.usrsrv.editFrmval(control, 'spec'),
+          jdenno: this.usrsrv.editFrmval(control, 'jdenno'),
+          jline: this.usrsrv.editFrmval(control, 'jline'),
+          yday: this.usrsrv.editFrmday(control, 'yday'),
+          ydaykbn: this.usrsrv.editFrmval(control, 'ydaykbn'),
+          mtax: this.usrsrv.editFrmval(control, 'mtax')
         });
       });
-      return hatmei;
+    return hatmei;
   }
   objectToArray(obj: object): string {
     var result = Object.keys(obj).map((key: keyof typeof obj) => {
@@ -354,31 +354,31 @@ export class HmeitblComponent implements OnInit {
   }
   refresh(): void {
     this.dataSource.paginator = this.paginator;
-    this.dataSource.data =  this.frmArr.controls;
+    this.dataSource.data = this.frmArr.controls;
   }
 
-  set_hatmei(){
+  set_hatmei() {
     this.frmArr.clear();
-    let i:number=0;
-    // console.log(this.hmisrv.hatmei);
+    let i: number = 0;
+    console.log(this.hmisrv.hatmei);
     this.hmisrv.hatmei.forEach(e => {
-      this.frmArr.push(this.createRow(i+1,e));
-      i+=1;
+      this.frmArr.push(this.createRow(i + 1, e));
+      i += 1;
     });
     this.refresh();
   }
 
-  add_newrow(i:number){
-    
+  add_newrow(i: number) {
+
     this.gcdInps.changes.pipe(take(1)).subscribe({
       next: changes => {
         changes.last.nativeElement.focus()
         // console.log(changes.last);
-        }
+      }
     })
     // console.log(i,this.frmArr.length);
-    if (i+1 == this.frmArr.length){
-      this.frmArr.push(this.createRow(i+2));
+    if (i + 1 == this.frmArr.length) {
+      this.frmArr.push(this.createRow(i + 2));
     }
     this.refresh();
     // console.log(this.gcdInps);
@@ -386,10 +386,10 @@ export class HmeitblComponent implements OnInit {
     // ((this.frmArr.at(i+1) as FormGroup).controls['gcode']as any).nativeElement = this.elementRef.nativeElement;
     // ((this.frmArr.at(i+1) as FormGroup).controls['gcode']as any).nativeElement.focus();
   }
-  getIdx(index : number)    {
-    if(this.paginator){
+  getIdx(index: number) {
+    if (this.paginator) {
       return index + this.paginator.pageSize * this.paginator.pageIndex;
-    } else{
+    } else {
       return index;
     }
     // console.log(index);

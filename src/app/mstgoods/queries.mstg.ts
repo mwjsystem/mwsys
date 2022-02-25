@@ -47,6 +47,7 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
       weight
       lot
       vgcode
+      hgcode
       msgtankas(limit:1,order_by: {day: desc}) {
         day
         tanka1
@@ -69,6 +70,7 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
         msgoods{
           gtext
           unit
+          gskbn
         }
       }
     }
@@ -114,7 +116,8 @@ mutation upd_ggroup($id: smallint!, $grpcd: String!,$_set: msggroup_set_input!,$
     ordering,
     koguchi,
     lot,
-    vgcode
+    vgcode,
+    hgcode
     ]}) {
     affected_rows
   }

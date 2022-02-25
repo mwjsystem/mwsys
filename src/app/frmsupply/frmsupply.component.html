@@ -3,7 +3,7 @@
     <button mat-button (click)="modeToCre()" *ngIf="mode==3">
       <mat-icon>add_box</mat-icon>新規
     </button>
-    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.denno">
+    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && denno">
       <mat-icon>edit</mat-icon>編集
     </button>
     <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
@@ -44,14 +44,14 @@
       <mat-card-title>
         {{mode|modetxt}}基本情報
       </mat-card-title>
-      <mat-form-field>
+      <!-- <mat-form-field>
         <mat-label>発注伝票ステータス</mat-label>
         <mat-select [value]="form.getRawValue().hdstatus" disabled>
           <mat-option *ngFor="let sval of bunsrv.kbn.hdstatus" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
         </mat-select>
-      </mat-form-field>
+      </mat-form-field> -->
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
     <mat-card-content fxLayout="column">

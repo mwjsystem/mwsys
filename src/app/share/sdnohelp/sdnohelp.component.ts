@@ -11,173 +11,136 @@ import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { StaffService } from './../../services/staff.service';
 import { BunruiService } from './../../services/bunrui.service';
-import { MembsService } from './../../services/membs.service';
-import { McdhelpComponent } from './../mcdhelp/mcdhelp.component';
+import { VendsService } from './../../services/vends.service';
+import { VcdhelpComponent } from './../vcdhelp/vcdhelp.component';
+import { HdnohelpComponent } from './../hdnohelp/hdnohelp.component';
 
-
-interface Jyuden {
+interface Siiden {
   denno: number;
-  day: Date;
-  yday: Date;
-  sday: Date;
-  uday: Date;
-  nday: Date;
-  mcode: string;
-  scde: string;
-  ncode: string;
-  nadr: number;
+  inday: Date;
+  vcode: string;
+  hdenno: number;
   scode: string;
   tcode: number;
-  tcode1: number;
-  jdstatus: string;
-  jdshsta: string;
-  keep: string;
-  cusden: string;
-  okurino: string;
-  pcode: string;
+  // del: boolean;
+  updated_at: Date;
+  updated_by: string;
+  gcode: string;
 }
 
 @Component({
-  selector: 'app-jdnohelp',
-  templateUrl: './jdnohelp.component.html',
-  styleUrls: ['./jdnohelp.component.scss']
+  selector: 'app-sdnohelp',
+  templateUrl: './sdnohelp.component.html',
+  styleUrls: ['./sdnohelp.component.scss']
 })
-export class JdnohelpComponent implements OnInit {
+export class SdnohelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-
-  dataSource: MatTableDataSource<Jyuden>;
-  subject = new Subject<Jyuden[]>();
+  dataSource: MatTableDataSource<Siiden>;
+  subject = new Subject<Siiden[]>();
   observe = this.subject.asObservable();
   displayedColumns = [
     'denno',
-    'day',
-    'yday',
-    'sday',
-    'uday',
-    'nday',
-    'mcode',
-    'nadr',
+    'inday',
+    'vcode',
+    // 'hdenno',
     'scode',
     'tcode',
-    'keep',
-    'okurino',
-    'cusden',
-    // 'skbn',
-    // 'torikbn',
-    'pcode',
-    'tcode1 ',
-    'del',
     'updated_at',
     'updated_by',
-    'scde',
-    'ncode',
     'gcode'
   ];
-  fmcdfld: string = "mcode";
-  fmcd: string = "";
-  fdayfld: string = "day";
+
+  fvcd: string = "";
   fday: Date = new Date();
   ftcd: string = "";
-  // mcdtxt:string="";
-  fcusden: string = "";
-  fjdst: string = "";
-  fjsst: string = "";
+  fsdno: number;
+  fhdno: number;
 
   constructor(public usrsrv: UserService,
     public stfsrv: StaffService,
-    public memsrv: MembsService,
+    public vensrv: VendsService,
     public bunsrv: BunruiService,
     public cdRef: ChangeDetectorRef,
     private apollo: Apollo,
     private overlay: Overlay,
     private dialog: MatDialog,
-    private dialogRef: MatDialogRef<JdnohelpComponent>) {
-    this.dataSource = new MatTableDataSource<Jyuden>();
+    private dialogRef: MatDialogRef<SdnohelpComponent>) {
+    this.dataSource = new MatTableDataSource<Siiden>();
   }
 
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;
     this.fday.setMonth(this.fday.getMonth() - 1);
-    // this.observe.subscribe(value => {
-    //     this.dataSource.paginator = this.paginator;
-    //     this.dataSource= new MatTableDataSource<Jyuden>(value);
-    //     this.overlayRef.detach();
-    //     this.cdRef.detectChanges();
-    // });  
   }
 
-  mcdHelp(): void {
+  vcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width = '100vw';
     dialogConfig.height = '98%';
     dialogConfig.panelClass = 'full-screen-modal';
-    let dialogRef = this.dialog.open(McdhelpComponent, dialogConfig);
+    let dialogRef = this.dialog.open(VcdhelpComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.fmcd = data.mcode;
+          console.log(data);
+          this.fvcd = data.code;
           // this.set_mcdtxt(this.fmcd);
         }
       }
     );
   }
+  hdnoHelp(): void {
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
+    let dialogRef = this.dialog.open(HdnohelpComponent, dialogConfig);
 
-  // set_mcdtxt(mcd:number){
-  //   this.mcdtxt=this.memsrv.get_mcdtxt(mcd);
-  // }
-  get_jyuden(): void {
+    dialogRef.afterClosed().subscribe(
+      data => {
+        if (typeof data != 'undefined') {
+          this.fhdno = data.denno;
+          // this.set_mcdtxt(this.fmcd);
+        }
+      }
+    );
+  }
+  get_siiden(): void {
     let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
-    if (this.fmcd) {
-      let fldobj: { [k: string]: any } = {};
-      fldobj[this.fmcdfld] = { "_eq": this.fmcd };
-      varWh.where._and.push(fldobj);
+    if (this.fvcd) {
+      varWh.where._and.push({ "vcode": { "_eq": this.fvcd } });
     }
     if (this.fday) {
-      let fldobj: { [k: string]: any } = {};
-      fldobj[this.fdayfld] = { "_gt": this.usrsrv.formatDate(this.fday) };
-      varWh.where._and.push(fldobj);
+      varWh.where._and.push({ "inday": { "_gt": this.fday } });
     }
     if (this.ftcd) {
       varWh.where._and.push({ "tcode": { "_eq": this.ftcd } });
     }
-
-    // console.log(varWh);
+    if (this.fsdno > 0) {
+      varWh.where._and.push({ "denno": { "_eq": this.fsdno } });
+    }
+    if (this.fhdno > 0) {
+      varWh.where._and.push({ "trsiimeis": { "sdenno": { "_eq": this.fhdno } } });
+    }
+    // console.log(this.fhdst,varWh);
 
     const GetTran = gql`
-    query get_jyuden($where:trjyuden_bool_exp!) {
-      trjyuden(where:$where, order_by:{denno: asc}) {
+    query get_siiden($where:trsiiden_bool_exp!) {
+      trsiiden(where:$where, order_by:{denno: asc}) {
         denno
-        day
-        yday
-        sday
-        uday
-        nday
-        hday
-        htime
-        hcode
-        ncode
-        nadr
+        inday
         scode
-        tcode
-        keep
-        okurino
-        cusden
-        skbn
-        torikbn
-        mcode
-        scde
-        pcode
-        tcode1 
-        del
+        vcode
+        tcode 
         updated_at
         updated_by
-        trjyumeis(where:{line:{_eq:1}}){ 
+        trsiimeis(where:{line:{_eq:1}}){ 
           gcode
         }
       }
@@ -190,34 +153,32 @@ export class JdnohelpComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        // this.subject.next(data.trjyuden);
-        let srcdata = [];
-        if (data.trjyuden.length == 0) {
+        if (data.trsiiden.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          data.trjyuden.forEach(element => {
-            let { trjyumeis, ...rest } = element;
-            let gcd = { gcode: trjyumeis[0].gcode };
+          let srcdata = [];
+          data.trsiiden.forEach(element => {
+            let { trsiimeis, ...rest } = element;
+            let gcd = { gcode: trsiimeis[0].gcode };
             srcdata.push({ ...rest, ...gcd });
           });
-          this.dataSource = new MatTableDataSource<Jyuden>(srcdata);
+          this.dataSource = new MatTableDataSource<Siiden>(srcdata);
           this.dataSource.paginator = this.paginator;
         }
         this.overlayRef.detach();
         this.cdRef.detectChanges();
-        // this.subject.complete();
       }, (error) => {
-        console.log('error query get_jyuden', error);
+        console.log('error query get_siiden', error);
       });
   }
-  sel_dno(selected: Jyuden) {
-    // console.log("select",selected);
-    // this.vcds=[];
+  sel_dno(selected: Siiden) {
     this.dialogRef.close(selected);
   }
 
   close() {
-    // this.vcds=[];
     this.dialogRef.close();
   }
+
+
+
 }

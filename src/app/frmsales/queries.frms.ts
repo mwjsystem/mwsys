@@ -16,6 +16,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
     ordering
     send
     gskbn
+    hgcode
     msgtankas(limit:1,where: {day: {_lt: $day}}, order_by: {day: desc_nulls_last}) {
       cost
       currency
@@ -32,7 +33,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
       tanka9
       taxrate
     }
-    msgsptnks{
+    msgsptnks(limit:1,where: {day: {_lt: $day}}, order_by: {day: desc_nulls_last}) {
       sptnkbn
       sptanka
     }

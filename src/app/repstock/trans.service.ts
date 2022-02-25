@@ -8,22 +8,22 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
 export class Trans {
-  sday:String;
-  ttype:String;
-  denno:number;
-  line:number;
-  biko:String;
-  tcode:String;
-  yday:String;
-  aitec:number;
-  aiten:String;
-  insuu:number;
-  ousuu:number;
-  zaisu:number;
-  yotei:number;
-  wait:number;
-  constructor(init?:Partial<Trans>) {
-      Object.assign(this, init);
+  sday: String;
+  ttype: String;
+  denno: number;
+  line: number;
+  biko: String;
+  tcode: String;
+  yday: String;
+  aitec: number;
+  aiten: String;
+  insuu: number;
+  ousuu: number;
+  zaisu: number;
+  yotei: number;
+  wait: number;
+  constructor(init?: Partial<Trans>) {
+    Object.assign(this, init);
   }
 }
 
@@ -31,42 +31,42 @@ export class Trans {
   providedIn: 'root'
 })
 export class TransService {
-  public tbldata:Trans[]=[];
-  public flg:number=1;
+  public tbldata: Trans[] = [];
+  public flg: number = 1;
   //コンポーネント間通信用
   subject = new Subject<Trans[]>();
   observe = this.subject.asObservable();
 
   constructor(public usrsrv: UserService,
-              public memsrv: MembsService,
-              public bunsrv: BunruiService, 
-              public stcsrv: StockService,         
-              private apollo: Apollo) {                
-               }
+    public memsrv: MembsService,
+    public bunsrv: BunruiService,
+    public stcsrv: StockService,
+    private apollo: Apollo) {
+  }
 
-  async get_trans(gcd:string,scd:string,day:Date):Promise<Trans[]> {
-    const lcmago=this.usrsrv.getLastMonth(day);
-    // console.log(lcmago);
-    let lcprms1:Promise<Trans[]>=new Promise( resolve => {
-      this.stcsrv.get_stocktrn(gcd,scd,lcmago).then(e =>{
+  async get_trans(gcd: string, scd: string, day: Date): Promise<Trans[]> {
+    const lcmago = this.usrsrv.getLastMonth(day);
+    console.log(lcmago);
+    let lcprms1: Promise<Trans[]> = new Promise(resolve => {
+      this.stcsrv.get_stocktrn(gcd, scd, lcmago).then(e => {
         // console.log(e);
-        let trans:Trans[]=[];  
-          const tran:Trans={
-            sday:this.usrsrv.formatDate(lcmago),
-            ttype:'前残',
-            denno:null,
-            line:null,
-            biko:null,
-            tcode:null,
-            yday:null,
-            aitec:null,
-            aiten:null,
-            insuu:e,
-            ousuu:null,
-            zaisu:e,
-            yotei:null,
-            wait:null
-          };
+        let trans: Trans[] = [];
+        const tran: Trans = {
+          sday: this.usrsrv.formatDate(lcmago),
+          ttype: '前残',
+          denno: null,
+          line: null,
+          biko: null,
+          tcode: null,
+          yday: null,
+          aitec: null,
+          aiten: null,
+          insuu: e,
+          ousuu: null,
+          zaisu: e,
+          yotei: null,
+          wait: null
+        };
         trans.push(tran);
         return resolve(trans);
       })
@@ -178,237 +178,237 @@ export class TransService {
         vcode
         adrname
       }                   
-    }`; 
-    let lcprms2:Promise<Trans[]>= new Promise( resolve => {
+    }`;
+    let lcprms2: Promise<Trans[]> = new Promise(resolve => {
       this.apollo.watchQuery<any>({
-        query: GetTran, 
-          variables: { 
-            id : this.usrsrv.compid,
-            gcd: gcd,
-            scd: scd,
-            day: lcmago,
-            today:new Date()
+        query: GetTran,
+        variables: {
+          id: this.usrsrv.compid,
+          gcd: gcd,
+          scd: scd,
+          day: lcmago,
+          today: new Date()
         },
       })
-      .valueChanges
-      .subscribe(({ data }) => {
-        // console.log('出荷',data);
-        let trans:Trans[]=[];
-        data.shukka.forEach(e => {
-          const tran:Trans={
-            sday:e.sday,
-            ttype:'出荷',
-            denno:e.denno,
-            line:e.line,
-            biko:e.mbikou,
-            tcode:e.trjyuden.tcode,
-            yday:null,
-            aitec:e.trjyuden.mcode,
-            aiten:e.trjyuden.msmember.sei + (e.trjyuden.msmember.mei ?? ""),
-            insuu:null,
-            ousuu:e.suu,
-            zaisu:null,
-            yotei:null,
-            wait:null
-          };
-          trans.push(tran);
-        });
-        data.siire.forEach(e => {
-          const tran:Trans={
-            sday:e.inday,
-            ttype:'仕入',
-            denno:e.denno,
-            line:e.line,
-            biko:e.mbiko,
-            tcode:e.trsiiden.tcode,
-            yday:null,
-            aitec:e.trsiiden.vcode,
-            aiten:e.trsiiden.msvendor.adrname,
-            insuu:e.suu,
-            ousuu:null,
-            zaisu:null,
-            yotei:null,
-            wait:null
-          };
-          trans.push(tran);
-        });        
-        data.movin.forEach(e => {
-          const tran:Trans={
-            sday:e.day,
-            ttype:'移動入庫',
-            denno:e.denno,
-            line:e.line,
-            biko:e.mbiko,
-            tcode:e.trmovsub.tcode,
-            yday:null,
-            aitec:e.outcode,
-            aiten:e.msstoreout.name,
-            insuu:e.suu,
-            ousuu:null,
-            zaisu:null,
-            yotei:null,
-            wait:null
-          };
-          trans.push(tran);
-        }); 
-        data.movout.forEach(e => {
-          const tran:Trans={
-            sday:e.day,
-            ttype:'移動入庫',
-            denno:e.denno,
-            line:e.line,
-            biko:e.mbiko,
-            tcode:e.trmovsub.tcode,
-            yday:null,
-            aitec:e.incode,
-            aiten:e.msstorein.name,
-            insuu:null,
-            ousuu:e.suu,
-            zaisu:null,
-            yotei:null,
-            wait:null
-          };
-          trans.push(tran);
-        }); 
-        data.tenmoto.forEach(e => {
-          const tran:Trans={
-            sday:e.day,
-            ttype:'展開元',
-            denno:e.denno,
-            line:e.line,
-            biko:e.memo,
-            tcode:e.tcode,
-            yday:null,
-            aitec:null,
-            aiten:null,
-            insuu:null,
-            ousuu:e.suu,
-            zaisu:null,
-            yotei:null,
-            wait:null
-          };
-          trans.push(tran);
-        }); 
-        data.tensaki.forEach(e => {
-          const tran:Trans={
-            sday:e.day,
-            ttype:'展開先',
-            denno:e.denno,
-            line:e.line,
-            biko:e.memo,
-            tcode:e.tcode,
-            yday:null,
-            aitec:null,
-            aiten:null,
-            insuu:e.suu,
-            ousuu:null,
-            zaisu:null,
-            yotei:null,
-            wait:null
-          };
-          trans.push(tran);
-        });
-        // console.log(data);
-        data.hikat.forEach(e => {
-          // console.log(e.sday);
-          const tran:Trans={
-            sday:e.sday,
-            ttype:this.bunsrv.get_name(e.spec,'jmeikbn'),
-            denno:e.denno,
-            line:e.line,
-            biko:e.mbikou,
-            tcode:e.trjyuden.tcode,
-            yday:e.trjyuden.yday,
-            aitec:e.trjyuden.mcode,
-            aiten:e.trjyuden.msmember.sei + (e.trjyuden.msmember.mei ?? ""),
-            insuu:null,
-            ousuu:e.suu,
-            zaisu:null,
-            yotei:null,
-            wait:null
-          };  
-          trans.push(tran);
-        });
-        data.hatzn.forEach(e => {
-          // console.log(e.sday);
-          const tran:Trans={
-            sday:null,
-            ttype:'入荷予定',
-            denno:e.denno,
-            line:e.line,
-            biko:e.mbikou,
-            tcode:e.tcode,
-            yday:e.yday,
-            aitec:e.vcode,
-            aiten:e.adrname,
-            insuu:null,
-            ousuu:null,
-            zaisu:null,
-            yotei:e.hatzn,
-            wait:null
-          };
-          trans.push(tran);
-        });
-        return resolve(trans);
-      },(error) => {
-        console.log('error query get_jyumei', error);
-      });
-    })
-      return new Promise( resolve => {
-        Promise.all([lcprms1,lcprms2]).then( result => {
-          let trans:Trans[]=[];
-          result.forEach(element => {
-            // console.log('Promise.all',element);
-            trans=trans.concat(element);
+        .valueChanges
+        .subscribe(({ data }) => {
+          // console.log('出荷',data);
+          let trans: Trans[] = [];
+          data.shukka.forEach(e => {
+            const tran: Trans = {
+              sday: e.sday,
+              ttype: '出荷',
+              denno: e.denno,
+              line: e.line,
+              biko: e.mbikou,
+              tcode: e.trjyuden.tcode,
+              yday: null,
+              aitec: e.trjyuden.mcode,
+              aiten: e.trjyuden.msmember.sei + (e.trjyuden.msmember.mei ?? ""),
+              insuu: null,
+              ousuu: e.suu,
+              zaisu: null,
+              yotei: null,
+              wait: null
+            };
+            trans.push(tran);
           });
-          return resolve(this.sort_tblData(trans));
-        })
+          data.siire.forEach(e => {
+            const tran: Trans = {
+              sday: e.yday,
+              ttype: '仕入',
+              denno: e.denno,
+              line: e.line,
+              biko: e.mbiko,
+              tcode: e.trsiiden.tcode,
+              yday: null,
+              aitec: e.trsiiden.vcode,
+              aiten: e.trsiiden.msvendor.adrname,
+              insuu: e.suu,
+              ousuu: null,
+              zaisu: null,
+              yotei: null,
+              wait: null
+            };
+            trans.push(tran);
+          });
+          data.movin.forEach(e => {
+            const tran: Trans = {
+              sday: e.day,
+              ttype: '移動入庫',
+              denno: e.denno,
+              line: e.line,
+              biko: e.mbiko,
+              tcode: e.trmovsub.tcode,
+              yday: null,
+              aitec: e.outcode,
+              aiten: e.msstoreout.name,
+              insuu: e.suu,
+              ousuu: null,
+              zaisu: null,
+              yotei: null,
+              wait: null
+            };
+            trans.push(tran);
+          });
+          data.movout.forEach(e => {
+            const tran: Trans = {
+              sday: e.day,
+              ttype: '移動入庫',
+              denno: e.denno,
+              line: e.line,
+              biko: e.mbiko,
+              tcode: e.trmovsub.tcode,
+              yday: null,
+              aitec: e.incode,
+              aiten: e.msstorein.name,
+              insuu: null,
+              ousuu: e.suu,
+              zaisu: null,
+              yotei: null,
+              wait: null
+            };
+            trans.push(tran);
+          });
+          data.tenmoto.forEach(e => {
+            const tran: Trans = {
+              sday: e.day,
+              ttype: '展開元',
+              denno: e.denno,
+              line: e.line,
+              biko: e.memo,
+              tcode: e.tcode,
+              yday: null,
+              aitec: null,
+              aiten: null,
+              insuu: null,
+              ousuu: e.suu,
+              zaisu: null,
+              yotei: null,
+              wait: null
+            };
+            trans.push(tran);
+          });
+          data.tensaki.forEach(e => {
+            const tran: Trans = {
+              sday: e.day,
+              ttype: '展開先',
+              denno: e.denno,
+              line: e.line,
+              biko: e.memo,
+              tcode: e.tcode,
+              yday: null,
+              aitec: null,
+              aiten: null,
+              insuu: e.suu,
+              ousuu: null,
+              zaisu: null,
+              yotei: null,
+              wait: null
+            };
+            trans.push(tran);
+          });
+          // console.log(data);
+          data.hikat.forEach(e => {
+            // console.log(e.sday);
+            const tran: Trans = {
+              sday: e.sday,
+              ttype: this.bunsrv.get_name(e.spec, 'jmeikbn'),
+              denno: e.denno,
+              line: e.line,
+              biko: e.mbikou,
+              tcode: e.trjyuden.tcode,
+              yday: e.trjyuden.yday,
+              aitec: e.trjyuden.mcode,
+              aiten: e.trjyuden.msmember.sei + (e.trjyuden.msmember.mei ?? ""),
+              insuu: null,
+              ousuu: e.suu,
+              zaisu: null,
+              yotei: null,
+              wait: null
+            };
+            trans.push(tran);
+          });
+          data.hatzn.forEach(e => {
+            // console.log(e.sday);
+            const tran: Trans = {
+              sday: null,
+              ttype: '入荷予定',
+              denno: e.denno,
+              line: e.line,
+              biko: e.mbikou,
+              tcode: e.tcode,
+              yday: e.yday,
+              aitec: e.vcode,
+              aiten: e.adrname,
+              insuu: null,
+              ousuu: null,
+              zaisu: null,
+              yotei: e.hatzn,
+              wait: null
+            };
+            trans.push(tran);
+          });
+          return resolve(trans);
+        }, (error) => {
+          console.log('error query get_jyumei', error);
+        });
+    })
+    return new Promise(resolve => {
+      Promise.all([lcprms1, lcprms2]).then(result => {
+        let trans: Trans[] = [];
+        result.forEach(element => {
+          // console.log('Promise.all',element);
+          trans = trans.concat(element);
+        });
+        return resolve(this.sort_tblData(trans));
       })
+    })
   }
 
   sort_tblData(tbldata): Trans[] {
     // return new Promise( resolve => {
-      tbldata.sort(function(a, b) {
+    tbldata.sort(function (a, b) {
+      if (a == null && b == null) return 0;
+      if (a == null) return 1;
+      if (b == null) return -1;
+      if (a.sday > b.sday) {
+        return 1;
+      } else {
+        return -1;
+      }
+      if (a.yday > b.yday) {
+        return 1;
+      } else {
+        return -1;
+      }
+    })
+    let wGenz: number = 0;
+    for (let i = 0; i < tbldata.length; i++) {
+      if (tbldata[i].sday != null) {
+        wGenz += tbldata[i].insuu - tbldata[i].ousuu;
+        tbldata[i].zaisu = wGenz;
+      }
+    }
+    if (this.flg == -1) {
+      tbldata.sort(function (a, b) {
         if (a == null && b == null) return 0;
         if (a == null) return 1;
         if (b == null) return -1;
-        if (a.sday > b.sday) {
+        if (a.sday < b.sday) {
           return 1;
         } else {
           return -1;
-        } 
+        }
         if (a.yday > b.yday) {
           return 1;
         } else {
           return -1;
-        }         
-      })
-      let wGenz:number=0;
-      for (let i=0; i < tbldata.length; i++ ){
-        if (tbldata[i].sday != null){
-          wGenz += tbldata[i].insuu - tbldata[i].ousuu;
-          tbldata[i].zaisu = wGenz;
         }
-      }
-      if (this.flg==-1) {
-          tbldata.sort(function(a, b) {
-          if (a == null && b == null) return 0;
-          if (a == null) return 1;
-          if (b == null) return -1;
-          if (a.sday < b.sday) {
-            return 1;
-          } else {
-            return -1;
-          } 
-          if (a.yday > b.yday) {
-            return 1;
-          } else {
-            return -1;
-          }
-        })
-      }
-      return tbldata;
-      // return resolve(tbldata);
+      })
+    }
+    return tbldata;
+    // return resolve(tbldata);
     // })
-  } 
+  }
 }

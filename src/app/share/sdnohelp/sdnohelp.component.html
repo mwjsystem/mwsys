@@ -1,5 +1,5 @@
 <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between" style="margin-bottom:10px;">
-    <h3 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">発注伝票検索</h3>
+    <h3 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">仕入伝票検索</h3>
     <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"
         [pageSizeOptions]="[20, 50, 100, 250, 1000]">
     </mat-paginator>
@@ -8,7 +8,7 @@
 <mat-dialog-content>
     <div class="mat-elevation-z8">
         <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;width:100%">
-            <button class="mat-raised-button" (click)="get_hatden()">検索</button>
+            <button class="mat-raised-button" (click)="get_siiden()">検索</button>
             <mat-form-field style="width:7em;">
                 <mat-label>仕入先</mat-label>
                 <input matInput [(ngModel)]="fvcd" [ngModelOptions]="{standalone: true}">
@@ -18,7 +18,7 @@
             </mat-form-field>
             <span class="nmtxt">{{fvcd | vcdtxt}}</span>
             <mat-form-field style="width:7em;">
-                <mat-label>発注日</mat-label>
+                <mat-label>入荷日</mat-label>
                 <input matInput [(ngModel)]="fday" [matDatepicker]="picker1" [ngModelOptions]="{standalone: true}">
                 <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
                 <mat-datepicker #picker1></mat-datepicker>
@@ -32,35 +32,16 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-            <!-- <mat-form-field style="width:20em;">
-                <mat-label>発注伝票ｽﾃｰﾀｽ</mat-label>
-                <mat-select [(ngModel)]="fhdst" [ngModelOptions]="{standalone: true}" multiple>
-                    <mat-option *ngFor="let sval of bunsrv.kbn.hdstatus" [value]="sval.value">
-                        {{sval.viewval}}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field> -->
         </mat-toolbar>
         <table mat-table [dataSource]="dataSource" aria-label="Elements">
             <ng-container matColumnDef="denno">
                 <th mat-header-cell *matHeaderCellDef>伝票番号</th>
                 <td mat-cell *matCellDef="let row">{{row.denno}}</td>
             </ng-container>
-            <ng-container matColumnDef="day">
-                <th mat-header-cell *matHeaderCellDef>発注日</th>
-                <td mat-cell *matCellDef="let row">{{row.day}}</td>
+            <ng-container matColumnDef="inday">
+                <th mat-header-cell *matHeaderCellDef>入荷日</th>
+                <td mat-cell *matCellDef="let row">{{row.inday}}</td>
             </ng-container>
-            <!-- <ng-container matColumnDef="hdstatus">
-                <th mat-header-cell *matHeaderCellDef>ステータス</th>
-                <td mat-cell *matCellDef="let row">
-                    {{bunsrv.get_name(row.hdstatus,'hdstatus') | async}}
-            <mat-select [value]="row.hdstatus" class="noArrow">
-                <mat-option *ngFor="let sval of bunsrv.kbn.hdstatus" [value]="sval.value">
-                    {{sval.viewval}}
-                </mat-option>
-            </mat-select>
-            </td>
-            </ng-container> -->
             <ng-container matColumnDef="vcode">
                 <th mat-header-cell *matHeaderCellDef>仕入先</th>
                 <td mat-cell *matCellDef="let row">{{row.vcode|vcdtxt}}</td>

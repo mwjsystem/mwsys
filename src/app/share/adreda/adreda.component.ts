@@ -15,43 +15,43 @@ import { AddressComponent } from './../address/address.component';
   styleUrls: ['./adreda.component.scss']
 })
 export class AdredaComponent implements OnInit, AfterViewInit {
-  @ViewChild( AddressComponent, {static: false} )
-    private child: AddressComponent;
-  mcode: string="";
-  mode:number=3;
+  @ViewChild(AddressComponent, { static: false })
+  private child: AddressComponent;
+  mcode: string = "";
+  mode: number = 3;
   form: FormGroup;
-  eda:number|string;
-  edaOld:number;
-  flg:boolean;
+  eda: number | string;
+  edaOld: number;
+  flg: boolean;
   constructor(private fb: FormBuilder,
-              public edasrv: EdaService,
-              private dialogRef: MatDialogRef<AdredaComponent>,
-              @Inject(MAT_DIALOG_DATA) data,
-              private dialog: MatDialog,
-              private cdRef: ChangeDetectorRef,
-              private usrsrv: UserService,
-              private apollo: Apollo) { 
-                this.mcode=data.mcode;
-                this.mode =data.mode;
-                this.eda =data.eda;
-                this.flg =data.flg;
-              }
+    public edasrv: EdaService,
+    private dialogRef: MatDialogRef<AdredaComponent>,
+    @Inject(MAT_DIALOG_DATA) data,
+    private dialog: MatDialog,
+    private cdRef: ChangeDetectorRef,
+    private usrsrv: UserService,
+    private apollo: Apollo) {
+    this.mcode = data.mcode;
+    this.mode = data.mode;
+    this.eda = data.eda;
+    this.flg = data.flg;
+  }
 
   ngOnInit(): void {
     this.form = this.fb.group({});
 
   }
 
-  ngAfterViewInit(): void{
-    let i:number = this.edasrv.adrs.findIndex(obj => obj.eda > 1);
-    
+  ngAfterViewInit(): void {
+    let i: number = this.edasrv.adrs.findIndex(obj => obj.eda > 1);
+
     // console.log(i);
-    if(i > -1 && ( this.eda == null || this.eda =='' ) ){
-      this.eda=this.edasrv.adrs[i].eda;
-    } else if ( this.eda == null ) {
+    if (i > -1 && (this.eda == null || this.eda == '')) {
+      this.eda = this.edasrv.adrs[i].eda;
+    } else if (this.eda == null) {
       this.form.reset();
       // this.cdRef.detectChanges();
-    } 
+    }
     // console.log(this.eda);
     this.refresh();
   }
@@ -64,15 +64,17 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     this.dialogRef.close(this.eda);
   }
 
-  modeToCre():void {
-    this.mode=1;
+  modeToCre(): void {
+    this.mode = 1;
     this.form.reset();
     this.form.enable();
-    this.edaOld=+this.eda;
-    this.eda="新規登録";
-    const bikou={nbikou:this.edasrv.adrs[0].nbikou,
-                 sbikou:this.edasrv.adrs[0].sbikou,
-                 obikou:this.edasrv.adrs[0].obikou};
+    this.edaOld = +this.eda;
+    this.eda = "新規登録";
+    const bikou = {
+      nbikou: this.edasrv.adrs[0].nbikou,
+      sbikou: this.edasrv.adrs[0].sbikou,
+      obikou: this.edasrv.adrs[0].obikou
+    };
     this.form.get('addr').patchValue(bikou);
 
     // let tmp=this.edasrv.adrs[this.edasrv.adrs.length-1].eda;
@@ -83,52 +85,52 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     // }
   }
 
-  modeToUpd():void {
-    this.mode=2;
+  modeToUpd(): void {
+    this.mode = 2;
     this.form.enable();
   }
 
-  save():void {
-    this.child.saveMadr(this.edasrv.mcode,this.eda,this.mode).subscribe(neweda =>{
-      this.eda=neweda;
-      this.mode=3;
+  save(): void {
+    this.child.saveMadr(this.edasrv.mcode, this.eda, this.mode).subscribe(neweda => {
+      this.eda = neweda;
+      this.mode = 3;
       this.form.disable();
       this.form.markAsPristine();
     });
   }
-  cancel():void {
-    if(this.mode==1){
-      this.eda=this.edaOld;
+  cancel(): void {
+    if (this.mode == 1) {
+      this.eda = this.edaOld;
     }
-    this.mode=3;
+    this.mode = 3;
     this.form.disable();
   }
 
-  setNext(){
-    let i:number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
-    if(i > -1 && i < this.edasrv.adrs.length - 1){
-      this.eda = this.edasrv.adrs[i+1].eda;
+  setNext() {
+    let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
+    if (i > -1 && i < this.edasrv.adrs.length - 1) {
+      this.eda = this.edasrv.adrs[i + 1].eda;
     }
     this.refresh();
   }
 
-  setPrev(){
-    let i:number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
-    if(i > 0 && this.edasrv.adrs[i].eda > 10){
-      this.eda = this.edasrv.adrs[i-1].eda;
+  setPrev() {
+    let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
+    if (i > 0 && this.edasrv.adrs[i].eda > 10) {
+      this.eda = this.edasrv.adrs[i - 1].eda;
     }
     this.refresh();
   }
 
-  refresh():void {
-    let i:number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
+  refresh(): void {
+    let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
     // console.log(i,this.eda);
-    if(i > -1 ){
-      let adrs:mwI.Adrs=this.edasrv.adrs[i];
+    if (i > -1) {
+      let adrs: mwI.Adrs = this.edasrv.adrs[i];
       // console.log(adrs,this.form.get('addr'));
       this.form.get('addr').patchValue(adrs);
     }
-    if(this.mode==3){
+    if (this.mode == 3) {
       this.form.disable();
     } else {
       this.form.enable();
@@ -140,13 +142,13 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     let dialogRef = this.dialog.open(EdahelpComponent, dialogConfig);
-    
+
     dialogRef.afterClosed().subscribe(
-      data=>{
-          if(typeof data != 'undefined'){
-            this.eda = data.eda;
-          }
-          this.refresh();
+      data => {
+        if (typeof data != 'undefined') {
+          this.eda = data.eda;
+        }
+        this.refresh();
       }
     );
   }
@@ -156,14 +158,14 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     this.refresh();
   }
 
-  getInvalid():string{
-    let tooltip:string="";
-    const ctrls=(this.form.controls['addr'] as FormGroup).controls;
+  getInvalid(): string {
+    let tooltip: string = "";
+    const ctrls = (this.form.controls['addr'] as FormGroup).controls;
     // console.log('addr',ctrls);
-  　for (const name in ctrls){
-      if(ctrls[name].invalid){
+    for (const name in ctrls) {
+      if (ctrls[name].invalid) {
         // console.log('addr',name);
-        tooltip += this.usrsrv.getColtxt('msmadr',name) + '⇒' + this.usrsrv.getValiderr(ctrls[name].errors) + '\n' ;
+        tooltip += this.usrsrv.getColtxt('msmadr', name) + '⇒' + this.usrsrv.getValiderr(ctrls[name].errors) + '\n';
         // invalid.push(name + '_' + ctrls1[name].invalid);
       }
     }

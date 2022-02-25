@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: 'mstmember', loadChildren: () => import('./mstmember/mstmember.module').then(m => m.MstmemberModule),  canActivate: [AuthGuard] },
   { path: 'frmsales', loadChildren: () => import('./frmsales/frmsales.module').then(m => m.FrmsalesModule),  canActivate: [AuthGuard] },
   { path: 'frmsupply', loadChildren: () => import('./frmsupply/frmsupply.module').then(m => m.FrmsupplyModule),  canActivate: [AuthGuard] },
+  { path: 'frmsiire', loadChildren: () => import('./frmsiire/frmsiire.module').then(m => m.FrmsiireModule),  canActivate: [AuthGuard] },
   { path: 'mstgoods', loadChildren: () => import('./mstgoods/mstgoods.module').then(m => m.MstgoodsModule),  canActivate: [AuthGuard] },
   { path: 'frmkeep', loadChildren: () => import('./frmkeep/frmkeep.module').then(m => m.FrmkeepModule),  canActivate: [AuthGuard] },
   { path: 'frmtreat', loadChildren: () => import('./frmtreat/frmtreat.module').then(m => m.FrmtreatModule),  canActivate: [AuthGuard] },

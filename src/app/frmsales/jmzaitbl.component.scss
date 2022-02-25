@@ -1,0 +1,13 @@
+.mat-elevation-z8 {
+    margin-bottom: 10px;
+}
+.i_num {
+    text-align: right;
+    margin:0px;
+}
+.mat-cell, .mat-footer-cell, .mat-header-cell{
+    padding: 5px;
+}
+::ng-deep td .mat-form-field-infix {
+    border: none;
+}

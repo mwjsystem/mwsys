@@ -53,7 +53,7 @@
       <mat-card-title>
         {{mode|modetxt}}基本情報
       </mat-card-title>
-      <mat-form-field>
+      <!-- <mat-form-field>
         <mat-label>受注伝票ステータス</mat-label>
         <mat-select [value]="form.value.jdstatus" disabled>
           <mat-option *ngFor="let sval of bunsrv.kbn.jdstatus" [value]="sval.value">
@@ -68,7 +68,7 @@
             {{sval.viewval}}
           </mat-option>
         </mat-select>
-      </mat-form-field>
+      </mat-form-field> -->
       <mat-checkbox formControlName="torikbn">掛請求</mat-checkbox>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>

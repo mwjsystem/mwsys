@@ -8,7 +8,8 @@ declare namespace mwI {
 
   interface Sval {
     value: string;
-    viewval: string;  
+    viewval: string;
+    // dis:boolean;
   }
 
   interface Bunsho {
@@ -202,6 +203,7 @@ declare namespace mwI {
     koguchi:number;
     lot:number;
     vgcode:string;
+    hgcode:string;
     msgzais:Gzai[];
   }
   

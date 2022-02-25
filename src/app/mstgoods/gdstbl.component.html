@@ -56,14 +56,18 @@
           </mat-form-field>
         </td>
       </ng-container>
-      <!-- <ng-container matColumnDef="irisu">
-        <th mat-header-cell *matHeaderCellDef>出荷数</th>
-        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+      <ng-container matColumnDef="pable">
+        <th mat-header-cell *matHeaderCellDef class="i_num">受注可能数</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
-            <input [tabIndex]="hidx + i * mcols + 5" type="number" matInput formControlName="irisu" class="i_num">
+            <button mat-icon-button matPrefix
+              (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],this.scode)">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['pable'] | number" class="i_num" disabled>
           </mat-form-field>
         </td>
-      </ng-container> -->
+      </ng-container>
       <ng-container matColumnDef="unit">
         <th mat-header-cell *matHeaderCellDef>単位</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
@@ -101,7 +105,7 @@
             </mat-select>
             <button mat-flat-button matSuffix (click)="diaGzai(getIdx(i))"
               *ngIf="frmArr.getRawValue()[getIdx(i)]['gskbn']==1"
-              matTooltip="{{getGzai(frmArr.getRawValue()[i]['gcode'])}}" matTooltipClass="ttips">内訳</button>
+              matTooltip="{{getGzai(frmArr.getRawValue()[getIdx(i)]['gcode'])}}" matTooltipClass="ttips">内訳</button>
           </mat-form-field>
         </td>
       </ng-container>
@@ -211,10 +215,35 @@
           </mat-form-field>
         </td>
       </ng-container>
+      <ng-container matColumnDef="hgcode">
+        <th mat-header-cell *matHeaderCellDef>加工前品番</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field>
+            <input [tabIndex]="hidx + i * mcols + 14" matInput formControlName="hgcode" maxlength="20"
+              (keydown.f4)="gcdHelp(getIdx(i))">
+            <button mat-icon-button matSuffix (click)="gcdHelp(getIdx(i))" *ngIf="frmArr.enabled">
+              <mat-icon>find_replace</mat-icon>
+            </button>
+          </mat-form-field>
+        </td>
+      </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
       <tr mat-row *matRowDef="let row; let i = index; columns: displayedColumns;"
         [style.background]="setBgcolor(frmArr.getRawValue()[getIdx(i)]['tkbn'])"></tr>
     </table>
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="5px">
+      <div style="padding:10px; " fxLayout="row" fxLayoutAlign="start baseline" fxLayoutGap="10px">
+        <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
+          <mat-label>倉庫</mat-label>
+          <mat-select [(value)]="scode">
+            <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button class="mat-raised-button" (click)="setPables()">の受注可能数を表示する</button>
+      </div>
+      <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+    </div>
   </ng-container>
-  <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
 </div>
