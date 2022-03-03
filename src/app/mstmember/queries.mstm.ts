@@ -104,6 +104,7 @@ query get_member($id: smallint!,$mcode:String!) {
       obikou
       del
       target
+      htitle
     }    
   }
 }`;

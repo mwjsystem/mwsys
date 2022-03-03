@@ -61,7 +61,8 @@ export class JmeitblComponent implements OnInit {
     'mtax',
     'tgenka',
     'taxmoney',
-    'taxrate'];
+    'taxrate',
+    'currency'];
 
   constructor(private cdRef: ChangeDetectorRef,
     private elementRef: ElementRef,
@@ -370,6 +371,7 @@ export class JmeitblComponent implements OnInit {
       gkbn: [jyumei?.gkbn],
       code: [jyumei?.code],
       hgcode: [jyumei?.hgcode],
+      tanano: [jyumei?.tanano],
       msgzais: lcArr,
       trjyumzais: lcAr2
     });
@@ -547,7 +549,7 @@ export class JmeitblComponent implements OnInit {
   }
 
   setPable(i: number, gcd: string, msgzais: any) {
-    // console.log(gcd,i);
+    // console.log(gcd, this.frmArr.controls[i].value.gskbn);
     if (this.frmArr.controls[i].value.gskbn == "0") {
       this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.frmArr.controls[i].value.scode).then(result => {
         // console.log(result);
@@ -648,6 +650,7 @@ export class JmeitblComponent implements OnInit {
           gkbn: null,
           code: null,
           hgcode: null,
+          tanano: null,
           msgzais: [],
           trjyumzais: []
         }
@@ -688,6 +691,7 @@ export class JmeitblComponent implements OnInit {
     this.frmArr.clear();
     this.jmisrv.trzaiko = [];
     let i: number = 0;
+    // console.log(this.jmisrv.jyumei);
     this.jmisrv.jyumei.forEach(e => {
       // console.log(e);
       this.frmArr.push(this.createRow(i + 1, e));

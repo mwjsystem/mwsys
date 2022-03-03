@@ -21,6 +21,7 @@ export class JyumeiService {
   public ntype: number;            //顧客マスタ「納品書タイプ」
   public tntype: number;           //顧客マスタ「直送納品書タイプ」
   public address: string = "";
+  public iaddress: string = "";
   public trzaiko: mwI.Zaiko[] = [];
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
@@ -30,7 +31,6 @@ export class JyumeiService {
       trjyuden_by_pk(denno: $dno, id: $id) {
         denno
         jdstatus
-        jdshsta
         torikbn
         created_at
         created_by
@@ -76,6 +76,7 @@ export class JyumeiService {
         genka
         hgenka
         egenka
+        iadr
         trjyumeis(order_by: {line: asc}) {
           line
           gcode
@@ -96,6 +97,7 @@ export class JyumeiService {
           taxmoney
           taxrate
           gskbn
+          currency
           msgood {
             unit
             max
@@ -103,6 +105,7 @@ export class JyumeiService {
             ordering
             send
             hgcode
+            tanano
             msggroup {
               vcode
               gkbn
@@ -199,7 +202,7 @@ export class JyumeiService {
         inc: { syuk: zai.suu }
       },
     }).subscribe(({ data }) => {
-      console.log(zai, data);
+      // console.log(zai, data);
       if (data.update_trzaiko.affected_rows == 0) {
         this.apollo.mutate<any>({
           mutation: InsertTran,

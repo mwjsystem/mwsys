@@ -24,20 +24,20 @@
     <button mat-button (click)="test(1)" *ngIf="mode!=1">
       <mat-icon>history</mat-icon>操作ログ
     </button>
-    <button mat-button (click)="test(1)" *ngIf="mode!=1">
-      <mat-icon>local_shipping</mat-icon>出荷指示
+    <button mat-button (click)="makeFrmShip(0)" [disabled]="!form.value.sday" *ngIf="mode!=1">
+      <mat-icon matTooltip="出荷日を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
     </button>
     <a id="csv-donwload" data-type="text/csv"></a>
     <button mat-button [matMenuTriggerFor]="papermenu" *ngIf="mode==3">
       <mat-icon>description</mat-icon>帳票
     </button>
     <mat-menu #papermenu="matMenu">
-      <button mat-menu-item (click)="download_csv('KEEP')">見積書</button>
-      <button mat-menu-item (click)="download_csv('FRM-KEEP')">キープ表</button>
-      <button mat-menu-item (click)="download_csv('KEEP')">受注票</button>
-      <button mat-menu-item (click)="download_csv('KEEP')">納品書</button>
-      <button mat-menu-item (click)="download_csv('KEEP')">請求書</button>
-      <button mat-menu-item (click)="download_csv('KEEP')">領収書</button>
+      <button mat-menu-item (click)="makeFrmShip(0)">見積書</button>
+      <button mat-menu-item (click)="makeFrmKeep()">キープ表</button>
+      <!-- <button mat-menu-item (click)="makeFrmShip('KEEP')">受注票</button> -->
+      <button mat-menu-item (click)="makeFrmShip(1)">納品書</button>
+      <button mat-menu-item (click)="makeFrmShip(2)">請求書</button>
+      <button mat-menu-item (click)="makeFrmShip(3)">領収書</button>
     </mat-menu>
 
     <button mat-button><a mat-button
@@ -131,7 +131,7 @@
             <mat-label>枝番</mat-label>
             <input matInput formControlName="nadr" required (change)="changeEda($event.target.value)">
           </mat-form-field>
-          <button mat-button (click)="diaBetsu()" *ngIf="form.value.nsaki=='2'">
+          <button mat-button (click)="diaBetsu('nadr')" *ngIf="form.value.nsaki=='2'">
             <mat-icon>local_shipping</mat-icon>
             <span fxHide fxShow.gt-sm>別納先</span>
           </button>
@@ -403,6 +403,30 @@
         <mat-label>納品先住所</mat-label>
         <textarea matInput [value]="jmisrv.address" matTextareaAutosize disabled></textarea>
       </mat-form-field>
+      <div fxLayout="column">
+        <div fxLayout="row wrap" fxLayoutAlign="start end">
+          <mat-form-field style="width: 7em;">
+            <mat-label>依頼主表示</mat-label>
+            <mat-select formControlName="isaki" (selectionChange)="selIrai($event.value)">
+              <mat-option *ngFor="let sval of iskVal" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field style="width: 3em;" *ngIf="form.value.isaki != ' '">
+            <mat-label>枝番</mat-label>
+            <input matInput formControlName="iadr" (change)="changeIadr($event.target.value)">
+          </mat-form-field>
+          <button mat-button (click)="diaBetsu('iadr')" *ngIf="form.value.isaki=='2'">
+            <mat-icon>local_shipping</mat-icon>
+            <span fxHide fxShow.gt-sm>別納先</span>
+          </button>
+        </div>
+        <mat-form-field>
+          <mat-label>依頼主住所</mat-label>
+          <textarea matInput [value]="jmisrv.iaddress" matTextareaAutosize disabled></textarea>
+        </mat-form-field>
+      </div>
       <qr-code [value]="qrurl" [size]="100" [hidden]="true"></qr-code>
     </div>
   </mat-expansion-panel>

@@ -50,6 +50,14 @@
         <mat-label>住所宛名</mat-label>
         <input tabIndex="111" matInput formControlName="adrname" [required]="this.formName!='addr1'">
     </mat-form-field>
+    <mat-form-field style="width:4em;">
+        <mat-label>敬称</mat-label>
+        <mat-select formControlName="htitle">
+            <mat-option *ngFor="let sval of bunsrv.kbn.htitle" [value]="sval.value">
+                {{sval.viewval}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
     <mat-checkbox formControlName="del">削除済</mat-checkbox>
     <div fxLafxLayout="row wrap" style="width: 100%;">
         <mat-form-field class="txtar">

@@ -61,7 +61,17 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   }
 
   set_eda() {
-    this.dialogRef.close(this.eda);
+    if (this.mode == 3) {
+      this.dialogRef.close(this.eda);
+    } else {
+      this.child.saveMadr(this.edasrv.mcode, this.eda, this.mode).subscribe(neweda => {
+        this.eda = neweda;
+        this.mode = 3;
+        this.form.disable();
+        this.form.markAsPristine();
+        this.dialogRef.close(this.eda);
+      });
+    }
   }
 
   modeToCre(): void {

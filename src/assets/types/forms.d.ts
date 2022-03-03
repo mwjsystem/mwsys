@@ -3,7 +3,7 @@ declare namespace mwI {
     id: number;
     denno: number;
     jdstatus: string;
-    jdshsta: string;
+    // jdshsta: string;
     torikbn: boolean;
     created_at: Date;
     created_by: string;
@@ -50,6 +50,7 @@ declare namespace mwI {
     genka: number;
     hgenka: number;
     egenka: number;
+    iadr: number;
     // keep:string;
     // gtotal:number;
     // souryou:number;
@@ -103,6 +104,7 @@ declare namespace mwI {
     gkbn: string;
     code: string;
     hgcode: string;
+    tanano: string;
     msgzais: Gzai[];
     trjyumzais: Jmzai[];
   }

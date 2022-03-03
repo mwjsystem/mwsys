@@ -49,6 +49,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   gdsttl: number = 0;
   stit: mwI.Stit[] = [];
   nskVal: mwI.Sval[] = [];
+  iskVal: mwI.Sval[] = [];
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -88,7 +89,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.form = this.fb.group({
       jdstatus: new FormControl(''),
-      jdshsta: new FormControl(''),
+      // jdshsta: new FormControl(''),
       torikbn: new FormControl(''),
       mcode: new FormControl(''),
       scde: new FormControl(''),
@@ -131,6 +132,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       genka: new FormControl(''),
       hgenka: new FormControl(''),
       egenka: new FormControl(''),
+      isaki: new FormControl(''),
+      iadr: new FormControl(''),
       mtbl: this.rows
     });
     this.bnssrv.get_bunsho();
@@ -190,10 +193,30 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  download_csv(format: string) {
-    // console.log(this.form.getRawValue());
+  selIrai(value) {
+    if (value == " ") {
+      this.form.get('iadr').reset();
+      this.form.get('iadr').disable();
+      this.changeIadr(null);
+    } else if (value == "2") {
+      // console.log(this.form.get('nadr'));
+      this.form.get('iadr').setValue('');
+      this.form.get('iadr').enable();
+      this.changeIadr(null);
+    } else {
+      this.form.get('iadr').setValue(+value);
+      this.form.get('iadr').disable();
+      this.changeIadr(+value);
+    }
+  }
 
+  makeFrmShip(code: number) {
+    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP' + "_" + this.jmisrv.denno, this.elementRef);
+  }
 
+  makeFrmKeep() {
+
+    const pref: string = this.jmisrv.denno + 'FRM-KEEP';
     let head = this.dwlsrv.pickObj(this.form.getRawValue(), ['yday', 'mcode', 'ncode', 'nadr']);
     const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl, ['line', 'gcode', 'gtext', 'suu', 'unit', 'mbikou', 'spec'])
     head['mcdtxt'] = this.memsrv.get_mcdtxt(this.form.value.mcode);
@@ -202,13 +225,13 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     head['tcdnm1'] = this.stfsrv.get_name(this.form.getRawValue().tcode1);
     head['tcd0'] = this.form.getRawValue().tcode;
     // console.log(this.qrurl);
-    this.dwlsrv.dl_csv(head, this.jmisrv.denno + format + "H.csv");
-    this.dwlsrv.dl_csv(det, this.jmisrv.denno + format + "M.csv");
+    this.dwlsrv.dl_csv(head, pref + "H.csv");
+    this.dwlsrv.dl_csv(det, pref + "M.csv");
 
     const base64 = this.elementRef.nativeElement.querySelector('qr-code > img').src;
-    this.dwlsrv.dl_img(this.jmisrv.denno + format + ".png", base64);
+    this.dwlsrv.dl_img(pref + ".png", base64);
 
-    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + format + "_" + this.jmisrv.denno, this.elementRef);
+    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-KEEP' + "_" + this.jmisrv.denno, this.elementRef);
   }
 
   openOkuri(hcode, value) {
@@ -216,8 +239,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   test(value) {
-    this.usrsrv.toastInf(this.form.value.yday);
-    console.log(this.getInvalid());
+    // this.usrsrv.toastInf(this.form.value.yday);
+    // console.log(this.getInvalid());
+    console.log(this.form.get('iadr').value, this.usrsrv.editFrmval(this.form, 'iadr'));
     // // this.router.navigate(['/mstmember','3',value]);
     // const url = this.router.createUrlTree(['/mstmember','3',value]);
     // window.open(url.toString(),null,'top=100,left=100');
@@ -261,6 +285,13 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               this.form.get('nsaki').setValue("2");
             } else {
               this.form.get('nsaki').setValue(jyuden.nadr.toString());
+            }
+            if (jyuden.iadr == null) {
+              this.form.get('isaki').setValue(" ");
+            } else if (jyuden.iadr > 1) {
+              this.form.get('isaki').setValue("2");
+            } else {
+              this.form.get('isaki').setValue(jyuden.nadr.toString());
             }
             this.form.patchValue(jyuden);
             this.jmisrv.edit_jyumei(jyuden.trjyumeis);
@@ -351,7 +382,19 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       }
     }
   }
-
+  changeIadr(eda) {
+    if (eda !== null) {
+      let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == eda);
+      if (i > -1) {
+        const adr = this.edasrv.adrs[i];
+        this.jmisrv.iaddress = adr.zip + '\n' + adr.region + adr.local + '\n' + adr.street + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
+      } else {
+        this.usrsrv.toastInf("別納品先枝番" + eda + "は登録されていません");
+      }
+    } else {
+      this.jmisrv.iaddress = "";
+    }
+  }
   async setOkrno() {
     let okrno: string = await this.okrsrv.set_okurino(this.form.value.hcode);
     // console.log(okrno);
@@ -411,6 +454,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             }
           }
           this.nskVal.push({ value: "2", viewval: "別納" });
+          this.iskVal = this.nskVal.concat();
+          this.iskVal.unshift({ value: " ", viewval: "通常依頼主" });
           this.changeEda(this.form.value.nadr);
           this.cdRef.detectChanges();
         }
@@ -427,7 +472,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  diaBetsu(): void {
+  diaBetsu(adrnm): void {
     let ncd: string = this.form.value.ncode;
     if (this.checkMcode(ncd)) {
       let dialogConfig = new MatDialogConfig();
@@ -444,8 +489,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         data => {
           // console.log(data);
           if (typeof data != 'undefined' && this.mode != 3) {
-            this.form.get('nadr').setValue(data);
-            this.changeEda(data);
+            this.form.get(adrnm).setValue(data);
+            if (adrnm === 'nadr') {
+              this.changeEda(data);
+            } else {
+              this.changeIadr(data);
+            }
           }
         }
       );
@@ -522,7 +571,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   async save() {
-    // console.log(this.form.get('nadr'));
+    // console.log(this.form.get('iadr'), this.usrsrv.editFrmval(this.form, 'iadr'));
     let jyuden: any = {
       torikbn: Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')),
       updated_at: new Date(),
@@ -567,6 +616,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       genka: this.usrsrv.editFrmval(this.form, 'genka'),
       hgenka: this.usrsrv.editFrmval(this.form, 'hgenka'),
       egenka: this.usrsrv.editFrmval(this.form, 'egenka'),
+      iadr: this.form.get('iadr').value
     }
 
     if (this.mode == 2) {
@@ -574,19 +624,19 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       this.jmeitbl.edit_jyumei(this.jmisrv.denno);
       let jyumei = this.jmisrv.trjyumei;
       let jyumzai = this.jmisrv.trjmzai;
-      // console.log(jyuden, jyumei);
+      // console.log(jyuden);
       this.jmisrv.upd_jyuden(this.jmisrv.denno, { ...jyuden, jdstatus: this.jmisrv.get_jdsta(jyumei) }, jyumei, jyumzai)
         .then(result => {
           this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
           //  zaiko更新処理 (読込時分マイナス)
 
-          console.log(this.jmisrv.trzaiko, jyumei);
+          // console.log(this.jmisrv.trzaiko, jyumei);
           this.jmisrv.trzaiko.forEach(e => {
             this.jmisrv.upd_zaiko(e);
           });
           //  zaiko更新処理 (通常分プラス)
           jyumei.forEach(e => {
-            console.log(e, jyuden);
+            // console.log(e, jyuden);
             if (jyuden.skbn != "1") {
               if (e.gskbn == "0" && e.sday != null) {
                 const lczaiko: mwI.Zaiko = {
