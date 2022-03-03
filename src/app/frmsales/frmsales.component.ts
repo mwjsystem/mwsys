@@ -211,7 +211,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   makeFrmShip(code: number) {
-    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP' + "_" + this.jmisrv.denno, this.elementRef);
+    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
   }
 
   makeFrmKeep() {
@@ -231,7 +231,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     const base64 = this.elementRef.nativeElement.querySelector('qr-code > img').src;
     this.dwlsrv.dl_img(pref + ".png", base64);
 
-    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-KEEP' + "_" + this.jmisrv.denno, this.elementRef);
+    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-KEEP_' + this.jmisrv.denno, this.elementRef);
   }
 
   openOkuri(hcode, value) {
