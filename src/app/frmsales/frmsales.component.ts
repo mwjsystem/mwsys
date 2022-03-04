@@ -210,8 +210,16 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  makeFrmShip(code: number) {
-    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
+  makeFrmShip(typ: string) {
+    this.save().then(() => {
+      if (typ == 'BUNSH') {
+        let i: number = this.bnssrv.bunsho.findIndex(obj => obj.code == this.form.value.bunsho);
+        this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + this.form.value.bunsho + this.bnssrv.bunsho[i].second + 'S', this.elementRef);
+      } else {
+        this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + typ, this.elementRef);
+      }
+    })
+    // this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
   }
 
   makeFrmKeep() {
@@ -474,14 +482,18 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 
   diaBetsu(adrnm): void {
     let ncd: string = this.form.value.ncode;
+    let flg: boolean = false;
+    if (this.mode < 3) {
+      flg = true;
+    }
     if (this.checkMcode(ncd)) {
       let dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
       dialogConfig.data = {
         mcode: ncd + ' ' + this.memsrv.get_mcdtxt(ncd),
-        mode: this.mode,
+        // mode: this.mode,
         eda: this.form.value.nadr,
-        flg: true
+        flg: flg
       };
       // console.log(dialogConfig.data);
       let dialogRef = this.dialog.open(AdredaComponent, dialogConfig);
@@ -489,6 +501,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         data => {
           // console.log(data);
           if (typeof data != 'undefined' && this.mode != 3) {
+
             this.form.get(adrnm).setValue(data);
             if (adrnm === 'nadr') {
               this.changeEda(data);
@@ -570,7 +583,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     return tooltip;
   }
 
-  async save() {
+  async save(): Promise<boolean> {
     // console.log(this.form.get('iadr'), this.usrsrv.editFrmval(this.form, 'iadr'));
     let jyuden: any = {
       torikbn: Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')),
@@ -620,102 +633,112 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     }
 
     if (this.mode == 2) {
-      // let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno); 
-      this.jmeitbl.edit_jyumei(this.jmisrv.denno);
-      let jyumei = this.jmisrv.trjyumei;
-      let jyumzai = this.jmisrv.trjmzai;
-      // console.log(jyuden);
-      this.jmisrv.upd_jyuden(this.jmisrv.denno, { ...jyuden, jdstatus: this.jmisrv.get_jdsta(jyumei) }, jyumei, jyumzai)
-        .then(result => {
-          this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
-          //  zaiko更新処理 (読込時分マイナス)
+      return new Promise(resolve => {
+        // let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno); 
+        this.jmeitbl.edit_jyumei(this.jmisrv.denno);
+        let jyumei = this.jmisrv.trjyumei;
+        let jyumzai = this.jmisrv.trjmzai;
+        // console.log(jyuden);
+        this.jmisrv.upd_jyuden(this.jmisrv.denno, { ...jyuden, jdstatus: this.jmisrv.get_jdsta(jyumei) }, jyumei, jyumzai)
+          .then(result => {
+            this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
+            //  zaiko更新処理 (読込時分マイナス)
 
-          // console.log(this.jmisrv.trzaiko, jyumei);
-          this.jmisrv.trzaiko.forEach(e => {
-            this.jmisrv.upd_zaiko(e);
-          });
-          //  zaiko更新処理 (通常分プラス)
-          jyumei.forEach(e => {
-            // console.log(e, jyuden);
-            if (jyuden.skbn != "1") {
-              if (e.gskbn == "0" && e.sday != null) {
-                const lczaiko: mwI.Zaiko = {
-                  scode: e.scode,
-                  gcode: e.gcode,
-                  day: e.sday,
-                  suu: e.suu
-                }
-                this.jmisrv.upd_zaiko(lczaiko);
-              } else if (e.gskbn == "1" && e.sday != null) {
-                e.msgzais.forEach(zai => {
-                  const lczai: mwI.Zaiko = {
+            // console.log(this.jmisrv.trzaiko, jyumei);
+            this.jmisrv.trzaiko.forEach(e => {
+              this.jmisrv.upd_zaiko(e);
+            });
+            //  zaiko更新処理 (通常分プラス)
+            jyumei.forEach(e => {
+              // console.log(e, jyuden);
+              if (jyuden.skbn != "1") {
+                if (e.gskbn == "0" && e.sday != null) {
+                  const lczaiko: mwI.Zaiko = {
                     scode: e.scode,
-                    gcode: zai.zcode,
+                    gcode: e.gcode,
                     day: e.sday,
-                    suu: e.suu * zai.irisu
+                    suu: e.suu
                   }
-                  this.jmisrv.upd_zaiko(lczai);
-                });
+                  this.jmisrv.upd_zaiko(lczaiko);
+                } else if (e.gskbn == "1" && e.sday != null) {
+                  e.msgzais.forEach(zai => {
+                    const lczai: mwI.Zaiko = {
+                      scode: e.scode,
+                      gcode: zai.zcode,
+                      day: e.sday,
+                      suu: e.suu * zai.irisu
+                    }
+                    this.jmisrv.upd_zaiko(lczai);
+                  });
+                }
               }
-            }
+            });
+            this.form.markAsPristine();
+            this.cancel();
+            return resolve(true);
+          }).catch(error => {
+            this.usrsrv.toastErr('データベースエラー', '受注伝票' + this.jmisrv.denno + 'の変更保存ができませんでした');
+            console.log('error update_jyuen', error);
+            return resolve(false);
           });
-          this.form.markAsPristine();
-          this.cancel();
-        }).catch(error => {
-          this.usrsrv.toastErr('データベースエラー', '受注伝票' + this.jmisrv.denno + 'の変更保存ができませんでした');
-          console.log('error update_jyuen', error);
-        });
-    } else {//新規登録
+      });
+    } else if (this.mode == 1) {//新規登録
       this.jmisrv.denno = await this.jmisrv.get_denno();
-      this.jmeitbl.edit_jyumei(this.jmisrv.denno);
-      const jyumei = this.jmisrv.trjyumei;
-      let jyumzai = this.jmisrv.trjmzai;
-      const trjyuden: mwI.Trjyuden[] = [{
-        ...{
-          id: this.usrsrv.compid,
-          denno: this.jmisrv.denno,
-          created_at: new Date(),
-          created_by: this.usrsrv.staff.code,
-          jdstatus: this.jmisrv.get_jdsta(jyumei)
-        }
-        , ...jyuden,
-      }]
-      // console.log(trjyuden, jyumei);
-      this.jmisrv.ins_jyuden(trjyuden, jyumei, jyumzai)
-        .then(result => {
-          // console.log('insert_trjyu', result);
-          this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'を新規登録しました');
-          //  zaiko更新処理 　新規
-          jyumei.forEach(e => {
-            console.log(e, this.form);
-            if (jyuden.skbn != "1") {
-              if (e.gskbn == "0" && e.sday != null) {
-                const lczaiko: mwI.Zaiko = {
-                  scode: e.scode,
-                  gcode: e.gcode,
-                  day: e.sday,
-                  suu: e.suu
-                }
-                this.jmisrv.upd_zaiko(lczaiko);
-              } else if (e.gskbn == "1" && e.sday != null) {
-                e.msgzais.forEach(zai => {
-                  const lczai: mwI.Zaiko = {
+      return new Promise(resolve => {
+        this.jmeitbl.edit_jyumei(this.jmisrv.denno);
+        const jyumei = this.jmisrv.trjyumei;
+        let jyumzai = this.jmisrv.trjmzai;
+        const trjyuden: mwI.Trjyuden[] = [{
+          ...{
+            id: this.usrsrv.compid,
+            denno: this.jmisrv.denno,
+            created_at: new Date(),
+            created_by: this.usrsrv.staff.code,
+            jdstatus: this.jmisrv.get_jdsta(jyumei)
+          }
+          , ...jyuden,
+        }]
+        // console.log(trjyuden, jyumei);
+        this.jmisrv.ins_jyuden(trjyuden, jyumei, jyumzai)
+          .then(result => {
+            // console.log('insert_trjyu', result);
+            this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'を新規登録しました');
+            //  zaiko更新処理 　新規
+            jyumei.forEach(e => {
+              console.log(e, this.form);
+              if (jyuden.skbn != "1") {
+                if (e.gskbn == "0" && e.sday != null) {
+                  const lczaiko: mwI.Zaiko = {
                     scode: e.scode,
-                    gcode: zai.zcode,
+                    gcode: e.gcode,
                     day: e.sday,
-                    suu: e.suu * zai.irisu
+                    suu: e.suu
                   }
-                  this.jmisrv.upd_zaiko(lczai);
-                });
+                  this.jmisrv.upd_zaiko(lczaiko);
+                } else if (e.gskbn == "1" && e.sday != null) {
+                  e.msgzais.forEach(zai => {
+                    const lczai: mwI.Zaiko = {
+                      scode: e.scode,
+                      gcode: zai.zcode,
+                      day: e.sday,
+                      suu: e.suu * zai.irisu
+                    }
+                    this.jmisrv.upd_zaiko(lczai);
+                  });
+                }
               }
-            }
+            });
+            this.form.markAsPristine();
+            this.cancel();
+            return resolve(true);
+          }).catch(error => {
+            this.usrsrv.toastErr('データベースエラー', '受注伝票の新規登録ができませんでした');
+            console.log('error insert_jyuden', error);
+            return resolve(false);
           });
-          this.form.markAsPristine();
-          this.cancel();
-        }).catch(error => {
-          this.usrsrv.toastErr('データベースエラー', '受注伝票の新規登録ができませんでした');
-          console.log('error insert_jyuden', error);
-        });
+      });
+    } else {//照会
+      return new Promise(resolve => { return resolve(true); })
     }
   }
 

@@ -22,7 +22,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   form: FormGroup;
   eda: number | string;
   edaOld: number;
-  flg: boolean;
+  flg: boolean; //true⇒枝番をセットボタン表示
   constructor(private fb: FormBuilder,
     public edasrv: EdaService,
     private dialogRef: MatDialogRef<AdredaComponent>,
@@ -32,7 +32,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     private usrsrv: UserService,
     private apollo: Apollo) {
     this.mcode = data.mcode;
-    this.mode = data.mode;
+    // this.mode = data.mode;
     this.eda = data.eda;
     this.flg = data.flg;
   }
@@ -64,8 +64,9 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     if (this.mode == 3) {
       this.dialogRef.close(this.eda);
     } else {
-      this.child.saveMadr(this.edasrv.mcode, this.eda, this.mode).subscribe(neweda => {
-        this.eda = neweda;
+      this.child.saveMadr(this.edasrv.mcode, this.eda, this.mode).subscribe(madr => {
+        this.edasrv.updateAdrs(madr, this.mode);
+        this.eda = madr.eda;
         this.mode = 3;
         this.form.disable();
         this.form.markAsPristine();
@@ -101,8 +102,9 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   }
 
   save(): void {
-    this.child.saveMadr(this.edasrv.mcode, this.eda, this.mode).subscribe(neweda => {
-      this.eda = neweda;
+    this.child.saveMadr(this.edasrv.mcode, this.eda, this.mode).subscribe(madr => {
+      this.edasrv.updateAdrs(madr, this.mode);
+      this.eda = madr.eda;
       this.mode = 3;
       this.form.disable();
       this.form.markAsPristine();

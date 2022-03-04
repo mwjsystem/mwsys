@@ -14,7 +14,7 @@ declare namespace mwI {
     scode: string;
     ncode: string;
     nadr: number;
-    bunsho: number;
+    bunsho: string;
     day: Date;
     yday: Date;
     sday: Date;

@@ -13,14 +13,14 @@ declare namespace mwI {
   }
 
   interface Bunsho {
-    code: number;
+    code: string;
     name: string;
     title: string;
     gakutxt: string;
     stamp: boolean;
     atesaki: string;
     message: string;
-    second: number;
+    second: string;
     include: number;
   }
 

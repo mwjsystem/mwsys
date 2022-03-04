@@ -24,7 +24,7 @@
     <button mat-button (click)="test(1)" *ngIf="mode!=1">
       <mat-icon>history</mat-icon>操作ログ
     </button>
-    <button mat-button (click)="makeFrmShip(0)" [disabled]="!form.value.sday" *ngIf="mode!=1">
+    <button mat-button (click)="makeFrmShip('BUNSH')" [disabled]="!form.value.sday" *ngIf="mode!=1">
       <mat-icon matTooltip="出荷日を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
     </button>
     <a id="csv-donwload" data-type="text/csv"></a>
@@ -32,12 +32,12 @@
       <mat-icon>description</mat-icon>帳票
     </button>
     <mat-menu #papermenu="matMenu">
-      <button mat-menu-item (click)="makeFrmShip(0)">見積書</button>
+      <button mat-menu-item (click)="makeFrmShip('00NON')">見積書</button>
       <button mat-menu-item (click)="makeFrmKeep()">キープ表</button>
       <!-- <button mat-menu-item (click)="makeFrmShip('KEEP')">受注票</button> -->
-      <button mat-menu-item (click)="makeFrmShip(1)">納品書</button>
-      <button mat-menu-item (click)="makeFrmShip(2)">請求書</button>
-      <button mat-menu-item (click)="makeFrmShip(3)">領収書</button>
+      <button mat-menu-item (click)="makeFrmShip('01NON')">納品書</button>
+      <button mat-menu-item (click)="makeFrmShip('06NON')">請求書</button>
+      <button mat-menu-item (click)="makeFrmShip('18NON')">領収書</button>
     </mat-menu>
 
     <button mat-button><a mat-button

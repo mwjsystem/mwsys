@@ -75,10 +75,10 @@ export class AddressComponent implements OnInit {
     this.parent.form.get(this.formName).get(fldnm).setValue(val);
   }
 
-  saveMadr(mcode: string, eda: string | number, mode: number): Subject<string | number> {
+  saveMadr(mcode: string, eda: string | number, mode: number): Subject<any> {
     // console.log(this.formName,eda);
     const form = this.parent.form;
-    let neweda: Subject<string | number> = new Subject();
+    let neweda: Subject<any> = new Subject();
     let madr: any = {
       id: this.usrsrv.compid,
       mcode: mcode,
@@ -113,7 +113,7 @@ export class AddressComponent implements OnInit {
         },
       }).subscribe(({ data }) => {
         // console.log('update_msmadr', data);
-        neweda.next(eda);
+        neweda.next(madr);
         neweda.complete();
       }, (error) => {
         console.log('error update_msmember', error);
@@ -129,14 +129,16 @@ export class AddressComponent implements OnInit {
       })
         .valueChanges
         .subscribe(({ data }) => {
+          // console.log(data, data.msmadr_aggregate.aggregate.max.eda);
           let lceda = data.msmadr_aggregate.aggregate.max.eda + 1;
-          if (data.msmadr_aggregate.aggregate.max.eda > 10) {
+          if (lceda > 10) {
             madr.eda = lceda;
           } else {
             madr.eda = 10;
           }
-          neweda.next(lceda);
+          neweda.next(madr);
           neweda.complete();
+          // console.log(madr);
           madrs.push(madr);
           this.apollo.mutate<any>({
             mutation: Query.InsertMast2,
