@@ -8,42 +8,40 @@ import { UserService } from './user.service';
 })
 export class BunshoService {
 
-  bunsho: mwI.Bunsho[]=[];
+  buntype: mwI.Buntype[] = [];
+  bunsho: mwI.Bunsho[] = [];
   constructor(private usrsrv: UserService,
     private apollo: Apollo) {
-      // this.get_bunsho();
-     }
-    
-    
-  get_bunsho():void {
-    if (this.bunsho.length==0){
+    // this.get_bunsho();
+  }
+
+
+  getBuntype(): void {
+    if (this.bunsho.length == 0) {
       const GetMast = gql`
       query get_bunsho($id: smallint!) {
-        msbunsho(where: {id: {_eq: $id}}) {
+        msbuntype(where: {id: {_eq: $id}}) {
           code
           name
-          title
-          gakutxt
-          stamp
-          atesaki
-          message
+          first
+          saki
           second
-          include
+          sksec
         }
       }`;
       this.apollo.watchQuery<any>({
-        query: GetMast, 
-          variables: { 
-            id : this.usrsrv.compid
-          },
-        })
+        query: GetMast,
+        variables: {
+          id: this.usrsrv.compid
+        },
+      })
         .valueChanges
         .subscribe(({ data }) => {
-          this.bunsho=data.msbunsho;
-        },(error) => {
-          console.log('error query get_bunsho', error);
+          this.buntype = data.msbuntype
+        }, (error) => {
+          console.log('error query get_buntype', error);
         });
     }
   }
-  
+
 }

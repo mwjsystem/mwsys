@@ -178,7 +178,7 @@
         <mat-form-field style="width:8em">
           <mat-label>納品書タイプ</mat-label>
           <mat-select #msel12 tabIndex="16" formControlName="ntype" (keydown.enter)="msel12.close()">
-            <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
+            <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
               {{sval.name}}
             </mat-option>
           </mat-select>
@@ -186,7 +186,7 @@
         <mat-form-field style="width:8em">
           <mat-label>納品書Type(直送)</mat-label>
           <mat-select #msel13 tabIndex="17" formControlName="tntype" (keydown.enter)="msel13.close()">
-            <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
+            <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
               {{sval.name}}
             </mat-option>
           </mat-select>

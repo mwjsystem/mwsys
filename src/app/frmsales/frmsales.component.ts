@@ -136,7 +136,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       iadr: new FormControl(''),
       mtbl: this.rows
     });
-    this.bnssrv.get_bunsho();
+    this.bnssrv.getBuntype();
     this.okrsrv.get_haisou();
     this.okrsrv.get_hokuri();
     this.okrsrv.get_hktime();

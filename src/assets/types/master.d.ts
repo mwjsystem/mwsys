@@ -12,6 +12,15 @@ declare namespace mwI {
     // dis:boolean;
   }
 
+  interface Buntype {
+    code: string;
+    name: string;
+    first: string;
+    saki: boolean;
+    second: string;
+    sksec: number;
+  }
+
   interface Bunsho {
     code: string;
     name: string;
@@ -23,7 +32,6 @@ declare namespace mwI {
     second: string;
     include: number;
   }
-
   interface Hokuri {
     code: number;
     name: string;

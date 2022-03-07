@@ -115,7 +115,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     this.bunsrv.get_bunrui();
     // this.stfsrv.get_staff();
     this.okrsrv.get_hokuri();
-    this.bnssrv.get_bunsho();
+    this.bnssrv.getBuntype();
 
   }
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
