@@ -22,16 +22,18 @@ declare namespace mwI {
   }
 
   interface Bunsho {
+    group: string;
     code: string;
     name: string;
-    title: string;
-    gakutxt: string;
-    stamp: boolean;
-    atesaki: string;
-    message: string;
-    second: string;
-    include: number;
+    // title: string;
+    // gakutxt: string;
+    // stamp: boolean;
+    // atesaki: string;
+    // message: string;
+    // second: string;
+    // include: number;
   }
+
   interface Hokuri {
     code: number;
     name: string;

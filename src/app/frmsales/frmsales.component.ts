@@ -137,6 +137,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       mtbl: this.rows
     });
     this.bnssrv.getBuntype();
+    this.bnssrv.getBunsho();
     this.okrsrv.get_haisou();
     this.okrsrv.get_hokuri();
     this.okrsrv.get_hktime();
@@ -211,10 +212,11 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   makeFrmShip(typ: string) {
+    console.log(typ);
     this.save().then(() => {
-      if (typ == 'BUNSH') {
-        let i: number = this.bnssrv.bunsho.findIndex(obj => obj.code == this.form.value.bunsho);
-        this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + this.form.value.bunsho + this.bnssrv.bunsho[i].second + 'S', this.elementRef);
+      if (typ == 'BUNTY') {
+        let i: number = this.bnssrv.buntype.findIndex(obj => obj.code == this.form.value.bunsho);
+        this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + this.form.value.bunsho + this.bnssrv.buntype[i].second + 'S', this.elementRef);
       } else {
         this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + typ, this.elementRef);
       }

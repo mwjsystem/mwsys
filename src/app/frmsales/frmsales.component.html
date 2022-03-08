@@ -24,7 +24,7 @@
     <button mat-button (click)="test(1)" *ngIf="mode!=1">
       <mat-icon>history</mat-icon>操作ログ
     </button>
-    <button mat-button (click)="makeFrmShip('BUNSH')" [disabled]="!form.value.sday" *ngIf="mode!=1">
+    <button mat-button (click)="makeFrmShip('BUNTY')" [disabled]="!form.value.sday" *ngIf="mode!=1">
       <mat-icon matTooltip="出荷日を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
     </button>
     <a id="csv-donwload" data-type="text/csv"></a>
@@ -32,12 +32,23 @@
       <mat-icon>description</mat-icon>帳票
     </button>
     <mat-menu #papermenu="matMenu">
-      <button mat-menu-item (click)="makeFrmShip('00NON')">見積書</button>
       <button mat-menu-item (click)="makeFrmKeep()">キープ表</button>
-      <!-- <button mat-menu-item (click)="makeFrmShip('KEEP')">受注票</button> -->
+      <ng-container *ngFor="let msbun of bnssrv.bunsho">
+        <button mat-menu-item (click)="makeFrmShip(msbun.code + 'NON')">{{msbun.group}} {{msbun.name}}</button>
+      </ng-container>
+      <!-- <mat-form-field>
+        <mat-label>帳票選択</mat-label>
+        <mat-select #mselbun>
+          <mat-option *ngFor="let sval of bnssrv.bunsho" [value]="sval.code">
+            {{sval.name}}
+          </mat-option>
+        </mat-select>
+        <button mat-button matSuffix (click)="makeFrmShip(mselbun.value + 'NON')">帳票Excel</button>
+      </mat-form-field> -->
+      <!-- <button mat-menu-item (click)="makeFrmShip('10NON')">見積書</button>
       <button mat-menu-item (click)="makeFrmShip('01NON')">納品書</button>
       <button mat-menu-item (click)="makeFrmShip('06NON')">請求書</button>
-      <button mat-menu-item (click)="makeFrmShip('18NON')">領収書</button>
+      <button mat-menu-item (click)="makeFrmShip('18NON')">領収書</button> -->
     </mat-menu>
 
     <button mat-button><a mat-button

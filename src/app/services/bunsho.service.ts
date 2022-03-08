@@ -15,7 +15,6 @@ export class BunshoService {
     // this.get_bunsho();
   }
 
-
   getBuntype(): void {
     if (this.bunsho.length == 0) {
       const GetMast = gql`
@@ -43,5 +42,31 @@ export class BunshoService {
         });
     }
   }
+  getBunsho(): void {
+    if (this.bunsho.length == 0) {
+      const GetMast = gql`
+      query get_bunsho($id: smallint!) {
+        msbunsho(where: {id: {_eq: $id}},order_by: {code: asc}) {
+          code
+          name
+        }
+      }`;
+      this.apollo.watchQuery<any>({
+        query: GetMast,
+        variables: {
+          id: this.usrsrv.compid
+        },
+      })
+        .valueChanges
+        .subscribe(({ data }) => {
+          data.msbunsho.forEach(element => {
+            this.bunsho.push({ group: element.code.slice(0, 1), code: element.code, name: element.name });
+          });
+        }, (error) => {
+          console.log('error query get_buntype', error);
+        });
+    }
+  }
+
 
 }
