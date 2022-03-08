@@ -57,6 +57,7 @@ export class JmeitblComponent implements OnInit {
     'scode',
     'sday',
     'tanka1',
+    'toutmoney',
     'money',
     'mtax',
     'tgenka',
@@ -98,16 +99,16 @@ export class JmeitblComponent implements OnInit {
       // console.log(arr[i]['tinmoney']);
       switch (arr[i]['gkbn']) {
         case '0':
-          lcgtotalzn += arr[i]['tinmoney'];
+          lcgtotalzn += arr[i]['toutmoney'];
           break;
         case '1':
-          lcsouryouzn += arr[i]['tinmoney'];
+          lcsouryouzn += arr[i]['toutmoney'];
           break;
         case '2':
-          lctesuuzn += arr[i]['tinmoney'];
+          lctesuuzn += arr[i]['toutmoney'];
           break;
         case '3':
-          lcnebikizn += arr[i]['tinmoney'];
+          lcnebikizn += arr[i]['toutmoney'];
           break;
       }
       lctaxtotal += arr[i]['taxmoney'];;
@@ -133,33 +134,33 @@ export class JmeitblComponent implements OnInit {
     const lcmoney: number = ctrl.tanka * ctrl.suu;
     const lctaxrate: number = +this.frmArr.getRawValue()[i]['taxrate'] / 100;
     let lctaxmoney: number = 0;
-    // let lctoutmoney:number=0;
+    let lctoutmoney: number = 0;
     let lctinmoney: number = 0;
     let lcgenka: number = 0;
     switch (this.frmArr.getRawValue()[i]['mtax']) {
       case '0':
         lctaxmoney = Math.round(ctrl.tanka * lctaxrate) * ctrl.suu;
-        // lctoutmoney = lcmoney;  
+        lctoutmoney = lcmoney;
         lctinmoney = lcmoney + lctaxmoney;
         break;
       case '1':
         lctaxmoney = Math.floor(ctrl.tanka * (1 + lctaxrate)) * ctrl.suu;
+        lctoutmoney = lcmoney - lctaxmoney;
         lctinmoney = lcmoney;
-        // lctoutmoney = lcmoney - lctaxmoney;  
         break;
       case '2':
         lctaxmoney = 0;
-        // lctoutmoney = lcmoney;
+        lctoutmoney = lcmoney;
         lctinmoney = lcmoney;
         break;
     }
-    // console.log(ctrl);
+    console.log(ctrl);
     lcgenka = Math.round(ctrl.genka * ctrl.suu);
     this.frmArr.controls[i].patchValue({
       money: lcmoney,
       tgenka: lcgenka,
       taxmoney: lctaxmoney,
-      // toutmoney:lctoutmoney,
+      toutmoney: lctoutmoney,
       tinmoney: lctinmoney
     });
 
@@ -347,6 +348,7 @@ export class JmeitblComponent implements OnInit {
       suu: [jyumei?.suu],
       unit: [jyumei?.unit],
       tanka: [jyumei?.tanka],
+      toutmoney: [{ value: jyumei?.toutmoney, disabled: true }],
       tinmoney: [{ value: jyumei?.tinmoney, disabled: true }],
       mbikou: [jyumei?.mbikou],
       spec: [jyumei?.spec],
@@ -499,7 +501,7 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue({ scode: this.parentForm.value.scode });
           let lctanka: number = 0;
           let lcgenka: number = 0;
-          console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
+          // console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
           if (msgds.msgtankas[0].currency == "USD") {
             lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate);
             // lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate) + msgds.msgtankas[0].cost;
@@ -567,8 +569,8 @@ export class JmeitblComponent implements OnInit {
   }
 
   changeTax(i: number, value: number) {
+    const lcmoney: number = this.frmArr.controls[i].value.suu * this.frmArr.controls[i].value.tanka;
     if (this.frmArr.getRawValue()[i]['mtax'] == "0") {
-      const lcmoney: number = this.frmArr.controls[i].value.suu * this.frmArr.controls[i].value.tanka;
       this.frmArr.controls[i].patchValue({ tinmoney: (lcmoney + value) });
     }
   }
@@ -626,6 +628,7 @@ export class JmeitblComponent implements OnInit {
           suu: +col[1],
           unit: null,
           tanka: (col[2] ?? +col[2]),
+          toutmoney: 0,
           tinmoney: 0,
           mbikou: null,
           spec: null,
@@ -772,6 +775,7 @@ export class JmeitblComponent implements OnInit {
           gtext: this.usrsrv.editFrmval(control, 'gtext'),
           suu: this.usrsrv.editFrmval(control, 'suu'),
           tanka: this.usrsrv.editFrmval(control, 'tanka'),
+          toutmoney: this.usrsrv.editFrmval(control, 'toutmoney'),
           tinmoney: this.usrsrv.editFrmval(control, 'tinmoney'),
           mbikou: this.usrsrv.editFrmval(control, 'mbikou'),
           spec: this.usrsrv.editFrmval(control, 'spec'),

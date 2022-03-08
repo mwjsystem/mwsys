@@ -83,6 +83,7 @@ export class JyumeiService {
           gtext
           suu
           tanka
+          toutmoney
           tinmoney
           mbikou
           spec

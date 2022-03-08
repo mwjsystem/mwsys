@@ -79,6 +79,7 @@ declare namespace mwI {
     gtext: string;
     suu: number;
     tanka: number;
+    toutmoney: number;
     tinmoney: number;
     mbikou: string;
     spec: string;
