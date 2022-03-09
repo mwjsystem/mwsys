@@ -148,7 +148,7 @@ export class JyumeiService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          // console.log(data);
+          console.log(data);
           observer.next(data.trjyuden_by_pk);
         }, (error) => {
           observer.error(error);

@@ -216,7 +216,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.save().then(() => {
       if (typ == 'BUNTY') {
         let i: number = this.bnssrv.buntype.findIndex(obj => obj.code == this.form.value.bunsho);
-        this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + this.form.value.bunsho + this.bnssrv.buntype[i].second + 'S', this.elementRef);
+        this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + this.bnssrv.buntype[i].first + this.bnssrv.buntype[i].saki + this.bnssrv.buntype[i].second + this.bnssrv.buntype[i].sksec + 'S', this.elementRef);
       } else {
         this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + typ, this.elementRef);
       }
