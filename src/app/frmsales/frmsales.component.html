@@ -34,7 +34,7 @@
     <mat-menu #papermenu="matMenu">
       <button mat-menu-item (click)="makeFrmKeep()">キープ表</button>
       <ng-container *ngFor="let msbun of bnssrv.bunsho">
-        <button mat-menu-item (click)="makeFrmShip(msbun.code + 'NON')">{{msbun.group}} {{msbun.name}}</button>
+        <button mat-menu-item (click)="makeFrmShip(msbun.code + 'hkaeNONNNON')">{{msbun.group}} {{msbun.name}}</button>
       </ng-container>
       <!-- <mat-form-field>
         <mat-label>帳票選択</mat-label>
