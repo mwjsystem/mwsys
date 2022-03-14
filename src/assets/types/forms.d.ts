@@ -51,6 +51,8 @@ declare namespace mwI {
     hgenka: number;
     egenka: number;
     iadr: number;
+    total8: number;
+    total10: number;
     // keep:string;
     // gtotal:number;
     // souryou:number;
@@ -63,8 +65,6 @@ declare namespace mwI {
     // uttotal:number;
     // utax:number;
     // httotal:number;
-    // total8:number;
-    // total10:number;
   }
   interface Jmzai {
     eda: number;

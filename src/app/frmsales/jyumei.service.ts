@@ -40,7 +40,7 @@ export class JyumeiService {
         scde
         ncode
         nadr
-        bunsho
+        buntype
         day
         yday
         sday
@@ -77,6 +77,8 @@ export class JyumeiService {
         hgenka
         egenka
         iadr
+        total8
+        total10
         trjyumeis(order_by: {line: asc}) {
           line
           gcode

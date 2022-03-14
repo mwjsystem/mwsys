@@ -24,8 +24,9 @@
     <button mat-button (click)="test(1)" *ngIf="mode!=1">
       <mat-icon>history</mat-icon>操作ログ
     </button>
-    <button mat-button (click)="makeFrmShip('BUNTY')" [disabled]="!form.value.sday" *ngIf="mode!=1">
-      <mat-icon matTooltip="出荷日を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
+    <button mat-button (click)="makeFrmShip('BUNTY')"
+      [disabled]="!form.value.sday || !form.value.buntype || !form.value.hcode" *ngIf="mode!=1">
+      <mat-icon matTooltip="出荷日、納品書ﾀｲﾌﾟ、配送伝票を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
     </button>
     <a id="csv-donwload" data-type="text/csv"></a>
     <button mat-button [matMenuTriggerFor]="papermenu" *ngIf="mode==3">
@@ -149,7 +150,7 @@
         </div>
         <mat-form-field style="width:12em">
           <mat-label>納品書タイプ</mat-label>
-          <mat-select #msel02 tabIndex="5" formControlName="bunsho" (keydown.enter)="msel02.close()">
+          <mat-select #msel02 tabIndex="5" formControlName="buntype" (keydown.enter)="msel02.close()">
             <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
               {{sval.name}}
             </mat-option>

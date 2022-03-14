@@ -94,6 +94,8 @@ export class JmeitblComponent implements OnInit {
     let lctaxtotal: number = 0;
     let lctotal: number = 0;
     let lcgenka: number = 0;
+    let lctot8: number = 0;
+    let lctot10: number = 0;
     const arr = this.frmArr.getRawValue();
     for (let i = 0; i < arr.length; i++) {
       // console.log(arr[i]['tinmoney']);
@@ -111,6 +113,14 @@ export class JmeitblComponent implements OnInit {
           lcnebikizn += arr[i]['toutmoney'];
           break;
       }
+      switch (arr[i]['taxrate']) {
+        case '8':
+          lctot8 += arr[i]['tinmoney'];
+          break;
+        case '10':
+          lctot8 += arr[i]['tinmoney'];
+          break;
+      }
       lctaxtotal += arr[i]['taxmoney'];;
       lcgenka += arr[i]['tgenka'];
     }
@@ -122,7 +132,9 @@ export class JmeitblComponent implements OnInit {
       nebikizn: lcnebikizn,
       taxtotal: lctaxtotal,
       total: lctotal,
-      genka: lcgenka
+      genka: lcgenka,
+      total8: lctot8,
+      total10: lctot10
     });
     this.jmisrv.subject.next(true);
     // this.jmisrv.subject.complete();
@@ -501,7 +513,7 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue({ scode: this.parentForm.value.scode });
           let lctanka: number = 0;
           let lcgenka: number = 0;
-          // console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
+          console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
           if (msgds.msgtankas[0].currency == "USD") {
             lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate);
             // lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate) + msgds.msgtankas[0].cost;
@@ -540,6 +552,13 @@ export class JmeitblComponent implements OnInit {
           // console.log(this.getMtbl(i,'msgzais'),this.getMtbl(i,'trjyumzais'));
           this.setPable(i, val, msgds.msgzais);
           this.calcMei(i);
+          // if (val.match(/KD2/)) {
+          //   this.frmArr.controls[i].patchValue({ mbikou: '純白' });
+          // } else if (val.match(/KU13.*-k/)) {
+          //   this.frmArr.controls[i].patchValue({ mbikou: '極真生成' });
+          // } else if (val.match(/KU9.*-k/)) {
+          //   this.frmArr.controls[i].patchValue({ mbikou: '極真純白' });
+          // }
           // this.calcTot();
           // this.jmisrv.subject.complete();
         }

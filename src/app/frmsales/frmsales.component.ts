@@ -96,7 +96,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       ncode: new FormControl(''),
       nsaki: new FormControl(''),
       nadr: new FormControl(''),
-      bunsho: new FormControl(''),
+      buntype: new FormControl(''),
       day: new FormControl(''),
       yday: new FormControl(''),
       sday: new FormControl(''),
@@ -134,6 +134,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       egenka: new FormControl(''),
       isaki: new FormControl(''),
       iadr: new FormControl(''),
+      total8: new FormControl(''),
+      total10: new FormControl(''),
       mtbl: this.rows
     });
     this.bnssrv.getBuntype();
@@ -185,11 +187,11 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       // console.log(this.form.get('nadr'));
       this.form.get('nadr').setValue('');
       this.form.get('nadr').enable();
-      this.form.get('bunsho').setValue(this.jmisrv.tntype);
+      this.form.get('buntype').setValue(this.jmisrv.tntype);
     } else {
       this.form.get('nadr').setValue(+value);
       this.form.get('nadr').disable();
-      this.form.get('bunsho').setValue(this.jmisrv.ntype);
+      this.form.get('buntype').setValue(this.jmisrv.ntype);
       this.changeEda(+value);
     }
   }
@@ -215,7 +217,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     console.log(typ);
     this.save().then(() => {
       if (typ == 'BUNTY') {
-        let i: number = this.bnssrv.buntype.findIndex(obj => obj.code == this.form.value.bunsho);
+        let i: number = this.bnssrv.buntype.findIndex(obj => obj.code == this.form.value.buntype);
         this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + this.bnssrv.buntype[i].first + this.bnssrv.buntype[i].saki + this.bnssrv.buntype[i].second + this.bnssrv.buntype[i].sksec + 'S', this.elementRef);
       } else {
         this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + typ, this.elementRef);
@@ -251,7 +253,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   test(value) {
     // this.usrsrv.toastInf(this.form.value.yday);
     // console.log(this.getInvalid());
-    console.log(this.form.get('iadr').value, this.usrsrv.editFrmval(this.form, 'iadr'));
+    console.log(!this.form.value.sday, this.form.value.sday);
+    console.log(!this.form.value.buntype, this.form.value.buntype);
+    console.log(!this.form.value.hcode, this.form.value.hcode);
     // // this.router.navigate(['/mstmember','3',value]);
     // const url = this.router.createUrlTree(['/mstmember','3',value]);
     // window.open(url.toString(),null,'top=100,left=100');
@@ -595,7 +599,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       scde: this.usrsrv.editFrmval(this.form, 'scde'),
       ncode: this.usrsrv.editFrmval(this.form, 'ncode'),
       nadr: +this.form.getRawValue()['nadr'],
-      bunsho: this.usrsrv.editFrmval(this.form, 'bunsho'),
+      buntype: this.usrsrv.editFrmval(this.form, 'buntype'),
       day: this.usrsrv.editFrmday(this.form, 'day'),
       yday: this.usrsrv.editFrmday(this.form, 'yday'),
       sday: this.usrsrv.editFrmday(this.form, 'sday'),
@@ -631,7 +635,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       genka: this.usrsrv.editFrmval(this.form, 'genka'),
       hgenka: this.usrsrv.editFrmval(this.form, 'hgenka'),
       egenka: this.usrsrv.editFrmval(this.form, 'egenka'),
-      iadr: this.form.get('iadr').value
+      iadr: this.form.get('iadr').value,
+      total8: this.usrsrv.editFrmval(this.form, 'total8'),
+      total10: this.usrsrv.editFrmval(this.form, 'total10')
     }
 
     if (this.mode == 2) {
