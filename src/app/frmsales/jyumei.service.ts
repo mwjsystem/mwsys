@@ -79,6 +79,7 @@ export class JyumeiService {
         iadr
         total8
         total10
+        dokono
         trjyumeis(order_by: {line: asc}) {
           line
           gcode
@@ -150,7 +151,7 @@ export class JyumeiService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          console.log(data);
+          // console.log(data);
           observer.next(data.trjyuden_by_pk);
         }, (error) => {
           observer.error(error);
@@ -171,7 +172,7 @@ export class JyumeiService {
     }
     // });
   }
-  edit_jyumei(data: any[]) {
+  makeJyumei(data: any[]) {
     data.forEach(element => {
       // console.log(element);
       let { msgood, ...rest } = element;

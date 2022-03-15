@@ -136,6 +136,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       iadr: new FormControl(''),
       total8: new FormControl(''),
       total10: new FormControl(''),
+      dokono: new FormControl(''),
       mtbl: this.rows
     });
     this.bnssrv.getBuntype();
@@ -214,15 +215,28 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   makeFrmShip(typ: string) {
-    console.log(typ);
-    this.save().then(() => {
-      if (typ == 'BUNTY') {
-        let i: number = this.bnssrv.buntype.findIndex(obj => obj.code == this.form.value.buntype);
-        this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + this.bnssrv.buntype[i].first + this.bnssrv.buntype[i].saki + this.bnssrv.buntype[i].second + this.bnssrv.buntype[i].sksec + 'S', this.elementRef);
-      } else {
-        this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + typ, this.elementRef);
-      }
-    })
+    // console.log(typ);
+    if (this.okrsrv.get_hinfo(this.form.value.hcode).numbering && !this.form.value.okurino) {
+      this.setOkrno().then(() => {
+        this.save().then(() => {
+          if (typ == 'BUNTY') {
+            let i: number = this.bnssrv.buntype.findIndex(obj => obj.code == this.form.value.buntype);
+            this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + this.bnssrv.buntype[i].first + this.bnssrv.buntype[i].saki + this.bnssrv.buntype[i].second + this.bnssrv.buntype[i].sksec + 'S', this.elementRef);
+          } else {
+            this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + typ, this.elementRef);
+          }
+        })
+      });
+    } else {
+      this.save().then(() => {
+        if (typ == 'BUNTY') {
+          let i: number = this.bnssrv.buntype.findIndex(obj => obj.code == this.form.value.buntype);
+          this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + this.bnssrv.buntype[i].first + this.bnssrv.buntype[i].saki + this.bnssrv.buntype[i].second + this.bnssrv.buntype[i].sksec + 'S', this.elementRef);
+        } else {
+          this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno + "-" + typ, this.elementRef);
+        }
+      })
+    }
     // this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
   }
 
@@ -252,10 +266,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 
   test(value) {
     // this.usrsrv.toastInf(this.form.value.yday);
-    // console.log(this.getInvalid());
-    console.log(!this.form.value.sday, this.form.value.sday);
-    console.log(!this.form.value.buntype, this.form.value.buntype);
-    console.log(!this.form.value.hcode, this.form.value.hcode);
+    console.log(value);
+    // console.log(!this.form.value.sday, this.form.value.sday);
+    // console.log(!this.form.value.buntype, this.form.value.buntype);
+    // console.log(!this.form.value.hcode, this.form.value.hcode);
     // // this.router.navigate(['/mstmember','3',value]);
     // const url = this.router.createUrlTree(['/mstmember','3',value]);
     // window.open(url.toString(),null,'top=100,left=100');
@@ -308,7 +322,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               this.form.get('isaki').setValue(jyuden.nadr.toString());
             }
             this.form.patchValue(jyuden);
-            this.jmisrv.edit_jyumei(jyuden.trjyumeis);
+            this.jmisrv.makeJyumei(jyuden.trjyumeis);
             this.jmeitbl.set_jyumei(jyuden.skbn);
             this.usrsrv.setTmstmp(jyuden);
             this.jmisrv.denno = denno;
@@ -351,18 +365,28 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     );
   }
 
-  dennoHelp() {
+  dennoHelp(flg?: boolean) {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width = '100vw';
     dialogConfig.height = '98%';
     dialogConfig.panelClass = 'full-screen-modal';
+    if (flg) {
+      dialogConfig.data = {
+        mcode: this.form.value.ncode,
+        mcdfld: 'ncode'
+      };
+    }
     let dialogRef = this.dialog.open(JdnohelpComponent, dialogConfig);
-
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.jmisrv.denno = data.denno;
-          this.get_jyuden(this.jmisrv.denno);
+          if (flg) {
+            this.form.get('dokono').setValue(data.denno);
+            this.form.get('okurino').setValue(data.okurino);
+          } else {
+            this.jmisrv.denno = data.denno;
+            this.get_jyuden(this.jmisrv.denno);
+          }
         }
       }
     );
@@ -637,7 +661,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       egenka: this.usrsrv.editFrmval(this.form, 'egenka'),
       iadr: this.form.get('iadr').value,
       total8: this.usrsrv.editFrmval(this.form, 'total8'),
-      total10: this.usrsrv.editFrmval(this.form, 'total10')
+      total10: this.usrsrv.editFrmval(this.form, 'total10'),
+      dokono: this.usrsrv.editFrmval(this.form, 'dokono')
     }
 
     if (this.mode == 2) {

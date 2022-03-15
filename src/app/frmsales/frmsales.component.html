@@ -21,7 +21,7 @@
         <mat-icon>find_replace</mat-icon>
       </button>
     </mat-form-field>
-    <button mat-button (click)="test(1)" *ngIf="mode!=1">
+    <button mat-button (click)="test(msel6)" *ngIf="mode!=1">
       <mat-icon>history</mat-icon>操作ログ
     </button>
     <button mat-button (click)="makeFrmShip('BUNTY')"
@@ -151,6 +151,7 @@
         <mat-form-field style="width:12em">
           <mat-label>納品書タイプ</mat-label>
           <mat-select #msel02 tabIndex="5" formControlName="buntype" (keydown.enter)="msel02.close()">
+            <mat-option>選択削除</mat-option>
             <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
               {{sval.name}}
             </mat-option>
@@ -253,6 +254,7 @@
           <mat-label>配送方法</mat-label>
           <mat-select #msel6 tabIndex="16" formControlName="hcode" (selectionChange)="selected(+$event.value)"
             (keydown.enter)="msel6.close()">
+            <mat-option>選択削除</mat-option>
             <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
               {{sval.name}}
             </mat-option>
@@ -275,13 +277,23 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <div fxLayout="row wrap" fxLayoutAlign="start end">
+        <div fxLayout="row wrap" fxLayoutAlign="start end" *ngIf="msel6.triggerValue.indexOf('同梱') == -1">
           <mat-form-field style="width: 4em;">
             <mat-label>荷物個数</mat-label>
             <input type="number" tabIndex="19" matInput formControlName="okurisuu" class="i_num">
           </mat-form-field>
           <span class="ybtxt">　個口</span>
         </div>
+        <mat-form-field style="width: 10em;" *ngIf="msel6.triggerValue.indexOf('同梱') > -1">
+          <mat-label>同梱先伝票番号</mat-label>
+          <input matInput formControlName="dokono">
+          <button mat-icon-button matPrefix *ngIf="form.value.dokono" (click)="usrsrv.openFrm('出荷',form.value.dokono)">
+            <mat-icon>open_in_new</mat-icon>
+          </button>
+          <button mat-button mat-icon-button matSuffix (click)="dennoHelp(true)" *ngIf="mode!=3">
+            <mat-icon>find_replace</mat-icon>
+          </button>
+        </mat-form-field>
         <mat-form-field style="width: 10em;">
           <mat-label>送り状番号</mat-label>
           <input tabIndex="20" matInput formControlName="okurino">

@@ -9,21 +9,6 @@
     <div class="mat-elevation-z8">
         <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;width:100%">
             <button class="mat-raised-button" (click)="get_jyuden()">検索</button>
-            <mat-form-field style="width:5em;">
-                <mat-label>顧客コード</mat-label>
-                <mat-select [(ngModel)]="fmcdfld" [ngModelOptions]="{standalone: true}">
-                    <mat-option value="mcode">受注先</mat-option>
-                    <mat-option value="scde">請求先</mat-option>
-                    <mat-option value="ncode">納入先</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field style="width:7em;">
-                <input matInput [(ngModel)]="fmcd" [ngModelOptions]="{standalone: true}">
-                <button mat-icon-button matSuffix (click)="mcdHelp()">
-                    <mat-icon>find_replace</mat-icon>
-                </button>
-            </mat-form-field>
-            <span class="nmtxt">{{fmcd | mcdtxt}}</span>
             <mat-form-field style="width:7em;">
                 <mat-label>日付</mat-label>
                 <mat-select [(ngModel)]="fdayfld" [ngModelOptions]="{standalone: true}">
@@ -40,6 +25,28 @@
                 <mat-datepicker #picker1></mat-datepicker>
             </mat-form-field>
             <span>以降</span>
+            <mat-form-field style="width:5em;">
+                <mat-label>顧客コード</mat-label>
+                <mat-select [(ngModel)]="fmcdfld" [ngModelOptions]="{standalone: true}">
+                    <mat-option value="mcode">受注先</mat-option>
+                    <mat-option value="scde">請求先</mat-option>
+                    <mat-option value="ncode">納入先</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field style="width:7em;">
+                <input matInput [(ngModel)]="fmcd" [ngModelOptions]="{standalone: true}">
+                <button mat-icon-button matSuffix (click)="mcdHelp()">
+                    <mat-icon>find_replace</mat-icon>
+                </button>
+            </mat-form-field>
+            <span class="nmtxt">{{fmcd | mcdtxt}}</span>
+            <mat-form-field style="width:5em;" *ngIf="fmcdfld=='ncode'">
+                <mat-label>納品先枝番</mat-label>
+                <input matInput [(ngModel)]="feda" [ngModelOptions]="{standalone: true}">
+                <button mat-icon-button matSuffix (click)="diaBetsu()">
+                    <mat-icon>find_replace</mat-icon>
+                </button>
+            </mat-form-field>
             <mat-form-field style="width:7em;">
                 <mat-label>担当者</mat-label>
                 <mat-select [(ngModel)]="ftcd" [ngModelOptions]="{standalone: true}">
@@ -52,7 +59,7 @@
                 <mat-label>受注先伝票番号</mat-label>
                 <input matInput (input)="fcusden=$event.target.value">
             </mat-form-field>
-            <mat-form-field style="width:7em;">
+            <!-- <mat-form-field style="width:7em;">
                 <mat-label>ｽﾃｰﾀｽ(受注伝票)</mat-label>
                 <mat-select [value]="fjdst">
                     <mat-option *ngFor="let sval of bunsrv.kbn.jdstatus" [value]="sval.value">
@@ -67,7 +74,7 @@
                         {{sval.viewval}}
                     </mat-option>
                 </mat-select>
-            </mat-form-field>
+            </mat-form-field> -->
             <!-- <mat-form-field>
                 <mat-label>メール1～5</mat-label>
                 <input matInput type="url" (input)="fmail=$event.target.value">

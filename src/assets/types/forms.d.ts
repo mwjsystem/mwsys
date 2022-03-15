@@ -53,6 +53,7 @@ declare namespace mwI {
     iadr: number;
     total8: number;
     total10: number;
+    dokono: number;
     // keep:string;
     // gtotal:number;
     // souryou:number;

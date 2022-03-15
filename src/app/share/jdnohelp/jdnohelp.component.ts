@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
@@ -13,6 +13,7 @@ import { StaffService } from './../../services/staff.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { MembsService } from './../../services/membs.service';
 import { McdhelpComponent } from './../mcdhelp/mcdhelp.component';
+import { AdredaComponent } from './../adreda/adreda.component';
 
 
 interface Jyuden {
@@ -80,6 +81,7 @@ export class JdnohelpComponent implements OnInit {
   ];
   fmcdfld: string = "mcode";
   fmcd: string = "";
+  feda: string = "";
   fdayfld: string = "day";
   fday: Date = new Date();
   ftcd: string = "";
@@ -96,8 +98,13 @@ export class JdnohelpComponent implements OnInit {
     private apollo: Apollo,
     private overlay: Overlay,
     private dialog: MatDialog,
-    private dialogRef: MatDialogRef<JdnohelpComponent>) {
+    private dialogRef: MatDialogRef<JdnohelpComponent>,
+    @Inject(MAT_DIALOG_DATA) data) {
     this.dataSource = new MatTableDataSource<Jyuden>();
+    if (data?.mcdfld) {
+      this.fmcdfld = data.mcdfld;
+    }
+    this.fmcd = data?.mcode;
   }
 
   ngOnInit(): void {
@@ -128,6 +135,26 @@ export class JdnohelpComponent implements OnInit {
     );
   }
 
+  diaBetsu(): void {
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.autoFocus = true;
+    dialogConfig.data = {
+      mcode: this.fmcd,
+      // mode: this.mode,
+      eda: this.feda,
+      flg: true
+    };
+    // console.log(dialogConfig.data);
+    let dialogRef = this.dialog.open(AdredaComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe(
+      data => {
+        if (typeof data != 'undefined') {
+          this.feda = data;
+        }
+      }
+    );
+  }
+
   // set_mcdtxt(mcd:number){
   //   this.mcdtxt=this.memsrv.get_mcdtxt(mcd);
   // }
@@ -137,6 +164,9 @@ export class JdnohelpComponent implements OnInit {
       let fldobj: { [k: string]: any } = {};
       fldobj[this.fmcdfld] = { "_eq": this.fmcd };
       varWh.where._and.push(fldobj);
+    }
+    if (this.feda && this.fmcdfld == 'ncode') {
+      varWh.where._and.push({ "nadr": { "_eq": this.feda } });
     }
     if (this.fday) {
       let fldobj: { [k: string]: any } = {};
