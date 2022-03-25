@@ -199,6 +199,14 @@
           <mat-label>領収書宛名</mat-label>
           <input tabIndex="19" matInput formControlName="ryoate">
         </mat-form-field>
+        <mat-form-field>
+          <mat-label>janシール</mat-label>
+          <mat-select formControlName="jan">
+            <mat-option *ngFor="let sval of bunsrv.kbn.jan" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-checkbox formControlName="del">削除済</mat-checkbox>
         <div fxLafxLayout="column" style="width:100%;">
           <mat-form-field class="txtar">

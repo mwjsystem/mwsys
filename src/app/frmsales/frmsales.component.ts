@@ -119,6 +119,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       cusden: new FormControl(''),
       ryoate: new FormControl(''),
       daibiki: new FormControl(''),
+      daibzei: new FormControl(''),
       daibunrui: new FormControl(''),
       chubunrui: new FormControl(''),
       shobunrui: new FormControl(''),
@@ -137,6 +138,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       total8: new FormControl(''),
       total10: new FormControl(''),
       dokono: new FormControl(''),
+      eidome: new FormControl(''),
+      eicode: new FormControl(''),
       mtbl: this.rows
     });
     this.bnssrv.getBuntype();
@@ -646,6 +649,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       cusden: this.usrsrv.editFrmval(this.form, 'cusden'),
       ryoate: this.usrsrv.editFrmval(this.form, 'ryoate'),
       daibiki: this.usrsrv.editFrmval(this.form, 'daibiki'),
+      daibzei: this.usrsrv.editFrmval(this.form, 'daibzei'),
       daibunrui: this.usrsrv.editFrmval(this.form, 'daibunrui'),
       chubunrui: this.usrsrv.editFrmval(this.form, 'chubunrui'),
       shobunrui: this.usrsrv.editFrmval(this.form, 'shobunrui'),
@@ -662,7 +666,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       iadr: this.form.get('iadr').value,
       total8: this.usrsrv.editFrmval(this.form, 'total8'),
       total10: this.usrsrv.editFrmval(this.form, 'total10'),
-      dokono: this.usrsrv.editFrmval(this.form, 'dokono')
+      dokono: this.usrsrv.editFrmval(this.form, 'dokono'),
+      eidome: this.usrsrv.editFrmval(this.form, 'eidome'),
+      eicode: this.usrsrv.editFrmval(this.form, 'eicode')
     }
 
     if (this.mode == 2) {

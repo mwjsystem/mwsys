@@ -343,8 +343,12 @@
           <input matInput formControlName="ryoate">
         </mat-form-field>
         <mat-form-field>
-          <mat-label>代引き金額</mat-label>
+          <mat-label>代引税込額</mat-label>
           <input matInput formControlName="daibiki">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>代引消費税</mat-label>
+          <input matInput formControlName="daibzei">
         </mat-form-field>
         <mat-form-field style="width:8em">
           <mat-label>顧客税区分</mat-label>
@@ -388,6 +392,7 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-checkbox formControlName="eidome" style="padding-top:12px;text-align:right">営業所止め</mat-checkbox>
       </div>
       <div fxLayout="column">
         <mat-form-field style="width:10em">
@@ -421,6 +426,10 @@
               {{sval.name}}
             </mat-option>
           </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>営業所コード</mat-label>
+          <input matInput formControlName="eicode">
         </mat-form-field>
       </div>
       <mat-form-field>

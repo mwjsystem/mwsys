@@ -90,6 +90,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       ryoate: new FormControl(''),
       del: new FormControl(''),
       bikou: new FormControl(''),
+      jan: new FormControl(''),
       // inbikou: new FormControl(''),      
       // }));
       // this.form.addControl('kake', new FormGroup({
@@ -406,6 +407,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       mtgt3: this.form.get('base').value.mtgt3,
       mtgt4: this.form.get('base').value.mtgt4,
       mtgt5: this.form.get('base').value.mtgt5,
+      jan: this.usrsrv.editFrmval(this.form.get('base'), 'jan'),
       updated_at: new Date(),
       updated_by: this.usrsrv.staff.code
     }

@@ -80,6 +80,7 @@ export class JyumeiService {
         total8
         total10
         dokono
+        daibzei
         trjyumeis(order_by: {line: asc}) {
           line
           gcode
