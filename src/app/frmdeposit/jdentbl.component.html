@@ -1,0 +1,52 @@
+<div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" aria-label="Elements">
+        <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>行削除</th>
+            <td mat-cell *matCellDef="let i = index">
+                <button mat-icon-button matPrefix (click)="delRow(i)">
+                    <mat-icon>remove_circle</mat-icon>
+                </button>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="denno">
+            <th mat-header-cell *matHeaderCellDef>伝票番号</th>
+            <td mat-cell *matCellDef="let row">{{row.denno}}</td>
+        </ng-container>
+        <ng-container matColumnDef="zandaka">
+            <th mat-header-cell *matHeaderCellDef class="i_num">残高</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.zandaka}}</td>
+        </ng-container>
+        <ng-container matColumnDef="jtotal">
+            <th mat-header-cell *matHeaderCellDef class="i_num">受注金額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.jtotal}}</td>
+        </ng-container>
+        <ng-container matColumnDef="htotal">
+            <th mat-header-cell *matHeaderCellDef class="i_num">返金額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.htotal}}</td>
+        </ng-container>
+        <ng-container matColumnDef="ntotal">
+            <th mat-header-cell *matHeaderCellDef class="i_num">入金額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.ntotal}}</td>
+        </ng-container>
+        <ng-container matColumnDef="stotal">
+            <th mat-header-cell *matHeaderCellDef class="i_num">出金額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.stotal}}</td>
+        </ng-container>
+        <ng-container matColumnDef="ttotal">
+            <th mat-header-cell *matHeaderCellDef class="i_num">調整額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.ttotal}}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <div style="padding:10px; " fxLayout="row" fxLayoutAlign="start baseline" fxLayoutGap="10px">
+        <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
+            <mat-label>受注伝票</mat-label>
+            <input matInput [(ngModel)]="jdno" [ngModelOptions]="{standalone: true}">
+            <button mat-icon-button matSuffix (click)="dennoHelp()">
+                <mat-icon>find_replace</mat-icon>
+            </button>
+        </mat-form-field>
+        <button class=" mat-raised-button" (click)="add()">対象伝票を追加する</button>
+    </div>
+</div>

@@ -1,0 +1,102 @@
+<mat-toolbar [color]="depsrv.mode==3 ? 'primary' : depsrv.mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
+    <div class="icon-area" fxLayout="row wrap">
+        <button mat-button (click)="modeToCre()" *ngIf="depsrv.mode==3">
+            <mat-icon>add_box</mat-icon>新規
+        </button>
+        <button mat-button (click)="modeToUpd()" *ngIf="depsrv.mode==3 && denno">
+            <mat-icon>edit</mat-icon>編集
+        </button>
+        <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="depsrv.mode!=3">
+            <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
+        </button>
+        <button mat-button (click)="cancel()" *ngIf="depsrv.mode!=3">
+            <mat-icon>cancel</mat-icon>中止
+        </button>
+        <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
+            <mat-label>入金伝票番号</mat-label>
+            <input matInput [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
+                (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
+                [disabled]="depsrv.mode==1 || (depsrv.mode==2 && form.dirty)">
+            <button mat-button mat-icon-button matSuffix (click)="dennoHelp()" *ngIf="depsrv.mode==3">
+                <mat-icon>find_replace</mat-icon>
+            </button>
+        </mat-form-field>
+        <button mat-button (click)="onEnter()" *ngIf="form.value.scde">
+            <mat-icon>receipt</mat-icon>請求確認
+        </button>
+        <button mat-button (click)="onEnter()" [style.display]="depsrv.mode==1 ? 'none' : 'inline-block'">
+            <mat-icon>history</mat-icon>操作ログ
+        </button>
+        <button mat-button><a mat-button
+                href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
+                target="_blank">
+                <mat-icon>help</mat-icon>ヘルプ
+            </a></button>
+    </div>
+</mat-toolbar>
+<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px">
+    <mat-card>
+        <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
+            <mat-card-title>
+                {{depsrv.mode|modetxt}}
+            </mat-card-title>
+            <app-tmstmp></app-tmstmp>
+        </mat-card-header>
+        <mat-card-content>
+            <fieldset fxLayout="column" fxLayoutAlign="start">
+                <legend>対象伝票</legend>
+                <div fxLayout="row wrap">
+                    <mat-form-field style="width:8em;">
+                        <mat-select placeholder="伝票タイプ" formControlName="kubun" required>
+                            <mat-option value="0">都度受注伝票</mat-option>
+                            <mat-option value="1">請求伝票</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px" *ngIf="form.value.kubun=='0'">
+                        <mat-label>受注伝票</mat-label>
+                        <input matInput formControlName="jdenno">
+                        <button mat-icon-button matSuffix (click)="dennoHelp()">
+                            <mat-icon>find_replace</mat-icon>
+                        </button>
+                        <button mat-button mat-icon-button matSuffix (click)="usrsrv.openFrm('出荷',form.value.jdenno)"
+                            *ngIf="form.value.jdenno">
+                            <mat-icon>open_in_new</mat-icon>
+                        </button>
+                    </mat-form-field>
+                    <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px" *ngIf="form.value.kubun=='1'">
+                        <mat-label>請求伝票</mat-label>
+                        <input matInput formControlName="idenno">
+                        <button mat-icon-button matSuffix (click)="dennoHelp()">
+                            <mat-icon>find_replace</mat-icon>
+                        </button>
+                    </mat-form-field>
+                </div>
+                <div fxLayout="row wrap" fxLayoutAlign="start end">
+                    <mat-form-field style="width: 9em;">
+                        <mat-label>請求先</mat-label>
+                        <input matInput [value]="form.value.scde" disabled>
+                        <button mat-button mat-icon-button matSuffix
+                            (click)="usrsrv.openMst('mstmember',form.value.scde)" *ngIf="form.value.scde">
+                            <mat-icon>open_in_new</mat-icon>
+                        </button>
+                    </mat-form-field>
+                    <span class="nmtxt">{{form.value.scde | mcdtxt}}</span>
+                </div>
+                <div fxLayout="row wrap" fxLayoutAlign="start end">
+                    <mat-form-field style="width: 9em;">
+                        <mat-label>支払先</mat-label>
+                        <input matInput formControlName="code" required (keydown.f4)="mcdHelp('code')">
+                        <button mat-icon-button matSuffix (click)="mcdHelp('code')" *ngIf="frmArr.enabled">
+                            <mat-icon>find_replace</mat-icon>
+                        </button>
+                        <button mat-button mat-icon-button matSuffix
+                            (click)="usrsrv.openMst('mstmember',form.value.code)" *ngIf="form.value.code">
+                            <mat-icon>open_in_new</mat-icon>
+                        </button>
+                    </mat-form-field>
+                    <span class="nmtxt">{{form.value.code | mcdtxt}}</span>
+                </div>
+            </fieldset>
+        </mat-card-content>
+    </mat-card>
+</form>

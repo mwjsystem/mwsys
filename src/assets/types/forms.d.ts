@@ -21,7 +21,7 @@ declare namespace mwI {
     uday: Date;
     nday: Date;
     tcode: string;
-    scd: string;
+    scde: string;
     skbn: string;
     jcode: string;
     pcode: string;

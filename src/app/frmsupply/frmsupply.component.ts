@@ -19,9 +19,6 @@ import { DownloadService } from './../services/download.service';
 import { HatmeiService } from './hatmei.service';
 import { filter } from 'rxjs/operators';
 
-import gql from 'graphql-tag';
-import { Apollo } from 'apollo-angular';
-
 @Component({
   selector: 'app-frmsupply',
   templateUrl: './frmsupply.component.html',
@@ -48,7 +45,6 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     private router: Router,
     private elementRef: ElementRef,
     private dialog: MatDialog,
-    private apollo: Apollo,
     public dwlsrv: DownloadService,
     public bunsrv: BunruiService,
     public strsrv: StoreService,

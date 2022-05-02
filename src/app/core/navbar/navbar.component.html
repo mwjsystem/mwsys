@@ -15,11 +15,11 @@
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="depo">売上入金</button>
     <mat-menu #depo="matMenu">
-        <a mat-menu-item>入金伝票</a>
+        <a mat-menu-item routerLink="/frminvoice">請求伝票(掛売/合算)</a>
+        <a mat-menu-item routerLink="/frmdeposit">入金伝票(一般/掛売)</a>
         <a mat-menu-item>一括入金処理</a>
         <a mat-menu-item>代引データ読込</a>
-        <a mat-menu-item>掛売請求</a>
-        <a mat-menu-item>掛売入金</a>
+        <!-- <a mat-menu-item>掛売入金</a> -->
         <a mat-menu-item>請求予定一覧表</a>
         <a mat-menu-item>請求書出力</a>
         <a mat-menu-item>未入金一覧表</a>
