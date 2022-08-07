@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 // import { UserService } from './../services/user.service';
-import { DepositService } from './deposit.service';
+import { InvoiceService } from './invoice.service';
 
 interface Jyuden {
   denno: number;
@@ -36,7 +36,7 @@ export class JdentblComponent implements OnInit {
     'stotal',
     'ttotal'
   ]
-  constructor(public depsrv: DepositService,
+  constructor(public invsrv: InvoiceService,
     // public usrsrv: UserService,
     private cdRef: ChangeDetectorRef,
     // private apollo: Apollo,

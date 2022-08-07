@@ -11,39 +11,31 @@ import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { StaffService } from './../../services/staff.service';
 import { BunruiService } from './../../services/bunrui.service';
-import { MembsService } from './../../services/membs.service';
 import { McdhelpComponent } from './../mcdhelp/mcdhelp.component';
-import { AdredaComponent } from './../adreda/adreda.component';
+import { JdnohelpComponent } from './../jdnohelp/jdnohelp.component';
 
-
-interface Jyuden {
+interface Nyusub {
   denno: number;
+  kubun: number;
   day: Date;
-  yday: Date;
-  sday: Date;
-  uday: Date;
-  nday: Date;
   mcode: string;
-  scde: string;
-  ncode: string;
-  nadr: number;
-  scode: string;
-  tcode: number;
-  tcode1: number;
-  // jdstatus: string;
-  // jdshsta: string;
-  keep: string;
-  cusden: string;
-  okurino: string;
-  pcode: string;
+  code: string;
+  tcode: string;
+  updated_at: Date;
+  updated_by: string
+  jdenno: number;
+  idenno: number;
+  nmoney: number;
+  smoney: number;
+  tmoney: number;
 }
 
 @Component({
-  selector: 'app-jdnohelp',
-  templateUrl: './jdnohelp.component.html',
-  styleUrls: ['./jdnohelp.component.scss']
+  selector: 'app-ndnohelp',
+  templateUrl: './ndnohelp.component.html',
+  styleUrls: ['./ndnohelp.component.scss']
 })
-export class JdnohelpComponent implements OnInit {
+export class NdnohelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -51,75 +43,45 @@ export class JdnohelpComponent implements OnInit {
       .position().global().centerHorizontally().centerVertically()
   });
 
-  dataSource: MatTableDataSource<Jyuden>;
-  subject = new Subject<Jyuden[]>();
+  dataSource: MatTableDataSource<Nyusub>;
+  subject = new Subject<Nyusub[]>();
   observe = this.subject.asObservable();
   displayedColumns = [
     'denno',
+    'kubun',
     'day',
-    'yday',
-    'sday',
-    'uday',
-    'nday',
     'mcode',
-    'nadr',
-    'scode',
+    'code',
     'tcode',
-    'keep',
-    'okurino',
-    'cusden',
-    // 'skbn',
-    // 'torikbn',
-    'pcode',
-    'tcode1 ',
-    'del',
+    // 'biko',
     'updated_at',
     'updated_by',
-    'scde',
-    'ncode',
-    'gcode'
+    'jdenno',
+    'idenno',
+    'nmoney',
+    'smoney',
+    'tmoney'
   ];
-  fmcdfld: string = "mcode";
   ftype: string = "0";
   fmcd: string = "";
-  feda: string = "";
-  fdayfld: string = "day";
   fday: Date = new Date();
   ftcd: string = "";
-  // mcdtxt:string="";
-  fcusden: string = "";
-  fjdst: string = "";
-  fjsst: string = "";
+  fjdno: number = 0;
 
   constructor(public usrsrv: UserService,
     public stfsrv: StaffService,
-    public memsrv: MembsService,
     public bunsrv: BunruiService,
     public cdRef: ChangeDetectorRef,
     private apollo: Apollo,
     private overlay: Overlay,
     private dialog: MatDialog,
-    private dialogRef: MatDialogRef<JdnohelpComponent>,
-    @Inject(MAT_DIALOG_DATA) data) {
-    this.dataSource = new MatTableDataSource<Jyuden>();
-    if (data?.ftype) {
-      this.ftype = data.ftype;
-    }
-    if (data?.mcdfld) {
-      this.fmcdfld = data.mcdfld;
-    }
-    this.fmcd = data?.mcode;
-  }
+    private dialogRef: MatDialogRef<NdnohelpComponent>,
+    @Inject(MAT_DIALOG_DATA) data) { }
 
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;
     this.fday.setMonth(this.fday.getMonth() - 1);
-    // this.observe.subscribe(value => {
-    //     this.dataSource.paginator = this.paginator;
-    //     this.dataSource= new MatTableDataSource<Jyuden>(value);
-    //     this.overlayRef.detach();
-    //     this.cdRef.detectChanges();
-    // });  
+
   }
 
   mcdHelp(): void {
@@ -139,87 +101,65 @@ export class JdnohelpComponent implements OnInit {
     );
   }
 
-  diaBetsu(): void {
+  dennoHelp() {
     let dialogConfig = new MatDialogConfig();
-    dialogConfig.autoFocus = true;
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.data = {
+      mcdfld: 'scde',
       mcode: this.fmcd,
-      // mode: this.mode,
-      eda: this.feda,
-      flg: true
+      ftype: '0'
     };
-    // console.log(dialogConfig.data);
-    let dialogRef = this.dialog.open(AdredaComponent, dialogConfig);
+    let dialogRef = this.dialog.open(JdnohelpComponent, dialogConfig);
+
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.feda = data;
+          this.fjdno = data.denno;
         }
       }
     );
+
   }
 
-  // set_mcdtxt(mcd:number){
-  //   this.mcdtxt=this.memsrv.get_mcdtxt(mcd);
-  // }
-  get_jyuden(): void {
+  get_nyuden(): void {
     let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     if (this.ftype == "0") {
-      varWh.where._and.push({ "torikbn": { "_eq": false } });
+      varWh.where._and.push({ "kubun": { "_eq": 0 } });
     } else if (this.ftype == "1") {
-      varWh.where._and.push({ "torikbn": { "_eq": true } });
+      varWh.where._and.push({ "kubun": { "_eq": 1 } });
     }
 
     if (this.fmcd) {
-      let fldobj: { [k: string]: any } = {};
-      fldobj[this.fmcdfld] = { "_eq": this.fmcd };
-      varWh.where._and.push(fldobj);
-    }
-    if (this.feda && this.fmcdfld == 'ncode') {
-      varWh.where._and.push({ "nadr": { "_eq": this.feda } });
+      varWh.where._and.push({ "mcode": { "_eq": this.fmcd } });
     }
     if (this.fday) {
-      let fldobj: { [k: string]: any } = {};
-      fldobj[this.fdayfld] = { "_gt": this.usrsrv.formatDate(this.fday) };
-      varWh.where._and.push(fldobj);
+      varWh.where._and.push({ "day": { "_gt": this.fday } });
     }
     if (this.ftcd) {
       varWh.where._and.push({ "tcode": { "_eq": this.ftcd } });
     }
-
-    // console.log(varWh);
-
+    if (this.fjdno > 0) {
+      varWh.where._and.push({ "jdenno": { "_eq": this.fjdno } });
+    }
     const GetTran = gql`
-    query get_jyuden($where:trjyuden_bool_exp!) {
-      trjyuden(where:$where, order_by:{denno: asc}) {
+    query get_nyuden($where:trnyusub_bool_exp!) {
+      trnyusub(where: $where, order_by:{denno: asc}) {
         denno
+        kubun
         day
-        yday
-        sday
-        uday
-        nday
-        hday
-        htime
-        hcode
-        ncode
-        nadr
-        scode
-        tcode
-        keep
-        okurino
-        cusden
-        skbn
-        torikbn
         mcode
-        scde
-        pcode
-        tcode1 
-        del
+        tcode
+        code
+        biko
         updated_at
         updated_by
-        trjyumeis(where:{line:{_eq:1}}){ 
-          gcode
-        }
+        jdenno
+        idenno
+        nmoney
+        smoney
+        tmoney
       }
     }`;
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
@@ -231,26 +171,26 @@ export class JdnohelpComponent implements OnInit {
       .subscribe(({ data }) => {
         // console.log(data);
         // this.subject.next(data.trjyuden);
-        let srcdata = [];
-        if (data.trjyuden.length == 0) {
+        if (data.trnyusub.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          data.trjyuden.forEach(element => {
-            let { trjyumeis, ...rest } = element;
-            let gcd = { gcode: trjyumeis[0].gcode };
-            srcdata.push({ ...rest, ...gcd });
-          });
-          this.dataSource = new MatTableDataSource<Jyuden>(srcdata);
+          let srcdata = data.trnyusub;
+          this.dataSource = new MatTableDataSource<Nyusub>(srcdata);
           this.dataSource.paginator = this.paginator;
         }
         this.overlayRef.detach();
         this.cdRef.detectChanges();
         // this.subject.complete();
       }, (error) => {
-        console.log('error query get_jyuden', error);
+        console.log('error query get_nyusub', error);
       });
+
+
+
+
   }
-  sel_dno(selected: Jyuden) {
+
+  sel_dno(selected: Nyusub) {
     // console.log("select",selected);
     // this.vcds=[];
     this.dialogRef.close(selected);

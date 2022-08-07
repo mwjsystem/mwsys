@@ -15,8 +15,9 @@
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="depo">売上入金</button>
     <mat-menu #depo="matMenu">
+        <a mat-menu-item routerLink="/frmdeposit">受注入金伝票</a>
+        <a mat-menu-item routerLink="/frmclear">請求入金伝票</a>
         <a mat-menu-item routerLink="/frminvoice">請求伝票(掛売/合算)</a>
-        <a mat-menu-item routerLink="/frmdeposit">入金伝票(一般/掛売)</a>
         <a mat-menu-item>一括入金処理</a>
         <a mat-menu-item>代引データ読込</a>
         <!-- <a mat-menu-item>掛売入金</a> -->
@@ -77,9 +78,12 @@
     <mat-menu #mast="matMenu">
         <a mat-menu-item routerLink="/mstgoods">商品マスタ</a>
         <a mat-menu-item routerLink="/mstvendor">仕入先マスタ</a>
-        <a mat-menu-item>伝票マスタ</a>
-        <a mat-menu-item>倉庫マスタ</a>
-        <a mat-menu-item>担当者マスタ</a>
+        <a mat-menu-item
+            href="https://mwjtables.herokuapp.com/console/data/schema/public/tables/msholiday/browse">休日マスタ</a>
+        <a mat-menu-item
+            href="https://mwjtables.herokuapp.com/console/data/schema/public/tables/msstore/browse">倉庫マスタ</a>
+        <a mat-menu-item
+            href="https://mwjtables.herokuapp.com/console/data/schema/public/tables/msstaff/browse">担当者マスタ</a>
         <button mat-menu-item [matMenuTriggerFor]="mstmenu">
             ﾏｽﾀﾒﾝﾃﾅﾝｽ(一括更新)
         </button>

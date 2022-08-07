@@ -1,0 +1,31 @@
+mat-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding-top: 20px;
+}
+
+.mat-cell, .mat-footer-cell, .mat-header-cell{
+    padding: 5px;
+}
+
+.mat-table {
+    overflow-x: scroll;
+    display: table;
+    padding-top: 0px;
+}
+
+td .mat-form-field {
+    height:20px;
+}
+
+tr.mat-row {
+    height:20px;
+}
+tr.mat-header-row {
+    height:20px;
+}
+//mat-selectの▼を非表示に
+::ng-deep mat-select.noArrow .mat-select-arrow  {
+    border: none;
+} 

@@ -200,6 +200,12 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     this.denno = this.usrsrv.convNumber(this.denno);
     this.get_siiden(this.denno);
   }
+  canEnter(e: KeyboardEvent): void {
+    let element = e.target as HTMLElement;
+    if (element.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+    }
+  }
   refresh(): void {
     if (this.mode == 3) {
       this.form.disable();

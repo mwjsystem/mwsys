@@ -31,7 +31,7 @@
             </a></button>
     </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px">
+<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($event)">
     <mat-card>
         <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between" style="margin-bottom: 10px;">
             <mat-card-title>
@@ -53,7 +53,8 @@
             <div fxLayout="row wrap" fxLayoutGap="5px" fxLayoutAlign="start end">
                 <mat-form-field style="width: 7em;">
                     <mat-label>入荷日</mat-label>
-                    <input matInput [matDatepicker]="picker" formControlName="inday" required>
+                    <input matInput [matDatepickerFilter]="usrsrv.holidayFltr" [matDatepicker]="picker"
+                        formControlName="inday" required>
                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
                 </mat-form-field>

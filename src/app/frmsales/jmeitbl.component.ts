@@ -166,7 +166,7 @@ export class JmeitblComponent implements OnInit {
         lctinmoney = lcmoney;
         break;
     }
-    console.log(ctrl);
+    // console.log(ctrl);
     lcgenka = Math.round(ctrl.genka * ctrl.suu);
     this.frmArr.controls[i].patchValue({
       money: lcmoney,
@@ -513,7 +513,7 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue({ scode: this.parentForm.value.scode });
           let lctanka: number = 0;
           let lcgenka: number = 0;
-          console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
+          // console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
           if (msgds.msgtankas[0].currency == "USD") {
             lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate);
             // lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate) + msgds.msgtankas[0].cost;
@@ -709,7 +709,7 @@ export class JmeitblComponent implements OnInit {
     // console.log(this.frmArr.controls);
   }
 
-  set_jyumei(skbn: string) {
+  set_jyumei(skbn: string) { //skbn:受注伝票出荷区分
     this.frmArr.clear();
     this.jmisrv.trzaiko = [];
     let i: number = 0;

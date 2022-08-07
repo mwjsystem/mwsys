@@ -6,14 +6,16 @@ import { FrmdepositRoutingModule } from './frmdeposit-routing.module';
 import { FrmdepositComponent } from './frmdeposit.component';
 import { DepttblComponent } from './depttbl.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
-import { JdentblComponent } from './jdentbl.component';
+import { HisttblComponent } from './histtbl.component';
+import { NdnohelpComponent } from '../share/ndnohelp/ndnohelp.component';
 
 
 @NgModule({
   declarations: [
     FrmdepositComponent,
     DepttblComponent,
-    JdentblComponent
+    HisttblComponent,
+    NdnohelpComponent
   ],
   imports: [
     CommonModule,

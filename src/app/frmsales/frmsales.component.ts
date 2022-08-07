@@ -423,6 +423,11 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       }
     }
   }
+
+  changeSday(sday) {
+    this.form.get('uday').setValue(sday);
+  }
+
   changeIadr(eda) {
     if (eda !== null) {
       let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == eda);
@@ -564,6 +569,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.jmisrv.denno = 0;
     this.form.get('tcode').setValue(this.usrsrv.staff.code);
     this.form.get('day').setValue(new Date());
+    this.form.get('yday').setValue(this.usrsrv.getNextday(new Date()));
     this.form.get('scode').setValue(this.usrsrv.staff.scode);
     this.form.get('skbn').setValue("0");
     this.jmeitbl.frmArr.clear();

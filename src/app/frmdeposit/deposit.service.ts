@@ -4,9 +4,52 @@ import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
+export class Nyuden {
+  line: number;
+  ptype: string;
+  nmoney: number;
+  smoney: number;
+  tmoney: number;
+  total: number;
+  mbiko: string;
+}
+
+export class Nyusub {
+  denno: number;
+  kubun: number;
+  day: Date;
+  mcode: string;
+  code: string;
+  tcode: string;
+  created_at: Date;
+  created_by: string;
+  updated_at: Date;
+  updated_by: string;
+  biko: string;
+  jdenno: number;
+  idenno: number;
+  nmoney: number;
+  smoney: number;
+  tmoney: number;
+  trnyudens: Nyuden[];
+}
+
+export class Nyuhis {
+  denno: number;
+  day: Date;
+  nmoney: number;
+  smoney: number;
+  tmoney: number;
+  total: number;
+  memo: string;
+}
+
+
+
 export class Jyuden {
   day: Date;
-  sday: Date;
+  uday: Date;
+  nday: Date;
   scde: string;
   hcode: string;
   okurino: String;
@@ -24,8 +67,11 @@ export class Jyuden {
   created_by: string;
   updated_at: Date;
   updated_by: string;
+  trnyusubs: Nyusub[];
   constructor(init?: Partial<Jyuden>) {
     Object.assign(this, init);
+    this.total = 0;
+    this.nyuzan = 0;
   }
 }
 
@@ -35,12 +81,58 @@ export class Jyuden {
 export class DepositService {
   total: number = 0;
   mode: number = 3;
+  nyusub: Nyusub[] = [];
+  nyuden: Nyuden[] = [];
+  public subHis = new Subject<Nyuhis[]>();
+  public observeH = this.subHis.asObservable();
+  public subDep = new Subject<boolean>();
+  public observeD = this.subDep.asObservable();
+
+  private GetTran0 = gql`
+    query get_nyuden($dno: Int!, $id: smallint!) {
+      trnyusub(where: {id: {_eq: $id}, denno: {_eq: $dno}}) {
+        kubun
+        day
+        mcode
+        tcode
+        code
+        biko
+        created_at
+        created_by
+        updated_at
+        updated_by
+        jdenno
+        idenno
+        nmoney
+        smoney
+        tmoney
+        trnyudens {
+          line
+          ptype
+          nmoney
+          smoney
+          tmoney
+          mbiko
+        }
+        vnyuzan {
+          trnyusubs {
+            denno
+            day
+            nmoney
+            smoney
+            tmoney
+            updated_at
+          }
+        }
+      }
+    }`;
 
   private GetTran = gql`
     query get_jyuden($dno: Int!, $id: smallint!) {
       vnyuzan(where: {id: {_eq: $id}, denno: {_eq: $dno}}) {
         day
-        sday
+        uday
+        nday
         scde
         hcode
         okurino
@@ -54,6 +146,14 @@ export class DepositService {
         shukin
         chosei
         nyuzan
+        trnyusubs {
+          denno
+          day
+          nmoney
+          smoney
+          tmoney
+          updated_at
+        }
       }
     }`;
 
@@ -71,10 +171,12 @@ export class DepositService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          if (data.vnyuzan[0].torikbn == true) {
+          // console.log(data);
+          if (data.vnyuzan.length == 0) {
+            observer.error('受注伝票' + denno + 'は未登録です');
+
+          } else if (data.vnyuzan[0].torikbn == true) {
             observer.error('締請求の伝票です');
-            // } else if (!data.vnyuzan[0].idenno) {
-            //   observer.error('請求処理済伝票です');
           } else {
             observer.next(data.vnyuzan[0]);
           }
@@ -83,5 +185,85 @@ export class DepositService {
         });
     });
     return observable;
+  }
+
+  qry_nyuden(denno: number): Observable<Nyusub> {
+    let observable: Observable<Nyusub> = new Observable<Nyusub>(observer => {
+      this.apollo.watchQuery<any>({
+        query: this.GetTran0,
+        variables: {
+          id: this.usrsrv.compid,
+          dno: denno
+        },
+      })
+        .valueChanges
+        .subscribe(({ data }) => {
+          observer.next(data.trnyusub[0]);
+        }, (error) => {
+          observer.error(error);
+        });
+    });
+    return observable;
+  }
+  upd_nyuden(denno, nyusub, dept): Promise<string> {
+    const UpdateTran = gql`
+      mutation upd_nyusub($id: smallint!, $dno: Int!,$_set: trnyusub_set_input!,$obj:[trnyuden_insert_input!]!) {
+        update_trnyusub(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: $_set)  {
+          affected_rows
+        }
+        delete_trnyuden(where: {id: {_eq:$id},denno: {_eq:$dno}}) {
+          affected_rows
+        }
+        insert_trnyuden(objects: $obj) {
+          affected_rows
+        }
+      }`;
+    return new Promise((resolve, reject) => {
+      this.apollo.mutate<any>({
+        mutation: UpdateTran,
+        variables: {
+          id: this.usrsrv.compid,
+          dno: denno,
+          _set: nyusub,
+          obj: dept
+        },
+        refetchQueries: [
+          {
+            query: this.GetTran,
+            variables: {
+              id: this.usrsrv.compid,
+              dno: denno
+            },
+          }],
+      }).subscribe(({ data }) => {
+        return resolve(data);
+      }, (error) => {
+        return reject(error);
+      });
+    });
+  }
+  ins_nyuden(nyusub, dept): Promise<string> {
+    const InsertTran = gql`
+      mutation ins_nyuden($obj:[trnyusub_insert_input!]!,$objm:[trnyuden_insert_input!]!) {
+        insert_trnyusub(objects: $obj)  {
+          affected_rows
+        }
+        insert_trnyuden(objects: $objm)  {
+          affected_rows
+        }
+      }`;
+    return new Promise((resolve, reject) => {
+      this.apollo.mutate<any>({
+        mutation: InsertTran,
+        variables: {
+          obj: nyusub,
+          objm: dept
+        },
+      }).subscribe(({ data }) => {
+        return resolve(data);
+      }, (error) => {
+        return reject(error);
+      });
+    });
   }
 }

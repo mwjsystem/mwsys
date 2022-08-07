@@ -475,6 +475,13 @@ export class UserService {
     }
     return ret;
   }
+  canEnter(e: KeyboardEvent): void {
+    let element = e.target as HTMLElement;
+    // console.log(element,element.tagName);
+    if (element.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+    }
+  }
   getTbldef(): void {
     const GetMast = gql`
       query get_tbldef{

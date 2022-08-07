@@ -224,7 +224,12 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.denno = this.usrsrv.convNumber(this.denno);
     this.get_hatden(this.denno);
   }
-
+  canEnter(e: KeyboardEvent): void {
+    let element = e.target as HTMLElement;
+    if (element.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+    }
+  }
   refresh(): void {
     // if (this.denno >0 ){
     // }

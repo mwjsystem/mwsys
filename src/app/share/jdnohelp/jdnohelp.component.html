@@ -10,6 +10,14 @@
         <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;width:100%">
             <button class="mat-raised-button" (click)="get_jyuden()">検索</button>
             <mat-form-field style="width:7em;">
+                <mat-label>締請求</mat-label>
+                <mat-select [(ngModel)]="ftype" [ngModelOptions]="{standalone: true}">
+                    <mat-option value="2">すべて</mat-option>
+                    <mat-option value="0">都度伝票のみ</mat-option>
+                    <mat-option value="1">締請求のみ</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field style="width:7em;">
                 <mat-label>日付</mat-label>
                 <mat-select [(ngModel)]="fdayfld" [ngModelOptions]="{standalone: true}">
                     <mat-option value="day">受付日</mat-option>

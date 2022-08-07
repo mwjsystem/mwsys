@@ -4,13 +4,14 @@ import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { DepttblComponent } from './depttbl.component';
-import { Jyuden, DepositService } from './deposit.service';
+import { Jyuden, Nyuden, Nyuhis, DepositService } from './deposit.service';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { MembsService } from './../services/membs.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
+import { NdnohelpComponent } from './../share/ndnohelp/ndnohelp.component';
 
 @Component({
   selector: 'app-frmdeposit',
@@ -19,12 +20,11 @@ import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FrmdepositComponent implements OnInit, AfterViewInit {
-  // @ViewChild(DepttblComponent) depttbl: DepttblComponent;
+  @ViewChild(DepttblComponent) depttbl: DepttblComponent;
   form: FormGroup;
   denno: number = 0;
-  jdno: number = 0;
   rows: FormArray = this.fb.array([]);
-  jyuden: Jyuden;
+  jyuden: Jyuden = new Jyuden();
   constructor(public usrsrv: UserService,
     public bunsrv: BunruiService,
     public stfsrv: StaffService,
@@ -42,12 +42,12 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      kubun: new FormControl(''),
-      denno: new FormControl('', Validators.required),
-      day: new FormControl('', Validators.required),
-      scde: new FormControl('', Validators.required),
+      // kubun: new FormControl(''),
+      day: new FormControl(''),
+      scde: new FormControl(''),
       code: new FormControl('', Validators.required),
       tcode: new FormControl('', Validators.required),
+      biko: new FormControl(''),
       nmoneysum: new FormControl(''),
       smoneysum: new FormControl(''),
       tmoneysum: new FormControl(''),
@@ -56,6 +56,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
       sdenno: new FormControl(''),
       mtbl: this.rows
     });
+    this.bunsrv.get_bunrui();
   }
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
     this.memsrv.get_members().then(result => {
@@ -68,20 +69,92 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
         }
         if (params.get('denno') !== null) {
           this.denno = +params.get('denno');
-          // this.get_jyuden(data.denno);
+          this.get_nyuden(this.denno);
         }
       });
     });
+    this.depsrv.observeD.subscribe(flg => {
+      this.cdRef.detectChanges();
+    });
+  }
+
+
+  get_nyuden(denno: number) {
+    this.depsrv.qry_nyuden(denno).subscribe(
+      result => {
+        if (result == null) {
+          this.usrsrv.toastInf("受注入金伝票番号" + denno + "は登録されていません");
+          history.replaceState('', '', './frmdeposit');
+        } else {
+          if (result.kubun == 1) {
+            this.usrsrv.toastInf('請求入金伝票です');
+          } else {
+            this.form.get('jdenno').setValue(+result.jdenno);
+            this.get_jyuden(result.jdenno);
+            this.depsrv.nyuden = [];
+            for (let i = 0; i < result.trnyudens.length; i++) {
+              this.depsrv.nyuden.push(
+                {
+                  line: result.trnyudens[i].line,
+                  ptype: result.trnyudens[i].ptype,
+                  nmoney: result.trnyudens[i].nmoney,
+                  smoney: result.trnyudens[i].smoney,
+                  tmoney: result.trnyudens[i].tmoney,
+                  total: result.trnyudens[i].nmoney - result.trnyudens[i].smoney + result.trnyudens[i].tmoney,
+                  mbiko: result.trnyudens[i].mbiko
+                }
+              );
+            }
+            this.depttbl.set_tbl();
+            this.form.get('day').setValue(result.day);
+            this.form.get('code').setValue(result.code);
+            this.form.get('tcode').setValue(result.tcode);
+            this.refresh();
+
+          }
+        }
+
+      }, error => {
+        console.log(error);
+      }
+    );
   }
 
   get_jyuden(denno: number) {
+
     this.depsrv.qry_jyuden(denno).subscribe(
       result => {
-        this.jyuden = result;
-        this.form.get('scde').setValue(this.jyuden.scde);
-        this.form.get('code').setValue(this.jyuden.scde);
-        console.log(this.jyuden);
+        let i: number = result.trnyusubs.findIndex(obj => obj.denno == this.denno);
+        if (result.torikbn == true) {
+          this.usrsrv.toastInf('この受注伝票は掛け請求伝票です');
+        } else if (result.nyuzan <= 0 && (this.depsrv.mode == 1 || (this.depsrv.mode == 2 && i < 0))) {
+          this.usrsrv.toastInf('この受注伝票は入金済です');
+        } else {
+          this.form.get('jdenno').setValue(denno);
+          this.jyuden = result;
+          this.form.get('scde').setValue(this.jyuden.scde);
+          this.form.get('code').setValue(this.jyuden.scde);
+          let nyuhis: Nyuhis[] = [];
+          for (let i = 0; i < result.trnyusubs.length; i++) {
+            if (this.denno !== result.trnyusubs[i].denno) {
+              nyuhis.push(
+                {
+                  denno: result.trnyusubs[i].denno,
+                  day: result.trnyusubs[i].day,
+                  nmoney: result.trnyusubs[i].nmoney,
+                  smoney: result.trnyusubs[i].smoney,
+                  tmoney: result.trnyusubs[i].tmoney,
+                  total: result.trnyusubs[i].nmoney - result.trnyusubs[i].smoney + result.trnyusubs[i].tmoney,
+                  memo: result.trnyusubs[i].biko
+                }
+              );
+            }
+          }
+          this.depsrv.subHis.next(nyuhis);
+        }
+
       }, error => {
+        this.usrsrv.toastWar(error);
         console.log(error);
       }
     );
@@ -92,12 +165,18 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
   }
   onEnter() {
     this.denno = this.usrsrv.convNumber(this.denno);
+    this.form.reset();
+    this.get_nyuden(this.denno);
   }
+
+
   refresh(): void {
     if (this.depsrv.mode == 3) {
       this.form.disable();
+      this.usrsrv.disable_mtbl(this.form);
     } else {
       this.form.enable();
+      this.usrsrv.enable_mtbl(this.form);
     }
     this.cdRef.detectChanges();
   }
@@ -106,18 +185,39 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     dialogConfig.width = '100vw';
     dialogConfig.height = '98%';
     dialogConfig.panelClass = 'full-screen-modal';
-    dialogConfig.data = { mcdfld: 'scde', mcode: this.form.value.scde };
+    dialogConfig.data = {
+      mcode: this.form.value.scde,
+      ftype: '0'
+    };
+    let dialogRef = this.dialog.open(NdnohelpComponent, dialogConfig);
+
+    dialogRef.afterClosed().subscribe(
+      data => {
+        if (typeof data != 'undefined') {
+          this.denno = data.denno;
+          this.get_nyuden(this.denno);
+        }
+      }
+    );
+  }
+
+  jdennoHelp() {
+    let dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
+    dialogConfig.data = {
+      mcdfld: 'scde',
+      mcode: this.form.value.scde,
+      ftype: '0'
+    };
     let dialogRef = this.dialog.open(JdnohelpComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
           this.form.get('jdenno').setValue(data.denno);
-          // console.log(data.denno);
           this.get_jyuden(data.denno);
-          // this.cdRef.detectChanges();
-          // console.log(this.jdno);
-          // this.get_hatden(this.denno);
         }
       }
     );
@@ -138,14 +238,18 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
       }
     );
   }
+  test() {
+    console.log(this.form);
 
+  }
   modeToCre(): void {
     this.depsrv.mode = 1;
     this.form.reset();
     this.denno = 0;
-
-    // this.hmeitbl.frmArr.clear();
-    // this.hmeitbl.add_rows(1);
+    this.jyuden = new Jyuden();
+    this.depsrv.subHis.next([new Nyuhis()]);
+    this.depttbl.frmArr.clear();
+    this.depttbl.insRow(1);
     this.refresh();
   }
   modeToUpd(): void {
@@ -163,6 +267,53 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     }
   }
   async save() {
+    let head: any = {
+      day: this.usrsrv.editFrmval(this.form, 'day'),
+      mcode: this.usrsrv.editFrmval(this.form, 'scde'),
+      code: this.usrsrv.editFrmval(this.form, 'code'),
+      jdenno: this.usrsrv.editFrmval(this.form, 'jdenno'),
+      tcode: this.usrsrv.editFrmval(this.form, 'tcode'),
+      updated_at: new Date(),
+      updated_by: this.usrsrv.staff.code
+    }
+
+    if (this.depsrv.mode == 2) {
+      let dept = this.depttbl.getMtbl(this.denno);
+      this.depsrv.upd_nyuden(this.denno, head, dept)
+        .then(result => {
+          // console.log('update_hatden',result);
+          this.usrsrv.toastSuc('入金伝票' + this.denno + 'の変更を保存しました');
+          this.form.markAsPristine();
+          this.cancel();
+        }).catch(error => {
+          this.usrsrv.toastErr('データベースエラー', '入金伝票' + this.denno + 'の変更保存ができませんでした');
+          console.log('error update_nyuden', error);
+        });
+
+
+    } else {//新規登録
+      this.denno = await this.usrsrv.getNumber('ndenno', 1, this.denno);
+      let dept = this.depttbl.getMtbl(this.denno);
+      const trnyusub = [{
+        ...{
+          id: this.usrsrv.compid,
+          denno: this.denno,
+          created_at: new Date(),
+          created_by: this.usrsrv.staff.code,
+        }
+        , ...head
+      }]
+      this.depsrv.ins_nyuden(trnyusub, dept)
+        .then(result => {
+          // console.log('insert_trhat',result);
+          this.usrsrv.toastSuc('入金伝票' + this.denno + 'を新規登録しました');
+          this.form.markAsPristine();
+          this.cancel();
+        }).catch(error => {
+          this.usrsrv.toastErr('データベースエラー', '入金伝票の新規登録ができませんでした');
+          console.log('error insert_nyusub', error);
+        });
+    }
 
   }
   getInvalid(): string {

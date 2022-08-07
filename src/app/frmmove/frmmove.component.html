@@ -1,0 +1,30 @@
+<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
+    <div class="icon-area" fxLayout="row wrap">
+        <button mat-button (click)="modeToCre()" *ngIf="mode==3">
+            <mat-icon>add_box</mat-icon>新規
+        </button>
+        <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.denno">
+            <mat-icon>edit</mat-icon>編集
+        </button>
+        <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
+            <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
+        </button>
+        <button mat-button (click)="cancel()" *ngIf="mode!=3">
+            <mat-icon>cancel</mat-icon>中止
+        </button>
+        <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
+            <mat-label>移動伝票番号</mat-label>
+            <input matInput [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
+                (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
+                [disabled]="mode==1 || (mode==2 && form.dirty)">
+            <button mat-button mat-icon-button matSuffix (click)="dennoHelp()" *ngIf="mode==3">
+                <mat-icon>find_replace</mat-icon>
+            </button>
+        </mat-form-field>
+        <button mat-button><a mat-button
+                href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
+                target="_blank">
+                <mat-icon>help</mat-icon>ヘルプ
+            </a></button>
+    </div>
+</mat-toolbar>

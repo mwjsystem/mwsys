@@ -1,0 +1,52 @@
+.mat-elevation-z8 {
+    margin-bottom: 10px;
+}
+// button {
+//     // min-width: 55px;
+//     padding: 0px;
+// }
+.i_num {
+    text-align: right;
+    margin:0px;
+}
+.mat-cell, .mat-footer-cell, .mat-header-cell{
+    padding: 5px;
+}
+.mat-table {
+    overflow-x: scroll;
+    display: table;
+}
+::ng-deep.mat-form-field {
+    padding-top: 0;
+    .mat-form-field-wrapper {
+        padding-bottom: 0;
+    }
+    .mat-form-field-underline {
+        bottom: 0;
+    }
+}
+::ng-deep td .mat-form-field-infix {
+    border: none;
+}
+::ng-deep.mat-form-field input:disabled {
+    color: black;
+}
+::ng-deep.mat-form-field select:disabled {
+    color: black;
+}
+// Add in style.scss as we are overriding css of global mat-select class which is part of other module.
+::ng-deep.mat-form-field .mat-select-disabled .mat-select-value {
+    color: black;
+}
+td .mat-form-field {
+    height:20px;
+  }
+td .mat-icon-button {
+    height:20px;
+  } 
+tr.mat-row{
+    height:20px;
+}
+tr.mat-header-row{
+    height:20px;
+}

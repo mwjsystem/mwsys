@@ -3,8 +3,8 @@ import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@ang
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { DepttblComponent } from './depttbl.component';
-import { DepositService } from './deposit.service';
+// import { DepttblComponent } from './depttbl.component';
+import { InvoiceService } from './invoice.service';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
@@ -15,13 +15,13 @@ import { StaffService } from './../services/staff.service';
   styleUrls: ['./frminvoice.component.scss']
 })
 export class FrminvoiceComponent implements OnInit, AfterViewInit {
-  @ViewChild(DepttblComponent) depttbl: DepttblComponent;
+  // @ViewChild(DepttblComponent) depttbl: DepttblComponent;
   form: FormGroup;
   denno: number = 0;
   constructor(public usrsrv: UserService,
     public bunsrv: BunruiService,
     public stfsrv: StaffService,
-    public depsrv: DepositService,
+    public invsrv: InvoiceService,
     private fb: FormBuilder,
     private title: Title,
     private route: ActivatedRoute,
@@ -42,7 +42,7 @@ export class FrminvoiceComponent implements OnInit, AfterViewInit {
   }
 
   refresh(): void {
-    if (this.depsrv.mode == 3) {
+    if (this.invsrv.mode == 3) {
       this.form.disable();
     } else {
       this.form.enable();
@@ -53,7 +53,7 @@ export class FrminvoiceComponent implements OnInit, AfterViewInit {
 
   }
   modeToCre(): void {
-    this.depsrv.mode = 1;
+    this.invsrv.mode = 1;
     this.form.reset();
     this.denno = 0;
 
@@ -62,17 +62,17 @@ export class FrminvoiceComponent implements OnInit, AfterViewInit {
     this.refresh();
   }
   modeToUpd(): void {
-    this.depsrv.mode = 2;
+    this.invsrv.mode = 2;
     this.refresh();
-    history.replaceState('', '', './frminvoice/' + this.depsrv.mode + '/' + this.denno);
+    history.replaceState('', '', './frminvoice/' + this.invsrv.mode + '/' + this.denno);
   }
   cancel(): void {
     if (this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
-      this.depsrv.mode = 3;
+      this.invsrv.mode = 3;
       // this.get_hatden(this.denno);
       this.refresh();
       this.form.markAsPristine();
-      history.replaceState('', '', './frminvoice/' + this.depsrv.mode + '/' + this.denno);
+      history.replaceState('', '', './frminvoice/' + this.invsrv.mode + '/' + this.denno);
     }
   }
   async save() {
