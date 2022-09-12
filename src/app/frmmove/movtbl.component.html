@@ -1,1 +1,126 @@
-<p>movtbl works!</p>
+<div fxLayout="row wrap" fxLayoutAlign="start end" fxLayoutGap="10px" style="height: 40px;">
+    <button mat-flat-button color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
+    <mat-menu #cnp="matMenu">
+        <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
+        <button mat-menu-item (click)="pasteFromClipboard(true)"
+            *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(明細洗替)</button>
+        <button mat-menu-item (click)="pasteFromClipboard(false)"
+            *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(末尾に追加)</button>
+    </mat-menu>
+</div>
+<div class="mat-elevation-z8">
+    <ng-container [formGroup]="parentForm">
+        <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
+            <ng-container matColumnDef="chk">
+                <th mat-header-cell *matHeaderCellDef class="i_num">
+                    <mat-checkbox (change)="setAll($event.checked)" *ngIf="frmArr.enabled">
+                    </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+                    <mat-checkbox formControlName="chk" *ngIf="frmArr.enabled"></mat-checkbox>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="line">
+                <th mat-header-cell *matHeaderCellDef class="i_num">
+                    <button mat-icon-button matPrefix (click)="ins_row(0)" *ngIf="frmArr.enabled"
+                        style="height:14px !important;width:14px !important;font-size:14px !important;">
+                        <mat-icon
+                            style="height:14px !important;width:14px !important;font-size:14px !important;vertical-align: text-top!important;">
+                            add_circle</mat-icon>
+                    </button>
+                    行番号
+                </th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+                    <mat-form-field style="width: 5em;">
+                        <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
+                        <button mat-icon-button matPrefix (click)="ins_row(getIdx(i)+1)" *ngIf="frmArr.enabled">
+                            <mat-icon>add_circle</mat-icon>
+                        </button>
+                        <button mat-icon-button matPrefix (click)="del_row(getIdx(i))" *ngIf="frmArr.enabled">
+                            <mat-icon>remove_circle</mat-icon>
+                        </button>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="gcode">
+                <th mat-header-cell *matHeaderCellDef>商品コード</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+                    <mat-form-field>
+                        <input #gcdInputs matInput formControlName="gcode" (change)="updGds(i,$event.target.value)"
+                            maxlength="20" (keydown.f4)="gcdHelp(getIdx(i))">
+                        <button mat-icon-button matSuffix (click)="gcdHelp(getIdx(i))" *ngIf="frmArr.enabled">
+                            <mat-icon>find_replace</mat-icon>
+                        </button>
+                        <button mat-icon-button matSuffix *ngIf="frmArr.getRawValue()[getIdx(i)]['gcode']"
+                            (click)="usrsrv.openMst('mstgoods',frmArr.getRawValue()[getIdx(i)]['gcode'])">
+                            <mat-icon>open_in_new</mat-icon>
+                        </button>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="gtext">
+                <th mat-header-cell *matHeaderCellDef>商品テキスト</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+                    <mat-form-field style="width:20em;">
+                        <input matInput formControlName="gtext">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="suu">
+                <th mat-header-cell *matHeaderCellDef>数量</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+                    <mat-form-field style="width:4em;">
+                        <input type="number" matInput formControlName="suu" class="i_num">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="unit">
+                <th mat-header-cell *matHeaderCellDef>単位</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+                    <mat-form-field style="width:4em;">
+                        <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['unit']" disabled>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="stock">
+                <th mat-header-cell *matHeaderCellDef class="i_num">入庫倉庫</th>
+                <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+                    <mat-form-field style="width:4em;"
+                        [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
+                        <button mat-icon-button matPrefix *ngIf="frmArr.getRawValue()[getIdx(i)]['gcode']"
+                            (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],parentForm.getRawValue()['incode'])">
+                            <mat-icon>open_in_new</mat-icon>
+                        </button>
+                        <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['stock'] | number" class="i_num"
+                            disabled>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="pable">
+                <th mat-header-cell *matHeaderCellDef class="i_num">出庫倉庫</th>
+                <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+                    <mat-form-field style="width:4em;"
+                        [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
+                        <button mat-icon-button matPrefix *ngIf="frmArr.getRawValue()[getIdx(i)]['gcode']"
+                            (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],parentForm.getRawValue()['outcode'])">
+                            <mat-icon>open_in_new</mat-icon>
+                        </button>
+                        <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['pable'] | number" class="i_num"
+                            disabled>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="memo">
+                <th mat-header-cell *matHeaderCellDef>明細備考</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+                    <mat-form-field>
+                        <input matInput formControlName="memo" (keydown.control)="add_newrow(getIdx(i))">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </ng-container>
+    <mat-paginator [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons></mat-paginator>
+</div>

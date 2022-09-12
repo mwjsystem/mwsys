@@ -7,7 +7,8 @@
             <mat-icon>edit</mat-icon>編集
         </button>
         <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
-            <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
+            <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>
+            保存
         </button>
         <button mat-button (click)="cancel()" *ngIf="mode!=3">
             <mat-icon>cancel</mat-icon>中止
@@ -21,10 +22,129 @@
                 <mat-icon>find_replace</mat-icon>
             </button>
         </mat-form-field>
-        <button mat-button><a mat-button
+        <button mat-button>
+            <a mat-button
                 href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
                 target="_blank">
                 <mat-icon>help</mat-icon>ヘルプ
             </a></button>
     </div>
 </mat-toolbar>
+<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($event)">
+    <mat-card>
+        <mat-card-header fxLayout="row wrap" fxLayoutGap="5px">
+            <mat-card-title>
+                {{mode|modetxt}}
+            </mat-card-title>
+            <app-tmstmp></app-tmstmp>
+        </mat-card-header>
+        <mat-card-content fxLayout="row wrap">
+            <div fxLayout="column">
+                <div fxLayout="row wrap" fxLayoutAlign="start end">
+                    <mat-form-field style="width: 7em;">
+                        <mat-label>移動日</mat-label>
+                        <input matInput [matDatepicker]="picker" formControlName="day">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                    <span class="ybtxt">{{form.value.day | jdate}}</span>
+                </div>
+                <mat-form-field>
+                    <mat-label>入庫倉庫</mat-label>
+                    <mat-select formControlName="incode" required>
+                        <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
+                            {{sval.viewval}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>出庫倉庫</mat-label>
+                    <mat-select formControlName="outcode" required>
+                        <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
+                            {{sval.viewval}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>担当者</mat-label>
+                    <mat-select formControlName="tcode">
+                        <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+                            {{sval.viewval}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div fxLayout="column">
+                <mat-form-field style="width: 7em;">
+                    <mat-label>配送方法</mat-label>
+                    <mat-select formControlName="hcode" (selectionChange)="selected(+$event.value)">
+                        <mat-option>選択削除</mat-option>
+                        <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
+                            {{sval.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div fxLayout="row wrap" fxLayoutAlign="start end">
+                    <mat-form-field style="width: 7em;">
+                        <mat-label>配送希望日</mat-label>
+                        <input matInput [matDatepicker]="picker5" formControlName="hday">
+                        <mat-datepicker-toggle matSuffix [for]="picker5"></mat-datepicker-toggle>
+                        <mat-datepicker #picker5></mat-datepicker>
+                    </mat-form-field>
+                    <span class="ybtxt">{{form.value.hday | jdate}}</span>
+                </div>
+                <mat-form-field style="width: 8em;">
+                    <mat-label>配送希望時間</mat-label>
+                    <mat-select formControlName="htime">
+                        <mat-option *ngFor="let sval of hktval" [value]="sval.value">
+                            {{sval.viewval}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div fxLayout="row wrap" fxLayoutAlign="start end">
+                    <mat-form-field style="width: 4em;">
+                        <mat-label>荷物個数</mat-label>
+                        <input type="number" matInput formControlName="okurisuu" class="i_num">
+                    </mat-form-field>
+                    <span class="ybtxt">　個口</span>
+                </div>
+                <mat-form-field style="width: 10em;">
+                    <mat-label>送り状番号</mat-label>
+                    <input tabIndex="20" matInput formControlName="okurino">
+                    <button mat-button mat-icon-button matSuffix
+                        (click)="openOkuri(form.value.hcode,form.value.okurino)"
+                        *ngIf="form.value.okurino && form.value.hcode">
+                        <mat-icon>web_asset</mat-icon>
+                    </button>
+                    <button mat-button mat-icon-button matSuffix (click)="setOkrno()"
+                        *ngIf="okrsrv.get_hinfo(form.value.hcode).numbering && mode!=3 && !form.value.okurino">
+                        <mat-icon>calculate</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+                <mat-form-field class="txtar">
+                    <mat-label>伝票備考</mat-label>
+                    <textarea matInput formControlName="bikou" matTextareaAutosize></textarea>
+                </mat-form-field>
+                <mat-form-field class="txtar">
+                    <mat-label>送り状備考</mat-label>
+                    <textarea matInput formControlName="obikou" matTextareaAutosize></textarea>
+                </mat-form-field>
+                <mat-form-field class="txtar">
+                    <mat-label>出荷指示書備考</mat-label>
+                    <textarea matInput formControlName="sbikou" matTextareaAutosize></textarea>
+                </mat-form-field>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <mat-card>
+        <mat-card-header fxLayout="row wrap" fxLayoutAlign="start start" fxLayoutGap="10px" style="height: 40px;">
+            <mat-card-title>移動明細</mat-card-title>
+
+        </mat-card-header>
+        <mat-card-content>
+            <app-movtbl [parentForm]="form"></app-movtbl>
+        </mat-card-content>
+    </mat-card>
+</form>

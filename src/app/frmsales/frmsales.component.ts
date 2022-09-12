@@ -503,6 +503,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           this.iskVal = this.nskVal.concat();
           this.iskVal.unshift({ value: " ", viewval: "通常依頼主" });
           this.changeEda(this.form.value.nadr);
+          console.log(this.bnssrv.buntype, this.jmisrv.ntype, this.jmisrv.tntype);
           this.cdRef.detectChanges();
         }
       }, (error) => {
@@ -743,7 +744,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           }
           , ...jyuden,
         }]
-        // console.log(trjyuden, jyumei);
+        console.log(trjyuden, jyumei);
         this.jmisrv.ins_jyuden(trjyuden, jyumei, jyumzai)
           .then(result => {
             // console.log('insert_trjyu', result);

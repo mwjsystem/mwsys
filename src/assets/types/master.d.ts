@@ -161,8 +161,8 @@ declare namespace mwI {
     lday: Date;
     created_by: string;
     updated_by: string;
-    ntype: number;
-    tntype: number;
+    ntype: string;
+    tntype: string;
     webid: string;
     ryoate: string;
     mtgt1: boolean;

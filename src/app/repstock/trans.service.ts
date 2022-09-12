@@ -351,7 +351,7 @@ export class TransService {
           });
           return resolve(trans);
         }, (error) => {
-          console.log('error query get_jyumei', error);
+          console.log('error query get_trans', error);
         });
     })
     return new Promise(resolve => {

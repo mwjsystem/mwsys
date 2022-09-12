@@ -18,8 +18,8 @@ export class JyumeiService {
   public tankakbn: string;         //顧客マスタ「単価区分」
   public sptnkbn: string;          //顧客マスタ「特別単価区分」
   // public souko:string;
-  public ntype: number;            //顧客マスタ「納品書タイプ」
-  public tntype: number;           //顧客マスタ「直送納品書タイプ」
+  public ntype: string;            //顧客マスタ「納品書タイプ」
+  public tntype: string;           //顧客マスタ「直送納品書タイプ」
   public address: string = "";
   public iaddress: string = "";
   public trzaiko: mwI.Zaiko[] = [];

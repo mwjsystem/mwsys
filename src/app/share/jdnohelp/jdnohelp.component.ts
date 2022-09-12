@@ -237,6 +237,7 @@ export class JdnohelpComponent implements OnInit {
         } else {
           data.trjyuden.forEach(element => {
             let { trjyumeis, ...rest } = element;
+            // console.log(element.denno, trjyumeis);
             let gcd = { gcode: trjyumeis[0].gcode };
             srcdata.push({ ...rest, ...gcd });
           });

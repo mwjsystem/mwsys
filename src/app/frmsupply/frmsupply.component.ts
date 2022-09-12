@@ -77,11 +77,9 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       mtbl: this.rows
     });
 
-    // this.cdRef.detectChanges(); 
-
     this.strsrv.get_store();
     this.bunsrv.get_bunrui();
-    // this.stfsrv.get_staff();
+
   }
 
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
