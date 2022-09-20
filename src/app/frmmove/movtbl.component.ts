@@ -6,7 +6,7 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { StockService } from './../services/stock.service';
-import { Gzai, Movden, MovingService } from './moving.service';
+import { Zaiko, Gzai, Movden, MovingService } from './moving.service';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { take } from 'rxjs/operators';
@@ -25,6 +25,7 @@ export class MovtblComponent implements OnInit {
   copyToClipboard: string;
   navCli = navigator.clipboard;
   setZai = [];
+  public trzaiko: Zaiko[] = [];
   displayedColumns: string[] = ['line',
     'gcode',
     'gtext',
@@ -133,8 +134,8 @@ export class MovtblComponent implements OnInit {
   }
   createRow(i: number, movden?: Movden) {
     let lcArr = this.fb.array([]);
-    if (movden?.gskbn == "1") {
-      movden.msgzais.forEach(e => {
+    if (movden?.msgood.gskbn == "1") {
+      movden.msgood.msgzais.forEach(e => {
         if (e.msgoods.gskbn == "0") {
           lcArr.push(this.fb.group({ zcode: e.zcode, irisu: e.irisu, msgoods: e.msgoods }));
         }
@@ -147,7 +148,7 @@ export class MovtblComponent implements OnInit {
       gtext: [movden?.msgood.gtext],
       suu: [movden?.suu, Validators.required],
       unit: [movden?.msgood.unit],
-      gskbn: [movden?.gskbn],
+      gskbn: [movden?.msgood.gskbn],
       pable: [{ value: movden?.pable, disabled: true }],
       stock: [{ value: movden?.stock, disabled: true }],
       memo: [movden?.memo],
@@ -156,27 +157,27 @@ export class MovtblComponent implements OnInit {
   }
 
   setPable(i: number, gcd: string, msgzais: any) {
-    // console.log(gcd, this.frmArr.controls[i].value.gskbn);
+    // console.log(gcd, this.parentForm.get('incode').value);
     if (this.frmArr.controls[i].value.gskbn == "0") {
-      this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.frmArr.controls[i].value.outcode).then(result => {
-        console.log(result);
+      this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('outcode').value).then(result => {
+        // console.log(result);
         this.frmArr.controls[i].patchValue({ pable: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
-        console.log(this.frmArr);
+        // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
-      this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.frmArr.controls[i].value.incode).then(result => {
-        console.log(result);
+      this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('incode').value).then(result => {
+        // console.log(result);
         this.frmArr.controls[i].patchValue({ stock: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
-        console.log(this.frmArr);
+        // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
     } else if (this.frmArr.controls[i].value.gskbn == "1") {
-      this.stcsrv.getSetZai(this.frmArr.controls[i].value.outcode, msgzais).then(result => {
+      this.stcsrv.getSetZai(this.parentForm.get('outcode').value, msgzais).then(result => {
         this.setZai[i] = result;
         this.frmArr.controls[i].patchValue({ pable: this.stcsrv.get_paabl(result) });
         this.movsrv.subject.next(true);
       });
-      this.stcsrv.getSetZai(this.frmArr.controls[i].value.incode, msgzais).then(result => {
+      this.stcsrv.getSetZai(this.parentForm.get('incode').value, msgzais).then(result => {
         this.setZai[i] = result;
         this.frmArr.controls[i].patchValue({ stock: this.stcsrv.get_paabl(result) });
         this.movsrv.subject.next(true);
@@ -242,12 +243,12 @@ export class MovtblComponent implements OnInit {
           pable: 0,
           stock: 0,
           memo: '',
-          gskbn: '',
           msgood: {
             gtext: '',
-            unit: ''
+            unit: '',
+            gskbn: '',
+            msgzais: [],
           },
-          msgzais: [],
         }
         this.frmArr.push(this.createRow(i + 1, movden));
         // console.log(this.updateRow(i+1,hmei));
@@ -265,6 +266,23 @@ export class MovtblComponent implements OnInit {
       }
     })
     this.usrsrv.toastInf('クリップボードにコピーしました');
+  }
+
+  get_movmei(dno) {
+    let movmei = [];
+    this.frmArr.controls
+      .forEach(control => {
+        movmei.push({
+          id: this.usrsrv.compid,
+          denno: dno,
+          line: this.usrsrv.editFrmval(control, 'line'),
+          gcode: this.usrsrv.editFrmval(control, 'gcode'),
+          gtext: this.usrsrv.editFrmval(control, 'gtext'),
+          suu: this.usrsrv.editFrmval(control, 'suu'),
+          memo: this.usrsrv.editFrmval(control, 'mbiko')
+        });
+      });
+    return movmei;
   }
   objectToArray(obj: object): string {
     var result = Object.keys(obj).map((key: keyof typeof obj) => {
@@ -285,8 +303,42 @@ export class MovtblComponent implements OnInit {
     let i: number = 0;
     movdens.forEach(e => {
       this.frmArr.push(this.createRow(i + 1, e));
-      this.setPable(i, e.gcode, e.msgzais);
+      this.setPable(i, e.gcode, e.msgood.msgzais);
       i += 1;
+      // console.log(e);
+      if (e.msgood.gskbn == "0") {
+        this.trzaiko.push({
+          scode: this.parentForm.get('incode').value,
+          gcode: e.gcode,
+          day: this.parentForm.get('day').value,
+          movi: e.suu * -1,
+          movo: 0
+        });
+        this.trzaiko.push({
+          scode: this.parentForm.get('outcode').value,
+          gcode: e.gcode,
+          day: this.parentForm.get('day').value,
+          movi: 0,
+          movo: e.suu * -1,
+        });
+      } else if (e.msgood.gskbn == "1") {
+        e.msgood.msgzais.forEach(zai => {
+          this.trzaiko.push({
+            scode: this.parentForm.get('incode').value,
+            gcode: zai.zcode,
+            day: this.parentForm.get('day').value,
+            movi: e.suu * zai.irisu * -1,
+            movo: 0
+          });
+          this.trzaiko.push({
+            scode: this.parentForm.get('outcode').value,
+            gcode: zai.zcode,
+            day: this.parentForm.get('day').value,
+            movi: 0,
+            movo: e.suu * zai.irisu * -1,
+          });
+        });
+      }
     });
     this.refresh();
   }

@@ -106,13 +106,13 @@ export class TransService {
         }
       } 
       movin:trmovden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, incode: {_eq: $scd}}) {
-        day
         denno
         line
         memo
-        outcode
         suu
         trmovsub{
+          day
+          outcode
           tcode
         }
         msstoreout{
@@ -120,13 +120,13 @@ export class TransService {
         }
       }  
       movout:trmovden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, outcode: {_eq: $scd}}) {
-        day
         denno
         line
         memo
-        incode
         suu
         trmovsub{
+          day
+          incode
           tcode
         }
         msstorein{
@@ -234,14 +234,14 @@ export class TransService {
           });
           data.movin.forEach(e => {
             const tran: Trans = {
-              sday: e.day,
+              sday: e.trmovsub.day,
               ttype: '移動入庫',
               denno: e.denno,
               line: e.line,
               biko: e.mbiko,
               tcode: e.trmovsub.tcode,
               yday: null,
-              aitec: e.outcode,
+              aitec: e.trmovsub.outcode,
               aiten: e.msstoreout.name,
               insuu: e.suu,
               ousuu: null,
@@ -253,14 +253,14 @@ export class TransService {
           });
           data.movout.forEach(e => {
             const tran: Trans = {
-              sday: e.day,
-              ttype: '移動入庫',
+              sday: e.trmovsub.day,
+              ttype: '移動出庫',
               denno: e.denno,
               line: e.line,
               biko: e.mbiko,
               tcode: e.trmovsub.tcode,
               yday: null,
-              aitec: e.incode,
+              aitec: e.trmovsub.incode,
               aiten: e.msstorein.name,
               insuu: null,
               ousuu: e.suu,

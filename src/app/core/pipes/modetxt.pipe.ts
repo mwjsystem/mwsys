@@ -10,13 +10,16 @@ export class ModetxtPipe implements PipeTransform {
     switch (value) {
       case 1:
         name = '【新規登録モード】';
-      break;
+        break;
       case 2:
         name = '【変更モード】';
-      break;
+        break;
       case 3:
         name = '【照会モード】';
-      break;
+        break;
+      case 4:
+        name = '【削除済】';
+        break;
       default:
         name = '';
     }

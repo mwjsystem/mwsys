@@ -6,7 +6,7 @@ import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { Movsub, MovingService } from './moving.service';
+import { Zaiko, Movsub, MovingService } from './moving.service';
 import { UserService } from './../services/user.service';
 import { EdaService } from './../share/adreda/eda.service';
 import { StaffService } from './../services/staff.service';
@@ -213,9 +213,103 @@ export class FrmmoveComponent implements OnInit {
     this.cdRef.detectChanges();
   }
 
-  save() {
+  async save() {
+
+    let movsub: any = {
+      day: this.usrsrv.editFrmday(this.form, 'day'),
+      outcode: this.usrsrv.editFrmval(this.form, 'outcode'),
+      incode: this.usrsrv.editFrmval(this.form, 'incode'),
+      tcode: this.usrsrv.editFrmval(this.form, 'tcode'),
+      hcode: this.usrsrv.editFrmval(this.form, 'hcode'),
+      hday: this.usrsrv.editFrmday(this.form, 'hday'),
+      htime: this.usrsrv.editFrmval(this.form, 'htime'),
+      okurisuu: this.usrsrv.editFrmval(this.form, 'okurisuu'),
+      okurino: this.usrsrv.editFrmval(this.form, 'okurino'),
+      bikou: this.usrsrv.editFrmval(this.form, 'bikou'),
+      obikou: this.usrsrv.editFrmval(this.form, 'obikou'),
+      sbikou: this.usrsrv.editFrmval(this.form, 'sbikou'),
+      updated_at: new Date(),
+      updated_by: this.usrsrv.staff.code,
+    }
+
+    if (this.mode == 2) {
+      let movmei = this.movtbl.get_movmei(this.denno);
+      this.movsrv.upd_movden(this.denno, movsub, movmei)
+        .then(result => {
+          this.usrsrv.toastSuc('移動伝票' + this.denno + 'の変更を保存しました');
+
+          //  zaiko更新処理 (読込時分マイナス)
+          this.movtbl.trzaiko.forEach(e => {
+            this.movsrv.upd_zaiko(e);
+          });
+
+          //  zaiko更新処理 (通常分プラス)
+          movmei.forEach(e => {
+            if (e.msgood.gskbn == "0") {
+              this.movsrv.upd_zaiko({
+                scode: movsub.incode,
+                gcode: e.gcode,
+                day: movsub.day,
+                movi: e.suu,
+                movo: 0
+              });
+              this.movsrv.upd_zaiko({
+                scode: movsub.outcode,
+                gcode: e.gcode,
+                day: movsub.day,
+                movi: 0,
+                movo: e.suu
+              });
+            } else if (e.msgood.gskbn == "1") {
+              e.msgood.msgzais.forEach(zai => {
+                this.movsrv.upd_zaiko({
+                  scode: movsub.incode,
+                  gcode: zai.zcode,
+                  day: movsub.day,
+                  movi: e.suu * zai.irisu,
+                  movo: 0
+                });
+                this.movsrv.upd_zaiko({
+                  scode: movsub.outcode,
+                  gcode: zai.zcode,
+                  day: movsub.day,
+                  movi: 0,
+                  movo: e.suu * zai.irisu
+                });
+              });
+            }
+          });
+          this.form.markAsPristine();
+          this.cancel();
+        }).catch(error => {
+          this.usrsrv.toastErr('データベースエラー', '移動伝票' + this.denno + 'の変更保存ができませんでした');
+          console.log('error update_movsub', error);
+        });
+    } else {//新規登録
+      this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
+      const movmei = this.movtbl.get_movmei(this.denno);
+      const trmovsub: Movsub[] = [{
+        ...{
+          id: this.usrsrv.compid,
+          denno: this.denno,
+          created_at: new Date(),
+          created_by: this.usrsrv.staff.code,
+        }
+        , ...movsub,
+      }]
+      this.movsrv.ins_movden(trmovsub, movmei)
+        .then(result => {
+          this.usrsrv.toastSuc('移動伝票' + this.denno + 'を新規登録しました');
+          this.form.markAsPristine();
+          this.cancel();
+        }).catch(error => {
+          this.usrsrv.toastErr('データベースエラー', '移動伝票の新規登録ができませんでした');
+          console.log('error insert_movden', error);
+        });
+    }
 
   }
+
   modeToCre(): void {
     this.mode = 1;
     this.form.reset();

@@ -36,6 +36,7 @@ export class JyumeiService {
         created_by
         updated_at
         updated_by
+        del
         mcode
         scde
         ncode
@@ -173,15 +174,33 @@ export class JyumeiService {
     }
     // });
   }
-  makeJyumei(data: any[]) {
-    data.forEach(element => {
+  makeJyumei(data) {
+    data.trjyumeis.forEach(element => {
       // console.log(element);
       let { msgood, ...rest } = element;
       let { msggroup, ...rest2 } = msgood;
-      // console.log(rest,rest2);
       this.jyumei.push({ ...msggroup, ...rest, ...rest2 });
+      if (data.skbn != "1") {//売上のみ以外
+        if (rest.gskbn == "0" && rest.sday != null) {
+          this.trzaiko.push({
+            scode: rest.scode,
+            gcode: rest.gcode,
+            day: rest.sday,
+            suu: rest.suu * -1
+          });
+        } else if (rest.gskbn == "1" && rest.sday != null) {
+          rest.msgzais.forEach(zai => {
+            this.trzaiko.push({
+              scode: rest.scode,
+              gcode: zai.zcode,
+              day: rest.sday,
+              suu: rest.suu * zai.irisu * -1
+            });
+          });
+        }
+      };
     });
-    // console.log(this.jyumei);
+    // console.log(this.jyumei, this.trzaiko);
   }
 
   upd_zaiko(zai: any) {
@@ -302,6 +321,45 @@ export class JyumeiService {
       }, (error) => {
         return reject(error);
       });
+    });
+  }
+
+  del_jyuden(denno, flg): void {
+    const DeleteTran = gql`
+      mutation del_jyuden($id: smallint!, $dno: Int!, $flg: Boolean!, $uat: timestamptz!, $uby: String!) {
+        update_trjyuden(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: {del: $flg, updated_at: $uat, updated_by: $uby})  {
+          affected_rows
+        }
+      }`;
+
+    this.apollo.mutate<any>({
+      mutation: DeleteTran,
+      variables: {
+        id: this.usrsrv.compid,
+        dno: denno,
+        flg: flg,
+        uat: new Date(),
+        uby: this.usrsrv.staff.code
+      },
+      refetchQueries: [
+        {
+          query: this.GetTran,
+          variables: {
+            id: this.usrsrv.compid,
+            dno: denno
+          },
+        }],
+    }).subscribe(({ data }) => {
+      this.usrsrv.toastSuc('受注伝票' + denno + 'を変更しました');
+      this.trzaiko.forEach(e => {
+        if (flg = false) {
+          e.suu = e.suu * -1;
+        }
+        this.upd_zaiko(e);
+      });
+    }, (error) => {
+      this.usrsrv.toastErr('データベースエラー', '受注伝票' + denno + 'の取消(解除)ができませんでした');
+      console.log('error del_jyuen', error);
     });
   }
 

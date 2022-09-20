@@ -38,8 +38,8 @@
             </mat-card-title>
             <app-tmstmp></app-tmstmp>
         </mat-card-header>
-        <mat-card-content fxLayout="row wrap">
-            <div fxLayout="column">
+        <mat-card-content fxLayout="column">
+            <div fxLayout="row wrap">
                 <div fxLayout="row wrap" fxLayoutAlign="start end">
                     <mat-form-field style="width: 7em;">
                         <mat-label>移動日</mat-label>
@@ -50,16 +50,17 @@
                     <span class="ybtxt">{{form.value.day | jdate}}</span>
                 </div>
                 <mat-form-field>
-                    <mat-label>入庫倉庫</mat-label>
-                    <mat-select formControlName="incode" required>
+                    <mat-label>出庫倉庫</mat-label>
+                    <mat-select formControlName="outcode" required>
                         <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
+                <div style="padding-top: 20px;"><span>⇒</span></div>
                 <mat-form-field>
-                    <mat-label>出庫倉庫</mat-label>
-                    <mat-select formControlName="outcode" required>
+                    <mat-label>入庫倉庫</mat-label>
+                    <mat-select formControlName="incode" required>
                         <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
@@ -74,7 +75,7 @@
                     </mat-select>
                 </mat-form-field>
             </div>
-            <div fxLayout="column">
+            <div fxLayout="row wrap">
                 <mat-form-field style="width: 7em;">
                     <mat-label>配送方法</mat-label>
                     <mat-select formControlName="hcode" (selectionChange)="selected(+$event.value)">

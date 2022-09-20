@@ -284,7 +284,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   refresh(): void {
-    if (this.mode == 3) {
+    if (this.mode == 3 || this.mode == 4) {
       this.form.disable();
       this.usrsrv.disable_mtbl(this.form);
     } else {
@@ -306,6 +306,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         result => {
           this.form.reset();
           this.jmisrv.jyumei = [];
+          this.jmisrv.trzaiko = [];
           if (result == null) {
             this.usrsrv.toastInf("受注伝票番号" + denno + "は登録されていません");
             history.replaceState('', '', './frmsales');
@@ -325,12 +326,17 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               this.form.get('isaki').setValue(jyuden.nadr.toString());
             }
             this.form.patchValue(jyuden);
-            this.jmisrv.makeJyumei(jyuden.trjyumeis);
+            this.jmisrv.makeJyumei(jyuden);
             this.jmeitbl.set_jyumei(jyuden.skbn);
             this.usrsrv.setTmstmp(jyuden);
             this.jmisrv.denno = denno;
             this.get_member(jyuden.mcode, false);
             this.qrurl = "https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
+            if (jyuden.del == true) {
+              this.mode = 4;
+            } else {
+              this.mode = 3;
+            }
             history.replaceState('', '', './frmsales/' + this.mode + '/' + this.jmisrv.denno);
           }
           this.refresh();
@@ -503,7 +509,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           this.iskVal = this.nskVal.concat();
           this.iskVal.unshift({ value: " ", viewval: "通常依頼主" });
           this.changeEda(this.form.value.nadr);
-          console.log(this.bnssrv.buntype, this.jmisrv.ntype, this.jmisrv.tntype);
+          // console.log(this.bnssrv.buntype, this.jmisrv.ntype, this.jmisrv.tntype);
           this.cdRef.detectChanges();
         }
       }, (error) => {
@@ -580,6 +586,13 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 
   modeToUpd(): void {
     this.mode = 2;
+    this.refresh();
+    history.replaceState('', '', './frmsales/' + this.mode + '/' + this.jmisrv.denno);
+  }
+
+  modeToDel(flg, mode): void {
+    this.jmisrv.del_jyuden(this.jmisrv.denno, flg);
+    this.mode = mode;
     this.refresh();
     history.replaceState('', '', './frmsales/' + this.mode + '/' + this.jmisrv.denno);
   }

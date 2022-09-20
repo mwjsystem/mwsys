@@ -9,7 +9,7 @@ declare namespace mwI {
     created_by: string;
     updated_at: Date;
     updated_by: string;
-    // del:boolean;
+    del: boolean;
     mcode: string;
     scode: string;
     ncode: string;
