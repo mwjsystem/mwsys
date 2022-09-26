@@ -34,6 +34,7 @@ export class JmeitblComponent implements OnInit {
   navCli = navigator.clipboard;
   jmeikbn: string;
   hatden = [];
+  movden = [];
   mall: boolean = false;
   hidx = 20; //tabindex用ヘッダ項目数
   mcols = 4; //tabindex用明細列数
@@ -279,6 +280,8 @@ export class JmeitblComponent implements OnInit {
           i += 1;
           if (kbn == "3" && this.hatden.indexOf(control.value.vcode) == -1) {
             this.hatden.push(control.value.vcode);
+          } else if (kbn == "6" && this.movden.indexOf(control.value.scode) == -1) {
+            this.movden.push(control.value.scode);
           }
         }
       })
@@ -287,6 +290,7 @@ export class JmeitblComponent implements OnInit {
   }
 
   async toFrmsup() {
+    //仕入先１件分の処理
     this.jmisrv.denno = await this.jmisrv.get_denno();
     let hdno = await this.usrsrv.getNumber('hdenno', 1);
     let jmei = [];
@@ -305,9 +309,34 @@ export class JmeitblComponent implements OnInit {
         vcd: this.hatden[0],
         mei: jmei
       }));
-    this.usrsrv.openFrmsup(hdno, this.jmisrv.denno + 'MWSYS_FRMSUPPLY');
+    this.usrsrv.openFrmCre('/frmsupply', hdno, this.jmisrv.denno + 'MWSYS_FRMSUPPLY');
     this.hatden.shift();
   }
+
+  async toFrmmov() {
+    this.jmisrv.denno = await this.jmisrv.get_denno();
+    let mdno = await this.usrsrv.getNumber('mdenno', 1);
+    let jmei = [];
+    this.frmArr.controls
+      .forEach(control => {
+        // console.log(control,this.hatden[0]);
+        // console.log(control.get('spec').value=="3",control);
+        if (control.get('spec').value == "6" && control.value.scode == this.movden[0]) {
+          jmei.push(control.value.gcode + "\t" + control.value.suu + "\t"
+            + this.jmisrv.denno + "\t" + control.get('line').value);
+          control.patchValue({ spdet: mdno });
+        }
+      })
+    localStorage.setItem(this.jmisrv.denno + 'MWSYS_FRMMOVE',
+      JSON.stringify({
+        outcode: this.parentForm.value.scode,
+        incode: this.movden[0],
+        mei: jmei
+      }));
+    this.usrsrv.openFrmCre('/frmmove', mdno, this.jmisrv.denno + 'MWSYS_FRMMOVE');
+    this.movden.shift();
+  }
+
 
   del_row(row: number) {
     this.frmArr.removeAt(row);
@@ -496,7 +525,9 @@ export class JmeitblComponent implements OnInit {
       variables: {
         id: this.usrsrv.compid,
         gds: val,
-        day: this.parentForm.value.day
+        day: this.parentForm.value.day,
+        mcd: this.parentForm.value.mcode,
+        sptnk: this.jmisrv.sptnkbn
       },
     })
       .valueChanges

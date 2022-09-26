@@ -118,6 +118,22 @@
                     </mat-form-field>
                 </td>
             </ng-container>
+            <ng-container matColumnDef="jdenno">
+                <th mat-header-cell *matHeaderCellDef>受注番号</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+                    <mat-form-field style="width:6em;">
+                        <input matInput formControlName="jdenno">
+                    </mat-form-field>
+                </td>
+            </ng-container>
+            <ng-container matColumnDef="jline">
+                <th mat-header-cell *matHeaderCellDef>受注行</th>
+                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+                    <mat-form-field style="width:4em;">
+                        <input matInput formControlName="jline">
+                    </mat-form-field>
+                </td>
+            </ng-container>
             <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>

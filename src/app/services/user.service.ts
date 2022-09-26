@@ -432,12 +432,12 @@ export class UserService {
       // case "展開元":
       //   // color = 'orange';
       //   break;
-      // case "移動入庫":
-      //   // color = 'blue';
-      //   break;
-      // case "移動出庫":
-      //   // color = 'royalblue';
-      //   break;
+      case typ == "移動入庫":
+        func = '/frmmove';
+        break;
+      case typ == "移動出庫":
+        func = '/frmmove';
+        break;
       // case "破棄":
       //   // color = 'red';
       //   break;
@@ -454,8 +454,8 @@ export class UserService {
     // window.open(url.toString(),null,'top=100,left=100');
     window.open(url.toString());
   }
-  openFrmsup(dno, jdkey) {
-    const url = this.router.createUrlTree(['/frmsupply', '1', dno]);
+  openFrmCre(frm, dno, jdkey) {
+    const url = this.router.createUrlTree([frm, '1', dno]);
     // window.open(url.toString() + '?stkey=' + jdkey ,null,'top=100,left=100');
     window.open(url.toString() + '?stkey=' + jdkey);
   }

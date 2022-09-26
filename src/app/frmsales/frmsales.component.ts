@@ -757,14 +757,15 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           }
           , ...jyuden,
         }]
-        console.log(trjyuden, jyumei);
+        // console.log(trjyuden, jyumei);
         this.jmisrv.ins_jyuden(trjyuden, jyumei, jyumzai)
           .then(result => {
             // console.log('insert_trjyu', result);
             this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'を新規登録しました');
             //  zaiko更新処理 　新規
+            let cnt_keep: number = 0;
             jyumei.forEach(e => {
-              console.log(e, this.form);
+              // console.log(e, this.form);
               if (jyuden.skbn != "1") {
                 if (e.gskbn == "0" && e.sday != null) {
                   const lczaiko: mwI.Zaiko = {
@@ -786,7 +787,13 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
                   });
                 }
               }
+              if (e.spec == '2') {
+                cnt_keep += 1;
+              }
             });
+            if (cnt_keep > 0) {
+              this.makeFrmKeep();
+            }
             this.form.markAsPristine();
             this.cancel();
             return resolve(true);

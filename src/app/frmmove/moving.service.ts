@@ -30,9 +30,9 @@ export class Movden {
   pable: number;
   stock: number;
   memo: string;
-  // day: Date;
-  // incode: string;
-  // outcode: string;
+  jdenno: number;
+  jline: number;
+  kako: string;
   msgood: {
     gtext: string;
     unit: string;

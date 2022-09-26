@@ -33,7 +33,9 @@ export class MovtblComponent implements OnInit {
     'unit',
     'pable',
     'stock',
-    'memo'];
+    'memo',
+    'jdenno',
+    'jline'];
 
 
   constructor(private cdRef: ChangeDetectorRef,
@@ -152,6 +154,9 @@ export class MovtblComponent implements OnInit {
       pable: [{ value: movden?.pable, disabled: true }],
       stock: [{ value: movden?.stock, disabled: true }],
       memo: [movden?.memo],
+      jdenno: [movden?.jdenno],
+      jline: [movden?.jline],
+      kako: [movden?.kako],
       msgzais: lcArr,
     });
   }
@@ -243,6 +248,9 @@ export class MovtblComponent implements OnInit {
           pable: 0,
           stock: 0,
           memo: '',
+          jdenno: 0,
+          jline: 0,
+          kako: '',
           msgood: {
             gtext: '',
             unit: '',

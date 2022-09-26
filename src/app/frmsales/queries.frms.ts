@@ -1,12 +1,16 @@
 import gql from 'graphql-tag';
 
 export const GetGood = gql`
-query get_good($id: smallint!,$gds:String!,$day: date!) {
+query get_good($id: smallint!,$gds:String!,$day: date!,$mcd:String!,$sptnk:String) {
   msgoods_by_pk(gcode: $gds, id: $id){
     msggroup {
       code
       gkbn
       vcode
+      msmstits(where: {mcode: {_eq: $mcd}}) {
+        patno
+        seq
+      }
     }
     gcode
     gtext
@@ -33,7 +37,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!) {
       tanka9
       taxrate
     }
-    msgsptnks(limit:1,where: {day: {_lt: $day}}, order_by: {day: desc_nulls_last}) {
+    msgsptnks(limit:1,where: {day: {_lt: $day},sptnkbn: {_eq: $sptnk}}, order_by: {day: desc_nulls_last}) {
       sptnkbn
       sptanka
     }

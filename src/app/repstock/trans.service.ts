@@ -105,32 +105,32 @@ export class TransService {
           }
         }
       } 
-      movin:trmovden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, incode: {_eq: $scd}}) {
+      movin:trmovden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},trmovsub:{day: {_gt: $day,_lte: $today}, incode: {_eq: $scd}}}) {
         denno
         line
         memo
         suu
-        trmovsub{
+        trmovsub {
           day
           outcode
           tcode
-        }
-        msstoreout{
-          name
+          msstoreout{
+            name
+          }
         }
       }  
-      movout:trmovden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, outcode: {_eq: $scd}}) {
+      movout:trmovden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},trmovsub:{day: {_gt: $day,_lte: $today}, outcode: {_eq: $scd}}}) {
         denno
         line
         memo
         suu
-        trmovsub{
+        trmovsub {
           day
           incode
           tcode
-        }
-        msstorein{
-          name
+          msstorein{
+            name
+          }
         }
       }
       tenmoto:trtenden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, scode: {_eq: $scd}, kubun: {_eq: 1}}) {
@@ -242,7 +242,7 @@ export class TransService {
               tcode: e.trmovsub.tcode,
               yday: null,
               aitec: e.trmovsub.outcode,
-              aiten: e.msstoreout.name,
+              aiten: e.trmovsub.msstoreout.name,
               insuu: e.suu,
               ousuu: null,
               zaisu: null,
@@ -261,7 +261,7 @@ export class TransService {
               tcode: e.trmovsub.tcode,
               yday: null,
               aitec: e.trmovsub.incode,
-              aiten: e.msstorein.name,
+              aiten: e.trmovsub.msstorein.name,
               insuu: null,
               ousuu: e.suu,
               zaisu: null,
