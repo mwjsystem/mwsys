@@ -33,6 +33,7 @@ export class JmeitblComponent implements OnInit {
   copyToClipboard: string;
   navCli = navigator.clipboard;
   jmeikbn: string;
+  // jyumei: mwI.Jyumei[] = [];
   hatden = [];
   movden = [];
   mall: boolean = false;
@@ -605,19 +606,45 @@ export class JmeitblComponent implements OnInit {
     if (this.frmArr.controls[i].value.gskbn == "0") {
       this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.frmArr.controls[i].value.scode).then(result => {
         // console.log(result);
-        this.frmArr.controls[i].patchValue({ pable: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
-        // console.log(this.frmArr);
+        let lcpable = (result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0;
+        this.frmArr.controls[i].patchValue({ pable: lcpable });
+        if (lcpable > 9 && this.frmArr.getRawValue()[i]['spec'] == null) {
+          this.frmArr.controls[i].patchValue({ spec: '1' });
+        } else if (lcpable > 0 && this.frmArr.getRawValue()[i]['spec'] == '3') {
+          this.usrsrv.toastWar('品番' + gcd + 'は受発注商品ですが、受注可能数が' + lcpable + 'です');
+        } else if (lcpable < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
+          this.usrsrv.toastWar('品番' + gcd + 'の受注可能数が' + lcpable + 'です');
+        }
+        if (this.frmArr.getRawValue()[i]['spec'] == null) {
+          this.frmArr.controls[i].get('spec').setErrors({ 'required': true });
+        }
         this.jmisrv.subject.next(true);
       });
     } else if (this.frmArr.controls[i].value.gskbn == "1") {
       this.stcsrv.getSetZai(this.frmArr.controls[i].value.scode, msgzais).then(result => {
         this.setZai[i] = result;
-        this.frmArr.controls[i].patchValue({ pable: this.stcsrv.get_paabl(result) });
+        let lcpable = this.stcsrv.get_paabl(result);
+        this.frmArr.controls[i].patchValue({ pable: lcpable });
+        if (lcpable > 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
+          this.frmArr.controls[i].patchValue({ spec: '1' });
+        } else if (lcpable < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
+          this.usrsrv.toastWar('品番' + gcd + 'の受注可能数が' + lcpable + 'です');
+        }
+        if (this.frmArr.getRawValue()[i]['spec'] == null) {
+          this.frmArr.controls[i].get('spec').setErrors({ 'required': true });
+        }
         this.jmisrv.subject.next(true);
       });
     }
   }
 
+  changeSpec(i: number) {
+    if (this.frmArr.getRawValue()[i]['spec'] == null) {
+      this.frmArr.controls[i].get('spec').setErrors({ 'required': true });
+    } else {
+      this.frmArr.controls[i].get('spec').setErrors(null);
+    }
+  }
   changeTax(i: number, value: number) {
     const lcmoney: number = this.frmArr.controls[i].value.suu * this.frmArr.controls[i].value.tanka;
     if (this.frmArr.getRawValue()[i]['mtax'] == "0") {
@@ -740,18 +767,29 @@ export class JmeitblComponent implements OnInit {
     // console.log(this.frmArr.controls);
   }
 
-  set_jyumei(skbn: string) { //skbn:受注伝票出荷区分
+  set_jyumei(data) { //skbn:受注伝票出荷区分
     this.frmArr.clear();
+    // this.jyumei = [];
     this.jmisrv.trzaiko = [];
     let i: number = 0;
-    // console.log(this.jmisrv.jyumei);
-    this.jmisrv.jyumei.forEach(e => {
-      // console.log(e);
+
+    data.trjyumeis.forEach(element => {
+      // console.log(element);
+      let { msgood, ...rest } = element;
+      let { msggroup, ...rest2 } = msgood;
+      // this.jyumei.push({ ...msggroup, ...rest, ...rest2 });
+      // });
+
+
+      // // console.log(this.jmisrv.jyumei);
+      // this.jyumei.forEach(e => {
+      //   console.log(e);
+      let e = { ...msggroup, ...rest, ...rest2 };
       this.frmArr.push(this.createRow(i + 1, e));
       this.setPable(i, e.gcode, e.msgzais);
       i += 1;
       //trzaikoテーブル取り消し用データ作成
-      if (skbn != "1") {
+      if (data.skbn != "1") {
         if (e.gskbn == "0" && e.sday != null) {
           const lczaiko: mwI.Zaiko = {
             scode: e.scode,

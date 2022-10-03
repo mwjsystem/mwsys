@@ -10,7 +10,7 @@ import { Apollo } from 'apollo-angular';
   providedIn: 'root'
 })
 export class JyumeiService {
-  public jyumei: mwI.Jyumei[] = []; //frmsales⇒jmeitblコンポーネントへ渡すときのみ使用
+  // public jyumei: mwI.Jyumei[] = []; //frmsales⇒jmeitblコンポーネントへ渡すときのみ使用
   public trjyumei = [];
   public trjmzai = [];
   public denno: number = 0;
@@ -162,45 +162,11 @@ export class JyumeiService {
     return observable;
   }
   async get_denno() {
-    // console.log(this.denno,this.denno==0); 
-    // let observable:Observable<number> = new Observable<number>(observer => {
-    // console.log(this.denno,this.denno==0); 
     if (this.denno == 0) {
-      // console.log(this.denno,this.denno==0);   
       return await this.usrsrv.getNumber('jdenno', 1);
     } else {
-      // console.log(this.denno,this.denno==0);
       return this.denno;
     }
-    // });
-  }
-  makeJyumei(data) {
-    data.trjyumeis.forEach(element => {
-      // console.log(element);
-      let { msgood, ...rest } = element;
-      let { msggroup, ...rest2 } = msgood;
-      this.jyumei.push({ ...msggroup, ...rest, ...rest2 });
-      if (data.skbn != "1") {//売上のみ以外
-        if (rest.gskbn == "0" && rest.sday != null) {
-          this.trzaiko.push({
-            scode: rest.scode,
-            gcode: rest.gcode,
-            day: rest.sday,
-            suu: rest.suu * -1
-          });
-        } else if (rest.gskbn == "1" && rest.sday != null) {
-          rest.msgzais.forEach(zai => {
-            this.trzaiko.push({
-              scode: rest.scode,
-              gcode: zai.zcode,
-              day: rest.sday,
-              suu: rest.suu * zai.irisu * -1
-            });
-          });
-        }
-      };
-    });
-    // console.log(this.jyumei, this.trzaiko);
   }
 
   upd_zaiko(zai: any) {

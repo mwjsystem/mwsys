@@ -164,7 +164,8 @@
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;"
             [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
-            <mat-select #msel4 formControlName="spec" (keydown.enter)="msel4.close()">
+            <mat-select #msel4 formControlName="spec" (keydown.enter)="msel4.close()"
+              (selectionChange)="changeSpec(getIdx(i))">
               <mat-option *ngFor="let sval of bunsrv.kbn.jmeikbn" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>

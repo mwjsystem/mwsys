@@ -44,7 +44,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   // scdtxt:string;
   // ncdtxt:string;  
   rows: FormArray = this.fb.array([]);
-  qrurl: string;
+  // qrurl: string;
   getden: number;
   gdsttl: number = 0;
   stit: mwI.Stit[] = [];
@@ -244,23 +244,23 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   makeFrmKeep() {
+    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-KEEP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
+    // const pref: string = this.jmisrv.denno + 'FRM-KEEP';
+    // let head = this.dwlsrv.pickObj(this.form.getRawValue(), ['yday', 'mcode', 'ncode', 'nadr']);
+    // const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl, ['line', 'gcode', 'gtext', 'suu', 'unit', 'mbikou', 'spec'])
+    // head['mcdtxt'] = this.memsrv.get_mcdtxt(this.form.value.mcode);
+    // head['adrname'] = this.edasrv.get_name(+this.form.getRawValue().nadr);
+    // head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
+    // head['tcdnm1'] = this.stfsrv.get_name(this.form.getRawValue().tcode1);
+    // head['tcd0'] = this.form.getRawValue().tcode;
+    // // console.log(this.qrurl);
+    // this.dwlsrv.dl_csv(head, pref + "H.csv");
+    // this.dwlsrv.dl_csv(det, pref + "M.csv");
 
-    const pref: string = this.jmisrv.denno + 'FRM-KEEP';
-    let head = this.dwlsrv.pickObj(this.form.getRawValue(), ['yday', 'mcode', 'ncode', 'nadr']);
-    const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl, ['line', 'gcode', 'gtext', 'suu', 'unit', 'mbikou', 'spec'])
-    head['mcdtxt'] = this.memsrv.get_mcdtxt(this.form.value.mcode);
-    head['adrname'] = this.edasrv.get_name(+this.form.getRawValue().nadr);
-    head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
-    head['tcdnm1'] = this.stfsrv.get_name(this.form.getRawValue().tcode1);
-    head['tcd0'] = this.form.getRawValue().tcode;
-    // console.log(this.qrurl);
-    this.dwlsrv.dl_csv(head, pref + "H.csv");
-    this.dwlsrv.dl_csv(det, pref + "M.csv");
+    // const base64 = this.elementRef.nativeElement.querySelector('qr-code > img').src;
+    // this.dwlsrv.dl_img(pref + ".png", base64);
 
-    const base64 = this.elementRef.nativeElement.querySelector('qr-code > img').src;
-    this.dwlsrv.dl_img(pref + ".png", base64);
-
-    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-KEEP_' + this.jmisrv.denno, this.elementRef);
+    // this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-KEEP_' + this.jmisrv.denno, this.elementRef);
   }
 
   openOkuri(hcode, value) {
@@ -305,7 +305,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       this.jmisrv.qry_jyuden(denno).subscribe(
         result => {
           this.form.reset();
-          this.jmisrv.jyumei = [];
+          // this.jmisrv.jyumei = [];
           this.jmisrv.trzaiko = [];
           if (result == null) {
             this.usrsrv.toastInf("受注伝票番号" + denno + "は登録されていません");
@@ -326,12 +326,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               this.form.get('isaki').setValue(jyuden.nadr.toString());
             }
             this.form.patchValue(jyuden);
-            this.jmisrv.makeJyumei(jyuden);
-            this.jmeitbl.set_jyumei(jyuden.skbn);
+            // this.jmisrv.makeJyumei(jyuden);
+            this.jmeitbl.set_jyumei(jyuden);
             this.usrsrv.setTmstmp(jyuden);
             this.jmisrv.denno = denno;
             this.get_member(jyuden.mcode, false);
-            this.qrurl = "https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
+            // this.qrurl = "https://mwsys.herokuapp.com/frmkeep/" + this.jmisrv.denno;
             if (jyuden.del == true) {
               this.mode = 4;
             } else {
@@ -419,6 +419,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == eda);
       // console.log(eda,this.edasrv.adrs);
       if (i > -1) {
+        this.form.get('nadr').setErrors(null);
         const adr = this.edasrv.adrs[i];
         this.form.get('nbikou').setValue(adr.nbikou);
         this.form.get('sbikou').setValue(adr.sbikou);
@@ -426,6 +427,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         this.jmisrv.address = adr.zip + '\n' + adr.region + adr.local + '\n' + adr.street + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
       } else {
         this.usrsrv.toastInf("別納品先枝番" + eda + "は登録されていません");
+        this.form.get('nadr').setErrors({ 'incorrect': true });
       }
     }
   }
@@ -438,10 +440,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     if (eda !== null) {
       let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == eda);
       if (i > -1) {
+        this.form.get('iadr').setErrors(null);
         const adr = this.edasrv.adrs[i];
         this.jmisrv.iaddress = adr.zip + '\n' + adr.region + adr.local + '\n' + adr.street + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
       } else {
-        this.usrsrv.toastInf("別納品先枝番" + eda + "は登録されていません");
+        this.usrsrv.toastInf("依頼主枝番" + eda + "は登録されていません");
+        this.form.get('iadr').setErrors({ 'incorrect': true });
       }
     } else {
       this.jmisrv.iaddress = "";
