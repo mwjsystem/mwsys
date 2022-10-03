@@ -43,6 +43,9 @@
                 <mat-label>Web会員ID</mat-label>
                 <input matInput (input)="fwebid=$event.target.value">
             </mat-form-field>
+            <!-- <mat-form-field> -->
+            <mat-checkbox [(ngModel)]="feda0">基本住所のみ表示</mat-checkbox>
+            <!-- </mat-form-field> -->
         </div>
     </mat-toolbar>
     <table mat-table [dataSource]="dataSource" aria-label="Elements">
