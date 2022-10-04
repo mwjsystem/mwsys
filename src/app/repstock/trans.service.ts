@@ -22,6 +22,7 @@ export class Trans {
   zaisu: number;
   yotei: number;
   wait: number;
+  srtdy: String;
   constructor(init?: Partial<Trans>) {
     Object.assign(this, init);
   }
@@ -65,7 +66,8 @@ export class TransService {
           ousuu: null,
           zaisu: e,
           yotei: null,
-          wait: null
+          wait: null,
+          srtdy: this.usrsrv.formatDate(lcmago),
         };
         trans.push(tran);
         return resolve(trans);
@@ -73,7 +75,7 @@ export class TransService {
     })
     const GetTran = gql`
     query get_trans($id: smallint!, $gcd: String!, $scd: String!, $day: date!, $today: date!) {
-      shukka:vjmeizai(where: {id: {_eq: $id}, gcode: {_eq: $gcd},sday: {_gt: $day,_lte: $today}, scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"}}}) {
+      shukka:vjmeizai(where: {id: {_eq: $id}, gcode: {_eq: $gcd},sday: {_gt: $day,_lte: $today}, scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"},del: {_eq: false}}}) {
         sday
         denno
         line
@@ -149,7 +151,14 @@ export class TransService {
         suu
         tcode
       } 
-      hikat:vjmeizai(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}], scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"}}}) {
+      hikat:vjmeizai(where: {id: {_eq: $id}, 
+                             gcode: {_eq: $gcd}, 
+                             scode: {_eq: $scd},
+                             trjyuden: {skbn: {_neq: "1"},del: {_eq: false}},
+                              _or:[{sday:{_gt:$today}}, 
+                                   {sday:{_is_null:true}}
+                                  ]
+                              }) {
         sday
         denno
         line
@@ -195,6 +204,7 @@ export class TransService {
           // console.log('出荷',data);
           let trans: Trans[] = [];
           data.shukka.forEach(e => {
+            let lcsrtdy = e.sday ?? e.yday;
             const tran: Trans = {
               sday: e.sday,
               ttype: '出荷',
@@ -209,7 +219,8 @@ export class TransService {
               ousuu: e.suu,
               zaisu: null,
               yotei: null,
-              wait: null
+              wait: null,
+              srtdy: lcsrtdy
             };
             trans.push(tran);
           });
@@ -228,7 +239,8 @@ export class TransService {
               ousuu: null,
               zaisu: null,
               yotei: null,
-              wait: null
+              wait: null,
+              srtdy: e.yday
             };
             trans.push(tran);
           });
@@ -247,7 +259,8 @@ export class TransService {
               ousuu: null,
               zaisu: null,
               yotei: null,
-              wait: null
+              wait: null,
+              srtdy: e.trmovsub.day
             };
             trans.push(tran);
           });
@@ -266,7 +279,8 @@ export class TransService {
               ousuu: e.suu,
               zaisu: null,
               yotei: null,
-              wait: null
+              wait: null,
+              srtdy: e.trmovsub.day
             };
             trans.push(tran);
           });
@@ -285,7 +299,8 @@ export class TransService {
               ousuu: e.suu,
               zaisu: null,
               yotei: null,
-              wait: null
+              wait: null,
+              srtdy: e.day
             };
             trans.push(tran);
           });
@@ -304,13 +319,15 @@ export class TransService {
               ousuu: null,
               zaisu: null,
               yotei: null,
-              wait: null
+              wait: null,
+              srtdy: e.day
             };
             trans.push(tran);
           });
           // console.log(data);
           data.hikat.forEach(e => {
             // console.log(e.sday);
+            let lcsrtdy = e.sday ?? e.trjyuden.yday;
             const tran: Trans = {
               sday: e.sday,
               ttype: this.bunsrv.get_name(e.spec, 'jmeikbn'),
@@ -325,7 +342,8 @@ export class TransService {
               ousuu: e.suu,
               zaisu: null,
               yotei: null,
-              wait: null
+              wait: null,
+              srtdy: lcsrtdy
             };
             trans.push(tran);
           });
@@ -345,7 +363,8 @@ export class TransService {
               ousuu: null,
               zaisu: null,
               yotei: e.hatzn,
-              wait: null
+              wait: null,
+              srtdy: e.yday
             };
             trans.push(tran);
           });
@@ -372,12 +391,7 @@ export class TransService {
       if (a == null && b == null) return 0;
       if (a == null) return 1;
       if (b == null) return -1;
-      if (a.sday > b.sday) {
-        return 1;
-      } else {
-        return -1;
-      }
-      if (a.yday > b.yday) {
+      if (a.srtdy > b.srtdy) {
         return 1;
       } else {
         return -1;
@@ -395,12 +409,7 @@ export class TransService {
         if (a == null && b == null) return 0;
         if (a == null) return 1;
         if (b == null) return -1;
-        if (a.sday < b.sday) {
-          return 1;
-        } else {
-          return -1;
-        }
-        if (a.yday > b.yday) {
+        if (a.srtdy < b.srtdy) {
           return 1;
         } else {
           return -1;

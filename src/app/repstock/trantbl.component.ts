@@ -12,24 +12,24 @@ import { UserService } from './../services/user.service';
   styleUrls: ['./trantbl.component.scss']
 })
 export class TrantblComponent implements OnInit {
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-  public dataSource:MatTableDataSource<Trans>;
-  public displayedColumns = ['ttype','sday','yday','aitec','aiten','denno','mline','tcode','biko','insuu','ousuu','zaisu','yotei','wait'];
-  
-  constructor(public trnsrv:TransService,
-              public usrsrv: UserService, 
-              public cdRef: ChangeDetectorRef) { }
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  public dataSource: MatTableDataSource<Trans>;
+  public displayedColumns = ['ttype', 'sday', 'yday', 'aitec', 'aiten', 'denno', 'mline', 'tcode', 'biko', 'insuu', 'ousuu', 'zaisu', 'yotei', 'wait'];
 
-  ngOnInit(): void {  
+  constructor(public trnsrv: TransService,
+    public usrsrv: UserService,
+    public cdRef: ChangeDetectorRef) { }
+
+  ngOnInit(): void {
     this.trnsrv.observe.subscribe(() => {
       // console.log('ngoninit');
       this.refresh();
     });
   }
 
-  setColor(ttype:string): string {
-    let color:string;
-    switch(ttype){
+  setColor(ttype: string): string {
+    let color: string;
+    switch (ttype) {
       case "発注":
         color = 'aqua';
         break;
@@ -62,20 +62,20 @@ export class TrantblComponent implements OnInit {
         break;
       case "棚卸":
         color = 'magenta';
-        break;  
+        break;
       default:
         color = 'black';
-    } 
+    }
     return color;
   }
-  refresh(): void{
+  refresh(): void {
     // console.log(this.trnsrv.tbldata);
-    this.dataSource= new MatTableDataSource<Trans>(this.trnsrv.sort_tblData(this.trnsrv.tbldata));
+    this.dataSource = new MatTableDataSource<Trans>(this.trnsrv.sort_tblData(this.trnsrv.tbldata));
     this.dataSource.paginator = this.paginator;
     this.cdRef.detectChanges();
   }
 
-  chFlg(): void{
+  chFlg(): void {
     this.trnsrv.flg *= -1;
     this.refresh();
   }

@@ -603,6 +603,8 @@ export class JmeitblComponent implements OnInit {
 
   setPable(i: number, gcd: string, msgzais: any) {
     // console.log(gcd, this.frmArr.controls[i].value.gskbn);
+    this.frmArr.controls[i].patchValue({ pable: 0 });
+    this.jmisrv.subject.next(true);
     if (this.frmArr.controls[i].value.gskbn == "0") {
       this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.frmArr.controls[i].value.scode).then(result => {
         // console.log(result);

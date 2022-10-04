@@ -292,7 +292,7 @@ export class JyumeiService {
 
   del_jyuden(denno, flg): void {
     const DeleteTran = gql`
-      mutation del_jyuden($id: smallint!, $dno: Int!, $flg: Boolean!, $uat: timestamptz!, $uby: String!) {
+      mutation del_jyuden($id: smallint!, $dno: Int!, $flg: Boolean, $uat: timestamptz!, $uby: String!) {
         update_trjyuden(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: {del: $flg, updated_at: $uat, updated_by: $uby})  {
           affected_rows
         }

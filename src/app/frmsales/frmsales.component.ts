@@ -692,7 +692,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       total10: this.usrsrv.editFrmval(this.form, 'total10'),
       dokono: this.usrsrv.editFrmval(this.form, 'dokono'),
       eidome: this.usrsrv.editFrmval(this.form, 'eidome'),
-      eicode: this.usrsrv.editFrmval(this.form, 'eicode')
+      eicode: this.usrsrv.editFrmval(this.form, 'eicode'),
+      del: false
     }
 
     if (this.mode == 2) {
