@@ -35,7 +35,7 @@ export class TransService {
   public tbldata: Trans[] = [];
   public flg: number = 1;
   //コンポーネント間通信用
-  subject = new Subject<Trans[]>();
+  subject = new Subject<boolean>();
   observe = this.subject.asObservable();
 
   constructor(public usrsrv: UserService,

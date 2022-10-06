@@ -209,7 +209,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       this.trnsrv.get_trans(this.gcode, this.scode, new Date()).then(result => {
         // console.log(result);
         this.trnsrv.tbldata = result;
-        this.trnsrv.subject.next(result);
+        this.trnsrv.subject.next(true);
         this.isLoading3 = false;
       });
 

@@ -119,6 +119,14 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <mat-form-field style="width: 7em;">
+          <mat-label>納品先初期値</mat-label>
+          <mat-select formControlName="gadr">
+            <mat-option *ngFor="let sval of gadrVal" [value]="sval.value" [disabled]="sval.dis">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
         <mat-form-field style="width:8em">
           <mat-label>大分類</mat-label>
           <mat-select #msel5 tabIndex="9" formControlName="daibunrui" (keydown.enter)="msel5.close()">

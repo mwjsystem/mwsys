@@ -460,7 +460,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.form.get('okurino').setValue(okrno);
   }
 
-  get_member(mcode: string, flg: boolean) {
+  get_member(mcode: string, flg: boolean) {//flg:true⇒画面変更時、false⇒受注伝票読込時
     this.apollo.watchQuery<any>({
       query: Query.GetMember,
       variables: {
@@ -475,8 +475,15 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         } else {
           let member: mwI.Member = data.msmember_by_pk;
           if (flg) {
+            // console.log(member.gadr);
             this.form.patchValue(member);
             this.form.get('nsaki').setValue(member.gadr);
+            if (member.gadr == "0" || member.gadr == "1") {
+              this.form.get('nadr').setValue(member.gadr);
+              this.form.get('buntype').setValue(member.ntype);
+            } else if (member.gadr == "2") {
+              this.form.get('buntype').setValue(member.tntype);
+            }
           }
           this.jmisrv.mtax = member.mtax;
           this.jmisrv.tankakbn = member.tankakbn;

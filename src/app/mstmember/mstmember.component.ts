@@ -23,6 +23,12 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
 import { AddressComponent } from './../share/address/address.component';
 import { MsstitComponent } from './../share/msstit/msstit.component';
 
+class Sval {
+  value: string;
+  viewval: string;
+  dis: boolean;
+}
+
 @Component({
   selector: 'app-mstmember',
   templateUrl: './mstmember.component.html',
@@ -37,6 +43,10 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   // mcd:  number=0;
   mcd: string = "";
   mode: number = 3;
+  gadrVal: Sval[] = [
+    { value: "0", viewval: "基本住所", dis: false },
+    { value: "1", viewval: "その他住所", dis: true },
+    { value: "2", viewval: "別納", dis: false }];
   flgadr1: number = 1; //その他住所フラグ 1：未登録、2：登録済
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -112,6 +122,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       mtgt3: new FormControl(''),
       mtgt4: new FormControl(''),
       mtgt5: new FormControl(''),
+      gadr: new FormControl('')
     }));
     this.bunsrv.get_bunrui();
     // this.stfsrv.get_staff();
@@ -279,9 +290,11 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
             if (j > -1) {
               this.form.get('addr1').patchValue(member.msmadrs[j]);
               this.flgadr1 = 2;
+              this.gadrVal[1].dis = false;
             } else {
               this.form.get('addr1').reset();
               this.flgadr1 = 1;
+              this.gadrVal[1].dis = true;
             }
             this.mcd = mcode;
             this.overlayRef.detach();
@@ -413,6 +426,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       mtgt4: this.form.get('base').value.mtgt4,
       mtgt5: this.form.get('base').value.mtgt5,
       jan: this.usrsrv.editFrmval(this.form.get('base'), 'jan'),
+      gadr: this.usrsrv.editFrmval(this.form.get('base'), 'gadr'),
       updated_at: new Date(),
       updated_by: this.usrsrv.staff.code
     }

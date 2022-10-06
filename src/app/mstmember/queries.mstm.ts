@@ -87,6 +87,7 @@ query get_member($id: smallint!,$mcode:String!) {
     mtgt4
     mtgt5
     jan
+    gadr
     msmadrs(order_by: {eda: asc}) {
       eda
       zip
