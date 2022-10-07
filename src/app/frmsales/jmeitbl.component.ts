@@ -180,8 +180,11 @@ export class JmeitblComponent implements OnInit {
 
 
     // console.log(+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'],this.frmArr.getRawValue()[i]['spec'] == null);
-    if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] > 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
+    if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] > 9 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '1' });
+    } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] < 10 &&
+      (this.frmArr.getRawValue()[i]['spec'] == null || this.frmArr.getRawValue()[i]['spec'] == '1')) {
+      this.frmArr.controls[i].patchValue({ spec: '0' });
     }
 
 
@@ -610,9 +613,7 @@ export class JmeitblComponent implements OnInit {
         // console.log(result);
         let lcpable = (result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0;
         this.frmArr.controls[i].patchValue({ pable: lcpable });
-        if (lcpable > 9 && this.frmArr.getRawValue()[i]['spec'] == null) {
-          this.frmArr.controls[i].patchValue({ spec: '1' });
-        } else if (lcpable > 0 && this.frmArr.getRawValue()[i]['spec'] == '3') {
+        if (lcpable > 0 && this.frmArr.getRawValue()[i]['spec'] == '3') {
           this.usrsrv.toastWar('品番' + gcd + 'は受発注商品ですが、受注可能数が' + lcpable + 'です');
         } else if (lcpable < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
           this.usrsrv.toastWar('品番' + gcd + 'の受注可能数が' + lcpable + 'です');

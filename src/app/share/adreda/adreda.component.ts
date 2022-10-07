@@ -84,7 +84,8 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     const bikou = {
       nbikou: this.edasrv.adrs[0].nbikou,
       sbikou: this.edasrv.adrs[0].sbikou,
-      obikou: this.edasrv.adrs[0].obikou
+      obikou: this.edasrv.adrs[0].obikou,
+      htitle: '0'
     };
     this.form.get('addr').patchValue(bikou);
 

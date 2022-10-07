@@ -176,7 +176,7 @@ export class TransService {
           }
         }
       } 
-      hatzn:vhatzn(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, hatzn: {_gt: 0}}) {
+      hatzn:vnymat(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, hatzn: {_gt: 0}}) {
         denno
         line
         mbiko
@@ -186,6 +186,7 @@ export class TransService {
         tcode
         vcode
         adrname
+        nymat
       }                   
     }`;
     let lcprms2: Promise<Trans[]> = new Promise(resolve => {
@@ -328,12 +329,18 @@ export class TransService {
           data.hikat.forEach(e => {
             // console.log(e.sday);
             let lcsrtdy = e.sday ?? e.trjyuden.yday;
+            let lcbiko;
+            if (e.spec == "8") {
+              lcbiko = e.spdet;
+            } else {
+              lcbiko = e.mbikou;
+            }
             const tran: Trans = {
               sday: e.sday,
               ttype: this.bunsrv.get_name(e.spec, 'jmeikbn'),
               denno: e.denno,
               line: e.line,
-              biko: e.mbikou,
+              biko: lcbiko,
               tcode: e.trjyuden.tcode,
               yday: e.trjyuden.yday,
               aitec: e.trjyuden.mcode,
@@ -363,7 +370,7 @@ export class TransService {
               ousuu: null,
               zaisu: null,
               yotei: e.hatzn,
-              wait: null,
+              wait: e.nymat,
               srtdy: e.yday
             };
             trans.push(tran);
