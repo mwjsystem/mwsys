@@ -155,7 +155,8 @@
               (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],frmArr.getRawValue()[getIdx(i)]['scode'])">
               <mat-icon>open_in_new</mat-icon>
             </button>
-            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['pable'] | number" class="i_num" disabled>
+            <input #minp1 matInput [value]="frmArr.getRawValue()[getIdx(i)]['pable'] | number" class="i_num" disabled
+              [style.color]="minp1.value < 10 ? 'red': 'black'">
           </mat-form-field>
         </td>
       </ng-container>
@@ -165,7 +166,7 @@
           <mat-form-field style="width:6em;"
             [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
             <mat-select #msel4 formControlName="spec" (keydown.enter)="msel4.close()"
-              (selectionChange)="changeSpec(getIdx(i))">
+              (selectionChange)="changeSpec(getIdx(i))" [style.background-color]="msel4.value == '0' ? 'red': 'white'">
               <mat-option *ngFor="let sval of bunsrv.kbn.jmeikbn" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
