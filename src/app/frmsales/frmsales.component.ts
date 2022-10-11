@@ -417,7 +417,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   changeEda(eda: number) {
     if (eda !== null) {
       let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == eda);
-      console.log(eda, this.edasrv.adrs);
+      // console.log(eda, this.edasrv.adrs);
       if (i > -1) {
         this.form.get('nadr').setErrors(null);
         const adr = this.edasrv.adrs[i];
