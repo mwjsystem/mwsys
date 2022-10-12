@@ -620,6 +620,7 @@ export class JmeitblComponent implements OnInit {
         } else if (lcpable < 10 && (this.frmArr.getRawValue()[i]['spec'] == null || this.frmArr.getRawValue()[i]['spec'] == '0')) {
           this.usrsrv.toastWar('品番' + gcd + 'の受注可能数が' + lcpable + 'です');
         }
+        this.calcMei(i);
         if (this.frmArr.getRawValue()[i]['spec'] == null) {
           this.frmArr.controls[i].get('spec').setErrors({ 'required': true });
         }
@@ -635,6 +636,7 @@ export class JmeitblComponent implements OnInit {
         } else if (lcpable < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
           this.usrsrv.toastWar('品番' + gcd + 'の受注可能数が' + lcpable + 'です');
         }
+        this.calcMei(i);
         if (this.frmArr.getRawValue()[i]['spec'] == null) {
           this.frmArr.controls[i].get('spec').setErrors({ 'required': true });
         }
@@ -685,9 +687,10 @@ export class JmeitblComponent implements OnInit {
     // if(navigator.clipboard){
     navigator.clipboard.readText()
       .then((text) => {
-        console.log(text);
+        // console.log(text);
         let rowData = text.split("\n");
         this.insRows(rowData, flg);
+        // console.log(this.frmArr.length);
         this.parentForm.markAsDirty();
       });
     // }
