@@ -27,11 +27,11 @@
         <mat-icon>find_replace</mat-icon>
       </button>
     </mat-form-field>
-    <button mat-button (click)="diaBetsu()" *ngIf="mode!=1">
+    <button mat-button (click)="diaBetsu()" *ngIf="mode==3">
       <mat-icon>local_shipping</mat-icon>
       <span fxHide fxShow.gt-sm>別納先</span>
     </button>
-    <button mat-button (click)="diaStit()" *ngIf="mode!=1">
+    <button mat-button (click)="diaStit()" *ngIf="mode==3">
       <mat-icon>scanner</mat-icon>
       <span fxHide fxShow.gt-sm>刺繍データ</span>
     </button>
@@ -39,7 +39,7 @@
       <mat-icon>question_answer</mat-icon>
       <span fxHide fxShow.gt-sm>問合せ</span>
     </button> -->
-    <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ mcode: mcd}" *ngIf="mode!==1"
+    <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ mcode: mcd}" *ngIf="mode==3"
         target="_blank">
         <mat-icon>question_answer</mat-icon>
         <span fxHide fxShow.gt-sm>問合せ</span>
@@ -218,13 +218,13 @@
         <mat-checkbox formControlName="del">削除済</mat-checkbox>
         <div fxLafxLayout="column" style="width:100%;">
           <mat-form-field class="txtar">
-            <mat-label>備考</mat-label>
+            <mat-label>伝票備考</mat-label>
             <textarea tabIndex="20" matInput formControlName="bikou" matTextareaAutosize></textarea>
           </mat-form-field>
-          <!-- <mat-form-field class="txtar">
-            <mat-label>社内向け備考</mat-label>
+          <mat-form-field class="txtar">
+            <mat-label>マスタ備考</mat-label>
             <textarea matInput formControlName="inbikou" matTextareaAutosize></textarea>
-          </mat-form-field> -->
+          </mat-form-field>
         </div>
       </form>
     </mat-card-content>

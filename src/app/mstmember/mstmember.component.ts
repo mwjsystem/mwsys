@@ -101,7 +101,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       del: new FormControl(''),
       bikou: new FormControl(''),
       jan: new FormControl(''),
-      // inbikou: new FormControl(''),      
+      inbikou: new FormControl(''),
       // }));
       // this.form.addControl('kake', new FormGroup({
       torikbn: new FormControl(''),

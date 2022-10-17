@@ -152,6 +152,7 @@ declare namespace mwI {
     tcode: string;
     del: boolean;
     bikou: string;
+    inbikou: string;
     sptnkbn: string;
     daibunuri: string;
     chubunrui: string;

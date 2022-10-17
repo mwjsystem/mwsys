@@ -68,6 +68,7 @@ query get_member($id: smallint!,$mcode:String!) {
     tcode
     del
     bikou
+    inbikou
     sptnkbn
     daibunrui
     chubunrui
