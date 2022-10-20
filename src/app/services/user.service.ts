@@ -53,6 +53,7 @@ export class UserService {
   tbldef: mwI.Tbldef[] = [];
   subject = new Subject<boolean>();
   observe = this.subject.asObservable();
+  manurl: string = 'https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5';
   holidays: String[] = [];
   holidayFltr = (d: Date | null): boolean => {
     const day = (d || new Date()).getDay();
