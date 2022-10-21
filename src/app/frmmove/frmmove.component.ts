@@ -161,7 +161,7 @@ export class FrmmoveComponent implements OnInit {
     this.form.get('okurino').setValue(okrno);
   }
 
-  selected(value: number) {
+  selHcd(value: string) {
     const i: number = this.okrsrv.hokuri.findIndex(obj => obj.code == value);
     if (i > -1) {
       this.hktval = [];

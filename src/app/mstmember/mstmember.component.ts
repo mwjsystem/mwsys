@@ -406,6 +406,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       // inbikou: this.usrsrv.editFrmval(this.form.get('base'),'inbikou'),
       pcode: this.usrsrv.editFrmval(this.form.get('base'), 'pcode'),
       hcode: this.usrsrv.editFrmval(this.form.get('base'), 'hcode'),
+      htime: this.usrsrv.editFrmval(this.form.get('base'), 'htime'),
       jcode: this.usrsrv.editFrmval(this.form.get('base'), 'jcode'),
       mtax: this.usrsrv.editFrmval(this.form.get('base'), 'mtax'),
       sscode: this.usrsrv.editFrmval(this.form.get('base'), 'sscode'),

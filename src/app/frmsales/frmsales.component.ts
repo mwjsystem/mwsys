@@ -171,7 +171,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       });
     });
   }
-  selected(value: number) {
+  selHcd(value: string) {
     const i: number = this.okrsrv.hokuri.findIndex(obj => obj.code == value);
     if (i > -1) {
       this.hktval = [];
@@ -240,27 +240,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         }
       })
     }
-    // this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-SHIP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
   }
 
   makeFrmKeep() {
     this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-KEEP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
-    // const pref: string = this.jmisrv.denno + 'FRM-KEEP';
-    // let head = this.dwlsrv.pickObj(this.form.getRawValue(), ['yday', 'mcode', 'ncode', 'nadr']);
-    // const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl, ['line', 'gcode', 'gtext', 'suu', 'unit', 'mbikou', 'spec'])
-    // head['mcdtxt'] = this.memsrv.get_mcdtxt(this.form.value.mcode);
-    // head['adrname'] = this.edasrv.get_name(+this.form.getRawValue().nadr);
-    // head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
-    // head['tcdnm1'] = this.stfsrv.get_name(this.form.getRawValue().tcode1);
-    // head['tcd0'] = this.form.getRawValue().tcode;
-    // // console.log(this.qrurl);
-    // this.dwlsrv.dl_csv(head, pref + "H.csv");
-    // this.dwlsrv.dl_csv(det, pref + "M.csv");
-
-    // const base64 = this.elementRef.nativeElement.querySelector('qr-code > img').src;
-    // this.dwlsrv.dl_img(pref + ".png", base64);
-
-    // this.dwlsrv.dl_kick(this.usrsrv.system.urischema + 'FRM-KEEP_' + this.jmisrv.denno, this.elementRef);
   }
 
   openOkuri(hcode, value) {
@@ -484,6 +467,14 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             } else if (member.gadr == "2") {
               this.form.get('buntype').setValue(member.tntype);
             }
+            this.selHcd(member.hcode);
+            let i: number = this.okrsrv.hokuri.findIndex(obj => obj.code == member.hcode);
+            // console.log(this.okrsrv.hokuri[i].hscode, member.htime);
+            let k: number = this.okrsrv.hktime.findIndex(obj => obj.hscode == this.okrsrv.hokuri[i].hscode && obj.bunrui == member.htime);
+
+            // console.log(k, this.okrsrv.hktime);
+            this.form.get('htime').setValue(this.okrsrv.hktime[k].code);
+
           }
           this.jmisrv.mtax = member.mtax;
           this.jmisrv.tankakbn = member.tankakbn;

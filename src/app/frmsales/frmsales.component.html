@@ -257,7 +257,7 @@
       <div fxLayout="column">
         <mat-form-field style="width: 7em;">
           <mat-label>配送方法</mat-label>
-          <mat-select #msel6 tabIndex="16" formControlName="hcode" (selectionChange)="selected(+$event.value)"
+          <mat-select #msel6 tabIndex="16" formControlName="hcode" (selectionChange)="selHcd($event.value)"
             (keydown.enter)="msel6.close()">
             <mat-option>選択削除</mat-option>
             <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">

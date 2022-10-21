@@ -78,7 +78,7 @@
             <div fxLayout="row wrap">
                 <mat-form-field style="width: 7em;">
                     <mat-label>配送方法</mat-label>
-                    <mat-select formControlName="hcode" (selectionChange)="selected(+$event.value)">
+                    <mat-select formControlName="hcode" (selectionChange)="selHcd($event.value)">
                         <mat-option>選択削除</mat-option>
                         <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
                             {{sval.name}}

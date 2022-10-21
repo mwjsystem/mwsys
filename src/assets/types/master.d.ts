@@ -35,7 +35,7 @@ declare namespace mwI {
   }
 
   interface Hokuri {
-    code: number;
+    code: string;
     name: string;
     htype: string;
     binshu: string;
@@ -145,6 +145,7 @@ declare namespace mwI {
     scode: string;
     pcode: string;
     hcode: string;
+    htime: string;
     jcode: string;
     mtax: string;
     sscode: string;
