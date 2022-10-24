@@ -77,35 +77,35 @@
           <mat-label>フリガナ(半角ｶﾅ)</mat-label>
           <input tabIndex="3" matInput formControlName="kana" (change)="updKana($event.target.value)" required>
         </mat-form-field>
-        <mat-form-field style="width:8em">
-          <mat-label>単価区分</mat-label>
-          <mat-select #msel1 tabIndex="4" formControlName="tankakbn" required (keydown.enter)="msel1.close()">
-            <mat-option *ngFor="let sval of bunsrv.kbn.tankakbn" [value]="sval.value">
-              {{sval.viewval}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field style="width:5em">
-          <mat-label>税区分</mat-label>
-          <mat-select #msel2 tabIndex="5" formControlName="mtax" required (keydown.enter)="msel2.close()">
-            <mat-option *ngFor="let sval of bunsrv.kbn.mtax" [value]="sval.value">
+        <mat-form-field style="width: 7em;">
+          <mat-label>納品先初期値</mat-label>
+          <mat-select #msel15 tabIndex="4" formControlName="gadr" (keydown.enter)="msel15.close()">
+            <mat-option *ngFor="let sval of gadrVal" [value]="sval.value" [disabled]="sval.dis">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field style="width:8em">
-          <mat-label>入金予定初期値</mat-label>
-          <mat-select #msel3 tabIndex="6" formControlName="pcode" (keydown.enter)="msel3.close()">
-            <mat-option *ngFor="let sval of bunsrv.kbn.pcode" [value]="sval.value">
-              {{sval.viewval}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field style="width:4em">
-          <mat-label>配送方法初期値</mat-label>
-          <mat-select #msel4 tabIndex="7" matInput formControlName="hcode" (keydown.enter)="msel4.close()">
-            <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
+          <mat-label>納品書タイプ</mat-label>
+          <mat-select #msel12 tabIndex="5" formControlName="ntype" (keydown.enter)="msel12.close()">
+            <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
               {{sval.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>納品書Type(直送)</mat-label>
+          <mat-select #msel13 tabIndex="6" formControlName="tntype" (keydown.enter)="msel13.close()">
+            <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
+              {{sval.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>内勤担当</mat-label>
+          <mat-select #msel9 tabIndex="7" formControlName="tcode" (keydown.enter)="msel9.close()" required>
+            <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+              {{sval.viewval}}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -117,17 +117,33 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <mat-form-field style="width: 7em;">
-          <mat-label>納品先初期値</mat-label>
-          <mat-select formControlName="gadr">
-            <mat-option *ngFor="let sval of gadrVal" [value]="sval.value" [disabled]="sval.dis">
+        <mat-form-field style="width:8em">
+          <mat-label>入金予定初期値</mat-label>
+          <mat-select #msel3 tabIndex="9" formControlName="pcode" (keydown.enter)="msel3.close()">
+            <mat-option *ngFor="let sval of bunsrv.kbn.pcode" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:6em">
+          <mat-label>配送方法初期値</mat-label>
+          <mat-select #msel4 tabIndex="10" matInput formControlName="hcode" (keydown.enter)="msel4.close()">
+            <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
+              {{sval.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:8em">
+          <mat-label>配達時間帯</mat-label>
+          <mat-select #msel11 tabIndex="11" formControlName="htime" (keydown.enter)="msel11.close()">
+            <mat-option *ngFor="let sval of bunsrv.kbn.htime" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field style="width:8em">
           <mat-label>大分類</mat-label>
-          <mat-select #msel5 tabIndex="9" formControlName="daibunrui" (keydown.enter)="msel5.close()">
+          <mat-select #msel5 tabIndex="12" formControlName="daibunrui" (keydown.enter)="msel5.close()">
             <mat-option *ngFor="let sval of bunsrv.kbn.daibunrui" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -135,7 +151,7 @@
         </mat-form-field>
         <mat-form-field style="width:8em">
           <mat-label>中分類</mat-label>
-          <mat-select #msel6 tabIndex="10" formControlName="chubunrui" (keydown.enter)="msel6.close()">
+          <mat-select #msel6 tabIndex="13" formControlName="chubunrui" (keydown.enter)="msel6.close()">
             <mat-option *ngFor="let sval of bunsrv.kbn.chubunrui" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -143,7 +159,7 @@
         </mat-form-field>
         <mat-form-field style="width:8em">
           <mat-label>小分類</mat-label>
-          <mat-select #msel7 tabIndex="11" formControlName="shobunrui" (keydown.enter)="msel7.close()">
+          <mat-select #msel7 tabIndex="14" formControlName="shobunrui" (keydown.enter)="msel7.close()">
             <mat-option *ngFor="let sval of bunsrv.kbn.shobunrui" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -151,59 +167,43 @@
         </mat-form-field>
         <mat-form-field style="width:8em">
           <mat-label>営業担当</mat-label>
-          <mat-select #msel8 tabIndex="12" formControlName="tcode1" (keydown.enter)="msel8.close()" required>
+          <mat-select #msel8 tabIndex="15" formControlName="tcode1" (keydown.enter)="msel8.close()" required>
             <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field style="width:8em">
-          <mat-label>内勤担当</mat-label>
-          <mat-select #msel9 tabIndex="13" formControlName="tcode" (keydown.enter)="msel9.close()" required>
-            <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
+          <mat-label>単価区分</mat-label>
+          <mat-select #msel1 tabIndex="16" formControlName="tankakbn" required (keydown.enter)="msel1.close()">
+            <mat-option *ngFor="let sval of bunsrv.kbn.tankakbn" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:5em">
+          <mat-label>税区分</mat-label>
+          <mat-select #msel2 tabIndex="17" formControlName="mtax" required (keydown.enter)="msel2.close()">
+            <mat-option *ngFor="let sval of bunsrv.kbn.mtax" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
         </mat-form-field>
         <mat-form-field style="width:8em">
           <mat-label>特別単価区分</mat-label>
-          <mat-select #msel10 tabIndex="14" formControlName="sptnkbn" (keydown.enter)="msel10.close()">
+          <mat-select #msel10 tabIndex="18" formControlName="sptnkbn" (keydown.enter)="msel10.close()">
             <mat-option *ngFor="let sval of bunsrv.kbn.sptnkbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
         </mat-form-field>
-        <mat-form-field style="width:8em">
-          <mat-label>配達時間帯</mat-label>
-          <mat-select #msel11 tabIndex="15" formControlName="htime" (keydown.enter)="msel11.close()">
-            <mat-option *ngFor="let sval of bunsrv.kbn.htime" [value]="sval.value">
-              {{sval.viewval}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field style="width:8em">
-          <mat-label>納品書タイプ</mat-label>
-          <mat-select #msel12 tabIndex="16" formControlName="ntype" (keydown.enter)="msel12.close()">
-            <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
-              {{sval.name}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field style="width:8em">
-          <mat-label>納品書Type(直送)</mat-label>
-          <mat-select #msel13 tabIndex="17" formControlName="tntype" (keydown.enter)="msel13.close()">
-            <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
-              {{sval.name}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
         <mat-form-field>
           <mat-label>Web会員ID</mat-label>
-          <input tabIndex="18" matInput formControlName="webid">
+          <input tabIndex="19" matInput formControlName="webid">
         </mat-form-field>
         <mat-form-field>
           <mat-label>領収書宛名</mat-label>
-          <input tabIndex="19" matInput formControlName="ryoate">
+          <input tabIndex="20" matInput formControlName="ryoate">
         </mat-form-field>
         <mat-form-field>
           <mat-label>janシール</mat-label>
@@ -217,11 +217,11 @@
         <div fxLafxLayout="column" style="width:100%;">
           <mat-form-field class="txtar">
             <mat-label>伝票備考</mat-label>
-            <textarea tabIndex="20" matInput formControlName="bikou" matTextareaAutosize></textarea>
+            <textarea tabIndex="21" matInput formControlName="bikou" matTextareaAutosize></textarea>
           </mat-form-field>
           <mat-form-field class="txtar">
             <mat-label>マスタ備考</mat-label>
-            <textarea matInput formControlName="inbikou" matTextareaAutosize></textarea>
+            <textarea tabIndex="22" matInput formControlName="inbikou" matTextareaAutosize></textarea>
           </mat-form-field>
         </div>
       </form>
@@ -246,11 +246,11 @@
         <div fxLayoutGap="5px">
           <mat-form-field style="width:5em">
             <mat-label>締め日</mat-label>
-            <input tabIndex="21" matInput formControlName="sime">
+            <input tabIndex="23" matInput formControlName="sime">
           </mat-form-field>
           <mat-form-field style="width:5em">
             <mat-label>入金サイト</mat-label>
-            <mat-select tabIndex="22" formControlName="site">
+            <mat-select tabIndex="24" formControlName="site">
               <mat-option *ngFor="let sval of bunsrv.kbn.site" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -258,16 +258,18 @@
           </mat-form-field>
           <mat-form-field style="width:5em">
             <mat-label>入金日</mat-label>
-            <input tabIndex="23" matInput formControlName="inday">
+            <input tabIndex="25" matInput formControlName="inday">
           </mat-form-field>
           <mat-form-field>
             <mat-label>請求先コード</mat-label>
-            <input tabIndex="24" matInput formControlName="scde">
+            <input tabIndex="26" matInput formControlName="scde">
           </mat-form-field>
+          <span class="nmtxt">{{form.getRawValue().scde | mcdtxt}}</span>
           <mat-form-field>
             <mat-label>請求書送付先コード</mat-label>
-            <input tabIndex="25" matInput formControlName="sscode">
+            <input tabIndex="27" matInput formControlName="sscode">
           </mat-form-field>
+          <span class="nmtxt">{{form.getRawValue().sscode | mcdtxt}}</span>
         </div>
       </mat-expansion-panel>
       <mat-expansion-panel>
