@@ -289,7 +289,7 @@ export class StockService {
     });
   }
   get_stock(gcd: string, gskbn: string, scd?: string, date?: Date): Promise<Stock[]> {
-    let scodes: string[] = null;
+    let scodes: string[] = [];
     let lcdate: Date;
     const GetView = gql`
     query get_gcdscd($id:smallint!,$gcode:String!,$scode:[String!]) {
