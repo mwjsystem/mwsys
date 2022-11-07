@@ -7,7 +7,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!,$mcd:String!,$sptnk:Strin
       code
       gkbn
       vcode
-      msmstits(where: {mcode: {_eq: $mcd}}) {
+      msprocesses(where: {mcode: {_eq: $mcd}}) {
         patno
         seq
       }
@@ -44,7 +44,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!,$mcd:String!,$sptnk:Strin
     msgzais {
       zcode
       irisu
-      msgoods {
+      msgood {
         gskbn
       }
     }
@@ -95,19 +95,27 @@ query get_member($id: smallint!,$mcode:String!) {
       obikou
       del
     } 
-    msmstits {
+    msprocesses {
+      mcode
       patno
       seq
-      stitype
-      stitno
+      prcpat
       vcode
-      biko
-      size
-      color
-      colorno
-      letter
-      position
-      posibikou
+      memo
+      tanka
+      genka
+      ptname
+      code
+      posi01
+      posi02
+      posi03
+      posi04
+      posi05
+      posi06
+      posi07
+      posi08
+      posi09
+      posi10
     } 
   }
 }`;

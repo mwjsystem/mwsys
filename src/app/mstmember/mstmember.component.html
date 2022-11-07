@@ -1,10 +1,17 @@
-<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
+<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' :  mode==1 ? 'accent' : 'basic'"
+  class="toolbar mat-elevation-z8">
   <div class="icon-area" fxLayout="row wrap">
     <button mat-button (click)="modeToCre()" *ngIf="mode==3" fxHide fxShow.gt-sm>
       <mat-icon>add_box</mat-icon>新規
     </button>
     <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.mcd" fxHide fxShow.gt-sm>
       <mat-icon>edit</mat-icon>編集
+    </button>
+    <button mat-button (click)="modeToDel(true,4)" *ngIf="mode==3 && this.mcd">
+      <mat-icon>delete</mat-icon>削除
+    </button>
+    <button mat-button (click)="modeToDel(false,3)" *ngIf="mode==4 && this.mcd">
+      <mat-icon>restore</mat-icon>削除取消
     </button>
     <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3" fxHide fxShow.gt-sm>
       <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
@@ -27,13 +34,13 @@
         <mat-icon>find_replace</mat-icon>
       </button>
     </mat-form-field>
-    <button mat-button (click)="diaBetsu()" *ngIf="mode==3">
+    <button mat-button (click)="diaBetsu()" *ngIf="mode==3 && this.mcd">
       <mat-icon>local_shipping</mat-icon>
       <span fxHide fxShow.gt-sm>別納先</span>
     </button>
-    <button mat-button (click)="diaStit()" *ngIf="mode==3">
+    <button mat-button (click)="diaProc()" *ngIf="mode==3 && this.mcd">
       <mat-icon>scanner</mat-icon>
-      <span fxHide fxShow.gt-sm>刺繍データ</span>
+      <span fxHide fxShow.gt-sm>加工マスタ</span>
     </button>
     <!-- <button mat-button (click)="test(1)" *ngIf="mode!=1">
       <mat-icon>question_answer</mat-icon>

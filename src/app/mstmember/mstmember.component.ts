@@ -21,7 +21,7 @@ import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { EdaService } from './../share/adreda/eda.service';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { AddressComponent } from './../share/address/address.component';
-import { MsstitComponent } from './../share/msstit/msstit.component';
+import { MsprocComponent } from './../share/msproc/msproc.component';
 
 class Sval {
   value: string;
@@ -157,13 +157,12 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       dialogConfig.autoFocus = true;
       dialogConfig.data = {
         mcode: this.mcd + '(' + this.memsrv.get_mcdtxt(this.mcd) + ')',
-        mode: this.mode,
         flg: false
       };
       let dialogRef = this.dialog.open(AdredaComponent, dialogConfig);
     }
   }
-  diaStit(): void {
+  diaProc(): void {
     if (this.checkMcode(this.mcd)) {
       let dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
@@ -171,7 +170,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         mcode: this.mcd + '(' + this.memsrv.get_mcdtxt(this.mcd) + ')',
         mode: this.mode
       };
-      let dialogRef = this.dialog.open(MsstitComponent, dialogConfig);
+      let dialogRef = this.dialog.open(MsprocComponent, dialogConfig);
     }
   }
   mcdHelp(): void {
@@ -215,7 +214,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     let flg: boolean;
     if (mcode == "") {
       flg = false;
-    } else {
+    } else if (this.mode > 1) {
       if (this.memsrv.membs.length == 0) {
         flg = true;
       } else {
@@ -234,6 +233,13 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
           flg = false;
         }
       }
+    } else {
+      let lcmcode: string = this.usrsrv.convUpper(mcode);
+      let i: number = this.memsrv.membs.findIndex(obj => obj.mcode == lcmcode);
+      if (i > -1) {
+        this.usrsrv.toastWar("顧客コード" + mcode + "は登録済です");
+      }
+      flg = false;
     }
     return flg;
   }
@@ -297,6 +303,11 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
               this.gadrVal[1].dis = true;
             }
             this.mcd = mcode;
+            if (member.del == true) {
+              this.mode = 4;
+            } else {
+              this.mode = 3;
+            }
             this.overlayRef.detach();
             this.refresh();
             // console.log("get_member");
@@ -373,15 +384,56 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     }
   }
 
+  modeToDel(flg, mode): void {
+    let lctxt: string = (flg ? '削除' : '削除取消');
+    if (window.confirm(lctxt + 'してもよろしいですか？')) {
+
+      this.apollo.mutate<any>({
+        mutation: Query.DeleteMast,
+        variables: {
+          id: this.usrsrv.compid,
+          mcd: this.mcd,
+          flg: flg,
+          uat: new Date(),
+          uby: this.usrsrv.staff.code
+        },
+        refetchQueries: [
+          {
+            query: Query.GetMast1,
+            variables: {
+              id: this.usrsrv.compid,
+              mcode: this.mcd
+            },
+          }],
+      }).subscribe(({ data }) => {
+        this.usrsrv.toastSuc('顧客コード' + this.mcd + 'を' + lctxt + 'しました');
+      }, (error) => {
+        this.usrsrv.toastErr('データベースエラー', '顧客コード' + this.mcd + 'の' + lctxt + 'ができませんでした');
+        console.log('error del_jyuen', error);
+      });
+      this.mode = mode;
+      this.form.disable();
+      history.replaceState('', '', './mstmember/' + this.mode + '/' + this.mcd);
+    }
+  }
+
   cancel(): void {
     if (this.mode == 1) {
       this.mcd = "";
       this.form.reset();
-    } 1
+    }
     this.mode = 3;
     this.form.disable();
     this.form.markAsPristine();
     history.replaceState('', '', './mstmember/' + this.mode + '/' + this.mcd);
+  }
+
+  async get_mcode() {
+    if (!this.mcd) {
+      return await this.usrsrv.getNumber('mcode', 1).toString();
+    } else {
+      return this.mcd;
+    }
   }
 
   async save() {
@@ -459,8 +511,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       let membs: any[] = [];
       // this.usrsrv.getNumber('mcode',1)
       //   .subscribe(value => {
-      let lcmcd: number = await this.usrsrv.getNumber('mcode', 1);
-      this.mcd = lcmcd.toString();
+      this.mcd = await this.get_mcode();
       member.mcode = this.mcd;
       if (!member.sscode) {
         member.sscode = this.mcd;

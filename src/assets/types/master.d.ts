@@ -91,21 +91,27 @@ declare namespace mwI {
     region: string;
     local: string;
   }
-  interface Stit {
-    id: number;
+  interface Proc {
     mcode: string;
     patno: number;
     seq: number;
-    stitype: string;
-    stitno: string;
+    prcpat: string;
     vcode: string;
-    biko: string;
-    size: string;
-    color: string;
-    colorno: number;
-    letter: string;
-    position: string;
-    posibikou: string;
+    memo: string;
+    tanka: number;
+    genka: number;
+    ptname: string;
+    code: string;
+    posi01: number;
+    posi02: number;
+    posi03: number;
+    posi04: number;
+    posi05: number;
+    posi06: number;
+    posi07: number;
+    posi08: number;
+    posi09: number;
+    posi10: number;
   }
   interface Adrs {
     eda: number;
@@ -174,7 +180,7 @@ declare namespace mwI {
     mtgt5: boolean;
     gadr: string;
     msmadrs: Adrs[];
-    msmstits: Stit[];
+    msprocesses: Proc[];
   }
   interface Gtanka {
     gcode: string;

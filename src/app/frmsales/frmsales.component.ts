@@ -47,7 +47,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   // qrurl: string;
   getden: number;
   gdsttl: number = 0;
-  stit: mwI.Stit[] = [];
+  proc: mwI.Proc[] = [];
   nskVal: mwI.Sval[] = [];
   iskVal: mwI.Sval[] = [];
   overlayRef = this.overlay.create({
@@ -478,10 +478,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           }
           this.jmisrv.mtax = member.mtax;
           this.jmisrv.tankakbn = member.tankakbn;
-          this.jmisrv.sptnkbn = member.sptnkbn;
+          this.jmisrv.sptnkbn = member.sptnkbn ?? "";
           this.jmisrv.ntype = member.ntype;
           this.jmisrv.tntype = member.tntype;
-          this.stit = member.msmstits;
+          this.proc = member.msprocesses;
           let msmadrs: mwI.Adrs[] = member.msmadrs;
           this.edasrv.mcode = mcode;
           this.edasrv.edas = [];
@@ -593,10 +593,13 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   modeToDel(flg, mode): void {
-    this.jmisrv.del_jyuden(this.jmisrv.denno, flg);
-    this.mode = mode;
-    this.refresh();
-    history.replaceState('', '', './frmsales/' + this.mode + '/' + this.jmisrv.denno);
+    let lctxt: string = (flg ? '取消' : '取消解除');
+    if (window.confirm(lctxt + 'してもよろしいですか？')) {
+      this.jmisrv.del_jyuden(this.jmisrv.denno, flg);
+      this.mode = mode;
+      this.refresh();
+      history.replaceState('', '', './frmsales/' + this.mode + '/' + this.jmisrv.denno);
+    }
   }
 
   cancel(): void {

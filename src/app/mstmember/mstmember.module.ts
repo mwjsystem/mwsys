@@ -11,6 +11,7 @@ import { EdatblComponent } from './../share/adreda/edatbl.component';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { McdtblComponent } from './../share/mcdhelp/mcdtbl.component';
 import { MsstitComponent } from '../share/msstit/msstit.component';
+import { MsprocComponent } from '../share/msproc/msproc.component';
 // import { UserService } from './../services/user.service';
 
 
@@ -24,6 +25,7 @@ import { MsstitComponent } from '../share/msstit/msstit.component';
     EdahelpComponent,
     EdatblComponent,
     MsstitComponent,
+    MsprocComponent,
   ],
   imports: [
     CommonModule,

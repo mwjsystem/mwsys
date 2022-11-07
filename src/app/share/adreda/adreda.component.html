@@ -1,4 +1,5 @@
-<mat-toolbar color="primary" class="toolbar" style="width:77%;">
+<mat-toolbar color="primary" [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar"
+  style="width:77%;">
   <div class="icon-area" fxLayout="row wrap">
     <button mat-button (click)="modeToCre()">
       <mat-icon>add_box</mat-icon>
@@ -34,7 +35,7 @@
     <!-- </div> -->
   </mat-form-field>
 </mat-toolbar>
-<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>{{mcode}} 別納先</h1>
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>{{mode|modetxt}}{{mcode}} 別納先</h1>
 
 <mat-dialog-content>
   <form [formGroup]="form">
@@ -43,5 +44,5 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button class="mat-raised-button" (click)="close()">閉じる</button>
-  <button class="mat-raised-button mat-primary"(click)="set_eda()" *ngIf="flg">枝番をセット</button>
+  <button class="mat-raised-button mat-primary" (click)="set_eda()" *ngIf="flg">枝番をセット</button>
 </mat-dialog-actions>

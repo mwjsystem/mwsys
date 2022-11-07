@@ -181,3 +181,10 @@ mutation upd_madr($id: smallint!, $mcode: String!, $eda: Int!,$_set: msmadr_set_
     affected_rows
   }
 }`;
+
+export const DeleteMast = gql`
+mutation del_jyuden($id: smallint!, $mcd: String!, $flg: Boolean, $uat: timestamptz!, $uby: String!) {
+  update_msmember(where: {id: {_eq:$id},mcode: {_eq:$mcd}}, _set: {del: $flg, updated_at: $uat, updated_by: $uby}) {
+    affected_rows
+  }
+}`;

@@ -32,7 +32,6 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     private usrsrv: UserService,
     private apollo: Apollo) {
     this.mcode = data.mcode;
-    // this.mode = data.mode;
     this.eda = data.eda;
     this.flg = data.flg;
   }
