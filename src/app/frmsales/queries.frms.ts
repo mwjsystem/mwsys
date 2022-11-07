@@ -44,7 +44,7 @@ query get_good($id: smallint!,$gds:String!,$day: date!,$mcd:String!,$sptnk:Strin
     msgzais {
       zcode
       irisu
-      msgood {
+      msgoods {
         gskbn
       }
     }
