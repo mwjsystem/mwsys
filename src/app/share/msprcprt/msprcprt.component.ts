@@ -8,11 +8,11 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
 @Component({
-  selector: 'app-msstit',
-  templateUrl: './msstit.component.html',
-  styleUrls: ['./msstit.component.scss']
+  selector: 'app-msprcprt',
+  templateUrl: './msprcprt.component.html',
+  styleUrls: ['./../../tbl.component.scss']
 })
-export class MsstitComponent implements OnInit {
+export class MsprcprtComponent implements OnInit {
   mcode: number;
   mode: number = 2;
   form: FormGroup;
@@ -22,7 +22,7 @@ export class MsstitComponent implements OnInit {
     public usrsrv: UserService,
     public cdRef: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) data,
-    private dialogRef: MatDialogRef<MsstitComponent>) {
+    private dialogRef: MatDialogRef<MsprcprtComponent>) {
     this.mcode = data.mcode;
   }
 
@@ -80,6 +80,9 @@ export class MsstitComponent implements OnInit {
   }
   close() {
     this.dialogRef.close();
+  }
+  selected(selected) {
+    this.dialogRef.close(selected);
   }
   shouldConfirmOnBeforeunload(): boolean {
     return this.form.dirty;

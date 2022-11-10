@@ -10,7 +10,7 @@ import { EdahelpComponent } from './../share/adreda/edahelp.component';
 import { EdatblComponent } from './../share/adreda/edatbl.component';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { McdtblComponent } from './../share/mcdhelp/mcdtbl.component';
-import { MsstitComponent } from '../share/msstit/msstit.component';
+import { MsprcprtComponent } from '../share/msprcprt/msprcprt.component';
 import { MsprocComponent } from '../share/msproc/msproc.component';
 // import { UserService } from './../services/user.service';
 
@@ -24,7 +24,7 @@ import { MsprocComponent } from '../share/msproc/msproc.component';
     McdtblComponent,
     EdahelpComponent,
     EdatblComponent,
-    MsstitComponent,
+    MsprcprtComponent,
     MsprocComponent,
   ],
   imports: [

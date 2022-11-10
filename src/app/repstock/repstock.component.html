@@ -59,8 +59,6 @@
     <button mat-button (click)="showChart()">
       <mat-icon>poll</mat-icon>
     </button>
-    <!-- <button type="button" class="btn btn1" (click)="outputCsv($event)">CSV出力</button>
-        <a id="csv-donwload"></a> -->
   </div>
 </mat-toolbar>
 <mat-toolbar style="visibility:hidden;"></mat-toolbar>
@@ -115,22 +113,10 @@
   </mat-card-content>
 </mat-card>
 <mat-card style="padding: 10px;" fxLayout="column">
-  <!-- <div fxLayout="row wrap" fxLayoutAlign="start baseline">
-  <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox>
-  <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
-    <mat-label>倉庫</mat-label>
-    <mat-select [(value)]="scode" (openedChange)="refresh()" [disabled]="!chSok">
-      <mat-option *ngFor="let sval of soksrv.scds" [value]="sval.value">
-        {{sval.viewval}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>  
-  </div> -->
   <mat-card-content fxLayout="column" fxLayoutAlign="start baseline" fxLayoutGap="5px">
     <fieldset>
       <legend>
         <div fxLayout="row wrap" fxLayoutAlign="start baseline">
-          <!-- <mat-checkbox (change)="onChange()" [(ngModel)]="chSok">倉庫選択(offは全倉庫)</mat-checkbox> -->
           <mat-form-field fxFlex="0 0 10em" fxFlexOffset="10px">
             <mat-label>倉庫</mat-label>
             <mat-select [(value)]="scode" (openedChange)="onChange()" [disabled]="!stcsrv.stcGcd">
@@ -170,10 +156,6 @@
               <mat-label>当日出荷</mat-label>
               <input matInput numberInput [value]="stcsrv.stc.today" disabled class="i_num">
             </mat-form-field>
-            <!-- <mat-form-field style="width:4em">
-              <mat-label>受注残</mat-label>
-              <input matInput numberInput [value]="stcsrv.stc.juzan" disabled class="i_num">
-            </mat-form-field> -->
             <mat-form-field style="width:4em">
               <mat-label>翌日出荷</mat-label>
               <input matInput numberInput [value]="stcsrv.stc.tommo" disabled class="i_num">

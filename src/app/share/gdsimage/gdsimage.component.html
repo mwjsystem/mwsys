@@ -15,14 +15,16 @@
             </mat-form-field>
             <button mat-flat-button matSuffix color="accent" (click)="openXlsx()" *ngIf="url" fxLayoutAlign="end"
                 style="margin-top:5px;">開く</button>
-            <button mat-flat-button matSuffix (click)="saveUrl()" color="primary" fxLayoutAlign="end" style="margin-top:5px;">URL・ｺﾒﾝﾄを保存</button>
+            <button mat-flat-button matSuffix (click)="saveUrl()" color="primary" fxLayoutAlign="end"
+                style="margin-top:5px;">URL・ｺﾒﾝﾄを保存</button>
         </div>
         <mat-grid-list cols="3">
             <ng-container *ngFor="let row of noimgs;let i=index">
                 <mat-grid-tile>
                     <img #img
                         src="{{usrsrv.system.imgurl + 'goods/' + grpcd + '_' + i.toString() + '.jpg?' + usrsrv.formatTime()}}"
-                        onload="row=0;" onError="this.onError=null;this.src='assets/noimage.gif';">
+                        width="300" height="300" onload="row=0;"
+                        onError="this.onError=null;this.src='assets/noimage.gif';">
                     <mat-grid-tile-footer fxLayoutAlign="space-between" style="height:30px;">
                         <input name="upfile" style="display: none" type="file" #upfile accept=".jpg"
                             (change)="onchange(upfile.files,i.toString())" capture="enviroment" />
