@@ -182,10 +182,9 @@ export class JmeitblComponent implements OnInit {
     // console.log(+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'],this.frmArr.getRawValue()[i]['spec'] == null);
     if (this.frmArr.getRawValue()[i]['pable'] == null) {
       this.frmArr.controls[i].patchValue({ spec: null });
-    } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] > 9 && this.frmArr.getRawValue()[i]['spec'] == null) {
+    } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] >= 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '1' });
-    } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] < 10 &&
-      (this.frmArr.getRawValue()[i]['spec'] == null || this.frmArr.getRawValue()[i]['spec'] == '1')) {
+    } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '0' });
     }
 
