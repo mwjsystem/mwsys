@@ -20,7 +20,7 @@
     <div class="mat-elevation-z8">
         <ng-container [formGroup]="form">
             <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
-                <ng-container matColumnDef="patno">
+                <ng-container matColumnDef="prcno">
                     <th mat-header-cell *matHeaderCellDef>パターン№
                         <button mat-icon-button (click)="ins_row(0)" *ngIf="frmArr.enabled">
                             <mat-icon>add_circle</mat-icon>
@@ -28,7 +28,7 @@
                     </th>
                     <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
                         <mat-form-field style="width:5em;">
-                            <input matInput [value]="frmArr.getRawValue()[i]['patno']" class="i_num" disabled>
+                            <input matInput [value]="frmArr.getRawValue()[i]['prcno']" class="i_num" disabled>
                             <button mat-icon-button matPrefix (click)="ins_row(i+1)" *ngIf="frmArr.enabled">
                                 <mat-icon>add_circle</mat-icon>
                             </button>
@@ -46,20 +46,20 @@
                         </mat-form-field>
                     </td>
                 </ng-container> -->
-                <ng-container matColumnDef="ptname">
-                    <th mat-header-cell *matHeaderCellDef>パターン名称</th>
+                <ng-container matColumnDef="prcname">
+                    <th mat-header-cell *matHeaderCellDef>加工名称</th>
                     <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
                         <mat-form-field style="width:20em;">
-                            <input matInput formControlName="ptname">
+                            <input matInput formControlName="prcname">
                         </mat-form-field>
                     </td>
                 </ng-container>
-                <ng-container matColumnDef="prctype">
-                    <th mat-header-cell *matHeaderCellDef>加工タイプ</th>
+                <ng-container matColumnDef="prcbody">
+                    <th mat-header-cell *matHeaderCellDef>加工ボディ</th>
                     <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
                         <mat-form-field style="width:7em;">
-                            <mat-select formControlName="prctype">
-                                <mat-option *ngFor="let sval of bunsrv.kbn.prctype" [value]="sval.value">
+                            <mat-select formControlName="prcbody">
+                                <mat-option *ngFor="let sval of bunsrv.kbn.prcbody" [value]="sval.value">
                                     {{sval.viewval}}
                                 </mat-option>
                             </mat-select>
@@ -121,7 +121,7 @@
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="posi01">
-                    <th mat-header-cell *matHeaderCellDef>加工1</th>
+                    <th mat-header-cell *matHeaderCellDef>加工1(胸)</th>
                     <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="i">
                         <mat-form-field style="width:5em;">
                             <input matInput formControlName="posi01" (keydown.f4)="prcprtHelp(i,'posi01')">

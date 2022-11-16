@@ -8,8 +8,8 @@ query get_good($id: smallint!,$gds:String!,$day: date!,$mcd:String!,$sptnk:Strin
       gkbn
       vcode
       msprocesses(where: {mcode: {_eq: $mcd}}) {
-        patno
-        seq
+        prcno
+        prcname
       }
     }
     gcode
@@ -96,26 +96,9 @@ query get_member($id: smallint!,$mcode:String!) {
       del
     } 
     msprocesses {
-      mcode
-      patno
-      seq
-      prcpat
-      vcode
-      memo
-      tanka
-      genka
-      ptname
+      prcno
+      prcname
       code
-      posi01
-      posi02
-      posi03
-      posi04
-      posi05
-      posi06
-      posi07
-      posi08
-      posi09
-      posi10
     } 
   }
 }`;

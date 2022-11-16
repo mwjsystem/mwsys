@@ -20,7 +20,7 @@ export class MsprocComponent implements OnInit {
   mode: number = 2;
   form: FormGroup;
   dataSource = new MatTableDataSource();
-  displayedColumns = ['patno', 'ptname', 'prctype', 'vcode', 'code', 'memo', 'tanka', 'genka', 'posi01', 'posi02'];
+  displayedColumns = ['prcno', 'prcname', 'prcbody', 'vcode', 'code', 'memo', 'tanka', 'genka', 'posi01', 'posi02'];
 
   constructor(private fb: FormBuilder,
     private dialog: MatDialog,
@@ -102,14 +102,16 @@ export class MsprocComponent implements OnInit {
 
   createRow(row: number, proc?) {
     return this.fb.group({
-      patno: [{ value: row, disabled: true }],
-      ptname: [proc?.ptname],
-      prctype: [proc?.prctype],
+      prcno: [{ value: row, disabled: true }],
+      prcname: [proc?.prcname],
+      prcbody: [proc?.prcbody],
       vcode: [proc?.vcode],
       code: [proc?.code],
       memo: [proc?.memo],
       tanka: [proc?.tanka],
-      genka: [proc?.genka]
+      genka: [proc?.genka],
+      posi01: [proc?.posi01],
+      posi02: [proc?.posi02]
 
     });
   }

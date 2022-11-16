@@ -92,26 +92,26 @@ declare namespace mwI {
     local: string;
   }
   interface Proc {
-    mcode: string;
-    patno: number;
-    seq: number;
-    prcpat: string;
-    vcode: string;
-    memo: string;
-    tanka: number;
-    genka: number;
-    ptname: string;
+    // mcode: string;
+    prcno: number;
+    // seq: number;
+    // prcpat: string;
+    // vcode: string;
+    // memo: string;
+    // tanka: number;
+    // genka: number;
+    prcname: string;
     code: string;
-    posi01: number;
-    posi02: number;
-    posi03: number;
-    posi04: number;
-    posi05: number;
-    posi06: number;
-    posi07: number;
-    posi08: number;
-    posi09: number;
-    posi10: number;
+    // posi01: number;
+    // posi02: number;
+    // posi03: number;
+    // posi04: number;
+    // posi05: number;
+    // posi06: number;
+    // posi07: number;
+    // posi08: number;
+    // posi09: number;
+    // posi10: number;
   }
   interface Adrs {
     eda: number;

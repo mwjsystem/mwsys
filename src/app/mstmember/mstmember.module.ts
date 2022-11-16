@@ -12,6 +12,7 @@ import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { McdtblComponent } from './../share/mcdhelp/mcdtbl.component';
 import { MsprcprtComponent } from '../share/msprcprt/msprcprt.component';
 import { MsprocComponent } from '../share/msproc/msproc.component';
+import { PartshelpComponent } from '../share/partshelp/partshelp.component';
 // import { UserService } from './../services/user.service';
 
 
@@ -26,6 +27,7 @@ import { MsprocComponent } from '../share/msproc/msproc.component';
     EdatblComponent,
     MsprcprtComponent,
     MsprocComponent,
+    PartshelpComponent,
   ],
   imports: [
     CommonModule,
