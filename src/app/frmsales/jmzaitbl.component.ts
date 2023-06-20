@@ -21,7 +21,7 @@ export class Jmzai {
 @Component({
   selector: 'app-jmzaitbl',
   templateUrl: './jmzaitbl.component.html',
-  styleUrls: ['./jmzaitbl.component.scss']
+  styleUrls: ['./../tbl.component.scss']
 })
 export class JmzaitblComponent implements OnInit {
   dataSource: MatTableDataSource<Jmzai> = new MatTableDataSource();

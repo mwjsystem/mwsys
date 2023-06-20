@@ -30,10 +30,10 @@ declare namespace mwI {
     htime: number;
     okurisuu: number;
     okurino: string;
-    bikou: string;
-    nbikou: string;
-    obikou: string;
-    sbikou: string;
+    dmemo: string;
+    nmemo: string;
+    omemo: string;
+    smemo: string;
     cusden: string;
     ryoate: string;
     daibiki: number;
@@ -42,8 +42,8 @@ declare namespace mwI {
     shobunrui: string;
     tcode1: string;
     gtotalzn: number;
-    souryouzn: number;
-    tesuuzn: number;
+    soryozn: number;
+    tesuzn: number;
     nebikizn: number;
     taxtotal: number;
     total: number;
@@ -82,7 +82,7 @@ declare namespace mwI {
     tanka: number;
     toutmoney: number;
     tinmoney: number;
-    mbikou: string;
+    mmemo: string;
     spec: string;
     spdet: string;
     pable: number;
@@ -163,7 +163,7 @@ declare namespace mwI {
     day: Date;
     scode: string;
     tcode: string;
-    dbiko: string;
+    dmemo: string;
     inbiko: string;
     gtotal: number;
     ttotal: number;
@@ -192,7 +192,7 @@ declare namespace mwI {
     money: number;
     taxrate: string;
     // unit: string;
-    mbiko: string;
+    mmemo: string;
     spec: string;
     jdenno: number;
     jline: number;
@@ -213,9 +213,9 @@ declare namespace mwI {
     inday: Date;
     scode: string;
     tcode: string;
-    dbiko: string;
+    dmemo: string;
     gtotal: number;
-    souryou: number;
+    soryo: number;
     tesuu: number;
     tax: number;
     total: number;
@@ -234,7 +234,7 @@ declare namespace mwI {
     money: number;
     taxrate: string;
     // unit: string;
-    mbiko: string;
+    mmemo: string;
     spec: string;
     hdenno: number;
     hline: number;

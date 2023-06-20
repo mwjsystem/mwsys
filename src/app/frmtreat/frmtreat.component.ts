@@ -3,10 +3,10 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { MatSpinner } from '@angular/material/progress-spinner';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatLegacySpinner as MatSpinner } from '@angular/material/legacy-progress-spinner';
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
 import { TrtdetailComponent } from './trtdetail.component';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
@@ -21,7 +21,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-frmtreat',
   templateUrl: './frmtreat.component.html',
-  styleUrls: ['./frmtreat.component.scss']
+  styleUrls: ['./../app.component.scss']
 })
 export class FrmtreatComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -53,8 +53,8 @@ export class FrmtreatComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.bunsrv.get_bunrui();
-    this.stfsrv.get_staff();
+    this.bunsrv.getBunrui();
+    this.stfsrv.getStaff();
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     // this.route.paramMap.subscribe((params: ParamMap)=>{
     //   if (params.get('param') !== null){
@@ -80,7 +80,7 @@ export class FrmtreatComponent implements OnInit {
             vars[k] = "%" + params[k] + "%"
           }
         })
-        this.get_treat(vars);
+        this.getTreat(vars);
       }
     )
 
@@ -108,7 +108,7 @@ export class FrmtreatComponent implements OnInit {
 
 
 
-  get_treat(params) {
+  getTreat(params) {
     const GetTrt = gql`
     query get_treat($id: smallint!, $mcode: Int, $grpcd: String) {
       trtreat(where: {id: {_eq: $id}, mcode: {_eq: $mcode}, grpcode: {_ilike: $grpcd}}, order_by: {seq: asc}) {

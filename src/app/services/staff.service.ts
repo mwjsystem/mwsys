@@ -15,7 +15,7 @@ export class StaffService {
     // this.get_staff();
   }
 
-  get_staff(): void {
+  getStaff(): void {
     const GetMast = gql`
     query get_staff($id: smallint!){
       msstaff(where: {id: {_eq: $id}},order_by: {sort:asc_nulls_last}) {
@@ -43,9 +43,9 @@ export class StaffService {
         console.log('error query get_staff', error);
       });
   }
-  get_name(code: string): string {
+  getName(code: string): string {
     if (this.stfs.length == 0) {
-      this.get_staff();
+      this.getStaff();
     }
     const i: number = this.stfs.findIndex(obj => obj.code == code);
     let ret: string;

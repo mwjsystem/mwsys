@@ -9,17 +9,17 @@ import { UserService } from './user.service';
 
 export class BunruiService {
 
-  public kbn:{ [key: string]: mwI.Sval[]; } = {};
+  public kbn: { [key: string]: mwI.Sval[]; } = {};
 
   constructor(private usrsrv: UserService,
-              private apollo: Apollo) {
-               }
-
-  get_bunrui():void{
-    this.qry_bunrui();
+    private apollo: Apollo) {
   }
 
-  async qry_bunrui():Promise<any> {
+  getBunrui(): void {
+    this.qryBunrui();
+  }
+
+  async qryBunrui(): Promise<any> {
     const GetMast = gql`
       query get_bunrui($id: smallint!){
         msbkbn {
@@ -30,43 +30,44 @@ export class BunruiService {
           }
         }
       }`;
-        
-    return new Promise( resolve => {
-      if (Object.keys(this.kbn).length>0){
-        return resolve(this.kbn);  
+
+    return new Promise(resolve => {
+      if (Object.keys(this.kbn).length > 0) {
+        return resolve(this.kbn);
       } else {
         this.apollo.watchQuery<any>({
-          query: GetMast, 
-            variables: { 
-              id : this.usrsrv.compid
-            },
-          })
+          query: GetMast,
+          variables: {
+            id: this.usrsrv.compid
+          },
+        })
           .valueChanges
           .subscribe(({ data }) => {
 
-            for (let i=0;i<data.msbkbn.length;i++){
-              this.kbn[data.msbkbn[i].kubun] = data.msbkbn[i].msbunruis; 
+            for (let i = 0; i < data.msbkbn.length; i++) {
+              this.kbn[data.msbkbn[i].kubun] = data.msbkbn[i].msbunruis;
             }
-            return resolve(this.kbn); 
-          },(error) => {
+            return resolve(this.kbn);
+          }, (error) => {
             console.log('error query get_bunrui', error);
           });
       }
     })
-    
+
   }
 
-  getSubcat(cat:string){
-    this.qry_bunrui();
-    return this.kbn.subcat?.filter(obj => {
-      if(obj.value.slice(0,2)==cat){
-       return true;}
-      })
-  } 
-  get_name(value: string, kubun: string):string  {
-    let i:number = this.kbn[kubun].findIndex(obj => obj.value == value);
-    let name:string="";
-    if( i > -1 ){
+  getSubcat(cat: string) {
+    this.qryBunrui();
+    return this.kbn['subcat']?.filter(obj => {
+      if (obj.value.slice(0, 2) == cat) {
+        return true;
+      }
+    })
+  }
+  getName(value: string, kubun: string): string {
+    let i: number = this.kbn[kubun].findIndex(obj => obj.value == value);
+    let name: string = "";
+    if (i > -1) {
       name = this.kbn[kubun][i]['viewval'];
     }
     return name;

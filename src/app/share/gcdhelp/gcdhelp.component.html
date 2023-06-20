@@ -1,26 +1,20 @@
-<mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between" style="margin-bottom:10px;">
-    <h3 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品コード検索</h3>
-    <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"
-        [pageSizeOptions]="[20, 50, 100, 250, 1000]">
-    </mat-paginator>
-    <button class="mat-raised-button" (click)="close()">閉じる</button>
-</mat-dialog-actions>
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品コード検索</h1>
 <mat-dialog-content>
     <div class="mat-elevation-z8">
-        <mat-toolbar fxLayoutGap="5px">
-            <div style="font-size: 12px;">
-                <button class="mat-raised-button" (click)="filterGcd()">検索</button>
+        <mat-toolbar class="flex flex-row" style="font-size: 10px;">
+            <button mat-raised-button (click)="filterGcd()">検索</button>
+            <div class="flex flex-wrap space-x-4">
                 <mat-form-field>
                     <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
-                    <input matInput [(ngModel)]="code" (change)="code=usrsrv.convUpper($event.target.value)"
+                    <input matInput [(ngModel)]="code" (change)="code=convUpper($any($event))"
                         (keydown.f4)="grpcdHelp()" [ngModelOptions]="{standalone: true}">
-                    <button mat-button mat-icon-button matSuffix (click)=" grpcdHelp()">
+                    <button mat-icon-button matSuffix (click)=" grpcdHelp()">
                         <mat-icon>find_replace</mat-icon>
                     </button>
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>商品コード</mat-label>
-                    <input matInput [(ngModel)]="gcode" (change)="gcode=usrsrv.convUpper($event.target.value)"
+                    <input matInput [(ngModel)]="gcode" (change)="gcode=convUpper($any($event))"
                         [ngModelOptions]="{standalone: true}">
                 </mat-form-field>
                 <mat-form-field>
@@ -34,7 +28,7 @@
                 <mat-form-field>
                     <mat-label>中止区分</mat-label>
                     <mat-select [(ngModel)]="tkbn" [ngModelOptions]="{standalone: true}" multiple>
-                        <mat-option *ngFor="let sval of bunsrv.kbn.tkbn" [value]="sval.value">
+                        <mat-option *ngFor="let sval of bunsrv.kbn['tkbn']" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
                     </mat-select>
@@ -74,7 +68,7 @@
                 <th mat-header-cell *matHeaderCellDef>数量区分</th>
                 <td mat-cell *matCellDef="let row">
                     <mat-select [value]="row.gskbn" class="noArrow" style="width:7em;">
-                        <mat-option *ngFor="let sval of bunsrv.kbn.gskbn" [value]="sval.value">
+                        <mat-option *ngFor="let sval of bunsrv.kbn['gskbn']" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
                     </mat-select>
@@ -84,7 +78,7 @@
                 <th mat-header-cell *matHeaderCellDef>中止区分</th>
                 <td mat-cell *matCellDef="let row">
                     <mat-select [value]="row.tkbn" class="noArrow" style="width:7em;">
-                        <mat-option *ngFor="let sval of bunsrv.kbn.tkbn" [value]="sval.value">
+                        <mat-option *ngFor="let sval of bunsrv.kbn['tkbn']" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
                     </mat-select>
@@ -93,5 +87,11 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setGcd(row)"></tr>
         </table>
+        <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"
+            [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+        </mat-paginator>
     </div>
 </mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-raised-button (click)="close()">閉じる</button>
+</mat-dialog-actions>

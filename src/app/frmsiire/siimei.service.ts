@@ -20,7 +20,7 @@ export class SiimeiService {
         tcode
         gtotal
         total
-        dbiko
+        dmemo
         created_at
         created_by
         updated_at
@@ -34,7 +34,7 @@ export class SiimeiService {
           genka
           money
           taxrate
-          mbiko
+          mmemo
           spec
           mtax
           tsuu
@@ -50,7 +50,7 @@ export class SiimeiService {
 
   constructor(public usrsrv: UserService,
     private apollo: Apollo) { }
-  qry_siiden(denno: number): Observable<mwI.Trsiiden> {
+  qrySiiden(denno: number): Observable<mwI.Trsiiden> {
     let observable: Observable<mwI.Trsiiden> = new Observable<mwI.Trsiiden>(observer => {
       this.apollo.watchQuery<any>({
         query: this.GetTran,
@@ -83,7 +83,7 @@ export class SiimeiService {
           genka: e.genka,
           money: e.money,
           taxrate: e.taxrate,
-          mbiko: e.mbiko,
+          mmemo: e.mmemo,
           spec: e.spec,
           hdenno: hdenno,
           hline: e.line,
@@ -99,7 +99,7 @@ export class SiimeiService {
     });
   }
 
-  upd_siiden(denno, siiden, siimei): Promise<string> {
+  updSiiden(denno, siiden, siimei): Promise<string> {
     const UpdateTran = gql`
       mutation upd_siiden($id: smallint!, $hdno: Int!,$_set: trsiiden_set_input!,$obj:[trsiimei_insert_input!]!) {
         update_trsiiden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -136,7 +136,7 @@ export class SiimeiService {
       });
     });
   }
-  ins_siiden(siiden, siimei): Promise<string> {
+  insSiiden(siiden, siimei): Promise<string> {
     const InsertTran = gql`
       mutation ins_siiden($obj:[trsiiden_insert_input!]!,$objm:[trsiimei_insert_input!]!) {
         insert_trsiiden(objects: $obj)  {

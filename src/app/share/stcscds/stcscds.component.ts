@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from "@angular/material/dialog";
+import { MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
 
 @Component({
   selector: 'app-stcscds',
   templateUrl: './stcscds.component.html',
-  styleUrls: ['./stcscds.component.scss']
+  styleUrls: ['./../../help.component.scss']
 })
 export class StcscdsComponent implements OnInit {
 
@@ -13,10 +13,10 @@ export class StcscdsComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  
-  
-  
+
+
+
   close() {
     this.dialogRef.close();
-  }  
+  }
 }

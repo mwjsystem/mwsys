@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-// import { AuthGuard } from '@auth0/auth0-angular';
 import { MstmemberComponent } from './mstmember.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 

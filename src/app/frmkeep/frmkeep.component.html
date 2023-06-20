@@ -2,9 +2,9 @@
 
   <mat-form-field>
     <mat-label>受注伝票番号</mat-label>
-    <input matInput [(ngModel)]="denno" (change)="to_Denno($event.target.value)">
+    <input matInput [(ngModel)]="denno" (change)="toDenno($event.target.value)">
   </mat-form-field>
-  <button mat-flat-button matSuffix color="warning" (click)="to_Req()" *ngIf="(denno > 0)">
+  <button mat-flat-button matSuffix color="warning" (click)="toReq()" *ngIf="(denno > 0)">
     未処理一覧へ
   </button>
   <div class="mat-elevation-z8">

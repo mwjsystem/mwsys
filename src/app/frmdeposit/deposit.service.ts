@@ -11,7 +11,7 @@ export class Nyuden {
   smoney: number;
   tmoney: number;
   total: number;
-  mbiko: string;
+  mmemo: string;
 }
 
 export class Nyusub {
@@ -25,7 +25,7 @@ export class Nyusub {
   created_by: string;
   updated_at: Date;
   updated_by: string;
-  biko: string;
+  memo: string;
   jdenno: number;
   idenno: number;
   nmoney: number;
@@ -96,7 +96,7 @@ export class DepositService {
         mcode
         tcode
         code
-        biko
+        memo
         created_at
         created_by
         updated_at
@@ -112,7 +112,7 @@ export class DepositService {
           nmoney
           smoney
           tmoney
-          mbiko
+          mmemo
         }
         vnyuzan {
           trnyusubs {
@@ -160,7 +160,7 @@ export class DepositService {
   constructor(public usrsrv: UserService,
     private apollo: Apollo) { }
 
-  qry_jyuden(denno: number): Observable<Jyuden> {
+  qryJyuden(denno: number): Observable<Jyuden> {
     let observable: Observable<Jyuden> = new Observable<Jyuden>(observer => {
       this.apollo.watchQuery<any>({
         query: this.GetTran,
@@ -187,7 +187,7 @@ export class DepositService {
     return observable;
   }
 
-  qry_nyuden(denno: number): Observable<Nyusub> {
+  qryNyuden(denno: number): Observable<Nyusub> {
     let observable: Observable<Nyusub> = new Observable<Nyusub>(observer => {
       this.apollo.watchQuery<any>({
         query: this.GetTran0,
@@ -205,7 +205,7 @@ export class DepositService {
     });
     return observable;
   }
-  upd_nyuden(denno, nyusub, dept): Promise<string> {
+  updNyuden(denno, nyusub, dept): Promise<string> {
     const UpdateTran = gql`
       mutation upd_nyusub($id: smallint!, $dno: Int!,$_set: trnyusub_set_input!,$obj:[trnyuden_insert_input!]!) {
         update_trnyusub(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: $_set)  {
@@ -242,7 +242,7 @@ export class DepositService {
       });
     });
   }
-  ins_nyuden(nyusub, dept): Promise<string> {
+  insNyuden(nyusub, dept): Promise<string> {
     const InsertTran = gql`
       mutation ins_nyuden($obj:[trnyusub_insert_input!]!,$objm:[trnyuden_insert_input!]!) {
         insert_trnyusub(objects: $obj)  {

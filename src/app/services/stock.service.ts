@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
-// import { StoreService } from './store.service';
 import { Subject, Observable } from 'rxjs';
 
 export class Goods {
@@ -93,16 +92,16 @@ export class StockService {
   public shGcd: string;
   public stcGcd: string;
   // public isLoading:boolean=false;
-  public subject = new Subject<Stcbs[]>();
+  public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
   constructor(public usrsrv: UserService,
     // public strsrv: StoreService,
     private apollo: Apollo) {
     // this.getGoods();
-    this.make_yyyymm();
+    this.makeYyyymm();
   }
 
-  make_yyyymm() {
+  makeYyyymm() {
     let date = new Date();
     for (let i = 1; i < 13; i++) {
       date.setMonth(date.getMonth() - 1);
@@ -145,7 +144,7 @@ export class StockService {
         console.log('error query get_goods', error);
       });
   }
-  get_shcount0(gcd: string): Promise<StGds> {
+  getShcount0(gcd: string): Promise<StGds> {
     // this.isLoading=true;
     this.shGcd = "";
     const GetTran = gql`
@@ -232,7 +231,7 @@ export class StockService {
         });
     });
   }
-  get_shcount1(gcd: string): Promise<StGds> {
+  getShcount1(gcd: string): Promise<StGds> {
     // this.isLoading=true;
     this.shGcd = "";
     const GetTran = gql`
@@ -288,7 +287,7 @@ export class StockService {
         });
     });
   }
-  get_stock(gcd: string, gskbn: string, scd?: string, date?: Date): Promise<Stock[]> {
+  getStock(gcd: string, gskbn: string, scd?: string, date?: Date): Promise<Stock[]> {
     let scodes: string[] = [];
     let lcdate: Date;
     const GetView = gql`
@@ -334,9 +333,9 @@ export class StockService {
             let lctana: number = item.tana ?? 0;
             let lcstc;
             if (gskbn == "0") {
-              lcstc = await this.get_zaiko(gcd, item.code, lcday, lctana, lcdate);
+              lcstc = await this.getZaiko(gcd, item.code, lcday, lctana, lcdate);
             } else if (gskbn == "1") {
-              lcstc = await this.get_zaiko1(gcd, item.code, lcday, lctana);
+              lcstc = await this.getZaiko1(gcd, item.code, lcday, lctana);
             }
             lcstcs.push(lcstc);
           })).then(() => {
@@ -348,7 +347,7 @@ export class StockService {
         });
     });
   }
-  get_stocktrn(gcd: string, scd: string, date: Date): Promise<number> {
+  getStocktrn(gcd: string, scd: string, date: Date): Promise<number> {
     const GetTrans = gql`
     query get_gcdscd($id:smallint!,$gcd:String!,$scd:String!,$date:date!) {
       trgtana(where:{id:{_eq:$id},gcode:{_eq:$gcd},scode:{_eq:$scd},day:{_lt:$date}},order_by:{day:desc}) {
@@ -431,7 +430,7 @@ export class StockService {
       let lcstcs = [];
       Promise.all(gzais.map(async item => {
         if (item.msgoods.gskbn == '0') {
-          let lcstc = await this.get_stock(item.zcode, '1', scd);
+          let lcstc = await this.getStock(item.zcode, '1', scd);
           lcstcs.push({ irisu: item.irisu, ...lcstc[0] });
         }
       })).then(() => {
@@ -440,7 +439,7 @@ export class StockService {
     });
   }
 
-  async get_zaiko(gcd: string, scd: string, day: Date, stc: number, tdy: Date): Promise<Stock> {
+  async getZaiko(gcd: string, scd: string, day: Date, stc: number, tdy: Date): Promise<Stock> {
     // console.log(gcd + '_' + scd,day);
     const GetTran = gql`
     query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!, $today: date!,$nextd: date!) {
@@ -513,7 +512,7 @@ export class StockService {
     });
   }
   //在庫数取得(内訳用)
-  async get_zaiko1(gcd: string, scd: string, day: Date, stc: number): Promise<Stcbs> {
+  async getZaiko1(gcd: string, scd: string, day: Date, stc: number): Promise<Stcbs> {
     const GetTran = gql`
     query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!, $today: date!) {
       trzaiko_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode},day: {_gt: $day,_lte: $today}, scode: {_eq: $scode}}) {
@@ -586,78 +585,8 @@ export class StockService {
         });
     });
   }
-  // async get_zaiko2(gcd:string,scd:string,day:Date,stc:number):Promise<Stock> {
-  //   const GetTran = gql`
-  //   query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!, $today: date!,$nextd: date!) {
-  //     siire:trsiimei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, inday: {_gt: $day}}) {
-  //       aggregate { sum { suu }}}
-  //     movin: trmovden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, incode: {_eq: $scode}, day: {_gt: $day}}) {
-  //       aggregate { sum { suu }}}
-  //     tensaki: trtenden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}, kubun: {_eq: "1"}}) {
-  //       aggregate { sum { suu }}}
-  //     hatgai: trhgnden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}}) {
-  //       aggregate { sum { suu }}}
-  //     shukka:trjyumei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_gt: $day}, del: {_is_null: true}}) {
-  //       aggregate { sum { suu }}}
-  //     movout: trmovden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, outcode: {_eq: $scode}, day: {_gt: $day}}) {
-  //       aggregate { sum { suu }}}
-  //     tenmoto: trtenden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}, kubun: {_eq: "0"}}) {
-  //       aggregate { sum { suu }}}
-  //     haki: trhakden_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, day: {_gt: $day}}) {
-  //       aggregate { sum { suu }}}
-  //     today:trjyumei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $today}, del: {_is_null: true}}) {
-  //       aggregate { sum { suu }}}
-  //     keepd:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
-  //         aggregate { sum { suu }}}
-  //     hikat:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "1"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
-  //       aggregate { sum { suu }}}
-  //     juzan:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
-  //       aggregate { sum { suu }}} 
-  //     tommo:trjyumei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $nextd}, del: {_is_null: true}}) {
-  //       aggregate { sum { suu }}}         
-  //   }`;    
 
-  //   return new Promise<Stock>( resolve => {
-  //     // console.log(this.usrsrv.getNextday(new Date()));
-  //     this.apollo.watchQuery<any>({
-  //       query: GetTran, 
-  //         variables: { 
-  //           id : this.usrsrv.compid,
-  //           gcode: gcd,
-  //           scode: scd,
-  //           day: day,
-  //           today:new Date(),       
-  //           nextd:this.usrsrv.getNextday(new Date())
-  //       },
-  //     })
-  //     .valueChanges
-  //     .subscribe(({ data }) => {
-  //       let lcstcs:Stock={
-  //         gcode: gcd,
-  //         scode: scd,
-  //         // yestr: 0,
-  //         stock: stc + (data.siire.aggregate.sum.suu || 0)
-  //                    + (data.movin.aggregate.sum.suu || 0)
-  //                    + (data.tensaki.aggregate.sum.suu || 0)
-  //                    + (data.hatgai.aggregate.sum.suu || 0)
-  //                    - (data.shukka.aggregate.sum.suu || 0)
-  //                    - (data.movout.aggregate.sum.suu || 0)
-  //                    - (data.tenmoto.aggregate.sum.suu || 0)
-  //                    - (data.haki.aggregate.sum.suu || 0),
-  //         hikat:data.hikat.aggregate.sum.suu || 0,
-  //         juzan:data.juzan.aggregate.sum.suu || 0,
-  //         today:data.today.aggregate.sum.suu || 0,
-  //         keepd:data.keepd.aggregate.sum.suu || 0,
-  //         tommo:data.tommo.aggregate.sum.suu || 0
-  //       }
-  //       return resolve(lcstcs);
-
-  //     },(error) => {
-  //       console.log('error query get_zaiko', error);
-  //     });
-  //   });
-  // }
-  get_paabl(stcbs): number {
+  getPaabl(stcbs): number {
     let paabl: number = 9999;
     for (let i = 0; i < stcbs.length; i++) {
       const wAble = Math.floor((stcbs[i].stock - stcbs[i].hikat - stcbs[i].keepd) / stcbs[i].irisu);

@@ -5,10 +5,10 @@ import { StaffService } from './../../services/staff.service';
   name: 'staff'
 })
 export class StaffPipe implements PipeTransform {
-  constructor(private stfsrv: StaffService) {}
+  constructor(private stfsrv: StaffService) { }
 
   transform(value: string): string {
-    return this.stfsrv.get_name(value);  
+    return this.stfsrv.getName(value);
   }
 
 }

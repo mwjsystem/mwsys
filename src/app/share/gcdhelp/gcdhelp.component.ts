@@ -8,8 +8,6 @@ import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { GrpcdhelpComponent } from './../grpcdhelp/grpcdhelp.component';
 import { Subject } from 'rxjs';
-// import { ToastrService } from 'ngx-toastr';
-// import { Gcd,GcdService } from './gcd.service';
 
 export interface Gcd {
   code: string;
@@ -27,7 +25,7 @@ export interface Gcd {
 @Component({
   selector: 'app-gcdhelp',
   templateUrl: './gcdhelp.component.html',
-  styleUrls: ['./gcdhelp.component.scss']
+  styleUrls: ['./../../help.component.scss']
 })
 export class GcdhelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -39,15 +37,13 @@ export class GcdhelpComponent implements OnInit {
   public gcode: string = "";
   public gtext: string = "";
   public tkbn: string[] = [];
-  public subject = new Subject<Gcd[]>();
+  public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
   constructor(private dialogRef: MatDialogRef<GcdhelpComponent>,
     private dialog: MatDialog,
     public usrsrv: UserService,
     public bunsrv: BunruiService,
     public cdRef: ChangeDetectorRef,
-    // private toastr: ToastrService,
-    // public gcdsrv: GcdService,
     private apollo: Apollo,
     @Inject(MAT_DIALOG_DATA) data) {
     this.dataSource = new MatTableDataSource<Gcd>(this.gcds);
@@ -74,19 +70,19 @@ export class GcdhelpComponent implements OnInit {
       }
     };
     if (this.code !== "") {
-      varWh.where._and.push({ "code": { "_like": "%" + this.code + "%" } });
+      varWh['where']._and.push({ "code": { "_like": "%" + this.code + "%" } });
     }
     if (this.jan !== "") {
-      varWh.where._and.push({ "jan": { "_like": "%" + this.jan + "%" } });
+      varWh['where']._and.push({ "jan": { "_like": "%" + this.jan + "%" } });
     }
     if (this.gcode !== "") {
-      varWh.where._and.push({ "gcode": { "_like": "%" + this.gcode + "%" } });
+      varWh['where']._and.push({ "gcode": { "_like": "%" + this.gcode + "%" } });
     }
     if (this.gtext !== "") {
-      varWh.where._and.push({ "gtext": { "_like": "%" + this.gtext + "%" } });
+      varWh['where']._and.push({ "gtext": { "_like": "%" + this.gtext + "%" } });
     }
     if (this.tkbn.length > 0) {
-      varWh.where._and.push({ "tkbn": { "_in": this.tkbn } });
+      varWh['where']._and.push({ "tkbn": { "_in": this.tkbn } });
     }
     const GetMast = gql`
     query get_goods($where:msgoods_bool_exp!) {
@@ -114,7 +110,7 @@ export class GcdhelpComponent implements OnInit {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
           this.gcds = data.msgoods;
-          this.subject.next();
+          this.subject.next(true);
         }
         // this.subject.complete();
       }, (error) => {
@@ -136,6 +132,11 @@ export class GcdhelpComponent implements OnInit {
         this.refresh();
       }
     );
+  }
+
+  convUpper(event: KeyboardEvent): string {
+    return this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
+
   }
 
   setGcd(selected) {

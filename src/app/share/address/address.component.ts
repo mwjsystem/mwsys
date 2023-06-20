@@ -4,14 +4,13 @@ import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
-// import { TabService } from './../tabidx/tab.service';
+import { DownloadService } from './../../services/download.service';
 import { Observable, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-address',
   templateUrl: './address.component.html',
-  // providers: [TabService],
-  styleUrls: ['./address.component.scss'],
+  styleUrls: ['./../../help.component.scss'],
   viewProviders: [
     {
       provide: ControlContainer,
@@ -24,6 +23,7 @@ export class AddressComponent implements OnInit {
   constructor(private parent: FormGroupDirective,
     private usrsrv: UserService,
     public bunsrv: BunruiService,
+    private dwlsrv: DownloadService,
     private apollo: Apollo) { }
 
   ngOnInit(): void {
@@ -41,40 +41,30 @@ export class AddressComponent implements OnInit {
       fax: new FormControl(''),
       tel2: new FormControl(''),
       tel3: new FormControl(''),
-      nbikou: new FormControl(''),
-      sbikou: new FormControl(''),
-      obikou: new FormControl(''),
+      nmemo: new FormControl(''),
+      smemo: new FormControl(''),
+      omemo: new FormControl(''),
       del: new FormControl(''),
       target: new FormControl(''),
       htitle: new FormControl('')
     }));
-    // } else {
-    //   form.addControl(this.formName, new FormGroup({
-    //     zip: new FormControl('', Validators.required),
-    //     region: new FormControl('', Validators.required),
-    //     local: new FormControl('', Validators.required),
-    //     street: new FormControl(''),
-    //     extend: new FormControl(''),
-    //     extend2: new FormControl(''),
-    //     adrname: new FormControl('', Validators.required),
-    //     tel: new FormControl('', Validators.required),
-    //     fax: new FormControl(''),
-    //     tel2: new FormControl(''),
-    //     tel3: new FormControl(''),
-    //     adrbikou: new FormControl(''),
-    //     adrinbikou: new FormControl(''),
-    //     adrokrbko: new FormControl(''),
-    //     del: new FormControl(''),
-    //     target: new FormControl('')
-    //   }));     
-    // }   
   }
-  updTel(fldnm: string, value: string) {
-    let val: string = this.usrsrv.convTel(value);
+  updTel(fldnm: string, event: KeyboardEvent) {
+    let val: string = this.usrsrv.convTel((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
     this.parent.form.get(this.formName).get(fldnm).setValue(val);
   }
 
+  async getAdr(event: KeyboardEvent) {
+    this.dwlsrv.getAdr((event.target as HTMLInputElement)?.value).then(result => {
+      // console.log(result, result.results)
+      this.parent.form.get(this.formName).patchValue({
+        region: result.results[0].address1,
+        local: result.results[0].address2,
+        street: result.results[0].address3
+      });
+    })
+  }
   saveMadr(mcode: string, eda: string | number, mode: number): Subject<any> {
     // console.log(this.formName,eda);
     const form = this.parent.form;
@@ -94,9 +84,9 @@ export class AddressComponent implements OnInit {
       tel3: this.usrsrv.editFrmval(form.get(this.formName), 'tel3'),
       extend2: this.usrsrv.editFrmval(form.get(this.formName), 'extend2'),
       adrname: this.usrsrv.editFrmval(form.get(this.formName), 'adrname'),
-      nbikou: this.usrsrv.editFrmval(form.get(this.formName), 'nbikou'),
-      sbikou: this.usrsrv.editFrmval(form.get(this.formName), 'sbikou'),
-      obikou: this.usrsrv.editFrmval(form.get(this.formName), 'obikou'),
+      nmemo: this.usrsrv.editFrmval(form.get(this.formName), 'nmemo'),
+      smemo: this.usrsrv.editFrmval(form.get(this.formName), 'smemo'),
+      omemo: this.usrsrv.editFrmval(form.get(this.formName), 'omemo'),
       del: this.usrsrv.editFrmval(form.get(this.formName), 'del'),
       ftel: this.usrsrv.editFtel(form.get(this.formName), 'tel', 'fax', 'tel2', 'tel3'),
       target: Boolean(form.get(this.formName).value.target),
@@ -107,14 +97,14 @@ export class AddressComponent implements OnInit {
         mutation: Query.UpdateMast2,
         variables: {
           id: this.usrsrv.compid,
-          mcode: mcode,
+          mcd: mcode,
           eda: eda,
           "_set": madr
         },
       }).subscribe(({ data }) => {
         // console.log('update_msmadr', data);
         neweda.next(madr);
-        neweda.complete();
+        // neweda.complete();
       }, (error) => {
         console.log('error update_msmember', error);
       });
@@ -124,7 +114,7 @@ export class AddressComponent implements OnInit {
         query: Query.GetMast6,
         variables: {
           id: this.usrsrv.compid,
-          mcode: mcode
+          mcd: mcode
         },
       })
         .valueChanges
@@ -137,7 +127,7 @@ export class AddressComponent implements OnInit {
             madr.eda = 10;
           }
           neweda.next(madr);
-          neweda.complete();
+          // neweda.complete();
           // console.log(madr);
           madrs.push(madr);
           this.apollo.mutate<any>({
@@ -156,4 +146,5 @@ export class AddressComponent implements OnInit {
     }
     return neweda;
   }
+
 }

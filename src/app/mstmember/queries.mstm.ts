@@ -42,8 +42,8 @@ query get_members($id: smallint!) {
 }`;
 
 export const GetMast1 = gql`
-query get_member($id: smallint!,$mcode:String!) {
-  msmember_by_pk(id: $id, mcode:$mcode) {
+query get_member($id: smallint!,$mcd:String!) {
+  msmember_by_pk(id: $id, mcode:$mcd) {
     mcode
     sei
     mei
@@ -68,8 +68,8 @@ query get_member($id: smallint!,$mcode:String!) {
     tcode1
     tcode
     del
-    bikou
-    inbikou
+    dmemo
+    memo
     sptnkbn
     daibunrui
     chubunrui
@@ -103,9 +103,9 @@ query get_member($id: smallint!,$mcode:String!) {
       tel3
       extend2
       adrname
-      nbikou
-      sbikou
-      obikou
+      nmemo
+      smemo
+      omemo
       del
       target
       htitle
@@ -137,19 +137,9 @@ query get_system($id: smallint!){
     maxmcd
   }
 }`;
-// export const GetMast5 = gql`
-// query get_mcode($id: smallint!,$maxmcd: Int){
-//   msmember_aggregate(where: {id: {_eq: $id}, mcode: {_lt: $maxmcd}}) {
-//     aggregate {
-//       max {
-//         mcode
-//       }
-//     }
-//   }
-// }`;
 export const GetMast6 = gql`
-query get_eda($id: smallint!,$mcode: String!){
-  msmadr_aggregate(where: {id: {_eq: $id}, mcode: {_eq: $mcode}}) {
+query get_eda($id: smallint!,$mcd: String!){
+  msmadr_aggregate(where: {id: {_eq: $id}, mcode: {_eq: $mcd}}) {
     aggregate {
       max {
         eda
@@ -170,14 +160,14 @@ mutation ins_madr($object: [msmadr_insert_input!]!) {
   }
 }`;
 export const UpdateMast1 = gql`
-mutation upd_member($id: smallint!, $mcode: String!,$_set: msmember_set_input!) {
-  update_msmember(where: {id: {_eq: $id},mcode: {_eq:$mcode}}, _set: $_set)  {
+mutation upd_member($id: smallint!, $mcd: String!,$_set: msmember_set_input!) {
+  update_msmember(where: {id: {_eq: $id},mcode: {_eq:$mcd}}, _set: $_set)  {
     affected_rows
   }
 }`;
 export const UpdateMast2 = gql`
-mutation upd_madr($id: smallint!, $mcode: String!, $eda: Int!,$_set: msmadr_set_input!) {
-  update_msmadr(where: {id: {_eq: $id},mcode: {_eq:$mcode},eda: {_eq:$eda}}, _set: $_set)  {
+mutation upd_madr($id: smallint!, $mcd: String!, $eda: Int!,$_set: msmadr_set_input!) {
+  update_msmadr(where: {id: {_eq: $id},mcode: {_eq:$mcd},eda: {_eq:$eda}}, _set: $_set)  {
     affected_rows
   }
 }`;

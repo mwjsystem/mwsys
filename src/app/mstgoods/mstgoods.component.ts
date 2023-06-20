@@ -9,7 +9,6 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstg';
 import * as AutoKana from 'vanilla-autokana';
-// import { ToastrService } from 'ngx-toastr';
 import { GdstblComponent } from './gdstbl.component';
 import { GtnktblComponent } from './gtnktbl.component';
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
@@ -19,14 +18,12 @@ import { GdsimageComponent } from './../share/gdsimage/gdsimage.component';
 import { UserService } from './../services/user.service';
 import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
-import { VendsService } from './../services/vends.service';
-// import { StaffService } from './../services/staff.service';
+import { VendsService } from './../mstvendor/vends.service';
 
 @Component({
   selector: 'app-mstgoods',
   templateUrl: './mstgoods.component.html',
-  styleUrls: ['./../app.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./../app.component.scss']
 })
 export class MstgoodsComponent implements OnInit, AfterViewInit {
   @ViewChild(GdstblComponent) gdstbl: GdstblComponent;
@@ -59,14 +56,14 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.vensrv.get_vendors();
-    this.bunsrv.get_bunrui();
+    this.vensrv.getVendors();
+    this.bunsrv.getBunrui();
     // this.stfsrv.get_staff();
     this.form = this.fb.group({
       kana: new FormControl('', Validators.required),
       name: new FormControl('', Validators.required),
       gkbn: new FormControl('', Validators.required),
-      bikou: new FormControl(''),
+      memo: new FormControl(''),
       sozai: new FormControl(''),
       vcode: new FormControl(''),
       genre: new FormControl(''),
@@ -81,7 +78,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       if (!this.overlayRef) {
         this.overlayRef.attach(new ComponentPortal(MatSpinner));
       }
-      this.gdssrv.get_ggroups().then(result => {
+      this.gdssrv.getGgroups().then(result => {
         this.overlayRef.detach();
       });
     }
@@ -91,7 +88,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       if (params.get('grpcd') != null) {
         //１件分だけ先に読込
         this.gdssrv.grpcd = params.get('grpcd');
-        this.get_ggroup(this.gdssrv.grpcd);
+        this.getGgroup(this.gdssrv.grpcd);
       }
       if (params.get('mode') === null) {
         this.mode = 3;
@@ -115,6 +112,9 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
 
   grpcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.autoFocus = true;
     dialogConfig.data = {
       code: this.gdssrv.grpcd
@@ -125,7 +125,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       data => {
         if (typeof data != 'undefined') {
           this.gdssrv.grpcd = data.code;
-          this.get_ggroup(this.gdssrv.grpcd);
+          this.getGgroup(this.gdssrv.grpcd);
         }
       }
     );
@@ -144,7 +144,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       data => {
         if (typeof data != 'undefined') {
           this.gdssrv.grpcd = data.gcode;
-          this.get_ggroup(this.gdssrv.grpcd);
+          this.getGgroup(this.gdssrv.grpcd);
         }
       }
     );
@@ -177,7 +177,12 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     this.form.get('kana').setValue(val);
   }
 
-  get_ggroup(grpcd: string) {
+  convUpper(event: KeyboardEvent) {
+    console.log((event.target as HTMLInputElement));
+    this.gdssrv.grpcd = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
+  }
+
+  getGgroup(grpcd: string) {
     // if (!this.overlayRef) {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     // }
@@ -227,8 +232,8 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
                     this.gdssrv.gtnks.push(Object.assign({ gcode: ggroup.msgoods[i].gcode }, ggroup.msgoods[i].msgtankas[j]));
                   }
                 }
-                this.gdstbl.set_goods();
-                this.gtnktbl.set_gtanka();
+                this.gdstbl.setGoods();
+                this.gtnktbl.setGtanka();
                 // if(this.mode==3){
                 //   this.form.disable();
                 // }else{
@@ -272,7 +277,8 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     this.form.reset();
     this.frmArr.clear();
     this.frmArr2.clear();
-    this.gdstbl.ins_row(false, 0);
+    this.gdstbl.insRow(false, 0);
+    this.form.markAsPristine();
     this.refresh();
     // this.gdssrv.grpcd="新規登録"; 
   }
@@ -291,7 +297,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
         this.refresh();
       } else {
         this.mode = 3;
-        this.get_ggroup(this.gdssrv.grpcd);
+        this.getGgroup(this.gdssrv.grpcd);
       }
       this.form.markAsPristine();
       history.replaceState('', '', './mstgoods/' + this.mode + '/' + this.gdssrv.grpcd);
@@ -305,7 +311,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       kana: this.usrsrv.editFrmval(this.form, 'kana'),
       name: this.usrsrv.editFrmval(this.form, 'name'),
       gkbn: this.usrsrv.editFrmval(this.form, 'gkbn'),
-      bikou: this.usrsrv.editFrmval(this.form, 'bikou'),
+      memo: this.usrsrv.editFrmval(this.form, 'memo'),
       sozai: this.usrsrv.editFrmval(this.form, 'sozai'),
       vcode: this.usrsrv.editFrmval(this.form, 'vcode'),
       // tcode: this.usrsrv.editFrmval(this.form,'tcode'),
@@ -477,12 +483,12 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       e.returnValue = true;
     }
   }
-  ins_tnkrow(emitParam: any) {
+  insTnkrow(emitParam: any) {
     // console.log(emitParam);
     if (emitParam.flg) {
-      this.gtnktbl.ins_row(emitParam.row, emitParam.flgCP);
+      this.gtnktbl.insRow(emitParam.row, emitParam.flgCP);
     } else {
-      this.gtnktbl.del_row(emitParam.row);
+      this.gtnktbl.delRow(emitParam.row);
     }
 
   }

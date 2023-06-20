@@ -113,6 +113,19 @@ declare namespace mwI {
     // posi09: number;
     // posi10: number;
   }
+
+  interface Edahlp {
+    eda: number;
+    zip: string;
+    region: string;
+    local: string;
+    street: string;
+    extend: string;
+    extend2: string;
+    adrname: string;
+    tel: string;
+  }
+
   interface Adrs {
     eda: number;
     zip: string;
@@ -126,9 +139,9 @@ declare namespace mwI {
     fax: string;
     tel2: string;
     tel3: string;
-    nbikou: string;
-    sbikou: string;
-    obikou: string;
+    nmemo: string;
+    smemo: string;
+    omemo: string;
     del: boolean;
     target: boolean;
     htitle: string;
@@ -158,8 +171,8 @@ declare namespace mwI {
     tcode1: string;
     tcode: string;
     del: boolean;
-    bikou: string;
-    inbikou: string;
+    memo: string;
+    inmemo: string;
     sptnkbn: string;
     daibunuri: string;
     chubunrui: string;
@@ -237,7 +250,7 @@ declare namespace mwI {
     kana: string;
     name: string;
     gkbn: string;
-    bikou: string;
+    memo: string;
     sozai: string;
     created_at: Date;
     created_by: string;

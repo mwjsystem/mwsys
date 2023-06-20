@@ -1,7 +1,65 @@
 <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">別納先枝番検索</h1>
 <mat-dialog-content>
-  <app-edatbl (seteda)="sel_eda($event)"></app-edatbl>
+  <!-- <app-edatbl (seteda)="sel_eda($event)"></app-edatbl> -->
+  <mat-toolbar class="toolbar" style="width:45%;">
+    <mat-form-field>
+      <mat-label>宛名</mat-label>
+      <input matInput (keyup)="updateFilter('adrname',$any($event))">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>都道府県</mat-label>
+      <input matInput (keyup)="updateFilter('region',$any($event))">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>市区町村</mat-label>
+      <input matInput type="url" (keyup)="updateFilter('local',$any($event))">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>電話番号</mat-label>
+      <input matInput type="url" (keyup)="updateFilter('tel',$any($event))">
+    </mat-form-field>
+  </mat-toolbar>
+  <table mat-table [dataSource]="dataSource" aria-label="Elements" class="mat-elevation-z8">
+    <ng-container matColumnDef="eda">
+      <th mat-header-cell *matHeaderCellDef>枝番</th>
+      <td mat-cell *matCellDef="let row">{{row.eda}}</td>
+    </ng-container>
+    <ng-container matColumnDef="adrname">
+      <th mat-header-cell *matHeaderCellDef>宛名</th>
+      <td mat-cell *matCellDef="let row">{{row.adrname}}</td>
+    </ng-container>
+    <ng-container matColumnDef="tel">
+      <th mat-header-cell *matHeaderCellDef>電話番号</th>
+      <td mat-cell *matCellDef="let row">{{row.tel}}</td>
+    </ng-container>
+    <ng-container matColumnDef="zip">
+      <th mat-header-cell *matHeaderCellDef>郵便番号</th>
+      <td mat-cell *matCellDef="let row">{{row.zip}}</td>
+    </ng-container>
+    <ng-container matColumnDef="region">
+      <th mat-header-cell *matHeaderCellDef>都道府県</th>
+      <td mat-cell *matCellDef="let row">{{row.region}}</td>
+    </ng-container>
+    <ng-container matColumnDef="local">
+      <th mat-header-cell *matHeaderCellDef>市区町村</th>
+      <td mat-cell *matCellDef="let row">{{row.local}}</td>
+    </ng-container>
+    <ng-container matColumnDef="street">
+      <th mat-header-cell *matHeaderCellDef>住所番地</th>
+      <td mat-cell *matCellDef="let row">{{row.street}}</td>
+    </ng-container>
+    <ng-container matColumnDef="extend">
+      <th mat-header-cell *matHeaderCellDef>建物その他</th>
+      <td mat-cell *matCellDef="let row">{{row.extend}}</td>
+    </ng-container>
+    <ng-container matColumnDef="extend2">
+      <th mat-header-cell *matHeaderCellDef>道場名/組織名</th>
+      <td mat-cell *matCellDef="let row">{{row.extend2}}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selEda(row)"></tr>
+  </table>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button class="mat-raised-button"(click)="close()">Cancel</button>
+  <button class="mat-raised-button" (click)="close()">Cancel</button>
 </mat-dialog-actions>

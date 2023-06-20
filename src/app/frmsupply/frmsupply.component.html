@@ -1,46 +1,47 @@
-<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
-  <div class="icon-area" fxLayout="row wrap">
-    <button mat-button (click)="modeToCre()" *ngIf="mode==3">
+<mat-toolbar [color]="usrsrv.getColor(mode)" class="toolbar mat-elevation-z8">
+  <div class="icon-area" class="flex flex-nowrap">
+    <button mat-flat-button (click)="modeToCre()" *ngIf="mode==3" [color]="usrsrv.getColor(mode)">
       <mat-icon>add_box</mat-icon>新規
     </button>
-    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && denno">
+    <button mat-flat-button (click)="modeToUpd()" *ngIf="mode==3 && denno" [color]="usrsrv.getColor(mode)">
       <mat-icon>edit</mat-icon>編集
     </button>
-    <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
+    <button mat-flat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3" [color]="usrsrv.getColor(mode)">
       <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
     </button>
-    <button mat-button (click)="cancel()" *ngIf="mode!=3">
+    <button mat-flat-button (click)="cancel()" *ngIf="mode!=3" [color]="usrsrv.getColor(mode)">
       <mat-icon>cancel</mat-icon>中止
     </button>
-    <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
-      <mat-label>発注伝票番号</mat-label>
-      <input matInput [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
-        (blur)="onEnter()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)">
-      <button mat-button mat-icon-button matSuffix (click)="dennoHelp()" *ngIf="mode==3">
-        <mat-icon>find_replace</mat-icon>
-      </button>
-    </mat-form-field>
-    <button mat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'">
+    <!-- <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
+      <mat-label>発注伝票番号</mat-label> -->
+    <input [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10" (blur)="onEnter()"
+      [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)">
+    <button mat-flat-button mat-icon-button matSuffix (click)="dennoHelp()" *ngIf="mode==3">
+      <mat-icon>find_replace</mat-icon>
+    </button>
+    <!-- </mat-form-field> -->
+    <button mat-flat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'"
+      [color]="usrsrv.getColor(mode)">
       <mat-icon>history</mat-icon>操作ログ
     </button>
     <a id="csv-donwload" data-type="text/csv"></a>
-    <button mat-button [matMenuTriggerFor]="papermenu" *ngIf="mode==3">
+    <button mat-flat-button [matMenuTriggerFor]="papermenu" *ngIf="mode==3" [color]="usrsrv.getColor(mode)">
       <mat-icon>description</mat-icon>帳票
     </button>
     <mat-menu #papermenu="matMenu">
-      <button mat-menu-item (click)="download_csv('FRM-SUPPLY')">発注書</button>
-      <button mat-menu-item (click)="download_csv('KEEP')">在庫確認票</button>
+      <button mat-menu-item (click)="downloadCsv('FRM-SUPPLY')">発注書</button>
+      <button mat-menu-item (click)="downloadCsv('KEEP')">在庫確認票</button>
     </mat-menu>
-    <button mat-button><a mat-button
+    <button mat-flat-button><a mat-flat-button
         href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
         target="_blank">
         <mat-icon>help</mat-icon>ヘルプ
       </a></button>
   </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($event)">
+<form [formGroup]="form" class="flex flex-wrap space-x-4" (keydown.enter)="canEnter($any($event))">
   <mat-card>
-    <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
+    <mat-card-header class="flex justify-between">
       <mat-card-title>
         {{mode|modetxt}}基本情報
       </mat-card-title>
@@ -54,8 +55,8 @@
       </mat-form-field> -->
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
-    <mat-card-content fxLayout="column">
-      <div fxLayout="row wrap" fxLayoutGap="5px" fxLayoutAlign="start end">
+    <mat-card-content class="flex flex-column">
+      <div class="flex flex-wrap content-between">
         <mat-form-field style="width: 7em;">
           <mat-label>発注日</mat-label>
           <input tabIndex="1" matInput [matDatepicker]="picker" formControlName="day" required>
@@ -116,17 +117,17 @@
       <div fxLafxLayout="row wrap" fxLayoutGap="5px">
         <mat-form-field class="txtar">
           <mat-label>伝票備考</mat-label>
-          <textarea matInput formControlName="dbiko" matTextareaAutosize></textarea>
+          <textarea matInput formControlName="dmemo" matTextareaAutosize></textarea>
         </mat-form-field>
         <mat-form-field class="txtar">
           <mat-label>社内向け備考</mat-label>
-          <textarea matInput formControlName="inbiko" matTextareaAutosize></textarea>
+          <textarea matInput formControlName="inmemo" matTextareaAutosize></textarea>
         </mat-form-field>
       </div>
     </mat-card-content>
   </mat-card>
   <mat-card>
-    <mat-card-header fxLayout="row wrap" fxLayoutAlign="start start" fxLayoutGap="10px" style="height: 40px;">
+    <mat-card-header class="flex flex-wrap space-x-4" style="height: 40px;">
       <mat-card-title>発注明細</mat-card-title>
       <mat-form-field style="width:6em;">
         <mat-label>商品計</mat-label>

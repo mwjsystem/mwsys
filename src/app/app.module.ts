@@ -6,30 +6,33 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { CommonModule } from '@angular/common';
-// import localeJa from '@angular/common/locales/ja';
-// import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { FlexLayoutModule } from '@angular/flex-layout';
-import { MaterialModule } from './material.module';
 import { AuthModule } from '@auth0/auth0-angular';
+import { Apollo } from 'apollo-angular';
 import { HttpClientModule } from '@angular/common/http';
 import { environment } from './../environments/environment';
 import { BeforeunloadGuard } from './beforeunload.guard';
 import { GraphQLModule } from './graphql.module';
 import { ToastrModule } from 'ngx-toastr';
 import { CoreModule } from './core/core.module';
-// import { UserService } from './services/user.service';
-// import { AuthService } from '@auth0/auth0-angular';
 
+import { UserService } from './services/user.service';
 import { LoginComponent } from './login/login.component';
+import { NavbarComponent } from './navbar/navbar.component';
 
-// function userInitializer(usrsrv: UserService) {
-//     return () => usersrv.initialize();
-// }
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    LoginComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,
@@ -40,25 +43,24 @@ import { LoginComponent } from './login/login.component';
       redirectUri: `${window.location.origin}`
     }),
     BrowserAnimationsModule,
-    // FormsModule,
-    // FlexLayoutModule,
-    // ReactiveFormsModule,
     GraphQLModule,
     ToastrModule.forRoot(),
-    MaterialModule,
     HttpClientModule,
-    CoreModule
+
+    MatButtonModule,
+    MatCardModule,
+    MatDatepickerModule,
+    MatIconModule,
+    MatInputModule,
+    MatMenuModule,
+    MatNativeDateModule,
+    MatToolbarModule
   ],
   providers: [
-    // AuthService,
-    // UserService,
+    Apollo,
+    UserService,
     BeforeunloadGuard,
-    // { provide: LOCALE_ID, useValue: 'ja-JP' }
-    // { provide: APP_INITIALIZER,
-    //   useFactory: userInitializer,
-    //   multi: true,
-    //   deps: [UserService],
-    // },
+    { provide: MAT_DATE_LOCALE, useValue: 'ja-JP' }
   ],
   bootstrap: [AppComponent]
 })

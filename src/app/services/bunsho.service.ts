@@ -12,7 +12,6 @@ export class BunshoService {
   bunsho: mwI.Bunsho[] = [];
   constructor(private usrsrv: UserService,
     private apollo: Apollo) {
-    // this.get_bunsho();
   }
 
   getBuntype(): void {
@@ -67,6 +66,8 @@ export class BunshoService {
         });
     }
   }
+
+
 
 
 }

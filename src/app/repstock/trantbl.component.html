@@ -71,7 +71,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-toolbar fxLayout="row wrap" fxLayoutAlign="space-between">
+    <mat-toolbar class="flex flex-wrap space-x-4">
         <button mat-raised-button (click)="chFlg()">日付並び順反転</button>
         <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0" [pageSize]="15"
             [pageSizeOptions]="[15, 30, 50, 100]">

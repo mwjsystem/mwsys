@@ -6,132 +6,63 @@ import { Observable } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
-import { VendsService } from './../../services/vends.service';
+import { VendsService } from './../../mstvendor/vends.service';
 // import { Ggrp,GoodsService } from './../../services/goods.service';
 
 interface Vendor {
-  code:string;
-  adrname:string;
-  kana:string;
-  tel:string;
-  tel2:string;
-  tel3:string;
-  fax:string;
-  mail1:string;
-  mail2:string;
-  mail3:string;
-  mail4:string;
-  mail5:string;
-  tanto:string;
-  url:string;
-  del:string;
-  ftel:string;
-  zip:string;
-  region:string;
-  local:string;
-} 
+  code: string;
+  adrname: string;
+  kana: string;
+  tel: string;
+  tel2: string;
+  tel3: string;
+  fax: string;
+  mail1: string;
+  mail2: string;
+  mail3: string;
+  mail4: string;
+  mail5: string;
+  tanto: string;
+  url: string;
+  del: string;
+  ftel: string;
+  zip: string;
+  region: string;
+  local: string;
+}
 
 @Component({
   selector: 'app-vcdhelp',
   templateUrl: './vcdhelp.component.html',
-  styleUrls: ['./vcdhelp.component.scss']
+  styleUrls: ['./../../help.component.scss']
 })
 export class VcdhelpComponent implements OnInit {
   // public vcds: Vendor[]=[];
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-  dataSource:MatTableDataSource<mwI.Vendor>;
-  displayedColumns = ['code','adrname','kana','tanto','tel','tel2','tel3','fax','mail1','mail2','mail3','mail4','mail5','zip','region','local','url']; 
-  filter:string="";
-  // fkana:string="";
-  // fmail:string="";
-  // ftel:string="";
-  
-  
-  constructor(public usrsrv: UserService,
-              private vensrv: VendsService,
-              private apollo: Apollo,
-              private dialogRef: MatDialogRef<VcdhelpComponent>) {
-                this.dataSource= new MatTableDataSource<mwI.Vendor>();
-               }
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  dataSource: MatTableDataSource<mwI.Vendor>;
+  displayedColumns = ['code', 'adrname', 'kana', 'tanto', 'tel', 'tel2', 'tel3', 'fax', 'mail1', 'mail2', 'mail3', 'mail4', 'mail5', 'zip', 'region', 'local', 'url'];
+  filter: string = "";
 
-  ngOnInit(): void {    
+  constructor(public usrsrv: UserService,
+    private vensrv: VendsService,
+    private apollo: Apollo,
+    private dialogRef: MatDialogRef<VcdhelpComponent>) {
+    this.dataSource = new MatTableDataSource<mwI.Vendor>();
+  }
+
+  ngOnInit(): void {
     // this.vensrv.observe.subscribe(value => {
-      this.dataSource= new MatTableDataSource<mwI.Vendor>(this.vensrv.vends);
-      this.dataSource.paginator = this.paginator;
+    this.dataSource = new MatTableDataSource<mwI.Vendor>(this.vensrv.vends);
+    this.dataSource.paginator = this.paginator;
     // });
   }
-  
-  applyFilter(value:string) {
+
+  applyFilter(event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
-  // get_vendors():Observable<Vendor[]>{
-  //   let varWh: {[k: string]: any}={"where" : {"_and":[{"id": {"_eq": this.usrsrv.compid}}]}};
-  //   // console.log(varWh,varWh.where);
-  //   if (this.fadrnm!==""){
-  //     varWh.where._and.push({"adrname" :{"_like":"%" + this.fadrnm + "%"}});
-  //   }
-  //   if (this.fkana!==""){
-  //     varWh.where._and.push({"kana" : {"_like":"%" + this.fkana + "%"}});
-  //   }
-  //   if (this.fmail!==""){
-  //     varWh.where._and.push({"_or" : [ {"mail":{"_like":"%" + this.fmail + "%"}},
-  //                                       {"mail2":{"_like":"%" + this.fmail + "%"}},
-  //                                       {"mail3":{"_like":"%" + this.fmail + "%"}},
-  //                                       {"mail4":{"_like":"%" + this.fmail + "%"}},
-  //                                       {"mail5":{"_like":"%" + this.fmail + "%"}}
-  //                                     ]});
-  //   }
-  //   if (this.ftel!==""){
-  //     // console.log(varWh,varWh.where2 != null);
-  //     if (varWh.where2 != null){
-  //         varWh.where2._and.push({"ftel" : {"_like":"%" + this.ftel + "%"}});
-  //     } else {
-  //       varWh.where2 = {"ftel" : {"_like":"%" + this.ftel + "%"}};
-  //     }
-  //   }
-  //   // console.log(varWh);
-  //   const GetMast = gql`
-  //   query get_vendors($where:msvendor_bool_exp!) {
-  //     msvendor(where:$where, order_by:{code: asc}) {
-  //       code
-  //       adrname
-  //       kana
-  //       tel
-  //       tel2
-  //       tel3
-  //       fax
-  //       mail1
-  //       mail2
-  //       mail3
-  //       mail4
-  //       mail5
-  //       tanto
-  //       url
-  //       del
-  //       ftel
-  //       zip
-  //       region
-  //       local
-  //     }
-  //   }`;
-  //   let observable:Observable<Vendor[]> = new Observable<Vendor[]>(observer => {
-  //     this.apollo.watchQuery<any>({
-  //         query: GetMast, 
-  //         variables: varWh
-  //     })
-  //     .valueChanges
-  //     .subscribe(({ data }) => {
-  //       observer.next(data.msvendor);
-  //       observer.complete();
-  //     },(error) => {
-  //       console.log('error query get_vendors', error);
-  //     });
-  //   });
-  //   return observable;
-  // }
 
-  sel_vcd(selected:Vendor) {
+  selVcd(selected: Vendor) {
     // console.log("select",selected);
     // this.vcds=[];
     this.dialogRef.close(selected);

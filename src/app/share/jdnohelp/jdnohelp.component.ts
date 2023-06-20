@@ -11,7 +11,7 @@ import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { StaffService } from './../../services/staff.service';
 import { BunruiService } from './../../services/bunrui.service';
-import { MembsService } from './../../services/membs.service';
+import { MembsService } from './../../mstmember/membs.service';
 import { McdhelpComponent } from './../mcdhelp/mcdhelp.component';
 import { AdredaComponent } from './../adreda/adreda.component';
 
@@ -41,7 +41,7 @@ interface Jyuden {
 @Component({
   selector: 'app-jdnohelp',
   templateUrl: './jdnohelp.component.html',
-  styleUrls: ['./jdnohelp.component.scss']
+  styleUrls: ['./../../help.component.scss']
 })
 export class JdnohelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -162,7 +162,7 @@ export class JdnohelpComponent implements OnInit {
   // set_mcdtxt(mcd:number){
   //   this.mcdtxt=this.memsrv.get_mcdtxt(mcd);
   // }
-  get_jyuden(): void {
+  getJyuden(): void {
     let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     if (this.ftype == "0") {
       varWh.where._and.push({ "torikbn": { "_eq": false } });
@@ -237,7 +237,7 @@ export class JdnohelpComponent implements OnInit {
         } else {
           data.trjyuden.forEach(element => {
             let { trjyumeis, ...rest } = element;
-            // console.log(element.denno, trjyumeis);
+            console.log(element.denno, trjyumeis);
             let gcd = { gcode: trjyumeis[0].gcode };
             srcdata.push({ ...rest, ...gcd });
           });
@@ -251,7 +251,7 @@ export class JdnohelpComponent implements OnInit {
         console.log('error query get_jyuden', error);
       });
   }
-  sel_dno(selected: Jyuden) {
+  selDno(selected: Jyuden) {
     // console.log("select",selected);
     // this.vcds=[];
     this.dialogRef.close(selected);

@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray } from '@angular/forms';
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { StockService } from './../services/stock.service';
@@ -17,7 +17,7 @@ import { take } from 'rxjs/operators';
   styleUrls: ['./../tbl.component.scss']
 })
 export class MovtblComponent implements OnInit {
-  @Input() parentForm: FormGroup;
+  @Input() parentForm: UntypedFormGroup;
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChildren('gcdInputs') gcdInps: QueryList<ElementRef>;
   private el: HTMLInputElement;
@@ -41,14 +41,14 @@ export class MovtblComponent implements OnInit {
   constructor(private cdRef: ChangeDetectorRef,
     private elementRef: ElementRef,
     private dialog: MatDialog,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private apollo: Apollo,
     public movsrv: MovingService,
     public stcsrv: StockService,
     public usrsrv: UserService) { }
 
   ngOnInit(): void {
-    this.add_rows(1);
+    this.addRows(1);
     this.refresh();
   }
   setAll(chked: boolean) {
@@ -131,8 +131,8 @@ export class MovtblComponent implements OnInit {
         console.log('error query get_good', error);
       });
   }
-  getMtbl(i: number, fnm: string): FormArray {
-    return this.frmArr.controls[i].get(fnm) as FormArray;
+  getMtbl(i: number, fnm: string): UntypedFormArray {
+    return this.frmArr.controls[i].get(fnm) as UntypedFormArray;
   }
   createRow(i: number, movden?: Movden) {
     let lcArr = this.fb.array([]);
@@ -164,13 +164,13 @@ export class MovtblComponent implements OnInit {
   setPable(i: number, gcd: string, msgzais: any) {
     // console.log(gcd, this.parentForm.get('incode').value);
     if (this.frmArr.controls[i].value.gskbn == "0") {
-      this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('outcode').value).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('outcode').value).then(result => {
         // console.log(result);
         this.frmArr.controls[i].patchValue({ pable: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
         // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
-      this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('incode').value).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('incode').value).then(result => {
         // console.log(result);
         this.frmArr.controls[i].patchValue({ stock: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
         // console.log(this.frmArr);
@@ -179,26 +179,26 @@ export class MovtblComponent implements OnInit {
     } else if (this.frmArr.controls[i].value.gskbn == "1") {
       this.stcsrv.getSetZai(this.parentForm.get('outcode').value, msgzais).then(result => {
         this.setZai[i] = result;
-        this.frmArr.controls[i].patchValue({ pable: this.stcsrv.get_paabl(result) });
+        this.frmArr.controls[i].patchValue({ pable: this.stcsrv.getPaabl(result) });
         this.movsrv.subject.next(true);
       });
       this.stcsrv.getSetZai(this.parentForm.get('incode').value, msgzais).then(result => {
         this.setZai[i] = result;
-        this.frmArr.controls[i].patchValue({ stock: this.stcsrv.get_paabl(result) });
+        this.frmArr.controls[i].patchValue({ stock: this.stcsrv.getPaabl(result) });
         this.movsrv.subject.next(true);
       });
     }
   }
 
-  del_row(row: number) {
+  delRow(row: number) {
     this.frmArr.removeAt(row);
-    this.auto_fil();
+    this.autoFil();
   }
-  ins_row(row: number) {
+  insRow(row: number) {
     this.frmArr.insert(row, this.createRow(row));
-    this.auto_fil();
+    this.autoFil();
   }
-  auto_fil() {
+  autoFil() {
     let i: number = 0;
     this.frmArr.controls
       .forEach(control => {
@@ -207,15 +207,15 @@ export class MovtblComponent implements OnInit {
       })
     this.refresh();
   }
-  add_rows(rows: number) {
+  addRows(rows: number) {
     for (let i = 0; i < rows; i++) {
       this.frmArr.push(this.createRow(i + 1));
     }
     this.refresh();
   }
-  get frmArr(): FormArray {
+  get frmArr(): UntypedFormArray {
     // console.log(this.parentForm);    
-    return this.parentForm.get('mtbl') as FormArray;
+    return this.parentForm.get('mtbl') as UntypedFormArray;
   }
   frmVal(i: number, fld: string): string {
     return this.frmArr.getRawValue()[i][fld];
@@ -276,7 +276,7 @@ export class MovtblComponent implements OnInit {
     this.usrsrv.toastInf('クリップボードにコピーしました');
   }
 
-  get_movmei(dno) {
+  getMovmei(dno) {
     let movmei = [];
     this.frmArr.controls
       .forEach(control => {
@@ -306,7 +306,7 @@ export class MovtblComponent implements OnInit {
     this.dataSource.data = this.frmArr.controls;
     this.movsrv.subject.next(true);
   }
-  set_movmei(movdens: Movden[]) {
+  setMovmei(movdens: Movden[]) {
     this.frmArr.clear();
     let i: number = 0;
     movdens.forEach(e => {
@@ -351,7 +351,7 @@ export class MovtblComponent implements OnInit {
     this.refresh();
   }
 
-  add_newrow(i: number) {
+  addNewrow(i: number) {
 
     this.gcdInps.changes.pipe(take(1)).subscribe({
       next: changes => {

@@ -1,4 +1,4 @@
-<div fxLayout="row wrap" fxLayoutAlign="start end" fxLayoutGap="10px" style="height: 40px;" class="mat-elevation-z8">
+<div style="height: 40px;" class="grid grid-row gap-2 mat-elevation-z8">
   <button mat-flat-button color="warn" (click)="toFrmsup()" *ngIf="frmArr.enabled && hatden.length>0">発注伝票登録</button>
   <button mat-flat-button color="primary" (click)="toFrmmov()"
     *ngIf="frmArr.enabled && movden.length>0">加工依頼(移動・指示書)</button>
@@ -10,10 +10,11 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
-  <button mat-flat-button color="primary" (click)="setJmeikbn(jmeikbn)" *ngIf="frmArr.enabled">一括設定</button>
-  <button mat-flat-button color="accent" (click)="setKoguchi()" [disabled]="parentForm.invalid" *ngIf="frmArr.enabled"
-    matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
-  <button mat-flat-button color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
+  <button mat-flat-button class="w-24" color="primary" (click)="setJmeikbn(jmeikbn)"
+    *ngIf="frmArr.enabled">一括設定</button>
+  <button mat-flat-button class="w-48" color="accent" (click)="setKoguchi()" [disabled]="parentForm.invalid"
+    *ngIf="frmArr.enabled" matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
+  <button mat-flat-button class="w-24 m-1" color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
   <mat-menu #cnp="matMenu">
     <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
     <button mat-menu-item (click)="pasteFromClipboard(true)"
@@ -36,25 +37,33 @@
       </ng-container>
       <ng-container matColumnDef="line" sticky>
         <th mat-header-cell *matHeaderCellDef>行番号
-          <button mat-icon-button (click)="ins_row(false,getIdx(0))" *ngIf="frmArr.enabled">
+          <button mat-icon-button (click)="insRow(false,getIdx(0))" *ngIf="frmArr.enabled">
             <mat-icon>add_circle</mat-icon>
           </button>
         </th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:5em;">
             <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
-            <button mat-icon-button matPrefix (click)="ins_row(false,getIdx(i)+1)" *ngIf="frmArr.enabled">
+            <button mat-icon-button matPrefix (click)="insRow(false,getIdx(i)+1)" *ngIf="frmArr.enabled">
               <mat-icon>add_circle</mat-icon>
             </button>
-            <button mat-icon-button matPrefix (click)="ins_row(true,getIdx(i)+1)" *ngIf="frmArr.enabled">
-              <mat-icon>content_copy</mat-icon>
-            </button>
-            <button mat-icon-button matPrefix (click)="del_row(getIdx(i))" *ngIf="frmArr.enabled">
-              <mat-icon>remove_circle</mat-icon>
-            </button>
+
           </mat-form-field>
         </td>
       </ng-container>
+      <ng-container matColumnDef="line2" sticky>
+        <th mat-header-cell *matHeaderCellDef>操作
+        </th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)" class="inline-grid">
+          <button mat-icon-button matPrefix (click)="insRow(true,getIdx(i)+1)" *ngIf="frmArr.enabled">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+          <button mat-icon-button matPrefix (click)="delRow(getIdx(i))" *ngIf="frmArr.enabled">
+            <mat-icon>remove_circle</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
       <!-- <ng-container matColumnDef="day">
       <th mat-header-cell *matHeaderCellDef>受付日</th>
       <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
@@ -137,12 +146,11 @@
           </mat-form-field>
         </td>
       </ng-container>
-      <ng-container matColumnDef="mbikou">
+      <ng-container matColumnDef="mmemo">
         <th mat-header-cell *matHeaderCellDef>明細備考</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field>
-            <input matInput [tabIndex]="hidx + i * mcols + 4" formControlName="mbikou"
-              (keydown.control)="add_newrow(i)">
+            <input matInput [tabIndex]="hidx + i * mcols + 4" formControlName="mmemo" (keydown.control)="addNewrow(i)">
           </mat-form-field>
         </td>
       </ng-container>

@@ -1,7 +1,7 @@
 <mat-toolbar color="primary" [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar"
   style="width:77%;">
-  <div class="icon-area" fxLayout="row wrap">
-    <button mat-button (click)="modeToCre()">
+  <div class="icon-area" class="flex flex-wrap">
+    <button mat-flat-button (click)="modeToCre()">
       <mat-icon>add_box</mat-icon>
       新規
     </button>
@@ -9,33 +9,34 @@
       <mat-icon>edit</mat-icon>
       編集
     </button>
-    <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
+    <button mat-flat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
       <span class="material-icons" matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</span>
       保存
     </button>
-    <button mat-button (click)="cancel()" *ngIf="mode!=3">
+    <button mat-flat-button (click)="cancel()" *ngIf="mode!=3">
       <span class="material-icons">cancel</span>
       中止
     </button>
   </div>
-  <mat-form-field fxFlexAlign="end" class="frm-fld-in-bar">
-    <mat-label>枝番</mat-label>
-    <input matInput [value]="eda" (ngModelChange)="eda=$event" (keyup.enter)="onEnter()" (keydown.f4)="edaHelp()"
-      (blur)="refresh()" disabled>
-    <!-- <div [style.display]="edasrv.adrs.length>0 ? 'inline' : 'none'"> -->
-    <button mat-button mat-icon-button matSuffix (click)="setNext()">
-      <mat-icon>keyboard_arrow_up</mat-icon>
-    </button>
-    <button mat-button mat-icon-button matSuffix (click)="setPrev()">
-      <mat-icon>keyboard_arrow_down</mat-icon>
-    </button>
-    <button mat-button mat-icon-button matSuffix (click)="edaHelp()">
-      <mat-icon>find_replace</mat-icon>
-    </button>
-    <!-- </div> -->
-  </mat-form-field>
+  <!-- <mat-form-field class="flex items-end"> -->
+  <label>枝番</label>
+  <input [(ngModel)]="eda" (keyup.enter)="onEnter()" (keydown.f4)="edaHelp()" (blur)="refresh()"
+    [ngModelOptions]="{standalone: true}" disabled>
+  <!-- <div [style.display]="edasrv.adrs.length>0 ? 'inline' : 'none'"> -->
+  <button mat-icon-button matSuffix (click)="setNext()">
+    <mat-icon>keyboard_arrow_up</mat-icon>
+  </button>
+  <button mat-icon-button matSuffix (click)="setPrev()">
+    <mat-icon>keyboard_arrow_down</mat-icon>
+  </button>
+  <button mat-icon-button matSuffix (click)="edaHelp()">
+    <mat-icon>find_replace</mat-icon>
+  </button>
+  <!-- </div> -->
+  <!-- </mat-form-field> -->
 </mat-toolbar>
-<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>{{mode|modetxt}}{{mcode}} 別納先</h1>
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>{{mode|modetxt}}{{memsrv.mcode}} 別納先
+</h1>
 
 <mat-dialog-content>
   <form [formGroup]="form">
@@ -43,6 +44,6 @@
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button class="mat-raised-button" (click)="close()">閉じる</button>
-  <button class="mat-raised-button mat-primary" (click)="set_eda()" *ngIf="flg">枝番をセット</button>
+  <button mat-raised-button (click)="close()">閉じる</button>
+  <button mat-raised-button [color]="'primary'" (click)="setEda()" *ngIf="flg">枝番をセット</button>
 </mat-dialog-actions>

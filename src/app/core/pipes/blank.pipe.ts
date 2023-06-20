@@ -8,15 +8,15 @@ export class BlankPipe implements PipeTransform {
   transform(value: any): any {
     if (typeof value == 'undefined') {
       return "";
-    } else if (value==="none") {
+    } else if (value === "none") {
       return "";
-    } else if (value==="2000-01-01") {
+    } else if (value === "2000-01-01") {
       return "";
-    } else if (value==="0") {
+    } else if (value === "0") {
       return "";
-    } else if (value===0) {
+    } else if (value === 0) {
       return "";
-    } else{
+    } else {
       return value;
     }
   }

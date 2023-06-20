@@ -1,43 +1,42 @@
-<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
-  <div class="icon-area" fxLayout="row wrap">
-    <button mat-button (click)="modeToCre()" *ngIf="mode==3" fxHide fxShow.gt-sm>
+<mat-toolbar [color]="usrsrv.getColor(mode)" class="toolbar mat-elevation-z8">
+  <div class="icon-area" class="flex flex-nowrap">
+    <button mat-flat-button (click)="modeToCre()" *ngIf="mode==3" [color]="usrsrv.getColor(mode)">
       <mat-icon>add_box</mat-icon>新規
     </button>
-    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.vcd" fxHide fxShow.gt-sm>
+    <button mat-flat-button (click)="modeToUpd()" *ngIf="mode==3 && this.vcd" [color]="usrsrv.getColor(mode)">
       <mat-icon>edit</mat-icon>編集
     </button>
-    <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3" fxHide fxShow.gt-sm>
+    <button mat-flat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3" [color]="usrsrv.getColor(mode)">
       <mat-icon>save</mat-icon>保存
     </button>
-    <button mat-button (click)="cancel()" *ngIf="mode!=3" fxHide fxShow.gt-sm>
+    <button mat-flat-button (click)="cancel()" *ngIf="mode!=3" [color]="usrsrv.getColor(mode)">
       <mat-icon>cancel</mat-icon>中止
     </button>
-    <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
-      <mat-label>仕入先コード</mat-label>
-      <input matInput [(ngModel)]="vcd" (keydown.enter)="refresh()" maxlength="12" (keydown.f4)="vcdHelp()"
-        (blur)="refresh()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)">
-      <button mat-button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode==3">
-        <mat-icon>find_replace</mat-icon>
-      </button>
-    </mat-form-field>
-    <button mat-button><a mat-button
+    <!-- <mat-form-field style="background-color: transparent;"> -->
+    <!-- <label class="text-xs">仕入先コード</label> -->
+    <input [(ngModel)]="vcd" (keydown.enter)="refresh()" maxlength="12" (keydown.f4)="vcdHelp()" (blur)="refresh()"
+      [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)" placeholder="仕入先コード">
+    <button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode==3">
+      <mat-icon>find_replace</mat-icon>
+    </button>
+    <!-- </mat-form-field> -->
+    <button mat-flat-button [color]="usrsrv.getColor(mode)"><a mat-flat-button [color]="usrsrv.getColor(mode)"
         href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
         target="_blank">
-        <mat-icon>help</mat-icon>
-        ヘルプ
+        <mat-icon>help</mat-icon>ヘルプ
       </a></button>
   </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px">
+<form [formGroup]="form" class="flex flex-wrap space-x-4">
   <mat-card>
-    <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
+    <mat-card-header class="flex flex-wrap content-between">
       <mat-card-title>
-        {{mode|modetxt}}基本情報
+        {{mode|modetxt}}仕入先マスタ
       </mat-card-title>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
-    <mat-card-content fxLayout="column">
-      <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+    <mat-card-content class="flex flex-col">
+      <div class="flex flex-wrap space-x-4">
         <mat-form-field style="width:20em">
           <mat-label>仕入先名</mat-label>
           <input matInput formControlName="adrname" required>
@@ -49,7 +48,7 @@
         <mat-form-field style="width:5em">
           <mat-label>税区分</mat-label>
           <mat-select #msel2 formControlName="mtax" required (keydown.enter)="msel2.close()">
-            <mat-option *ngFor="let sval of bunsrv.kbn.mtax" [value]="sval.value">
+            <mat-option *ngFor="let sval of bunsrv.kbn['mtax']" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
           </mat-select>
@@ -63,23 +62,23 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>郵便番号(ハイフンなし)</mat-label>
-          <input matInput formControlName="zip" ybPostalCode size="7" maxlength="7">
+          <input matInput formControlName="zip" size="7" maxlength="7" (change)="getAdr($any($event))">
         </mat-form-field>
         <mat-form-field>
           <mat-label>都道府県</mat-label>
-          <input matInput formControlName="region" ybRegion>
+          <input matInput formControlName="region">
         </mat-form-field>
         <mat-form-field>
           <mat-label>市区町村</mat-label>
-          <input matInput formControlName="local" ybLocality>
+          <input matInput formControlName="local">
         </mat-form-field>
         <mat-form-field>
           <mat-label>町名・番地</mat-label>
-          <input matInput formControlName="street" ybStreet>
+          <input matInput formControlName="street">
         </mat-form-field>
         <mat-form-field>
           <mat-label>マンション・ビル名</mat-label>
-          <input matInput formControlName="extend" ybExtended>
+          <input matInput formControlName="extend">
         </mat-form-field>
         <mat-form-field>
           <mat-label>電話番号</mat-label>
@@ -107,26 +106,24 @@
         </mat-form-field>
         <mat-checkbox formControlName="del">削除済</mat-checkbox>
       </div>
-      <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+      <div class="flex flex-wrap space-x-4">
         <mat-form-field style="width:100%;">
           <mat-label>発注伝票備考</mat-label>
-          <textarea matInput formControlName="adrbikou" matTextareaAutosize></textarea>
+          <textarea matInput formControlName="adrbikou" cdkTextareaAutosize></textarea>
         </mat-form-field>
         <mat-form-field style="width:100%;">
           <mat-label>社内備考</mat-label>
-          <textarea matInput formControlName="adrinbikou" matTextareaAutosize></textarea>
+          <textarea matInput formControlName="adrinbikou" cdkTextareaAutosize></textarea>
         </mat-form-field>
       </div>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <!-- <div fxLayout="column" fxLayoutGap="5px"> -->
           <mat-form-field>
             <mat-label>メールアドレス</mat-label>
             <input matInput formControlName="mail1">
           </mat-form-field>
-          <!-- </div> -->
         </mat-expansion-panel-header>
-        <div fxLayout="row" fxLayoutGap="5px">
+        <div class="flex flex-row space-x-4">
           <mat-form-field>
             <mat-label>メールアドレス2</mat-label>
             <input matInput formControlName="mail2">
@@ -147,4 +144,5 @@
       </mat-expansion-panel>
     </mat-card-content>
   </mat-card>
+  <div id="script"></div>
 </form>

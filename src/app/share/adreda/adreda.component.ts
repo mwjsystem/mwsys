@@ -4,34 +4,33 @@ import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms'
 import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
-import { EdaService } from './eda.service';
+import { MembsService } from './../../mstmember/membs.service';
 import { EdahelpComponent } from './edahelp.component';
 import { AddressComponent } from './../address/address.component';
-
 
 @Component({
   selector: 'app-adreda',
   templateUrl: './adreda.component.html',
-  styleUrls: ['./adreda.component.scss']
+  styleUrls: ['./../../help.component.scss']
 })
 export class AdredaComponent implements OnInit, AfterViewInit {
   @ViewChild(AddressComponent, { static: false })
   private child: AddressComponent;
-  mcode: string = "";
   mode: number = 3;
   form: FormGroup;
   eda: number | string;
   edaOld: number;
   flg: boolean; //true⇒枝番をセットボタン表示
+
   constructor(private fb: FormBuilder,
-    public edasrv: EdaService,
+    public memsrv: MembsService,
     private dialogRef: MatDialogRef<AdredaComponent>,
     @Inject(MAT_DIALOG_DATA) data,
     private dialog: MatDialog,
     private cdRef: ChangeDetectorRef,
     private usrsrv: UserService,
     private apollo: Apollo) {
-    this.mcode = data.mcode;
+    this.memsrv.mcode = data.mcode;
     this.eda = data.eda;
     this.flg = data.flg;
   }
@@ -42,11 +41,11 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    let i: number = this.edasrv.adrs.findIndex(obj => obj.eda > 1);
+    let i: number = this.memsrv.adrs.findIndex(obj => obj.eda > 1);
 
     // console.log(i);
     if (i > -1 && (this.eda == null || this.eda == '')) {
-      this.eda = this.edasrv.adrs[i].eda;
+      this.eda = this.memsrv.adrs[i].eda;
     } else if (this.eda == null) {
       this.form.reset();
       // this.cdRef.detectChanges();
@@ -59,12 +58,12 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     this.dialogRef.close();
   }
 
-  set_eda() {
+  setEda() {
     if (this.mode == 3) {
       this.dialogRef.close(this.eda);
     } else {
-      this.child.saveMadr(this.edasrv.mcode, this.eda, this.mode).subscribe(madr => {
-        this.edasrv.updateAdrs(madr, this.mode);
+      this.child.saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
+        this.updateAdrs(madr);
         this.eda = madr.eda;
         this.mode = 3;
         this.form.disable();
@@ -80,20 +79,13 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     this.form.enable();
     this.edaOld = +this.eda;
     this.eda = "新規登録";
-    const bikou = {
-      nbikou: this.edasrv.adrs[0].nbikou,
-      sbikou: this.edasrv.adrs[0].sbikou,
-      obikou: this.edasrv.adrs[0].obikou,
+    const memos = {
+      nmemo: this.memsrv.adrs[0].nmemo,
+      smemo: this.memsrv.adrs[0].smemo,
+      omemo: this.memsrv.adrs[0].omemo,
       htitle: '0'
     };
-    this.form.get('addr').patchValue(bikou);
-
-    // let tmp=this.edasrv.adrs[this.edasrv.adrs.length-1].eda;
-    // if(tmp>9){
-    //   this.eda=tmp + 1;
-    // } else{
-    //   this.eda=10;
-    // }
+    this.form.get('addr').patchValue(memos);
   }
 
   modeToUpd(): void {
@@ -102,8 +94,8 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   }
 
   save(): void {
-    this.child.saveMadr(this.edasrv.mcode, this.eda, this.mode).subscribe(madr => {
-      this.edasrv.updateAdrs(madr, this.mode);
+    this.child.saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
+      this.updateAdrs(madr);
       this.eda = madr.eda;
       this.mode = 3;
       this.form.disable();
@@ -117,30 +109,39 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     this.mode = 3;
     this.form.disable();
   }
-
+  updateAdrs(padrs) {
+    if (this.mode == 1) {
+      this.memsrv.adrs.push(padrs);
+    } else if (this.mode == 2) {
+      const i: number = this.memsrv.adrs.findIndex(obj => obj.eda == padrs.eda);
+      if (i > -1) {
+        this.memsrv.adrs[i] = padrs;
+      }
+    }
+  }
   setNext() {
-    let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
-    if (i > -1 && i < this.edasrv.adrs.length - 1) {
-      this.eda = this.edasrv.adrs[i + 1].eda;
+    let i: number = this.memsrv.adrs.findIndex(obj => obj.eda == this.eda);
+    if (i > -1 && i < this.memsrv.adrs.length - 1) {
+      this.eda = this.memsrv.adrs[i + 1].eda;
     }
     this.refresh();
   }
 
   setPrev() {
-    let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
-    if (i > 0 && this.edasrv.adrs[i].eda > 10) {
-      this.eda = this.edasrv.adrs[i - 1].eda;
+    let i: number = this.memsrv.adrs.findIndex(obj => obj.eda == this.eda);
+    if (i > 0 && this.memsrv.adrs[i].eda > 10) {
+      this.eda = this.memsrv.adrs[i - 1].eda;
     }
     this.refresh();
   }
 
   refresh(): void {
-    let i: number = this.edasrv.adrs.findIndex(obj => obj.eda == this.eda);
+    let i: number = this.memsrv.adrs.findIndex(obj => obj.eda == this.eda);
     // console.log(i,this.eda);
     if (i > -1) {
-      let adrs: mwI.Adrs = this.edasrv.adrs[i];
+      let lcadrs: mwI.Adrs = this.memsrv.adrs[i];
       // console.log(adrs,this.form.get('addr'));
-      this.form.get('addr').patchValue(adrs);
+      this.form.get('addr').patchValue(lcadrs);
     }
     if (this.mode == 3) {
       this.form.disable();
@@ -185,5 +186,6 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     return tooltip;
 
   }
+
 
 }

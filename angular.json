@@ -17,11 +17,18 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "zen-observable",
+              "file-saver",
+              "json2csv",
+              "vanilla-autokana"
+            ],
             "outputPath": "dist/",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
             "aot": true,
             "assets": [
               "src/favicon.ico",
@@ -29,6 +36,10 @@
             ],
             "styles": [
               "src/styles.scss",
+              "@angular/material/prebuilt-themes/deeppurple-amber.css",
+              "node_modules/tailwindcss/base.css",
+              "node_modules/tailwindcss/components.css",
+              "node_modules/tailwindcss/utilities.css",
               "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": []
@@ -44,7 +55,6 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "extractCss": true,
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,
@@ -99,19 +109,6 @@
             "scripts": []
           }
         },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        },
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
@@ -127,5 +124,7 @@
       }
     }
   },
-  "defaultProject": "mwsys"
+  "cli": {
+    "analytics": "de95cad1-fbcc-4b5c-afaa-69cbfa665072"
+  }
 }

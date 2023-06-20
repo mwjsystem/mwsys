@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-gdsimage',
   templateUrl: './gdsimage.component.html',
-  styleUrls: ['./gdsimage.component.scss']
+  styleUrls: ['./../../help.component.scss']
 })
 export class GdsimageComponent implements OnInit, AfterViewInit {
   public noimgs: Boolean[] = [];
@@ -29,7 +29,7 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.get_url(this.grpcd);
+    this.getUrl(this.grpcd);
     for (let i = 0; i < 9; i++) {
       this.noimgs.push(false);
     }
@@ -40,7 +40,7 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
     });
   }
 
-  get_url(grpcd: string): void {
+  getUrl(grpcd: string): void {
     const GetUrl = gql`
     query get_specurl($id: smallint!, $grpcd: String!) {
       msggroup_by_pk(id: $id, code: $grpcd) {
@@ -127,11 +127,6 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
   openXlsx() {
     window.open(this.url, "_blank");
   }
-
-  // saveUrl() {
-  //   this.set_url(this.grpcd,this.url);
-  //   // this.dialogRef.close();
-  // }
 
   close() {
     this.dialogRef.close();

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
 // import { Apollo } from 'apollo-angular';
 // import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
@@ -23,7 +23,7 @@ interface Nymat {
 @Component({
   selector: 'app-spdethelp',
   templateUrl: './spdethelp.component.html',
-  styleUrls: ['./spdethelp.component.scss']
+  styleUrls: ['./../../help.component.scss']
 })
 export class SpdethelpComponent implements OnInit {
   dataSource: MatTableDataSource<Nymat>;

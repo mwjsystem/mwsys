@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit, ChangeDetectorRef, ViewChildren, QueryList, ElementRef } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
 import { TreatService } from './treat.service';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
@@ -14,19 +14,19 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-trtdetail',
   templateUrl: './trtdetail.component.html',
-  styleUrls: ['./trtdetail.component.scss']
+  styleUrls: ['./../tbl.component.scss']
 })
 export class TrtdetailComponent implements OnInit {
 
   public idx: number = 0;
-  public form: FormGroup;
+  public form: UntypedFormGroup;
   @ViewChildren('upfile', { read: ElementRef }) inputs: QueryList<ElementRef>;
   constructor(public trtsrv: TreatService,
     public usrsrv: UserService,
     public bunsrv: BunruiService,
     public stfsrv: StaffService,
     public cdRef: ChangeDetectorRef,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private dialog: MatDialog,
     private apollo: Apollo,
     // private toastr: ToastrService,
@@ -38,20 +38,20 @@ export class TrtdetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      seq: new FormControl(''),
-      created_at: new FormControl(''),
-      created_by: new FormControl(''),
-      trttype: new FormControl(''),
-      genre: new FormControl(''),
-      mcode: new FormControl(''),
-      grpcode: new FormControl(''),
-      gcode: new FormControl(''),
-      tel: new FormControl(''),
-      email: new FormControl(''),
-      question: new FormControl(''),
-      answer: new FormControl(''),
-      kaizen: new FormControl(''),
-      result: new FormControl(''),
+      seq: new UntypedFormControl(''),
+      created_at: new UntypedFormControl(''),
+      created_by: new UntypedFormControl(''),
+      trttype: new UntypedFormControl(''),
+      genre: new UntypedFormControl(''),
+      mcode: new UntypedFormControl(''),
+      grpcode: new UntypedFormControl(''),
+      gcode: new UntypedFormControl(''),
+      tel: new UntypedFormControl(''),
+      email: new UntypedFormControl(''),
+      question: new UntypedFormControl(''),
+      answer: new UntypedFormControl(''),
+      kaizen: new UntypedFormControl(''),
+      result: new UntypedFormControl(''),
     });
     if (this.idx == -1) {
       this.form.get('seq').setValue("新規登録");

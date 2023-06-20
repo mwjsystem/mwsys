@@ -2,8 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { MatSpinner } from '@angular/material/progress-spinner';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatLegacySpinner as MatSpinner } from '@angular/material/legacy-progress-spinner';
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
@@ -21,7 +21,7 @@ interface GetOpe {
 @Component({
   selector: 'app-frmkeep',
   templateUrl: './frmkeep.component.html',
-  styleUrls: ['./frmkeep.component.scss']
+  styleUrls: ['./../app.component.scss']
 })
 export class FrmkeepComponent implements OnInit {
   denno: number;
@@ -67,14 +67,14 @@ export class FrmkeepComponent implements OnInit {
       // console.log('param',params);
       if (params.get('denno') !== null) {
         this.denno = +params.get('denno');
-        this.get_opelog({ denno: params.get('denno') }).subscribe(value => {
+        this.getOpelog({ denno: params.get('denno') }).subscribe(value => {
           console.log(value);
           this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
           this.overlayRef.detach();
           this.cdRef.detectChanges();
         });
       } else {
-        this.get_opelog({ status: "依頼中" }).subscribe(value => {
+        this.getOpelog({ status: "依頼中" }).subscribe(value => {
           console.log(value);
           this.denno = 0;
           this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
@@ -86,7 +86,7 @@ export class FrmkeepComponent implements OnInit {
     });
   }
 
-  get_opelog(param: GetOpe): Observable<mwI.Tropelog[]> {
+  getOpelog(param: GetOpe): Observable<mwI.Tropelog[]> {
     if (param['denno']) {
       this.keycode = [param['denno']];
     }
@@ -122,10 +122,10 @@ export class FrmkeepComponent implements OnInit {
     return observable;
   }
 
-  to_Req() {
+  toReq() {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.denno = 0;
-    this.get_opelog({ status: "依頼中" }).subscribe(value => {
+    this.getOpelog({ status: "依頼中" }).subscribe(value => {
       this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
       this.overlayRef.detach();
       this.cdRef.detectChanges();
@@ -133,9 +133,9 @@ export class FrmkeepComponent implements OnInit {
     });
   }
 
-  to_Denno(pdenno) {
+  toDenno(pdenno) {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.get_opelog({ denno: pdenno }).subscribe(value => {
+    this.getOpelog({ denno: pdenno }).subscribe(value => {
       this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
       this.overlayRef.detach();
       this.cdRef.detectChanges();

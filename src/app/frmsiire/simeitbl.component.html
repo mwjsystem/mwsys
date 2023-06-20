@@ -3,7 +3,7 @@
         <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
             <ng-container matColumnDef="line">
                 <th mat-header-cell *matHeaderCellDef class="i_num">
-                    <button mat-icon-button matPrefix (click)="ins_row(0)" *ngIf="frmArr.enabled"
+                    <button mat-icon-button matPrefix (click)="insRow(0)" *ngIf="frmArr.enabled"
                         style="height:14px !important;width:14px !important;font-size:14px !important;">
                         <mat-icon
                             style="height:14px !important;width:14px !important;font-size:14px !important;vertical-align: text-top!important;">
@@ -14,10 +14,10 @@
                 <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
                     <mat-form-field style="width: 5em;">
                         <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
-                        <button mat-icon-button matPrefix (click)="ins_row(getIdx(i)+1)" *ngIf="frmArr.enabled">
+                        <button mat-icon-button matPrefix (click)="insRow(getIdx(i)+1)" *ngIf="frmArr.enabled">
                             <mat-icon>add_circle</mat-icon>
                         </button>
-                        <button mat-icon-button matPrefix (click)="del_row(getIdx(i))" *ngIf="frmArr.enabled">
+                        <button mat-icon-button matPrefix (click)="delRow(getIdx(i))" *ngIf="frmArr.enabled">
                             <mat-icon>remove_circle</mat-icon>
                         </button>
                     </mat-form-field>
@@ -106,11 +106,11 @@
                     </mat-form-field>
                 </td>
             </ng-container>
-            <ng-container matColumnDef="mbiko">
+            <ng-container matColumnDef="mmemo">
                 <th mat-header-cell *matHeaderCellDef>明細備考</th>
                 <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
                     <mat-form-field>
-                        <input matInput formControlName="mbiko">
+                        <input matInput formControlName="mmemo">
                     </mat-form-field>
                 </td>
             </ng-container>

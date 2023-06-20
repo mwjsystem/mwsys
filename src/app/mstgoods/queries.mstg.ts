@@ -22,7 +22,7 @@ query get_ggroup($id: smallint!, $grpcd: String!) {
     sozai
     vcode
     tcode
-    bikou
+    memo
     specurl
     genre
     created_at

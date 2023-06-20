@@ -2,7 +2,6 @@ import { Component, OnInit, Inject, ChangeDetectorRef, HostListener } from '@ang
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-// import { ToastrService } from 'ngx-toastr';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GoodsService } from './../../mstgoods/goods.service';
 import { UserService } from './../../services/user.service';
@@ -13,7 +12,7 @@ import gql from 'graphql-tag';
 @Component({
   selector: 'app-gzai',
   templateUrl: './gzai.component.html',
-  styleUrls: ['./gzai.component.scss']
+  styleUrls: ['./../../tbl.component.scss']
 })
 export class GzaiComponent implements OnInit {
   form: FormGroup;
@@ -33,27 +32,29 @@ export class GzaiComponent implements OnInit {
     this.form = this.fb.group({ mtbl: this.fb.array([]) });
     this.gcode = data.gcode;
     const i: number = this.gdssrv.goods.findIndex(obj => obj.gcode == this.gcode);
-    this.gdssrv.goods[i].msgzais.forEach(e => {
-      this.frmArr.push(this.fb.group({
-        line: [{ value: 0, disabled: true }],
-        zcode: [e.zcode],
-        gtext: [{ value: e.msgoods.gtext, disabled: true }],
-        irisu: [e.irisu],
-        unit: [{ value: e.msgoods.unit, disabled: true }]
-      }));
-    });
-    this.auto_fil();
+    if (i > -1) {
+      this.gdssrv.goods[i].msgzais.forEach(e => {
+        this.frmArr.push(this.fb.group({
+          line: [{ value: 0, disabled: true }],
+          zcode: [e.zcode],
+          gtext: [{ value: e.msgoods.gtext, disabled: true }],
+          irisu: [e.irisu],
+          unit: [{ value: e.msgoods.unit, disabled: true }]
+        }));
+      });
+    }
+    this.autoFil();
   }
 
   ngOnInit(): void { }
   get frmArr(): FormArray {
     return this.form.get('mtbl') as FormArray;
   }
-  del_row(row: number) {
+  delRow(row: number) {
     this.frmArr.removeAt(row);
-    this.auto_fil();
+    this.autoFil();
   }
-  ins_row(row: number) {
+  insRow(row: number) {
     this.frmArr.insert(row, this.fb.group({
       line: [{ value: 0, disabled: true }],
       zcode: [""],
@@ -61,9 +62,9 @@ export class GzaiComponent implements OnInit {
       irisu: [0],
       unit: [{ value: "", disabled: true }]
     }));
-    this.auto_fil();
+    this.autoFil();
   }
-  auto_fil() {
+  autoFil() {
     let i: number = 0;
     this.frmArr.controls
       .forEach(control => {
@@ -81,8 +82,8 @@ export class GzaiComponent implements OnInit {
     this.form.markAsPristine();
     this.refresh();
   }
-  updGds(i: number, value: string): void {
-    let val: string = this.usrsrv.convUpper(value);
+  updGds(i: number, event: KeyboardEvent): void {
+    let val: string = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
     this.frmArr.controls[i].get('zcode').setValue(val);
     const GetMast = gql`
     query get_goods($id: smallint!, $gcode: String!) {
@@ -165,7 +166,9 @@ export class GzaiComponent implements OnInit {
       this.cancel();
       const i: number = this.gdssrv.goods.findIndex(obj => obj.gcode == this.gcode);
       // console.log(this.frmArr.controls);
-      this.gdssrv.goods[i].msgzais = gzai;
+      if (i > -1) {
+        this.gdssrv.goods[i].msgzais = gzai;
+      }
     }, (error) => {
       this.usrsrv.toastErr('データベースエラー', 'セット商品内訳の更新ができませんでした');
       console.log('error mutation upd_msgzai', error);

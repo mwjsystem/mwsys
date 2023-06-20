@@ -11,12 +11,10 @@ import { SdnohelpComponent } from './../share/sdnohelp/sdnohelp.component';
 import { HdnohelpComponent } from './../share/hdnohelp/hdnohelp.component';
 import { SimeitblComponent } from './simeitbl.component';
 import { filter } from 'rxjs/operators';
-// import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
-import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
-import { VendsService } from './../services/vends.service';
+import { VendsService } from './../mstvendor/vends.service';
 import { SiimeiService } from './siimei.service';
 import { HatmeiService } from './../frmsupply/hatmei.service';
 import gql from 'graphql-tag';
@@ -25,7 +23,7 @@ import { Apollo } from 'apollo-angular';
 @Component({
   selector: 'app-frmsiire',
   templateUrl: './frmsiire.component.html',
-  styleUrls: ['./frmsiire.component.scss'],
+  styleUrls: ['./../app.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -49,13 +47,11 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     private elementRef: ElementRef,
     private dialog: MatDialog,
     private apollo: Apollo,
-    public bunsrv: BunruiService,
     public strsrv: StoreService,
     public stfsrv: StaffService,
     public hmisrv: HatmeiService,
     public smisrv: SiimeiService,
     private vensrv: VendsService,
-    // private toastr: ToastrService,
     private overlay: Overlay,
     private cdRef: ChangeDetectorRef) {
     title.setTitle('仕入伝票(MWSystem)');
@@ -68,17 +64,16 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
       scode: new FormControl('', Validators.required),
       tcode: new FormControl('', Validators.required),
       currency: new FormControl(''),
-      dbiko: new FormControl(''),
+      dmemo: new FormControl(''),
       gtotal: new FormControl(''),
       tax: new FormControl(''),
       total: new FormControl(''),
       mtbl: this.rows
     });
-    this.strsrv.get_store();
-    this.bunsrv.get_bunrui();
+    this.strsrv.getStore();
   }
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
-    this.vensrv.get_vendors().then(result => {
+    this.vensrv.getVendors().then(result => {
       this.route.paramMap.subscribe((params: ParamMap) => {
         if (params.get('mode') === null) {
           this.cancel();
@@ -104,7 +99,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
           this.mode = +params.get('mode');
           if (params.get('denno') !== null) {
             this.denno = +params.get('denno');
-            this.get_siiden(this.denno);
+            this.getSiiden(this.denno);
           }
           this.refresh();
         }
@@ -114,12 +109,12 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
       this.cdRef.detectChanges();
     });
   }
-  get_siiden(denno: number): void {
+  getSiiden(denno: number): void {
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
     if (denno > 0) {
-      this.smisrv.qry_siiden(denno).subscribe(
+      this.smisrv.qrySiiden(denno).subscribe(
         result => {
           this.form.reset();
           if (result == null) {
@@ -131,7 +126,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
             // this.form.patchValue(siiden.msvendor[0]);
             this.usrsrv.setTmstmp(siiden);
             this.smisrv.siimei = siiden.trsiimeis;
-            this.simeitbl.set_siimei();
+            this.simeitbl.setSiimei();
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             // this.denno = denno;
             // history.replaceState('', '', './frmsupply/' + this.mode + '/' + this.denno);
@@ -150,12 +145,12 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     this.cdRef.detectChanges();
   }
 
-  get_hatden(denno: number): void {
+  getHatden(denno: number): void {
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
     if (denno > 0) {
-      this.hmisrv.qry_hatden(denno).subscribe(
+      this.hmisrv.qryHatden(denno).subscribe(
         result => {
           this.form.reset();
           if (result == null) {
@@ -168,7 +163,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
             this.form.patchValue({ inday: hatden.vhatzns[0].yday });
             // this.usrsrv.setTmstmp(hatden);
             this.smisrv.convHatmei(denno, hatden.vhatzns);
-            this.simeitbl.set_siimei();
+            this.simeitbl.setSiimei();
           }
           this.refresh();
           this.overlayRef.detach();
@@ -187,7 +182,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
 
   test(value) {
     // this.toastr.info(this.form.value.yday);
-    console.log(this.simeitbl.get_siimei(this.denno));
+    console.log(this.simeitbl.getSiimei(this.denno));
     this.refresh();
     // this.router.navigate(['/mstmember','3',value]);
     // const url = this.router.createUrlTree(['/mstmember','3',value]);
@@ -198,7 +193,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
   }
   onEnter() {
     this.denno = this.usrsrv.convNumber(this.denno);
-    this.get_siiden(this.denno);
+    this.getSiiden(this.denno);
   }
   canEnter(e: KeyboardEvent): void {
     let element = e.target as HTMLElement;
@@ -225,7 +220,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
       data => {
         if (typeof data != 'undefined') {
           this.denno = data.denno;
-          this.get_siiden(this.denno);
+          this.getSiiden(this.denno);
         }
       }
     );
@@ -242,7 +237,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
         if (typeof data != 'undefined') {
           this.hdenno = data.denno;
           // console.log(data);
-          this.get_hatden(this.hdenno);
+          this.getHatden(this.hdenno);
         }
       }
     );
@@ -255,7 +250,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     this.form.get('inday').setValue(new Date());
     this.form.get('scode').setValue(this.usrsrv.staff.scode);
     this.simeitbl.frmArr.clear();
-    this.simeitbl.add_rows(1);
+    this.simeitbl.addRows(1);
     this.refresh();
   }
 
@@ -268,7 +263,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
   cancel(): void {
     if (this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
       this.mode = 3;
-      this.get_siiden(this.denno);
+      this.getSiiden(this.denno);
       this.refresh();
       this.form.markAsPristine();
       history.replaceState('', '', './frmsiire/' + this.mode + '/' + this.denno);
@@ -283,7 +278,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
       inday: this.usrsrv.editFrmday(this.form, 'inday'),
       scode: this.usrsrv.editFrmval(this.form, 'scode'),
       tcode: this.usrsrv.editFrmval(this.form, 'tcode'),
-      dbiko: this.usrsrv.editFrmval(this.form, 'dbiko'),
+      dmemo: this.usrsrv.editFrmval(this.form, 'dmemo'),
       gtotal: this.usrsrv.editFrmval(this.form, 'gtotal'),
       // ttotal: this.usrsrv.editFrmval(this.form,'ttotal'),
       tax: this.usrsrv.editFrmval(this.form, 'tax'),
@@ -294,8 +289,8 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     }
 
     if (this.mode == 2) {
-      let siimei = this.simeitbl.get_siimei(this.denno);
-      this.smisrv.upd_siiden(this.denno, siiden, siimei)
+      let siimei = this.simeitbl.getSiimei(this.denno);
+      this.smisrv.updSiiden(this.denno, siiden, siimei)
         .then(result => {
           // console.log('update_hatden',result);
           this.usrsrv.toastSuc('仕入伝票' + this.denno + 'の変更を保存しました');
@@ -307,7 +302,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
         });
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('sdenno', 1, this.denno);
-      const siimei = this.simeitbl.get_siimei(this.denno);
+      const siimei = this.simeitbl.getSiimei(this.denno);
       const trsiiden: mwI.Trsiiden[] = [{
         ...{
           id: this.usrsrv.compid,
@@ -318,7 +313,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
         , ...siiden,
       }]
       // console.log(trhatden);
-      this.hmisrv.ins_hatden(trsiiden, siimei)
+      this.hmisrv.insHatden(trsiiden, siimei)
         .then(result => {
           // console.log('insert_trhat',result);
           this.usrsrv.toastSuc('発注伝票' + this.denno + 'を新規登録しました');

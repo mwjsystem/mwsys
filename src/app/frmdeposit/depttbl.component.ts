@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray } from '@angular/forms';
+// import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
@@ -8,10 +9,10 @@ import { DepositService } from './deposit.service';
 @Component({
   selector: 'app-depttbl',
   templateUrl: './depttbl.component.html',
-  styleUrls: ['./depttbl.component.scss']
+  styleUrls: ['./../tbl.component.scss']
 })
 export class DepttblComponent implements OnInit {
-  @Input() parentForm: FormGroup;
+  @Input() parentForm: UntypedFormGroup;
   dataSource = new MatTableDataSource();
   displayedColumns: string[] = ['line',
     'ptype',
@@ -19,9 +20,9 @@ export class DepttblComponent implements OnInit {
     'smoney',
     'tmoney',
     'total',
-    'mbiko'];
+    'mmemo'];
   constructor(private cdRef: ChangeDetectorRef,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     public depsrv: DepositService,
     public bunsrv: BunruiService,
     public usrsrv: UserService) { }
@@ -33,8 +34,8 @@ export class DepttblComponent implements OnInit {
       this.cdRef.detectChanges();
     });
   }
-  get frmArr(): FormArray {
-    return this.parentForm.get('mtbl') as FormArray;
+  get frmArr(): UntypedFormArray {
+    return this.parentForm.get('mtbl') as UntypedFormArray;
   }
   delRow(row: number) {
     this.frmArr.removeAt(row);
@@ -89,7 +90,7 @@ export class DepttblComponent implements OnInit {
       smoney: [deposit?.smoney],
       tmoney: [deposit?.tmoney],
       total: [deposit?.nmoney - deposit?.smoney + deposit?.tmoney],
-      mbiko: [deposit?.mbiko]
+      mmemo: [deposit?.mmemo]
     })
   }
   refresh(): void {
@@ -110,12 +111,12 @@ export class DepttblComponent implements OnInit {
           nmoney: this.usrsrv.editFrmval(control, 'nmoney'),
           smoney: this.usrsrv.editFrmval(control, 'smoney'),
           tmoney: this.usrsrv.editFrmval(control, 'tmoney'),
-          mbiko: this.usrsrv.editFrmval(control, 'mbiko')
+          mmemo: this.usrsrv.editFrmval(control, 'mmemo')
         });
       });
     return dept;
   }
-  set_tbl() {
+  setTbl() {
     this.frmArr.clear();
     let i: number = 0;
     this.depsrv.nyuden.forEach(e => {

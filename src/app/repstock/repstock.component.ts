@@ -10,9 +10,9 @@ import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
-import { MembsService } from './../services/membs.service';
+import { MembsService } from './../mstmember/membs.service';
 import { StGds, Stock, StockService } from './../services/stock.service';
-import { Trans, TransService } from './trans.service';
+import { Trans, TransService } from './../services/trans.service';
 // import { ToastrService } from 'ngx-toastr';
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { StcscdsComponent } from './../share/stcscds/stcscds.component';
@@ -21,7 +21,7 @@ import { StcscdsComponent } from './../share/stcscds/stcscds.component';
 @Component({
   selector: 'app-repstock',
   templateUrl: './repstock.component.html',
-  styleUrls: ['./repstock.component.scss']
+  styleUrls: ['./../app.component.scss']
 })
 export class RepstockComponent implements OnInit, AfterViewInit {
   public stgds: StGds = new StGds();
@@ -55,29 +55,35 @@ export class RepstockComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.memsrv.get_members();
-    this.bunsrv.get_bunrui();
-    this.strsrv.get_store();
+    this.memsrv.getMembers();
+    this.bunsrv.getBunrui();
+    this.strsrv.getStore();
     this.stcsrv.getGoods();
   }
 
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
     this.route.queryParams.subscribe(params => {
-      this.usrsrv.getStaff(this.usrsrv.userInfo.email).then(result => {
-        if (params.scode != null) {
-          this.scode = params.scode;
+      this.usrsrv.getStaff(this.usrsrv.userInfo['email']).then(result => {
+        if (params['scode'] != null) {
+          this.scode = params['scode'];
           //   this.chSok=true;
         } else {
           this.scode = result.scode
         }
-        if (params.gcode != null) {
-          this.gcode = params.gcode;
-          this.get_zinfo();
+        if (params['gcode'] != null) {
+          this.gcode = params['gcode'];
+          this.getZinfo();
         }
         this.cdRef.detectChanges();
       });
     });
   }
+
+  convUpper(event: KeyboardEvent) {
+    console.log((event.target as HTMLInputElement));
+    this.gcode = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
+  }
+
   onChange(): void {
     // if (this.chSok == false){
     //   this.scode="";
@@ -85,7 +91,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     // }else{
     // if (this.scode){
     // console.log(this.scode); 
-    this.sel_scd();
+    this.selScd();
     // }
 
   }
@@ -95,7 +101,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     } else {
       this.scode = this.usrsrv.staff.scode;
     }
-    this.get_zinfo();
+    this.getZinfo();
     // this.trnsrv.subject.next();
     // console.log(this.gcode);
   }
@@ -114,7 +120,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
         if (typeof data != 'undefined') {
           this.gcode = data.gcode;
           this.stgds.gtext = data.gtext;
-          this.get_zinfo();
+          this.getZinfo();
         }
       }
     );
@@ -132,7 +138,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     let i: number = this.stcsrv.goods.findIndex(obj => obj.gcode == this.gcode);
     if (i > -1 && i < this.stcsrv.goods.length) {
       this.gcode = this.stcsrv.goods[i + 1].gcode;
-      this.get_zinfo();
+      this.getZinfo();
     }
   }
 
@@ -140,7 +146,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     let i: number = this.stcsrv.goods.findIndex(obj => obj.gcode == this.gcode);
     if (i > -1) {
       this.gcode = this.stcsrv.goods[i - 1].gcode;
-      this.get_zinfo();
+      this.getZinfo();
     }
   }
 
@@ -161,7 +167,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
   public outputCsv(event: any) {
 
   }
-  sel_scd() {
+  selScd() {
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd) {
         let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
@@ -183,7 +189,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       } else {
         if (this.scode && this.gcode) {
           this.isLoading2 = true;
-          this.stcsrv.get_stock(this.gcode, "0", this.scode).then(result => {
+          this.stcsrv.getStock(this.gcode, "0", this.scode).then(result => {
             // console.log('result',result);
             this.isLoading2 = false;
             this.stcsrv.stc.stock = result[0]?.stock;
@@ -198,7 +204,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
         }
         if (this.gcode) {
           this.stcsrv.stcGcd = "";
-          this.stcsrv.get_stock(this.gcode, "0").then(result => {
+          this.stcsrv.getStock(this.gcode, "0").then(result => {
             this.stcsrv.stcs = result;
             this.stcsrv.stcGcd = this.gcode;
             this.cdRef.detectChanges();
@@ -206,7 +212,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
         }
       }
       this.isLoading3 = true;
-      this.trnsrv.get_trans(this.gcode, this.scode, new Date()).then(result => {
+      this.trnsrv.getTrans(this.gcode, this.scode, new Date()).then(result => {
         // console.log(result);
         this.trnsrv.tbldata = result;
         this.trnsrv.subject.next(true);
@@ -224,7 +230,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           return (a.gcode < b.gcode) ? -1 : 1;  //オブジェクトの昇順ソート
         });
         // this.stcsrv.stcGcd=this.gcode;
-        this.stcsrv.subject.next();
+        this.stcsrv.subject.next(true);
         this.isLoading2 = false;
       });
 
@@ -235,7 +241,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     if (this.gcode != this.stcsrv.shGcd) {
       this.isLoading = true;
       if (this.stgds.gskbn == "0") {
-        this.stcsrv.get_shcount0(this.gcode).then(result => {
+        this.stcsrv.getShcount0(this.gcode).then(result => {
           // console.log(result);
           this.isLoading = false;
           this.stgds.moavg = result.moavg;
@@ -247,7 +253,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           this.cdRef.detectChanges();
         });
       } else if (this.stgds.gskbn == "1") {
-        this.stcsrv.get_shcount1(this.gcode).then(result => {
+        this.stcsrv.getShcount1(this.gcode).then(result => {
           this.isLoading = false;
           this.stgds.moavg = result.moavg;
           this.stgds.motai = result.motai;
@@ -261,7 +267,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     }
     history.replaceState('', '', './repstock?gcode=' + this.gcode + '&scode=' + this.scode);
   }
-  get_zinfo() {
+  getZinfo() {
     if (this.gcode) {
       this.stcsrv.stc.stock = 0;
       this.stcsrv.stc.juzan = 0;
@@ -301,7 +307,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
             this.stgds.unit = data.msgoods_by_pk.unit;
             this.stgds.msgzais = data.msgoods_by_pk.msgzais;
             // console.log(this.stgds.msgzais,this.stcsrv.goods);
-            this.sel_scd();
+            this.selScd();
           }, (error) => {
             console.log('error query get_goods', error);
           });
@@ -312,7 +318,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           this.stgds.gskbn = this.stcsrv.goods[i].gskbn;
           this.stgds.unit = this.stcsrv.goods[i].unit;
           this.stgds.msgzais = this.stcsrv.goods[i].msgzais;
-          this.sel_scd();
+          this.selScd();
         } else {
           this.usrsrv.toastWar("商品コード" + this.gcode + "は登録されていません。");
         }

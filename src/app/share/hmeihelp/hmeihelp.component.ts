@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef, MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
 import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { MatSpinner } from '@angular/material/progress-spinner';
+import { MatLegacySpinner as MatSpinner } from '@angular/material/legacy-progress-spinner';
 import { Subject } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
@@ -39,7 +39,7 @@ interface Hatmei {
 @Component({
   selector: 'app-hmeihelp',
   templateUrl: './hmeihelp.component.html',
-  styleUrls: ['./hmeihelp.component.scss']
+  styleUrls: ['./../../help.component.scss'],
 })
 export class HmeihelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

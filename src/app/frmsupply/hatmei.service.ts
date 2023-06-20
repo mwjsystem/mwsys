@@ -23,8 +23,8 @@ export class HatmeiService {
         gtotal
         jdenno
         total
-        dbiko
-        inbiko
+        dmemo
+        inmemo
         created_at
         created_by
         tax
@@ -42,7 +42,7 @@ export class HatmeiService {
           jdenno
           jline
           line
-          mbiko
+          mmemo
           money
           spec
           genka
@@ -62,7 +62,7 @@ export class HatmeiService {
   constructor(public usrsrv: UserService,
     private apollo: Apollo) { }
 
-  qry_hatden(denno: number): Observable<mwI.Trhatden> {
+  qryHatden(denno: number): Observable<mwI.Trhatden> {
     // console.log(denno);
     // return new Promise( (resolve,reject) => {
     let observable: Observable<mwI.Trhatden> = new Observable<mwI.Trhatden>(observer => {
@@ -85,7 +85,7 @@ export class HatmeiService {
     });
     return observable;
   }
-  upd_hatden(denno, hatden, hatmei): Promise<string> {
+  updHatden(denno, hatden, hatmei): Promise<string> {
     const UpdateTran = gql`
       mutation upd_hatden($id: smallint!, $hdno: Int!,$_set: trhatden_set_input!,$obj:[trhatmei_insert_input!]!) {
         update_trhatden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -122,7 +122,7 @@ export class HatmeiService {
       });
     });
   }
-  ins_hatden(hatden, hatmei): Promise<string> {
+  insHatden(hatden, hatmei): Promise<string> {
     const InsertTran = gql`
       mutation ins_hatden($obj:[trhatden_insert_input!]!,$objm:[trhatmei_insert_input!]!) {
         insert_trhatden(objects: $obj)  {
@@ -146,7 +146,7 @@ export class HatmeiService {
       });
     });
   }
-  get_hdsta(hmei): string {
+  getHdsta(hmei): string {
     let flg0: boolean = false;//発注済
     let flg1: boolean = false;//入荷予定あり
     let flg2: boolean = false;//入荷確定あり

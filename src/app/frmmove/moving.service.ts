@@ -115,7 +115,7 @@ export class MovingService {
   constructor(public usrsrv: UserService,
     private apollo: Apollo) { }
 
-  qry_movden(denno: number): Observable<Movsub> {
+  qryMovden(denno: number): Observable<Movsub> {
     let observable: Observable<Movsub> = new Observable<Movsub>(observer => {
       this.apollo.watchQuery<any>({
         query: this.GetTran,
@@ -134,7 +134,7 @@ export class MovingService {
     return observable;
   }
 
-  upd_zaiko(zai: any) {
+  updZaiko(zai: any) {
     const UpdateTran = gql`
       mutation upd_zaiko($id:smallint!,$scd:String!,$gcd:String!,$day:date!,$inc: trzaiko_inc_input!) {
         update_trzaiko(where:{id:{_eq:$id},scode:{_eq:$scd},gcode:{_eq:$gcd},day:{_eq:$day}}, _inc: $inc)  {
@@ -182,7 +182,7 @@ export class MovingService {
     });
   }
 
-  upd_movden(denno, movsub, movmei): Promise<string> {
+  updMovden(denno, movsub, movmei): Promise<string> {
     const UpdateTran = gql`
       mutation upd_movsub($id: smallint!, $dno: Int!,$_set: trmovsub_set_input!,$obj:[trmovden_insert_input!]!) {
         update_trmovsub(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: $_set)  {
@@ -219,7 +219,7 @@ export class MovingService {
       });
     });
   }
-  ins_movden(movsub, movmei): Promise<string> {
+  insMovden(movsub, movmei): Promise<string> {
     const InsertTran = gql`
       mutation ins_movsub($obj:[trmovsub_insert_input!]!,$objm:[trmovden_insert_input!]!) {
         insert_trmovsub(objects: $obj)  {

@@ -2,19 +2,20 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { Trans, TransService } from './trans.service';
+import { Trans, TransService } from './../services/trans.service';
 import { UserService } from './../services/user.service';
 
 
 @Component({
   selector: 'app-trantbl',
   templateUrl: './trantbl.component.html',
-  styleUrls: ['./trantbl.component.scss']
+  styleUrls: ['./../tbl.component.scss']
 })
 export class TrantblComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   public dataSource: MatTableDataSource<Trans>;
-  public displayedColumns = ['ttype', 'sday', 'yday', 'aitec', 'aiten', 'denno', 'mline', 'tcode', 'biko', 'insuu', 'ousuu', 'zaisu', 'yotei', 'wait'];
+  public displayedColumns = ['ttype', 'sday', 'yday', 'aitec', 'aiten', 'denno', 'mline', 'tcode', 'biko', 'insuu',
+    'ousuu', 'zaisu', 'yotei', 'wait'];
 
   constructor(public trnsrv: TransService,
     public usrsrv: UserService,
@@ -70,7 +71,7 @@ export class TrantblComponent implements OnInit {
   }
   refresh(): void {
     // console.log(this.trnsrv.tbldata);
-    this.dataSource = new MatTableDataSource<Trans>(this.trnsrv.sort_tblData(this.trnsrv.tbldata));
+    this.dataSource = new MatTableDataSource<Trans>(this.trnsrv.sortTblData(this.trnsrv.tbldata));
     this.dataSource.paginator = this.paginator;
     this.cdRef.detectChanges();
   }

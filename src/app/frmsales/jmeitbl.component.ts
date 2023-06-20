@@ -11,7 +11,7 @@ import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
 import { StockService } from './../services/stock.service';
 // import { GoodsService } from './../services/goods.service';
-import { EdaService } from './../share/adreda/eda.service';
+import { MembsService } from './../mstmember/membs.service';
 import { JyumeiService } from './jyumei.service';
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
@@ -21,7 +21,7 @@ import { take } from 'rxjs/operators';
 @Component({
   selector: 'app-jmeitbl',
   templateUrl: './jmeitbl.component.html',
-  styleUrls: ['./jmeitbl.component.scss'],
+  styleUrls: ['./../tbl.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class JmeitblComponent implements OnInit {
@@ -44,6 +44,7 @@ export class JmeitblComponent implements OnInit {
   setZai = [];
   defCol = ['chk',
     'line',
+    'line2',
     'gcode',
     'gtext',
     'suu',
@@ -51,7 +52,7 @@ export class JmeitblComponent implements OnInit {
     'rate',
     'tanka',
     'tinmoney',
-    'mbikou',
+    'mmemo',
     'pable',
     'spec',
     'spdet'];
@@ -78,20 +79,20 @@ export class JmeitblComponent implements OnInit {
     public strsrv: StoreService,
     public stcsrv: StockService,
     // public gdssrv: GoodsService,
-    public edasrv: EdaService,
+    public memsrv: MembsService,
     public jmisrv: JyumeiService) { }
 
   ngOnInit(): void {
     this.displayedColumns = this.defCol;
-    this.add_rows(1);
+    this.addRows(1);
     this.refresh();
     // console.log(this.frmArr.getRawValue()[this.getIdx(0)]);
   }
 
   calcTot() {
     let lcgtotalzn: number = 0;
-    let lcsouryouzn: number = 0;
-    let lctesuuzn: number = 0;
+    let lcsoryozn: number = 0;
+    let lctesuzn: number = 0;
     let lcnebikizn: number = 0;
     let lctaxtotal: number = 0;
     let lctotal: number = 0;
@@ -106,10 +107,10 @@ export class JmeitblComponent implements OnInit {
           lcgtotalzn += arr[i]['toutmoney'];
           break;
         case '1':
-          lcsouryouzn += arr[i]['toutmoney'];
+          lcsoryozn += arr[i]['toutmoney'];
           break;
         case '2':
-          lctesuuzn += arr[i]['toutmoney'];
+          lctesuzn += arr[i]['toutmoney'];
           break;
         case '3':
           lcnebikizn += arr[i]['toutmoney'];
@@ -126,11 +127,11 @@ export class JmeitblComponent implements OnInit {
       lctaxtotal += arr[i]['taxmoney'];;
       lcgenka += arr[i]['tgenka'];
     }
-    lctotal = lcgtotalzn + lcsouryouzn + lctesuuzn + lcnebikizn + lctaxtotal;
+    lctotal = lcgtotalzn + lcsoryozn + lctesuzn + lcnebikizn + lctaxtotal;
     this.parentForm.patchValue({
       gtotalzn: lcgtotalzn,
-      souryouzn: lcsouryouzn,
-      tesuuzn: lctesuuzn,
+      soryozn: lcsoryozn,
+      tesuzn: lctesuzn,
       nebikizn: lcnebikizn,
       taxtotal: lctaxtotal,
       total: lctotal,
@@ -236,38 +237,40 @@ export class JmeitblComponent implements OnInit {
       this.frmArr.removeAt(fordel);
     })
     // console.log(calc,sour);
-    let j: number = this.edasrv.adrs.findIndex(obj => obj.eda == this.parentForm.getRawValue()['nadr']);
-    let sufi: string = "";
-    // console.log(this.parentForm.value,j);
-    if (!this.edasrv.adrs[j].region.indexOf('北海道')) {
-      sufi = '-01';
-    } else if (!this.edasrv.adrs[j].region.indexOf('沖縄県')) {
-      sufi = '-47';
-    }
-    for (let kbn in calc) {
-      kogu += Math.ceil(calc[kbn]);
-      if (sour[kbn] > 0) {
-        sour[kbn] += Math.ceil(calc[kbn]);
-      } else {
-        sour[kbn] = Math.ceil(calc[kbn]);
+    let j: number = this.memsrv.adrs.findIndex(obj => obj.eda == this.parentForm.getRawValue()['nadr']);
+    if (j > -1) {
+      let sufi: string = "";
+      // console.log(this.parentForm.value,j);
+      if (!this.memsrv.adrs[j].region.indexOf('北海道')) {
+        sufi = '-01';
+      } else if (!this.memsrv.adrs[j].region.indexOf('沖縄県')) {
+        sufi = '-47';
+      }
+      for (let kbn in calc) {
+        kogu += Math.ceil(calc[kbn]);
+        if (sour[kbn] > 0) {
+          sour[kbn] += Math.ceil(calc[kbn]);
+        } else {
+          sour[kbn] = Math.ceil(calc[kbn]);
+        }
+      }
+      for (let kbn in sour) {
+        let lcgcd: string;
+        if (kbn == 'null') {
+          lcgcd = 'Z01' + sufi;
+        } else {
+          lcgcd = 'Z01' + '-' + kbn + sufi;
+        }
+        this.insRows([lcgcd + "\t" + sour[kbn]], false);
+      }
+      if (this.parentForm.value.pcode == '9') {
+        this.insRows(["Z02" + "\t" + "1"], false);
+      }
+      if (mall > 0) {
+        this.insRows(["MALL" + "\t" + mall], false);
       }
     }
-    for (let kbn in sour) {
-      let lcgcd: string;
-      if (kbn == 'null') {
-        lcgcd = 'Z01' + sufi;
-      } else {
-        lcgcd = 'Z01' + '-' + kbn + sufi;
-      }
-      this.insRows([lcgcd + "\t" + sour[kbn]], false);
-    }
-    if (this.parentForm.value.pcode == '9') {
-      this.insRows(["Z02" + "\t" + "1"], false);
-    }
-    if (mall > 0) {
-      this.insRows(["MALL" + "\t" + mall], false);
-    }
-    this.auto_fil();
+    this.autoFil();
     this.parentForm.get('okurisuu').setValue(kogu);
   }
 
@@ -296,7 +299,7 @@ export class JmeitblComponent implements OnInit {
 
   async toFrmsup() {
     //仕入先１件分の処理
-    this.jmisrv.denno = await this.jmisrv.get_denno();
+    this.jmisrv.denno = await this.jmisrv.getDenno();
     let hdno = await this.usrsrv.getNumber('hdenno', 1);
     let jmei = [];
     this.frmArr.controls
@@ -319,7 +322,7 @@ export class JmeitblComponent implements OnInit {
   }
 
   async toFrmmov() {
-    this.jmisrv.denno = await this.jmisrv.get_denno();
+    this.jmisrv.denno = await this.jmisrv.getDenno();
     let mdno = await this.usrsrv.getNumber('mdenno', 1);
     let jmei = [];
     this.frmArr.controls
@@ -343,19 +346,19 @@ export class JmeitblComponent implements OnInit {
   }
 
 
-  del_row(row: number) {
+  delRow(row: number) {
     this.frmArr.removeAt(row);
-    this.auto_fil();
+    this.autoFil();
   }
-  ins_row(flgCP: boolean, row: number) {
+  insRow(flgCP: boolean, row: number) {
     if (flgCP) {
       this.frmArr.insert(row, this.createRow(row, this.frmArr.controls[row - 1].value));
     } else {
       this.frmArr.insert(row, this.createRow(row));
     }
-    this.auto_fil();
+    this.autoFil();
   }
-  auto_fil() {
+  autoFil() {
     let i: number = 0;
     this.frmArr.controls
       .forEach(control => {
@@ -365,7 +368,7 @@ export class JmeitblComponent implements OnInit {
 
     this.calcTot();
   }
-  add_rows(rows: number) {
+  addRows(rows: number) {
     for (let i = 0; i < rows; i++) {
       this.frmArr.push(this.createRow(i + 1));
     }
@@ -373,11 +376,11 @@ export class JmeitblComponent implements OnInit {
   }
   createRow(i: number, jyumei?: mwI.Jyumei) {
     // console.log(i,jyumei);
-    let lcArr = this.fb.array([]);
-    let lcAr2 = this.fb.array([]);
-    if (jyumei?.gskbn == "1") {
+    let lcArr: FormArray = this.fb.array([]);
+    let lcAr2: FormArray = this.fb.array([]);
+    if (jyumei?.gskbn == "0" || jyumei?.gskbn == "1") { //数量区分"0：在庫品"または、"1：セット品"の場合
       jyumei.msgzais.forEach(e => {
-        if (e.msgoods.gskbn == "0") {
+        if (e.msgoods.gskbn == "0") { //数量区分"0：在庫品"の場合
           lcArr.push(this.fb.group({ zcode: e.zcode, irisu: e.irisu, msgoods: e.msgoods }));
           // lcAr2.push({eda:i,gcode:e.zcode,suu:e.irisu*jyumei?.suu,spec:null,spdet:null});
         }
@@ -396,7 +399,7 @@ export class JmeitblComponent implements OnInit {
       tanka: [jyumei?.tanka],
       toutmoney: [{ value: jyumei?.toutmoney, disabled: true }],
       tinmoney: [{ value: jyumei?.tinmoney, disabled: true }],
-      mbikou: [jyumei?.mbikou],
+      mmemo: [jyumei?.mmemo],
       spec: [jyumei?.spec],
       spdet: [jyumei?.spdet],
       pable: [{ value: jyumei?.pable, disabled: true }],
@@ -501,7 +504,9 @@ export class JmeitblComponent implements OnInit {
     // console.log(this.getMtbl(i,'trjyumzais'),this.frmArr.controls[i].get('trjyumzais'));
     this.getMtbl(i, 'trjyumzais').controls.forEach(e => {
       let j: number = this.setZai[i].findIndex(obj => obj.gcode == e.value.gcode);
-      lcdata.push({ eda: e.value.eda, gcode: e.value.gcode, suu: e.value.suu, spec: e.value.spec, spdet: e.value.spdet, pable: (this.setZai[i][j]?.stock - this.setZai[i][j]?.hikat - this.setZai[i][j]?.keepd) });
+      if (j > -1) {
+        lcdata.push({ eda: e.value.eda, gcode: e.value.gcode, suu: e.value.suu, spec: e.value.spec, spdet: e.value.spdet, pable: (this.setZai[i][j]?.stock - this.setZai[i][j]?.hikat - this.setZai[i][j]?.keepd) });
+      }
     });
 
     // console.log(lcdata);
@@ -610,7 +615,7 @@ export class JmeitblComponent implements OnInit {
     this.frmArr.controls[i].patchValue({ pable: null });
     this.jmisrv.subject.next(true);
     if (this.frmArr.controls[i].value.gskbn == "0") {
-      this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.frmArr.controls[i].value.scode).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.frmArr.controls[i].value.scode).then(result => {
         // console.log(result);
         let lcpable = (result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0;
         this.frmArr.controls[i].patchValue({ pable: lcpable });
@@ -628,7 +633,7 @@ export class JmeitblComponent implements OnInit {
     } else if (this.frmArr.controls[i].value.gskbn == "1") {
       this.stcsrv.getSetZai(this.frmArr.controls[i].value.scode, msgzais).then(result => {
         this.setZai[i] = result;
-        let lcpable = this.stcsrv.get_paabl(result);
+        let lcpable = this.stcsrv.getPaabl(result);
         this.frmArr.controls[i].patchValue({ pable: lcpable });
         if (lcpable > 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
           this.frmArr.controls[i].patchValue({ spec: '1' });
@@ -714,7 +719,7 @@ export class JmeitblComponent implements OnInit {
           tanka: (col[2] ?? +col[2]),
           toutmoney: 0,
           tinmoney: 0,
-          mbikou: null,
+          mmemo: null,
           spec: null,
           spdet: null,
           pable: 0,
@@ -774,7 +779,7 @@ export class JmeitblComponent implements OnInit {
     // console.log(this.frmArr.controls);
   }
 
-  set_jyumei(data) { //skbn:受注伝票出荷区分
+  setJyumei(data) { //skbn:受注伝票出荷区分
     this.frmArr.clear();
     // this.jyumei = [];
     this.jmisrv.trzaiko = [];
@@ -821,7 +826,7 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
 
-  add_newrow(i: number) {
+  addNewrow(i: number) {
     this.gcdInps.changes.pipe(take(1)).subscribe({  //最後に更新されたformArray内の項目にフォーカスを当てる
       next: changes => {
         changes.last.nativeElement.focus()
@@ -857,7 +862,7 @@ export class JmeitblComponent implements OnInit {
     }
 
   }
-  edit_jyumei(dno) {
+  editJyumei(dno) {
     this.jmisrv.trjyumei = [];
     this.jmisrv.trjmzai = [];
     this.frmArr.controls
@@ -872,7 +877,7 @@ export class JmeitblComponent implements OnInit {
           tanka: this.usrsrv.editFrmval(control, 'tanka'),
           toutmoney: this.usrsrv.editFrmval(control, 'toutmoney'),
           tinmoney: this.usrsrv.editFrmval(control, 'tinmoney'),
-          mbikou: this.usrsrv.editFrmval(control, 'mbikou'),
+          mmemo: this.usrsrv.editFrmval(control, 'mmemo'),
           spec: this.usrsrv.editFrmval(control, 'spec'),
           spdet: this.usrsrv.editFrmval(control, 'spdet'),
           genka: this.usrsrv.editFrmval(control, 'genka'),

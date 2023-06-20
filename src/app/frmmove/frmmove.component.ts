@@ -1,14 +1,13 @@
 import { Component, OnInit, HostListener, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, UntypedFormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { MatSpinner } from '@angular/material/progress-spinner';
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatLegacySpinner as MatSpinner } from '@angular/material/legacy-progress-spinner';
+import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
 import { Zaiko, Movsub, MovingService } from './moving.service';
 import { UserService } from './../services/user.service';
-import { EdaService } from './../share/adreda/eda.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
 import { OkuriService } from './../services/okuri.service';
@@ -24,11 +23,11 @@ import { filter } from 'rxjs/operators';
 })
 export class FrmmoveComponent implements OnInit {
   @ViewChild(MovtblComponent) movtbl: MovtblComponent;
-  form: FormGroup;
+  form: UntypedFormGroup;
   denno: number = 0;
   mode: number = 3;
   hktval: mwI.Sval[] = [];
-  rows: FormArray = this.fb.array([]);
+  rows: UntypedFormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -39,7 +38,7 @@ export class FrmmoveComponent implements OnInit {
     public okrsrv: OkuriService,
     public strsrv: StoreService,
     public movsrv: MovingService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private dialog: MatDialog,
     private overlay: Overlay,
     private cdRef: ChangeDetectorRef,
@@ -51,24 +50,24 @@ export class FrmmoveComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      day: new FormControl('', Validators.required),
-      incode: new FormControl('', Validators.required),
-      outcode: new FormControl('', Validators.required),
-      tcode: new FormControl('', Validators.required),
-      hcode: new FormControl(),
-      hday: new FormControl(),
-      htime: new FormControl(),
-      okurisuu: new FormControl(),
-      okurino: new FormControl(),
-      bikou: new FormControl(),
-      sbikou: new FormControl(),
-      obikou: new FormControl(),
+      day: new UntypedFormControl('', Validators.required),
+      incode: new UntypedFormControl('', Validators.required),
+      outcode: new UntypedFormControl('', Validators.required),
+      tcode: new UntypedFormControl('', Validators.required),
+      hcode: new UntypedFormControl(),
+      hday: new UntypedFormControl(),
+      htime: new UntypedFormControl(),
+      okurisuu: new UntypedFormControl(),
+      okurino: new UntypedFormControl(),
+      bikou: new UntypedFormControl(),
+      sbikou: new UntypedFormControl(),
+      obikou: new UntypedFormControl(),
       mtbl: this.rows
     });
-    this.okrsrv.get_haisou();
-    this.okrsrv.get_hokuri();
-    this.okrsrv.get_hktime();
-    this.strsrv.get_store();
+    this.okrsrv.getHaisou();
+    this.okrsrv.getHokuri();
+    this.okrsrv.getHktime();
+    this.strsrv.getStore();
   }
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
     this.route.paramMap.subscribe((params: ParamMap) => {
@@ -98,7 +97,7 @@ export class FrmmoveComponent implements OnInit {
         if (params.get('denno') !== null) {
           this.denno = +params.get('denno');
           // console.log(this.denno);
-          this.get_movden(this.denno);
+          this.getMovden(this.denno);
         }
         this.refresh();
       }
@@ -109,12 +108,12 @@ export class FrmmoveComponent implements OnInit {
     });
   }
 
-  get_movden(denno: number): void {
+  getMovden(denno: number): void {
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     };
     if (denno > 0) {
-      this.movsrv.qry_movden(denno).subscribe(
+      this.movsrv.qryMovden(denno).subscribe(
         result => {
           this.form.reset();
           if (result == null) {
@@ -125,7 +124,7 @@ export class FrmmoveComponent implements OnInit {
             let movsub: Movsub = result;
             this.form.patchValue(movsub);
             this.usrsrv.setTmstmp(movsub);
-            this.movtbl.set_movmei(movsub.trmovdens);
+            this.movtbl.setMovmei(movsub.trmovdens);
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             this.denno = denno;
             history.replaceState('', '', './frmmove/' + this.mode + '/' + this.denno);
@@ -143,25 +142,26 @@ export class FrmmoveComponent implements OnInit {
     }
     this.cdRef.detectChanges();
   }
-  get frmArr(): FormArray {
-    return this.form.get('mtbl') as FormArray;
+  get frmArr(): UntypedFormArray {
+    return this.form.get('mtbl') as UntypedFormArray;
   }
 
   onEnter() {
     this.denno = this.usrsrv.convNumber(this.denno);
-    this.get_movden(this.denno);
+    this.getMovden(this.denno);
   }
 
   openOkuri(hcode, value) {
-    window.open(this.okrsrv.get_url(hcode) + value, '_blank');
+    window.open(this.okrsrv.getUrl(hcode) + value, '_blank');
   }
 
   async setOkrno() {
-    let okrno: string = await this.okrsrv.set_okurino(this.form.value.hcode);
+    let okrno: string = await this.okrsrv.setOkurino(this.form.value.hcode);
     this.form.get('okurino').setValue(okrno);
   }
 
-  selHcd(value: string) {
+  selHcd(event: KeyboardEvent) {
+    let value: string = (event.target as HTMLInputElement)?.value;
     const i: number = this.okrsrv.hokuri.findIndex(obj => obj.code == value);
     if (i > -1) {
       this.hktval = [];
@@ -185,7 +185,7 @@ export class FrmmoveComponent implements OnInit {
       data => {
         if (typeof data != 'undefined') {
           this.denno = data.denno;
-          this.get_movden(this.denno);
+          this.getMovden(this.denno);
 
         }
       }
@@ -233,27 +233,27 @@ export class FrmmoveComponent implements OnInit {
     }
 
     if (this.mode == 2) {
-      let movmei = this.movtbl.get_movmei(this.denno);
-      this.movsrv.upd_movden(this.denno, movsub, movmei)
+      let movmei = this.movtbl.getMovmei(this.denno);
+      this.movsrv.updMovden(this.denno, movsub, movmei)
         .then(result => {
           this.usrsrv.toastSuc('移動伝票' + this.denno + 'の変更を保存しました');
 
           //  zaiko更新処理 (読込時分マイナス)
           this.movtbl.trzaiko.forEach(e => {
-            this.movsrv.upd_zaiko(e);
+            this.movsrv.updZaiko(e);
           });
 
           //  zaiko更新処理 (通常分プラス)
           movmei.forEach(e => {
             if (e.msgood.gskbn == "0") {
-              this.movsrv.upd_zaiko({
+              this.movsrv.updZaiko({
                 scode: movsub.incode,
                 gcode: e.gcode,
                 day: movsub.day,
                 movi: e.suu,
                 movo: 0
               });
-              this.movsrv.upd_zaiko({
+              this.movsrv.updZaiko({
                 scode: movsub.outcode,
                 gcode: e.gcode,
                 day: movsub.day,
@@ -262,14 +262,14 @@ export class FrmmoveComponent implements OnInit {
               });
             } else if (e.msgood.gskbn == "1") {
               e.msgood.msgzais.forEach(zai => {
-                this.movsrv.upd_zaiko({
+                this.movsrv.updZaiko({
                   scode: movsub.incode,
                   gcode: zai.zcode,
                   day: movsub.day,
                   movi: e.suu * zai.irisu,
                   movo: 0
                 });
-                this.movsrv.upd_zaiko({
+                this.movsrv.updZaiko({
                   scode: movsub.outcode,
                   gcode: zai.zcode,
                   day: movsub.day,
@@ -287,7 +287,7 @@ export class FrmmoveComponent implements OnInit {
         });
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
-      const movmei = this.movtbl.get_movmei(this.denno);
+      const movmei = this.movtbl.getMovmei(this.denno);
       const trmovsub: Movsub[] = [{
         ...{
           id: this.usrsrv.compid,
@@ -297,7 +297,7 @@ export class FrmmoveComponent implements OnInit {
         }
         , ...movsub,
       }]
-      this.movsrv.ins_movden(trmovsub, movmei)
+      this.movsrv.insMovden(trmovsub, movmei)
         .then(result => {
           this.usrsrv.toastSuc('移動伝票' + this.denno + 'を新規登録しました');
           this.form.markAsPristine();
@@ -317,7 +317,7 @@ export class FrmmoveComponent implements OnInit {
     this.form.get('tcode').setValue(this.usrsrv.staff?.code);
     this.form.get('day').setValue(new Date());
     this.movtbl.frmArr.clear();
-    this.movtbl.add_rows(1);
+    this.movtbl.addRows(1);
     this.refresh();
 
   }

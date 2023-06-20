@@ -57,10 +57,10 @@ export class JyumeiService {
         htime
         okurisuu
         okurino
-        bikou
-        nbikou
-        obikou
-        sbikou
+        dmemo
+        nmemo
+        omemo
+        smemo
         cusden
         ryoate
         daibiki
@@ -69,8 +69,8 @@ export class JyumeiService {
         shobunrui
         tcode1
         gtotalzn
-        souryouzn
-        tesuuzn
+        soryozn
+        tesuzn
         nebikizn
         taxtotal
         total
@@ -90,7 +90,7 @@ export class JyumeiService {
           tanka
           toutmoney
           tinmoney
-          mbikou
+          mmemo
           spec
           spdet
           genka
@@ -142,7 +142,7 @@ export class JyumeiService {
     // private toastr: ToastrService
   ) { }
 
-  qry_jyuden(denno: number): Observable<mwI.Trjyuden> {
+  qryJyuden(denno: number): Observable<mwI.Trjyuden> {
     let observable: Observable<mwI.Trjyuden> = new Observable<mwI.Trjyuden>(observer => {
       this.apollo.watchQuery<any>({
         query: this.GetTran,
@@ -161,7 +161,7 @@ export class JyumeiService {
     });
     return observable;
   }
-  async get_denno() {
+  async getDenno() {
     if (this.denno == 0) {
       return await this.usrsrv.getNumber('jdenno', 1);
     } else {
@@ -169,7 +169,7 @@ export class JyumeiService {
     }
   }
 
-  upd_zaiko(zai: any) {
+  updZaiko(zai: any) {
     const UpdateTran = gql`
       mutation upd_zaiko($id:smallint!,$scd:String!,$gcd:String!,$day:date!,$inc: trzaiko_inc_input!) {
         update_trzaiko(where:{id:{_eq:$id},scode:{_eq:$scd},gcode:{_eq:$gcd},day:{_eq:$day}}, _inc: $inc)  {
@@ -216,7 +216,7 @@ export class JyumeiService {
     });
   }
 
-  upd_jyuden(denno, jyuden, jyumei, jyumzai): Promise<string> {
+  updJyuden(denno, jyuden, jyumei, jyumzai): Promise<string> {
     const UpdateTran = gql`
       mutation upd_jyuden($id: smallint!, $hdno: Int!,$_set: trjyuden_set_input!,$obj:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
         update_trjyuden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -261,7 +261,7 @@ export class JyumeiService {
     });
   }
 
-  ins_jyuden(jyuden, jyumei, jyumzai): Promise<string> {
+  insJyuden(jyuden, jyumei, jyumzai): Promise<string> {
     const InsertTran = gql`
       mutation ins_jyuden($obj:[trjyuden_insert_input!]!,$objm:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
         insert_trjyuden(objects: $obj)  {
@@ -290,7 +290,7 @@ export class JyumeiService {
     });
   }
 
-  del_jyuden(denno, flg): void {
+  delJyuden(denno, flg): void {
     const DeleteTran = gql`
       mutation del_jyuden($id: smallint!, $dno: Int!, $flg: Boolean, $uat: timestamptz!, $uby: String!) {
         update_trjyuden(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: {del: $flg, updated_at: $uat, updated_by: $uby})  {
@@ -321,7 +321,7 @@ export class JyumeiService {
         if (flg = false) {
           e.suu = e.suu * -1;
         }
-        this.upd_zaiko(e);
+        this.updZaiko(e);
       });
     }, (error) => {
       this.usrsrv.toastErr('データベースエラー', '受注伝票' + denno + 'の取消(解除)ができませんでした');
@@ -329,14 +329,14 @@ export class JyumeiService {
     });
   }
 
-  get_jdsta(hmei): string {
+  getJdsta(hmei): string {
 
     let ret: string = "";
 
     return ret;
   }
 
-  async check_amazon(hcode, pOkrno: string): Promise<string> {
+  async checkAmazon(hcode, pOkrno: string): Promise<string> {
     const CheckOkrno = gql`
       query get_jyuden($okrno: String!) {
         trjyuden(where: {id: {_eq: 1}, mcode: {_eq: "408223"}, okurino: {_eq: $okrno}}) {
@@ -356,7 +356,7 @@ export class JyumeiService {
           if (data.trjyuden.length == 0) {
             return resolve(pOkrno);
           } else {
-            this.okrsrv.set_okurino(hcode).then(value => this.check_amazon(hcode, value));
+            this.okrsrv.setOkurino(hcode).then(value => this.checkAmazon(hcode, value));
           }
         });
     });

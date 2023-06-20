@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, HostListener, ElementRef, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -7,16 +7,18 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
-import { VendsService } from './../services/vends.service';
+import { DownloadService } from './../services/download.service';
+import { VendsService } from './vends.service';
 // import { ToastrService } from 'ngx-toastr';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 
 @Component({
   selector: 'app-mstvendor',
   templateUrl: './mstvendor.component.html',
-  styleUrls: ['./mstvendor.component.scss']
+  styleUrls: ['./../app.component.scss'],
+  encapsulation: ViewEncapsulation.None //グローバルにCSSが効く
 })
-export class MstvendorComponent implements OnInit {
+export class MstvendorComponent implements OnInit, AfterViewInit {
   vcd: string;
   form: FormGroup;
   mode: number = 3;
@@ -28,6 +30,7 @@ export class MstvendorComponent implements OnInit {
     private dialog: MatDialog,
     public usrsrv: UserService,
     public bunsrv: BunruiService,
+    private dwlsrv: DownloadService,
     private vensrv: VendsService,
     private apollo: Apollo
     // private toastr: ToastrService
@@ -36,8 +39,8 @@ export class MstvendorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.bunsrv.get_bunrui();
-    this.vensrv.get_vendors();
+    this.bunsrv.getBunrui();
+    this.vensrv.getVendors();
     this.form = this.fb.group({
       mtax: new FormControl(''),
       currency: new FormControl(''),
@@ -71,15 +74,27 @@ export class MstvendorComponent implements OnInit {
       } else {
         this.mode = +params.get('mode');
       }
+      this.refresh();
       if (params.get('vcd') !== null) {
         this.vcd = params.get('vcd');
         this.get_vendor();
       }
     });
   }
+  ngAfterViewInit() {
+    const script = document.createElement('script');
+    script.src = "https://yubinbango.github.io/yubinbango/yubinbango.js";
+
+    script.charset = "UTF-8";
+    const div = document.getElementById('script');
+    div.insertAdjacentElement('afterend', script);
+  }
 
   onEnter(): void {
     this.elementRef.nativeElement.querySelector('button').focus();
+    if (this.vcd) {
+      this.get_vendor();
+    }
   }
 
   vcdHelp(): void {
@@ -90,8 +105,8 @@ export class MstvendorComponent implements OnInit {
       data => {
         if (typeof data != 'undefined') {
           this.vcd = data.code;
+          this.get_vendor();
         }
-        this.refresh();
       }
     );
   }
@@ -153,28 +168,40 @@ export class MstvendorComponent implements OnInit {
   modeToCre(): void {
     this.mode = 1;
     this.form.reset();
-    this.form.enable();
+    this.refresh();
     this.vcd = "新規登録";
   }
 
   modeToUpd(): void {
     this.mode = 2;
-    this.form.enable();
-    // history.replaceState('','','./mstgoods/' + this.mode + '/' + this.grpcd);
+    this.refresh();
+    history.replaceState('', '', './mstvendor/' + this.mode + '/' + this.vcd);
   }
 
   save(): void {
 
   }
 
+  async getAdr(event: KeyboardEvent) {
+    this.dwlsrv.getAdr((event.target as HTMLInputElement)?.value).then(result => {
+      // console.log(result, result.results)
+      this.form.patchValue({
+        region: result.results[0].address1,
+        local: result.results[0].address2,
+        street: result.results[0].address3
+      });
+
+
+    })
+  }
   cancel(): void {
     if (this.mode == 1) {
       this.vcd = '';
     }
     this.mode = 3;
-    this.form.disable();
+    this.refresh();
     this.form.markAsPristine();
-    // history.replaceState('','','./mstgoods/' + this.mode + '/' + this.grpcd);
+    history.replaceState('', '', './mstvendor/' + this.mode + '/' + this.vcd);
   }
 
   shouldConfirmOnBeforeunload(): boolean {
@@ -189,9 +216,12 @@ export class MstvendorComponent implements OnInit {
   }
 
   refresh(): void {
-    if (this.vcd) {
-      this.get_vendor();
+    if (this.mode == 3) {
+      this.form.disable();
+    } else {
+      this.form.enable();
     }
+    // this.cdRef.detectChanges();
   }
 
 }

@@ -1,66 +1,67 @@
-<mat-toolbar [color]="mode==3 ? 'primary' : mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
-  <div class="icon-area" fxLayout="row wrap">
-    <button mat-button (click)="modeToCre()" *ngIf="mode==3">
+<mat-toolbar [color]="usrsrv.getColor(mode)" class="toolbar mat-elevation-z8">
+  <div class="icon-area" class="flex flex-nowrap">
+    <button mat-flat-button (click)="modeToCre()" *ngIf="mode==3" [color]="usrsrv.getColor(mode)">
       <mat-icon>add_box</mat-icon>新規
     </button>
-    <button mat-button (click)="modeToUpd()" *ngIf="mode==3 && this.gdssrv.grpcd">
+    <button mat-flat-button (click)="modeToUpd()" *ngIf="mode==3 && this.gdssrv.grpcd" [color]="usrsrv.getColor(mode)">
       <mat-icon>edit</mat-icon>編集
     </button>
-    <button mat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
+    <button mat-flat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3" [color]="usrsrv.getColor(mode)">
       <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
     </button>
-    <button mat-button (click)="cancel()" *ngIf="mode!=3">
+    <button mat-flat-button (click)="cancel()" *ngIf="mode!=3" [color]="usrsrv.getColor(mode)">
       <mat-icon>cancel</mat-icon>中止
     </button>
-    <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
-      <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label>
-      <input matInput [ngModel]="gdssrv.grpcd" gcdInput (ngModelChange)="gdssrv.grpcd=usrsrv.convUpper($event)"
-        (keydown.f4)="grpcdHelp()" [disabled]="mode==2 && form.dirty" (keyup.enter)="get_ggroup(gdssrv.grpcd)"
-        (blur)="refresh()" [ngModelOptions]="{standalone: true}">
+    <mat-form-field>
+      <!-- <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label> -->
+      <input [ngModel]="gdssrv.grpcd" matInput (change)="convUpper($any($event))" (keydown.f4)="grpcdHelp()"
+        [disabled]="mode==2 && form.dirty" (keyup.enter)="getGgroup(gdssrv.grpcd)" (blur)="refresh()"
+        [ngModelOptions]="{standalone: true}" placeholder="商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ">
       <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" [style.display]="mode==3 ? 'inline-block' : 'none'">
           <mat-icon>keyboard_arrow_up</mat-icon>
         </button>
         <button mat-button mat-icon-button matSuffix (click)="setPrev()" [style.display]="mode==3 ? 'inline-block' : 'none'">
           <mat-icon>keyboard_arrow_down</mat-icon>
         </button> -->
-      <button mat-button mat-icon-button matSuffix (click)="grpcdHelp()" *ngIf="mode==3">
-        <mat-icon>find_replace</mat-icon>
-      </button>
-      <button mat-button mat-icon-button matSuffix (click)="gcdHelp()" *ngIf="mode==3">
-        <mat-icon>find_replace</mat-icon>
-      </button>
     </mat-form-field>
-    <button mat-button (click)="diaImage()">
+    <button mat-icon-button matSuffix (click)="grpcdHelp()" *ngIf="mode==3" matTooltip="ｸﾞﾙｰﾌﾟｺｰﾄﾞ検索">
+      <mat-icon>find_replace</mat-icon>
+    </button>
+    <button mat-icon-button matSuffix (click)="gcdHelp()" *ngIf="mode==3" matTooltip="商品ｺｰﾄﾞ検索">
+      <mat-icon>find_replace</mat-icon>
+    </button>
+    <button mat-flat-button (click)="diaImage()" [color]="usrsrv.getColor(mode)">
       <mat-icon>perm_media</mat-icon>画像・仕様書
     </button>
     <!-- <button mat-button (click)="toTreat()" *ngIf="mode!==1">
         <mat-icon>question_answer</mat-icon>問合せ
       </button> -->
-    <button mat-button><a mat-button [routerLink]="['/frmtreat']" [queryParams]="{ grpcd: gdssrv.grpcd}"
-        *ngIf="mode!==1" target="_blank">
+    <button mat-flat-button [color]="usrsrv.getColor(mode)"><a mat-flat-button [routerLink]="['/frmtreat']"
+        [queryParams]="{ grpcd: gdssrv.grpcd}" *ngIf="mode!==1" target="_blank" [color]="usrsrv.getColor(mode)">
         <mat-icon>question_answer</mat-icon>問合せ
       </a></button>
-    <button mat-button (click)="test()">
+    <button mat-flat-button (click)="test()" [color]="usrsrv.getColor(mode)">
       <!-- <button mat-button (click)="refresh()"> -->
       <mat-icon>autorenew</mat-icon>再表示
     </button>
-    <button mat-button><a mat-button href="{{usrsrv.manurl + '&ActiveCell=%27goods%27!A1'}}" target="_blank">
+    <button mat-flat-button [color]="usrsrv.getColor(mode)"><a mat-flat-button
+        href="{{usrsrv.manurl + '&ActiveCell=%27goods%27!A1'}}" target="_blank" [color]="usrsrv.getColor(mode)">
         <mat-icon>help</mat-icon>ヘルプ
       </a></button>
   </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="column" (keydown.enter)="canEnter($event)">
+<form [formGroup]="form" class="flex flex-wrap" (keydown.enter)="canEnter($any($event))">
   <!-- <div > -->
-  <mat-card fxLayout="column" fxLayoutGap="5px">
-    <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
+  <mat-card class="flex flex-wrap">
+    <mat-card-header class="flex flex-wrap">
       <mat-card-title>
         {{mode|modetxt}}基本情報
       </mat-card-title>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
     <mat-card-content>
-      <div fxLayout="column">
-        <div fxLayoutGap="5px">
+      <div class="flex flex-column inline-grid">
+        <div class="flex">
           <mat-form-field style="width:20em">
             <mat-label>グループ名</mat-label>
             <input tabIndex="1" matInput formControlName="name" required name="first-fld" id="first-fld"
@@ -69,12 +70,12 @@
           <mat-form-field>
             <mat-label>フリガナ</mat-label>
             <input #kanafld tabIndex="2" matInput formControlName="kana" required name="kanafld" id="kanafld"
-              (change)="updKana($event.target.value)">
+              (change)="updKana(kanafld.value)">
           </mat-form-field>
           <mat-form-field style="width:8em">
             <mat-label>商品区分</mat-label>
             <mat-select tabIndex="3" #msel01 formControlName="gkbn" required (keydown.enter)="msel01.close()">
-              <mat-option *ngFor="let sval of bunsrv.kbn.gkbn" [value]="sval.value">
+              <mat-option *ngFor="let sval of bunsrv.kbn['gkbn']" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
@@ -82,7 +83,7 @@
           <mat-form-field>
             <mat-label>カテゴリ</mat-label>
             <mat-select tabIndex="4" #msel02 formControlName="category" required (keydown.enter)="msel02.close()">
-              <mat-option *ngFor="let sval of bunsrv.kbn.category" [value]="sval.value">
+              <mat-option *ngFor="let sval of bunsrv.kbn['category']" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
@@ -106,7 +107,7 @@
           <mat-form-field style="width: 7em;">
             <mat-label>仕入先</mat-label>
             <input tabIndex="6" matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
-            <button mat-button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode!==3">
+            <button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode!==3">
               <mat-icon>find_replace</mat-icon>
             </button>
           </mat-form-field>
@@ -118,12 +119,10 @@
           </mat-form-field>
           <!-- <mat-checkbox formControlName="del">削除済</mat-checkbox> -->
         </div>
-        <div fxLafxLayout="row wrap" fxLayoutGap="5px">
-          <mat-form-field class="txtar">
-            <mat-label>備考</mat-label>
-            <textarea tabIndex="8" matInput formControlName="bikou" matTextareaAutosize></textarea>
-          </mat-form-field>
-        </div>
+        <mat-form-field class="txtar">
+          <mat-label>備考</mat-label>
+          <textarea tabIndex="8" matInput formControlName="memo" matTextareaAutosize></textarea>
+        </mat-form-field>
       </div>
     </mat-card-content>
   </mat-card>
@@ -134,12 +133,10 @@
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <app-gdstbl [parentForm]="form" (action)="ins_tnkrow($event)"></app-gdstbl>
-      <!-- <app-jmeitbl [parentForm]="form"></app-jmeitbl> -->
+      <app-gdstbl [parentForm]="form" (action)="insTnkrow($event)"></app-gdstbl>
     </mat-card-content>
   </mat-card>
-  <!-- </div> -->
-  <!-- <div fxLayout="row wrap"> -->
+
   <mat-card>
     <mat-card-header>
       <mat-card-title>
@@ -150,5 +147,4 @@
       <app-gtnktbl [parentForm]="form"></app-gtnktbl>
     </mat-card-content>
   </mat-card>
-  <!-- </div> -->
 </form>

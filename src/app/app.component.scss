@@ -1,19 +1,25 @@
-::ng-deep.mat-form-field.frm-fld-in-bar {
-    .mat-form-field-wrapper {
-        padding-bottom: 0;
-    }
-    .mat-form-field-underline {
-        bottom: 0;
-    }
+// ::ng-deep.mat-mdc-form-field.frm-fld-in-bar {
+//     .mat-form-text-field-wrapper {
+//         padding: 0;
+//     }
+//     .mat-form-field-underline {
+//         bottom: 0;
+//     }
+// }
+:host ::ng-deep.mat-mdc-form-field input:disabled {
+  color: black !important;
 }
-::ng-deep.mat-form-field input:disabled {
-  color: black;
-}
-::ng-deep.mat-form-field select:disabled {
-  color: black;
+// ::ng-deep.mat-form-field input:disabled {
+//   color: black !important;
+// }
+// ::ng-deep.mat-mdc-form-field select:disabled {
+//   color: black;
+// }
+:host ::ng-deep.mat-mdc-select-value-text {
+  color: black !important;
 }
 // Add in style.scss as we are overriding css of global mat-select class which is part of other module.
-::ng-deep.mat-form-field .mat-select-disabled .mat-select-value {
+:host ::ng-deep.mat-mdc-form-field .mat-select .mat-select-value {
   color: black;
 }
 .RouterOutlet {
@@ -23,15 +29,25 @@ mat-toolbar {
     position: fixed;
     z-index: 100; 
 }
+mat-toolbar input {
+  color: black;
+  border-radius: 5px;
+  padding-left: .4em;
+}
 mat-toolbar + *{
     padding-top: 70px;    
 }
 mat-form-field {
     height: 3em;
-    font-size: 1em;
+    // font-size: 1em;
     padding-left: .4em;
   }
-
+:host ::ng-deep.mat-mdc-text-field-wrapper {
+    padding:0;
+}
+:host ::ng-deep.mat-mdc-form-field-subscript-wrapper {
+  display:none;
+}
 .nmtxt {
   padding-bottom: 5px;
   margin-right: 7px; 
@@ -48,10 +64,10 @@ mat-form-field {
   margin:0px;
 }
 
-.fw_b * {
-  // font-weight:bold;
-  font-size:large;
-}
+// .fw_b * {
+//   // font-weight:bold;
+//   font-size:large;
+// }
 
 .txtar {
   width: 100%;

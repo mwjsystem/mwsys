@@ -1,29 +1,24 @@
-<mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between" style="margin-bottom:10px;">
-    <h2 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品グループコード検索
-    </h2>
-    <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"
-        [pageSizeOptions]="[20, 50, 100, 250, 1000]">
-    </mat-paginator>
-    <button class="mat-raised-button" (click)="close()">閉じる</button>
-</mat-dialog-actions>
-<mat-dialog-content style="max-height: 85vh;">
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品グループコード検索</h1>
+<mat-dialog-content>
     <div class="mat-elevation-z8">
-        <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;">
-            <button class="mat-raised-button" (click)="filterGcd()">検索</button>
-            <mat-form-field>
-                <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
-                <input matInput [(ngModel)]="code" (change)="code=usrsrv.convUpper($event.target.value)"
-                    [ngModelOptions]="{standalone: true}">
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>ﾌﾘｶﾞﾅ</mat-label>
-                <input matInput [(ngModel)]="kana" (change)="kana=usrsrv.convKana($event.target.value)"
-                    [ngModelOptions]="{standalone: true}">
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>名称</mat-label>
-                <input matInput [(ngModel)]="name" [ngModelOptions]="{standalone: true}">
-            </mat-form-field>
+        <mat-toolbar class="flex flex-row" style="font-size: 10px;">
+            <button mat-raised-button (click)="filterGcd()">検索</button>
+            <div class="flex flex-wrap space-x-4">
+                <mat-form-field>
+                    <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
+                    <input matInput [(ngModel)]="code" (change)="code=convUpper($any($event))"
+                        [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>ﾌﾘｶﾞﾅ</mat-label>
+                    <input matInput [(ngModel)]="kana" (change)="kana=convKana($any($event))"
+                        [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>名称</mat-label>
+                    <input matInput [(ngModel)]="name" [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
+            </div>
         </mat-toolbar>
         <table mat-table [dataSource]="dataSource" aria-label="Elements">
             <ng-container matColumnDef="code">
@@ -43,7 +38,7 @@
                 <td mat-cell *matCellDef="let row">
                     <!-- <mat-form-field> -->
                     <mat-select [value]="row.gkbn" class="noArrow">
-                        <mat-option *ngFor="let sval of bunsrv.kbn.gkbn" [value]="sval.value">
+                        <mat-option *ngFor="let sval of bunsrv.kbn['gkbn']" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
                     </mat-select>
@@ -69,6 +64,11 @@
             <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setGrpcd(row)"></tr>
         </table>
-
+        <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"
+            [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+        </mat-paginator>
     </div>
 </mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-raised-button (click)="close()">閉じる</button>
+</mat-dialog-actions>

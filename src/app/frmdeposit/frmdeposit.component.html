@@ -50,7 +50,7 @@
                         <div fxLayout="row wrap">
                             <mat-form-field>
                                 <mat-label>受注伝票</mat-label>
-                                <input matInput formControlName="jdenno" (change)="get_jyuden($event.target.value)">
+                                <input matInput formControlName="jdenno" (change)="getJyuden($event.target.value)">
                                 <button type="button" mat-icon-button matSuffix (click)="jdennoHelp()"
                                     *ngIf="frmArr.enabled">
                                     <mat-icon>find_replace</mat-icon>

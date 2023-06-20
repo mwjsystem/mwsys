@@ -9,16 +9,13 @@ import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstm';
-// import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { BunshoService } from './../services/bunsho.service';
 import { OkuriService } from './../services/okuri.service';
 import { StaffService } from './../services/staff.service';
-import { MembsService } from './../services/membs.service';
-import { McdService } from './../share/mcdhelp/mcd.service';
+import { MembsService } from './membs.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
-import { EdaService } from './../share/adreda/eda.service';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { AddressComponent } from './../share/address/address.component';
 import { MsprocComponent } from './../share/msproc/msproc.component';
@@ -32,17 +29,15 @@ class Sval {
 @Component({
   selector: 'app-mstmember',
   templateUrl: './mstmember.component.html',
-  styleUrls: ['./../app.component.scss'],
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./../app.component.scss']
 })
 export class MstmemberComponent implements OnInit, AfterViewInit {
   @ViewChildren(AddressComponent)
   private children: QueryList<AddressComponent>;
   form: FormGroup;
-  // mcd:  number=0;
   mcd: string = "";
   mode: number = 3;
+
   gadrVal: Sval[] = [
     { value: "0", viewval: "基本住所", dis: false },
     { value: "1", viewval: "その他住所", dis: true },
@@ -59,19 +54,15 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     private title: Title,
     private route: ActivatedRoute,
     private dialog: MatDialog,
-    public mcdsrv: McdService,
-    public edasrv: EdaService,
     public bunsrv: BunruiService,
     public bnssrv: BunshoService,
     public stfsrv: StaffService,
     public okrsrv: OkuriService,
     public memsrv: MembsService,
     private apollo: Apollo,
-    // private toastr: ToastrService,
     private overlay: Overlay,
     private cdRef: ChangeDetectorRef,
     private zone: NgZone) {
-    // zone.onMicrotaskEmpty.subscribe(() => { console.log('mstmember detect change'); });
     this.title.setTitle('顧客マスタ(MWSystem)');
   }
 
@@ -99,19 +90,17 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       webid: new FormControl(''),
       ryoate: new FormControl(''),
       del: new FormControl(''),
-      bikou: new FormControl(''),
+      dmemo: new FormControl(''),
       jan: new FormControl(''),
-      inbikou: new FormControl(''),
-      // }));
-      // this.form.addControl('kake', new FormGroup({
+      memo: new FormControl(''),
+
       torikbn: new FormControl(''),
       sime: new FormControl(''),
       site: new FormControl(''),
       inday: new FormControl(''),
       scde: new FormControl(''),
       sscode: new FormControl(''),
-      // }));
-      // this.form.addControl('mail', new FormGroup({
+
       mail: new FormControl('', Validators.email),
       mail2: new FormControl('', Validators.email),
       mail3: new FormControl('', Validators.email),
@@ -124,14 +113,14 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       mtgt5: new FormControl(''),
       gadr: new FormControl('')
     }));
-    this.bunsrv.get_bunrui();
-    // this.stfsrv.get_staff();
-    this.okrsrv.get_hokuri();
+    this.bunsrv.getBunrui();
+    this.okrsrv.getHokuri();
     this.bnssrv.getBuntype();
 
   }
+
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
-    this.memsrv.get_members().then(result => {
+    this.memsrv.getMembers().then(result => {
       this.overlayRef.detach();
     });
     this.route.paramMap.subscribe((params: ParamMap) => {
@@ -140,13 +129,14 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       } else {
         this.mode = +params.get('mode');
       }
+      this.refresh();
       if (params.get('mcd') === null) {
         // this.mcd = '読込中です！';
-        this.refresh();
+        // this.refresh();
       } else {
         //１件分だけ先に読込
         this.mcd = params.get('mcd');
-        this.get_member(this.mcd);
+        this.getMember(this.mcd);
       }
     });
   }
@@ -156,23 +146,25 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       let dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
       dialogConfig.data = {
-        mcode: this.mcd + '(' + this.memsrv.get_mcdtxt(this.mcd) + ')',
+        mcode: this.mcd + '(' + this.memsrv.getMcdtxt(this.mcd) + ')',
         flg: false
       };
       let dialogRef = this.dialog.open(AdredaComponent, dialogConfig);
     }
   }
+
   diaProc(): void {
     if (this.checkMcode(this.mcd)) {
       let dialogConfig = new MatDialogConfig();
       dialogConfig.autoFocus = true;
       dialogConfig.data = {
-        mcode: this.mcd + '(' + this.memsrv.get_mcdtxt(this.mcd) + ')',
+        mcode: this.mcd + '(' + this.memsrv.getMcdtxt(this.mcd) + ')',
         mode: this.mode
       };
       let dialogRef = this.dialog.open(MsprocComponent, dialogConfig);
     }
   }
+
   mcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width = '100vw';
@@ -188,10 +180,11 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         if (typeof data != 'undefined') {
           this.mcd = data.mcode;
         }
-        this.get_member(this.mcd);
+        this.getMember(this.mcd);
       }
     );
   }
+
   canEnter(e: KeyboardEvent): void {
     let element = e.target as HTMLElement;
     if (element.tagName !== 'TEXTAREA') {
@@ -202,7 +195,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     // if( this.checkMcode(this.mcd) ){
     //   this.get_member(+this.mcd);
     // }
-    if (this.mode == 3) {
+    if (this.mode == 3 || this.mode == 4) {
       this.form.disable();
     } else {
       this.form.enable();
@@ -244,8 +237,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     return flg;
   }
 
-  get_member(mcode: string) {
-    // this.mcd += '  読込中';
+  getMember(mcode: string) {
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
@@ -254,30 +246,26 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         query: Query.GetMast1,
         variables: {
           id: this.usrsrv.compid,
-          mcode: mcode
+          mcd: mcode
         },
       })
         .valueChanges
         .subscribe(({ data }) => {
           this.form.reset();
-          // console.log(mcode,data);
           if (data.msmember_by_pk == null) {
             this.usrsrv.toastWar("顧客コード" + mcode + "は登録されていません");
             history.replaceState('', '', './mstmember');
           } else {
             let member: mwI.Member = data.msmember_by_pk;
             this.form.get('base').patchValue(member);
-            // this.form.get('base').patchValue({bikou:member.msmadrs[0].adrbikou,inbikou:member.msmadrs[0].adrinbikou});
-            // this.form.get('kake').patchValue(member);
-            // this.form.get('mail').patchValue(member);
             this.usrsrv.setTmstmp(member);
-            this.edasrv.mcode = mcode;
-            this.edasrv.edas = [];
-            this.edasrv.adrs = [];
+            this.memsrv.mcode = mcode;
+            this.memsrv.edas = [];
+            this.memsrv.adrs = [];
             for (let j = 0; j < member.msmadrs.length; j++) {
-              this.edasrv.adrs.push(member.msmadrs[j]);
+              this.memsrv.adrs.push(member.msmadrs[j]);
               if (member.msmadrs[j].eda > 1) {
-                this.edasrv.edas.push({
+                this.memsrv.edas.push({
                   eda: member.msmadrs[j].eda,
                   zip: member.msmadrs[j].zip,
                   region: member.msmadrs[j].region,
@@ -286,7 +274,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
                   extend: member.msmadrs[j].extend,
                   extend2: member.msmadrs[j].extend2,
                   adrname: member.msmadrs[j].adrname,
-                  tel: this.mcdsrv.set_tel(member.msmadrs[j].tel, member.msmadrs[j].tel2, member.msmadrs[j].tel3, member.msmadrs[j].fax)
+                  tel: this.usrsrv.setTel(member.msmadrs[j].tel, member.msmadrs[j].tel2, member.msmadrs[j].tel3, member.msmadrs[j].fax)
                 });
               }
             }
@@ -323,13 +311,15 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         });
     }
   }
-  updKana(value: string) {
-    let val: string = this.usrsrv.convKana(value);
+
+  updKana(event: KeyboardEvent) {
+    let val: string = this.usrsrv.convKana((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
     this.form.get('base').get('kana').setValue(val);
   }
-  updMail(fldnm: string, value: string) {
-    let val: string = this.usrsrv.convHan(value);
+
+  updMail(fldnm: string, event: KeyboardEvent) {
+    let val: string = this.usrsrv.convHan((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
     this.form.get('base').get(fldnm).setValue(val);
   }
@@ -402,7 +392,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
             query: Query.GetMast1,
             variables: {
               id: this.usrsrv.compid,
-              mcode: this.mcd
+              mcd: this.mcd
             },
           }],
       }).subscribe(({ data }) => {
@@ -428,7 +418,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     history.replaceState('', '', './mstmember/' + this.mode + '/' + this.mcd);
   }
 
-  async get_mcode() {
+  async getMcode() {
     if (!this.mcd) {
       return await this.usrsrv.getNumber('mcode', 1).toString();
     } else {
@@ -437,6 +427,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   }
 
   async save() {
+    // console.log(this.form.get('base'), this.form.get('base').value);
     let member: any = {
       id: this.usrsrv.compid,
       mcode: this.mcd,
@@ -454,8 +445,8 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       site: this.usrsrv.editFrmval(this.form.get('base'), 'site'),
       inday: this.usrsrv.editFrmval(this.form.get('base'), 'inday'),
       scde: this.usrsrv.editFrmval(this.form.get('base'), 'scde'),
-      bikou: this.usrsrv.editFrmval(this.form.get('base'), 'bikou'),
-      // inbikou: this.usrsrv.editFrmval(this.form.get('base'),'inbikou'),
+      memo: this.usrsrv.editFrmval(this.form.get('base'), 'memo'),
+      dmemo: this.usrsrv.editFrmval(this.form.get('base'), 'dmemo'),
       pcode: this.usrsrv.editFrmval(this.form.get('base'), 'pcode'),
       hcode: this.usrsrv.editFrmval(this.form.get('base'), 'hcode'),
       htime: this.usrsrv.editFrmval(this.form.get('base'), 'htime'),
@@ -483,19 +474,20 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       updated_at: new Date(),
       updated_by: this.usrsrv.staff.code
     }
+    console.log(member);
     if (this.mode == 2) {
       this.apollo.mutate<any>({
         mutation: Query.UpdateMast1,
         variables: {
           id: this.usrsrv.compid,
-          mcode: this.mcd,
+          mcd: this.mcd,
           "_set": member
         },
       }).subscribe(({ data }) => {
-        console.log('update_msmember', data);
-        this.form.get('addr0').patchValue({ adrbikou: member.bikou, adrinbikou: member.inbikou });
+        // console.log('update_msmember', data);
+        this.form.get('addr0').patchValue({ dmemo: member.dmemo, memo: member.memo });
         this.children.toArray()[0].saveMadr(this.mcd, 0, this.mode);
-        // console.log(this.form.get('addr1').get('zip'), );
+        // console.log(this.form.get('addr1').value);
         if (this.form.get('addr1').value.zip != null) {
           this.children.toArray()[1].saveMadr(this.mcd, 1, this.flgadr1);
         }
@@ -511,7 +503,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       let membs: any[] = [];
       // this.usrsrv.getNumber('mcode',1)
       //   .subscribe(value => {
-      this.mcd = await this.get_mcode();
+      this.mcd = await this.getMcode();
       member.mcode = this.mcd;
       if (!member.sscode) {
         member.sscode = this.mcd;
@@ -590,12 +582,8 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         // console.log('addr1',name);
       }
     }
-
-
     // console.log(tooltip);
     return tooltip;
 
   }
-
-
 }

@@ -1,12 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
+// import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { UserService } from './../services/user.service';
 import { Nyuhis, DepositService } from './deposit.service';
 
 @Component({
   selector: 'app-histtbl',
   templateUrl: './histtbl.component.html',
-  styleUrls: ['./depttbl.component.scss']
+  styleUrls: ['./../tbl.component.scss']
 })
 export class HisttblComponent implements OnInit {
   // @Input() parentForm: FormGroup;

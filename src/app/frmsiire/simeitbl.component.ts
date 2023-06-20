@@ -16,7 +16,7 @@ import { take } from 'rxjs/operators';
 @Component({
   selector: 'app-simeitbl',
   templateUrl: './simeitbl.component.html',
-  styleUrls: ['./simeitbl.component.scss']
+  styleUrls: ['./../tbl.component.scss']
 })
 export class SimeitblComponent implements OnInit {
   @Input() parentForm: FormGroup;
@@ -36,7 +36,7 @@ export class SimeitblComponent implements OnInit {
     'unit',
     'genka',
     'money',
-    'mbiko',
+    'mmemo',
     'spec',
     // 'inday',
     'mtax',
@@ -55,7 +55,7 @@ export class SimeitblComponent implements OnInit {
     public strsrv: StoreService) { }
 
   ngOnInit(): void {
-    this.add_rows(1);
+    this.addRows(1);
     this.refresh();
   }
   calcTot() {
@@ -88,20 +88,20 @@ export class SimeitblComponent implements OnInit {
       money: [siimei?.money],
       taxrate: [siimei?.taxrate],
       unit: [{ value: siimei?.msgood.unit, disabled: true }],
-      mbiko: [siimei?.mbiko],
+      mmemo: [siimei?.mmemo],
       spec: [siimei?.spec],
       mtax: [siimei?.mtax],
     });
   }
-  del_row(row: number) {
+  delRow(row: number) {
     this.frmArr.removeAt(row);
-    this.auto_fil();
+    this.autoFil();
   }
-  ins_row(row: number) {
+  insRow(row: number) {
     this.frmArr.insert(row, this.createRow(row));
-    this.auto_fil();
+    this.autoFil();
   }
-  auto_fil() {
+  autoFil() {
     let i: number = 0;
     this.frmArr.controls
       .forEach(control => {
@@ -116,7 +116,7 @@ export class SimeitblComponent implements OnInit {
     this.dataSource.data = this.frmArr.controls;
   }
 
-  add_rows(rows: number) {
+  addRows(rows: number) {
     for (let i = 0; i < rows; i++) {
       this.frmArr.push(this.createRow(i + 1));
     }
@@ -155,7 +155,7 @@ export class SimeitblComponent implements OnInit {
           money: 0,
           taxrate: '',
           msgood: { gtext: '', unit: '' },
-          mbiko: '',
+          mmemo: '',
           spec: '',
           hdenno: +col?.[2],
           hline: +col?.[3],
@@ -187,7 +187,7 @@ export class SimeitblComponent implements OnInit {
       return index;
     }
   }
-  get_siimei(dno) {
+  getSiimei(dno) {
     let siimei = [];
     this.frmArr.controls
       .forEach(control => {
@@ -201,7 +201,7 @@ export class SimeitblComponent implements OnInit {
           genka: this.usrsrv.editFrmval(control, 'genka'),
           money: this.usrsrv.editFrmval(control, 'money'),
           taxrate: this.usrsrv.editFrmval(control, 'taxrate'),
-          mbiko: this.usrsrv.editFrmval(control, 'mbiko'),
+          mmemo: this.usrsrv.editFrmval(control, 'mmemo'),
           spec: this.usrsrv.editFrmval(control, 'spec'),
           hdenno: this.usrsrv.editFrmval(control, 'jdenno'),
           hline: this.usrsrv.editFrmval(control, 'jline'),
@@ -239,7 +239,7 @@ export class SimeitblComponent implements OnInit {
     // console.log(result.toString())
     return result.toString() + "\n";
   }
-  set_siimei() {
+  setSiimei() {
     let i: number = 0;
     this.frmArr.clear();
     // console.log(this.smisrv.siimei, flg);
@@ -248,6 +248,6 @@ export class SimeitblComponent implements OnInit {
       i += 1;
       // console.log(this.frmArr);
     });
-    this.auto_fil();
+    this.autoFil();
   }
 }

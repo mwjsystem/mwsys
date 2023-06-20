@@ -13,7 +13,7 @@ import gql from 'graphql-tag';
 @Component({
   selector: 'app-msproc',
   templateUrl: './msproc.component.html',
-  styleUrls: ['./msproc.component.scss']
+  styleUrls: ['./../../help.component.scss']
 })
 export class MsprocComponent implements OnInit {
   mcode: number;
@@ -85,17 +85,17 @@ export class MsprocComponent implements OnInit {
     );
   }
 
-  del_row(row: number) {
+  delRow(row: number) {
     this.frmArr.removeAt(row);
     this.refresh();
   }
 
-  ins_row(row: number) {
+  insRow(row: number) {
     this.frmArr.insert(row, this.createRow(row));
     this.refresh();
   }
 
-  copy_row(row: number) {
+  copyRow(row: number) {
     this.frmArr.insert(row, this.createRow(row, this.frmArr.controls[row - 1].value));
     this.refresh();
   }

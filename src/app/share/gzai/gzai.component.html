@@ -1,5 +1,5 @@
 <mat-toolbar color="primary" class="toolbar">
-    <div class="icon-area" fxLayout="row wrap">
+    <div class="icon-area" class="flex flex-wrap">
         <button mat-button (click)="modeToUpd()" *ngIf="mode==3">
             <mat-icon>edit</mat-icon>
             編集
@@ -22,17 +22,17 @@
             <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
                 <ng-container matColumnDef="line">
                     <th mat-header-cell *matHeaderCellDef>行番号
-                        <button mat-icon-button (click)="ins_row(0)" *ngIf="frmArr.enabled">
+                        <button mat-icon-button (click)="insRow(0)" *ngIf="frmArr.enabled">
                             <mat-icon>add_circle</mat-icon>
                         </button>
                     </th>
                     <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
                         <mat-form-field style="width:5em;">
                             <input matInput [value]="frmArr.getRawValue()[i]['line']" class="i_num" disabled>
-                            <button mat-icon-button matPrefix (click)="ins_row(i+1)" *ngIf="frmArr.enabled">
+                            <button mat-icon-button matPrefix (click)="insRow(i+1)" *ngIf="frmArr.enabled">
                                 <mat-icon>add_circle</mat-icon>
                             </button>
-                            <button mat-icon-button matPrefix (click)="del_row(i)" *ngIf="frmArr.enabled">
+                            <button mat-icon-button matPrefix (click)="delRow(i)" *ngIf="frmArr.enabled">
                                 <mat-icon>remove_circle</mat-icon>
                             </button>
                         </mat-form-field>
@@ -42,8 +42,8 @@
                     <th mat-header-cell *matHeaderCellDef>内訳商品コード</th>
                     <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
                         <mat-form-field>
-                            <input matInput formControlName="zcode" maxlength="20"
-                                (change)="updGds(i,$event.target.value)" (keydown.f4)="gcdHelp(i)">
+                            <input matInput formControlName="zcode" maxlength="20" (change)="updGds(i,$any($event))"
+                                (keydown.f4)="gcdHelp(i)">
                             <button mat-icon-button matSuffix (click)="gcdHelp(i)" *ngIf="frmArr.enabled">
                                 <mat-icon>find_replace</mat-icon>
                             </button>

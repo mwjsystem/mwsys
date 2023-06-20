@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChild, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChild, ViewEncapsulation, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -6,7 +6,6 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstg';
-// import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
 import { StoreService } from './../services/store.service';
 import { StockService } from './../services/stock.service';
@@ -17,9 +16,10 @@ import { GzaiComponent } from './../share/gzai/gzai.component';
 @Component({
   selector: 'app-gdstbl',
   templateUrl: './gdstbl.component.html',
-  styleUrls: ['./gdstbl.component.scss']
+  styleUrls: ['./../tbl.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
-export class GdstblComponent implements OnInit, AfterViewInit {
+export class GdstblComponent {
   @Input() parentForm: FormGroup;
   private paginator: MatPaginator;
   @ViewChild(MatPaginator, { static: false }) set matPaginator(mp: MatPaginator) {
@@ -46,18 +46,18 @@ export class GdstblComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.add_rows(1);
+    this.addRows(1);
     this.refresh();
-    this.strsrv.get_store();
+    this.strsrv.getStore();
     // this.dataSource.paginator = this.paginator;
   }
 
-  del_row(row: number) {
+  delRow(row: number) {
     this.frmArr.removeAt(row);
     this.action.emit({ flg: false, row: row });//mstgoods.componentのメソッドins_throwに渡す引数
     this.refresh();
   }
-  ins_row(flgCP: boolean, row: number) {
+  insRow(flgCP: boolean, row: number) {
     if (flgCP) {
       this.frmArr.insert(row, this.createRow(false, this.frmArr.controls[row - 1].value));
     } else {
@@ -70,13 +70,13 @@ export class GdstblComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
-    console.log(this.usrsrv);
-    this.usrsrv.getStaff(this.usrsrv.userInfo.email).then(result => {
+    // console.log(this.usrsrv);
+    this.usrsrv.getStaff(this.usrsrv.userInfo['email']).then(result => {
       this.scode = result.scode;
     });
   }
 
-  add_rows(rows: number) {
+  addRows(rows: number) {
     for (let i = 0; i < rows; i++) {
       this.frmArr.push(this.createRow(false));
     }
@@ -135,8 +135,8 @@ export class GdstblComponent implements OnInit, AfterViewInit {
 
 
 
-  updGds(i: number, value: string) {
-    let val: string = this.usrsrv.convUpper(value);  //小文字全角→大文字半角変換
+  updGds(i: number, event: KeyboardEvent) {
+    let val: string = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);  //小文字全角→大文字半角変換
     this.frmArr.controls[i].get('gcode').setErrors(null);
     this.frmArr.controls[i].get('gcode').setValue(val);
     this.apollo.watchQuery<any>({
@@ -144,7 +144,7 @@ export class GdstblComponent implements OnInit, AfterViewInit {
       variables: {
         id: this.usrsrv.compid,
         grpcd: this.gdssrv.grpcd,
-        gcode: value
+        gcode: val
       },
     }).valueChanges
       .subscribe(({ data }) => {
@@ -153,15 +153,15 @@ export class GdstblComponent implements OnInit, AfterViewInit {
           let j: number = 0;
           this.frmArr.controls
             .forEach(control => {
-              if (control.get('gcode').value == value && j != i) {
+              if (control.get('gcode').value == val && j != i) {
 
-                this.usrsrv.toastErr(value + 'は重複しています(' + (j + 1) + '行目)', '商品コード入力エラー');
+                this.usrsrv.toastErr(val + 'は重複しています(' + (j + 1) + '行目)', '商品コード入力エラー');
                 this.frmArr.controls[i].get('gcode').setErrors({ 'exist': true });
               }
               j += 1;
             });
         } else {
-          this.usrsrv.toastErr(value + 'は商品ｸﾞﾙｰﾌﾟ' + data.msgoods[0].msggroup.code + 'で登録済です', '商品コード入力エラー');
+          this.usrsrv.toastErr(val + 'は商品ｸﾞﾙｰﾌﾟ' + data.msgoods[0].msggroup.code + 'で登録済です', '商品コード入力エラー');
           this.frmArr.controls[i].get('gcode').setErrors({ 'exist': true });
         }
       });
@@ -191,7 +191,7 @@ export class GdstblComponent implements OnInit, AfterViewInit {
     });
   }
 
-  set_goods() {
+  setGoods() {
     this.frmArr.clear();
     this.gdssrv.goods.forEach(e => {
       this.frmArr.push(this.createRow(true, e));
@@ -237,18 +237,20 @@ export class GdstblComponent implements OnInit, AfterViewInit {
     // console.log(this.frmArr.controls[i].value,i);
     if (this.frmArr.controls[i].value.gskbn == "0") {
       // console.log(this.scode);
-      this.stcsrv.get_stock(gcd, this.frmArr.controls[i].value.gskbn, this.scode).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.scode).then(result => {
         this.frmArr.controls[i].patchValue({ pable: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
         this.refresh();
       });
     } else if (this.frmArr.controls[i].value.gskbn == "1") {
       this.stcsrv.getSetZai(this.scode, msgzais).then(result => {
         // console.log(result);
-        this.frmArr.controls[i].patchValue({ pable: this.stcsrv.get_paabl(result) });
+        this.frmArr.controls[i].patchValue({ pable: this.stcsrv.getPaabl(result) });
         this.refresh();
       });
     }
   }
+
+
 
 
 }

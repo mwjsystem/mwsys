@@ -16,7 +16,7 @@ import { take } from 'rxjs/operators';
 @Component({
   selector: 'app-hmeitbl',
   templateUrl: './hmeitbl.component.html',
-  styleUrls: ['./hmeitbl.component.scss']
+  styleUrls: ['./../tbl.component.scss']
 })
 export class HmeitblComponent implements OnInit {
   @Input() parentForm: FormGroup;
@@ -37,7 +37,7 @@ export class HmeitblComponent implements OnInit {
     'money',
     'taxrate',
     'unit',
-    'mbiko',
+    'mmemo',
     'spec',
     'jdenno',
     'jline',
@@ -60,7 +60,7 @@ export class HmeitblComponent implements OnInit {
     public strsrv: StoreService) { }
 
   ngOnInit(): void {
-    this.add_rows(1);
+    this.addRows(1);
     this.refresh();
     // console.log(this.parentForm);
   }
@@ -204,7 +204,7 @@ export class HmeitblComponent implements OnInit {
       money: [hatmei?.money],
       taxrate: [hatmei?.taxrate],
       unit: [hatmei?.msgood.unit],
-      mbiko: [hatmei?.mbiko],
+      mmemo: [hatmei?.mmemo],
       spec: [hatmei?.spec],
       jdenno: [hatmei?.jdenno],
       jline: [hatmei?.jline],
@@ -217,15 +217,15 @@ export class HmeitblComponent implements OnInit {
     });
   }
 
-  del_row(row: number) {
+  delRow(row: number) {
     this.frmArr.removeAt(row);
-    this.auto_fil();
+    this.autoFil();
   }
-  ins_row(row: number) {
+  insRow(row: number) {
     this.frmArr.insert(row, this.createRow(row));
-    this.auto_fil();
+    this.autoFil();
   }
-  auto_fil() {
+  autoFil() {
     let i: number = 0;
     this.frmArr.controls
       .forEach(control => {
@@ -234,7 +234,7 @@ export class HmeitblComponent implements OnInit {
       })
     this.refresh();
   }
-  add_rows(rows: number) {
+  addRows(rows: number) {
     for (let i = 0; i < rows; i++) {
       this.frmArr.push(this.createRow(i + 1));
     }
@@ -288,7 +288,7 @@ export class HmeitblComponent implements OnInit {
           money: 0,
           taxrate: '',
           msgood: { unit: '' },
-          mbiko: '',
+          mmemo: '',
           spec: '',
           jdenno: +col?.[2],
           jline: +col?.[3],
@@ -315,7 +315,7 @@ export class HmeitblComponent implements OnInit {
     })
     this.usrsrv.toastInf('クリップボードにコピーしました');
   }
-  get_hatmei(dno) {
+  getHatmei(dno) {
     let hatmei = [];
     this.frmArr.controls
       .forEach(control => {
@@ -332,7 +332,7 @@ export class HmeitblComponent implements OnInit {
           money: this.usrsrv.editFrmval(control, 'money'),
           taxrate: this.usrsrv.editFrmval(control, 'taxrate'),
           // unit:this.usrsrv.editFrmval(control,'unit'),
-          mbiko: this.usrsrv.editFrmval(control, 'mbiko'),
+          mmemo: this.usrsrv.editFrmval(control, 'mmemo'),
           spec: this.usrsrv.editFrmval(control, 'spec'),
           jdenno: this.usrsrv.editFrmval(control, 'jdenno'),
           jline: this.usrsrv.editFrmval(control, 'jline'),
@@ -357,7 +357,7 @@ export class HmeitblComponent implements OnInit {
     this.dataSource.data = this.frmArr.controls;
   }
 
-  set_hatmei() {
+  setHatmei() {
     this.frmArr.clear();
     let i: number = 0;
     console.log(this.hmisrv.hatmei);
@@ -368,7 +368,7 @@ export class HmeitblComponent implements OnInit {
     this.refresh();
   }
 
-  add_newrow(i: number) {
+  addNewrow(i: number) {
 
     this.gcdInps.changes.pipe(take(1)).subscribe({
       next: changes => {

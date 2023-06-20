@@ -3,8 +3,9 @@ import { RouterModule, Routes } from '@angular/router';
 import { MstgoodsComponent } from './mstgoods.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 
-const routes: Routes = [ 
+const routes: Routes = [
   { path: '', component: MstgoodsComponent },
+  { path: ':mode', component: MstgoodsComponent, canDeactivate: [BeforeunloadGuard] },
   { path: ':mode/:grpcd', component: MstgoodsComponent, canDeactivate: [BeforeunloadGuard] },
 ];
 

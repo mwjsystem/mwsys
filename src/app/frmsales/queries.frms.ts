@@ -68,7 +68,7 @@ query get_member($id: smallint!,$mcode:String!) {
     tcode1
     tcode
     del
-    bikou
+    memo
     sptnkbn
     daibunrui
     chubunrui
@@ -90,9 +90,9 @@ query get_member($id: smallint!,$mcode:String!) {
       tel3
       extend2
       adrname
-      nbikou
-      sbikou
-      obikou
+      nmemo
+      smemo
+      omemo
       del
     } 
     msprocesses {

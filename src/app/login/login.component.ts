@@ -4,7 +4,7 @@ import { AuthService } from '@auth0/auth0-angular';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./../app.component.scss']
 })
 export class LoginComponent implements OnInit {
 

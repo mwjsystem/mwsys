@@ -9,12 +9,11 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 import { HdnohelpComponent } from './../share/hdnohelp/hdnohelp.component';
 import { HmeitblComponent } from './hmeitbl.component';
-// import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
-import { VendsService } from './../services/vends.service';
+import { VendsService } from './../mstvendor/vends.service';
 import { DownloadService } from './../services/download.service';
 import { HatmeiService } from './hatmei.service';
 import { filter } from 'rxjs/operators';
@@ -30,8 +29,6 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   form: FormGroup;
   denno: number = 0;
   mode: number = 3;
-  // base64:string;
-  // vcdtxt:string;
   rows: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -51,7 +48,6 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     public stfsrv: StaffService,
     public hmisrv: HatmeiService,
     private vensrv: VendsService,
-    // private toastr: ToastrService,
     private overlay: Overlay,
     private cdRef: ChangeDetectorRef) {
     title.setTitle('発注伝票(MWSystem)');
@@ -66,25 +62,22 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       autoproc: new FormControl(''),
       mtax: new FormControl(''),
       currency: new FormControl(''),
-      // hdstatus: new FormControl(''),
-      dbiko: new FormControl(''),
-      inbiko: new FormControl(''),
+      dmemo: new FormControl(''),
+      inmemo: new FormControl(''),
       gtotal: new FormControl(''),
-      // ttotal: new FormControl(''),
       tax: new FormControl(''),
       total: new FormControl(''),
-      // jdenno: new FormControl(''),
       mtbl: this.rows
     });
 
-    this.strsrv.get_store();
-    this.bunsrv.get_bunrui();
+    this.strsrv.getStore();
+    this.bunsrv.getBunrui();
 
   }
 
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
     // console.log(this.usrsrv);
-    this.vensrv.get_vendors().then(result => {
+    this.vensrv.getVendors().then(result => {
       this.route.paramMap.subscribe((params: ParamMap) => {
         if (params.get('mode') === null) {
           this.cancel();
@@ -117,7 +110,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
           if (params.get('denno') !== null) {
             this.denno = +params.get('denno');
             // console.log(this.denno);
-            this.get_hatden(this.denno);
+            this.getHatden(this.denno);
           }
           this.refresh();
         }
@@ -128,12 +121,12 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     });
   }
 
-  get_hatden(denno: number): void {
+  getHatden(denno: number): void {
     if (!this.overlayRef) {
       this.overlayRef.attach(new ComponentPortal(MatSpinner));
     }
     if (denno > 0) {
-      this.hmisrv.qry_hatden(denno).subscribe(
+      this.hmisrv.qryHatden(denno).subscribe(
         result => {
           this.form.reset();
           if (result == null) {
@@ -145,7 +138,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
             this.form.patchValue(hatden.msvendor[0]);
             this.usrsrv.setTmstmp(hatden);
             this.hmisrv.hatmei = hatden.vhatzns;
-            this.hmeitbl.set_hatmei();
+            this.hmeitbl.setHatmei();
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             this.denno = denno;
             history.replaceState('', '', './frmsupply/' + this.mode + '/' + this.denno);
@@ -164,28 +157,29 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.cdRef.detectChanges();
   }
   updVcd(value: string): void {
-    this.form.patchValue({ mtax: this.vensrv.get_vendor(value)?.mtax, currency: this.vensrv.get_vendor(value)?.currency });
+    let vend = this.vensrv.getVendor(value);
+    this.form.patchValue({ mtax: vend?.mtax, currency: vend?.currency });
   }
   test(value) {
     this.usrsrv.toastInf(this.form.value.yday);
     // this.usrsrv.getNumber('denno',2).subscribe(value => {
     //   console.log(value);
     // });
-    console.log(this.hmeitbl.get_hatmei(this.denno));
+    console.log(this.hmeitbl.getHatmei(this.denno));
     this.refresh();
     // this.router.navigate(['/mstmember','3',value]);
     // const url = this.router.createUrlTree(['/mstmember','3',value]);
     // window.open(url.toString(),null,'top=100,left=100');
   }
 
-  async download_csv(format: string) {
-    let head = this.dwlsrv.pickObj(this.form.getRawValue(), ['day', 'vcode', 'scode', 'biko']);
+  async downloadCsv(format: string) {
+    let head = this.dwlsrv.pickObj(this.form.getRawValue(), ['day', 'vcode', 'scode', 'memo']);
     // head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
-    const vend = this.vensrv.get_vendor(this.form.getRawValue().vcode);
+    const vend = this.vensrv.getVendor(this.form.getRawValue().vcode);
     head['adrname'] = vend.name;
     head['tel'] = vend.tel;
     head['fax'] = vend.fax;
-    const store = await this.strsrv.get_stradr(this.form.getRawValue().scode);
+    const store = await this.strsrv.getStradr(this.form.getRawValue().scode);
     head['sname'] = store.name;
     head['szip'] = store.zip;
     head['sregion'] = store.region;
@@ -194,11 +188,11 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     head['sextend'] = store.extend;
     head['stel'] = store.tel;
     head['sfax'] = store.fax;
-    const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl, ['line', 'gcode', 'gtext', 'suu', 'unit', 'jdenno', 'mbikou']);
-    this.dwlsrv.dl_png('staff/', this.form.getRawValue().tcode.toString() + ".png", this.denno + format + ".png");
-    this.dwlsrv.dl_csv(head, this.denno + format + "H.csv");
-    this.dwlsrv.dl_csv(det, this.denno + format + "M.csv");
-    this.dwlsrv.dl_kick(this.usrsrv.system.urischema + format + "_" + this.denno, this.elementRef);
+    const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl, ['line', 'gcode', 'gtext', 'suu', 'unit', 'jdenno', 'mmemou']);
+    this.dwlsrv.dlPng('staff/', this.form.getRawValue().tcode.toString() + ".png", this.denno + format + ".png");
+    this.dwlsrv.dlCsv(head, this.denno + format + "H.csv");
+    this.dwlsrv.dlCsv(det, this.denno + format + "M.csv");
+    this.dwlsrv.dlKick(this.usrsrv.system.urischema + format + "_" + this.denno, this.elementRef);
   }
 
   get frmArr(): FormArray {
@@ -220,7 +214,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   }
   onEnter() {
     this.denno = this.usrsrv.convNumber(this.denno);
-    this.get_hatden(this.denno);
+    this.getHatden(this.denno);
   }
   canEnter(e: KeyboardEvent): void {
     let element = e.target as HTMLElement;
@@ -253,7 +247,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
         if (typeof data != 'undefined') {
           this.denno = data.denno;
           // console.log(data);
-          this.get_hatden(this.denno);
+          this.getHatden(this.denno);
         }
       }
     );
@@ -269,7 +263,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     // this.form.get('hdstatus').setValue("0"); 
     this.hmeitbl.frmArr.clear();
     console.log(this.hmeitbl.frmArr);
-    this.hmeitbl.add_rows(1);
+    this.hmeitbl.addRows(1);
     this.refresh();
   }
 
@@ -282,7 +276,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   cancel(): void {
     if (this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
       this.mode = 3;
-      this.get_hatden(this.denno);
+      this.getHatden(this.denno);
       this.refresh();
       this.form.markAsPristine();
       history.replaceState('', '', './frmsupply/' + this.mode + '/' + this.denno);
@@ -300,8 +294,8 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       tcode: this.usrsrv.editFrmval(this.form, 'tcode'),
       autoproc: this.usrsrv.editFrmval(this.form, 'autoproc'),
       // mtax: this.usrsrv.editFrmval(this.form,'mtax'),
-      dbiko: this.usrsrv.editFrmval(this.form, 'dbiko'),
-      inbiko: this.usrsrv.editFrmval(this.form, 'inbiko'),
+      dmemo: this.usrsrv.editFrmval(this.form, 'dmemo'),
+      inmemo: this.usrsrv.editFrmval(this.form, 'inmemo'),
       gtotal: this.usrsrv.editFrmval(this.form, 'gtotal'),
       // ttotal: this.usrsrv.editFrmval(this.form,'ttotal'),
       tax: this.usrsrv.editFrmval(this.form, 'tax'),
@@ -312,8 +306,8 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     }
 
     if (this.mode == 2) {
-      let hatmei = this.hmeitbl.get_hatmei(this.denno);
-      this.hmisrv.upd_hatden(this.denno, hatden, hatmei)
+      let hatmei = this.hmeitbl.getHatmei(this.denno);
+      this.hmisrv.updHatden(this.denno, hatden, hatmei)
         .then(result => {
           // console.log('update_hatden',result);
           this.usrsrv.toastSuc('発注伝票' + this.denno + 'の変更を保存しました');
@@ -325,7 +319,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
         });
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('hdenno', 1, this.denno);
-      const hatmei = this.hmeitbl.get_hatmei(this.denno);
+      const hatmei = this.hmeitbl.getHatmei(this.denno);
       const trhatden: mwI.Trhatden[] = [{
         ...{
           id: this.usrsrv.compid,
@@ -333,12 +327,12 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
           //  trhatmeis:hatmei,
           created_at: new Date(),
           created_by: this.usrsrv.staff.code,
-          hdstatus: this.hmisrv.get_hdsta(hatmei),
+          hdstatus: this.hmisrv.getHdsta(hatmei),
         }
         , ...hatden,
       }]
       // console.log(trhatden);
-      this.hmisrv.ins_hatden(trhatden, hatmei)
+      this.hmisrv.insHatden(trhatden, hatmei)
         .then(result => {
           // console.log('insert_trhat',result);
           this.usrsrv.toastSuc('発注伝票' + this.denno + 'を新規登録しました');

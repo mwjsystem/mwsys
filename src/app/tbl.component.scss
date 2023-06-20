@@ -1,16 +1,16 @@
 .mat-elevation-z8 {
     margin-bottom: 10px;
 }
-// button {
-//     // min-width: 55px;
-//     padding: 0px;
-// }
+button {
+    // min-width: 55px;
+    padding: 0px;
+}
 .i_num {
     text-align: right;
     margin:0px;
 }
 .mat-cell, .mat-footer-cell, .mat-header-cell{
-    padding: 5px;
+    padding: 0.5px;
 }
 .mat-table {
     overflow-x: scroll;
@@ -38,15 +38,24 @@
 ::ng-deep.mat-form-field .mat-select-disabled .mat-select-value {
     color: black;
 }
-td .mat-form-field {
-    height:20px;
+td .mat-mdc-cell {
+    // height:20px;
+    padding: 0;
   }
 td .mat-icon-button {
-    height:20px;
+    width:20px;
+    height:15px;
+    line-height: 15px;
   } 
 tr.mat-row{
-    height:20px;
+    // height:20px;
+    padding: 0;
 }
 tr.mat-header-row{
-    height:20px;
+    // height:20px;
+    padding: 0;
+}
+mat-form-field {
+    // height:20px;
+    padding: 0;
 }

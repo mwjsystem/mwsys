@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, ChangeDetectorRef, HostListener, ViewChildren, QueryList, ElementRef } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { UntypedFormGroup, UntypedFormBuilder, FormControl, UntypedFormArray, Validators } from '@angular/forms';
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef, MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
 import { UserService } from './../../services/user.service';
 import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
 import { Apollo } from 'apollo-angular';
@@ -16,12 +16,12 @@ import { HttpClient } from '@angular/common/http';
 export class MsprcprtComponent implements OnInit {
   mcode: number;
   mode: number = 2;
-  form: FormGroup;
+  form: UntypedFormGroup;
   selrow;
   dataSource = new MatTableDataSource();
   @ViewChildren('upfile', { read: ElementRef }) inputs: QueryList<ElementRef>;
   displayedColumns = ['line', 'partno', 'seq', 'pic'];
-  constructor(private fb: FormBuilder,
+  constructor(private fb: UntypedFormBuilder,
     private http: HttpClient,
     public usrsrv: UserService,
     public cdRef: ChangeDetectorRef,
@@ -57,8 +57,8 @@ export class MsprcprtComponent implements OnInit {
     }));
     this.refresh();
   }
-  get frmArr(): FormArray {
-    return this.form.get('mtbl') as FormArray;
+  get frmArr(): UntypedFormArray {
+    return this.form.get('mtbl') as UntypedFormArray;
   }
   // modeToUpd(): void {
   //   this.mode = 2;

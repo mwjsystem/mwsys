@@ -8,7 +8,7 @@ import { Jyuden, Nyuden, Nyuhis, DepositService } from './deposit.service';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
-import { MembsService } from './../services/membs.service';
+import { MembsService } from './../mstmember/membs.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { NdnohelpComponent } from './../share/ndnohelp/ndnohelp.component';
@@ -47,7 +47,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
       scde: new FormControl(''),
       code: new FormControl('', Validators.required),
       tcode: new FormControl('', Validators.required),
-      biko: new FormControl(''),
+      memo: new FormControl(''),
       nmoneysum: new FormControl(''),
       smoneysum: new FormControl(''),
       tmoneysum: new FormControl(''),
@@ -56,10 +56,10 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
       sdenno: new FormControl(''),
       mtbl: this.rows
     });
-    this.bunsrv.get_bunrui();
+    this.bunsrv.getBunrui();
   }
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
-    this.memsrv.get_members().then(result => {
+    this.memsrv.getMembers().then(result => {
       this.route.paramMap.subscribe((params: ParamMap) => {
         if (params.get('mode') === null) {
           this.cancel();
@@ -69,7 +69,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
         }
         if (params.get('denno') !== null) {
           this.denno = +params.get('denno');
-          this.get_nyuden(this.denno);
+          this.getNyuden(this.denno);
         }
       });
     });
@@ -78,9 +78,12 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     });
   }
 
+  changeDno(event: KeyboardEvent) {
+    this.getJyuden(+(event.target as HTMLInputElement));
+  }
 
-  get_nyuden(denno: number) {
-    this.depsrv.qry_nyuden(denno).subscribe(
+  getNyuden(denno: number) {
+    this.depsrv.qryNyuden(denno).subscribe(
       result => {
         if (result == null) {
           this.usrsrv.toastInf("受注入金伝票番号" + denno + "は登録されていません");
@@ -90,7 +93,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
             this.usrsrv.toastInf('請求入金伝票です');
           } else {
             this.form.get('jdenno').setValue(+result.jdenno);
-            this.get_jyuden(result.jdenno);
+            this.getJyuden(result.jdenno);
             this.depsrv.nyuden = [];
             for (let i = 0; i < result.trnyudens.length; i++) {
               this.depsrv.nyuden.push(
@@ -101,11 +104,11 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
                   smoney: result.trnyudens[i].smoney,
                   tmoney: result.trnyudens[i].tmoney,
                   total: result.trnyudens[i].nmoney - result.trnyudens[i].smoney + result.trnyudens[i].tmoney,
-                  mbiko: result.trnyudens[i].mbiko
+                  mmemo: result.trnyudens[i].mmemo
                 }
               );
             }
-            this.depttbl.set_tbl();
+            this.depttbl.setTbl();
             this.form.get('day').setValue(result.day);
             this.form.get('code').setValue(result.code);
             this.form.get('tcode').setValue(result.tcode);
@@ -120,9 +123,9 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     );
   }
 
-  get_jyuden(denno: number) {
+  getJyuden(denno: number) {
 
-    this.depsrv.qry_jyuden(denno).subscribe(
+    this.depsrv.qryJyuden(denno).subscribe(
       result => {
         let i: number = result.trnyusubs.findIndex(obj => obj.denno == this.denno);
         if (result.torikbn == true) {
@@ -145,7 +148,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
                   smoney: result.trnyusubs[i].smoney,
                   tmoney: result.trnyusubs[i].tmoney,
                   total: result.trnyusubs[i].nmoney - result.trnyusubs[i].smoney + result.trnyusubs[i].tmoney,
-                  memo: result.trnyusubs[i].biko
+                  memo: result.trnyusubs[i].memo
                 }
               );
             }
@@ -166,17 +169,17 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
   onEnter() {
     this.denno = this.usrsrv.convNumber(this.denno);
     this.form.reset();
-    this.get_nyuden(this.denno);
+    this.getNyuden(this.denno);
   }
 
 
   refresh(): void {
     if (this.depsrv.mode == 3) {
       this.form.disable();
-      this.usrsrv.disable_mtbl(this.form);
+      this.usrsrv.disableMtbl(this.form);
     } else {
       this.form.enable();
-      this.usrsrv.enable_mtbl(this.form);
+      this.usrsrv.enableMtbl(this.form);
     }
     this.cdRef.detectChanges();
   }
@@ -195,7 +198,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
       data => {
         if (typeof data != 'undefined') {
           this.denno = data.denno;
-          this.get_nyuden(this.denno);
+          this.getNyuden(this.denno);
         }
       }
     );
@@ -217,7 +220,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
       data => {
         if (typeof data != 'undefined') {
           this.form.get('jdenno').setValue(data.denno);
-          this.get_jyuden(data.denno);
+          this.getJyuden(data.denno);
         }
       }
     );
@@ -279,7 +282,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
 
     if (this.depsrv.mode == 2) {
       let dept = this.depttbl.getMtbl(this.denno);
-      this.depsrv.upd_nyuden(this.denno, head, dept)
+      this.depsrv.updNyuden(this.denno, head, dept)
         .then(result => {
           // console.log('update_hatden',result);
           this.usrsrv.toastSuc('入金伝票' + this.denno + 'の変更を保存しました');
@@ -303,7 +306,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
         }
         , ...head
       }]
-      this.depsrv.ins_nyuden(trnyusub, dept)
+      this.depsrv.insNyuden(trnyusub, dept)
         .then(result => {
           // console.log('insert_trhat',result);
           this.usrsrv.toastSuc('入金伝票' + this.denno + 'を新規登録しました');

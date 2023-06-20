@@ -106,7 +106,7 @@ export class UserService {
           console.log('error query get_system', error);
         });
 
-      const color: string = localStorage.getItem(user.nickname + 'MWSYS_COLOR');
+      const color: string = localStorage.getItem(this.userInfo['nickname'] + 'MWSYS_COLOR');
       // console.log(color);
       if (color !== null) {
         var links = document.getElementsByTagName("link");
@@ -118,7 +118,7 @@ export class UserService {
         }
       }
       this.getHolidays();
-      this.getStaff(this.userInfo.email).then(result => this.staff = result);
+      this.getStaff(this.userInfo['email']).then(result => this.staff = result);
     });
     this.getTbldef();
   }
@@ -181,7 +181,7 @@ export class UserService {
           // observer.next(data.update_trnumber.returning[0].curnum);
           // observer.complete();
         }, (error) => {
-          this.toastr.error('採番エラー', '採番タイプ' + type + 'の採番ができませんでした',
+          this.toastr.error('採番エラー', '番号種別' + type + 'の採番ができませんでした',
             { closeButton: true, disableTimeOut: true, tapToDismiss: false });
           console.log('error mutation getNextnum', error);
           return resolve(0);
@@ -217,6 +217,7 @@ export class UserService {
 
   editFrmval(frm: AbstractControl, fld: string): any {
     let val: any;
+    // console.log(fld, frm.get(fld).value);
     if (frm.get(fld).value == "") {
       val = null;
     } else {
@@ -274,6 +275,42 @@ export class UserService {
     return val;
   }
 
+  setMail(m1: string, m2: string, m3: string, m4: string, m5: string): string {
+    let mail: string = "";
+    if (m1 !== null) {
+      mail += m1 + "/";
+    }
+    if (m2 !== null) {
+      mail += m2 + "/";
+    }
+    if (m3 !== null) {
+      mail += m3 + "/";
+    }
+    if (m4 !== null) {
+      mail += m4 + "/";
+    }
+    if (m5 !== null) {
+      mail += m5 + "/";
+    }
+    return (mail || "").slice(0, -1);
+  }
+
+  setTel(t1: string, t2: string, t3: string, fax: string): string {
+    let tel: string = "";
+    if (t1 !== null) {
+      tel += t1 + "/";
+    }
+    if (t2 !== null) {
+      tel += t2 + "/";
+    }
+    if (t3 !== null) {
+      tel += t3 + "/";
+    }
+    if (fax !== null) {
+      tel += fax + "/";
+    }
+    return (tel || "").slice(0, -1);
+  }
   setTmstmp(obj: any): void {
     this.tmstmp.created_at = obj.created_at;
     this.tmstmp.created_by = obj.created_by;
@@ -330,28 +367,28 @@ export class UserService {
     }
     return ret;
   }
-  convHan(value): string {
+  convHan(value: string): string {
     // 全角を半角に(メール用)
     const val = value.replace(/[^a-zA-Zａ-ｚＡ-Ｚ0-9０-９＠@－-＿_．.]/g, '').replace(/[０-９ａ-ｚＡ-Ｚ＠－＿．]/g, function (s) {
       return String.fromCharCode(s.charCodeAt(0) - 65248);
     })
     return val;
   }
-  convTel(value): string {
+  convTel(value: string): string {
     // 全角を半角に(数字、－のみ)
     const val = value.replace(/[^0-9０-９－-]/g, '').replace(/[０-９－]/g, function (s) {
       return String.fromCharCode(s.charCodeAt(0) - 65248);
     })
     return val;
   }
-  convUpper(value): string {
+  convUpper(value: string): string {
     // 全角は半角にして、大文字に変換
     const val = value.toUpperCase().replace(/[^A-ZＡ-Ｚ0-9０-９－-]/g, '').replace(/[０-９Ａ-Ｚ－]/g, function (s) {
       return String.fromCharCode(s.charCodeAt(0) - 65248);
     })
     return val;
   }
-  convKana(value): string {
+  convKana(value: string): string {
     const kanaMap = {
       "ガ": "ｶﾞ", "ギ": "ｷﾞ", "グ": "ｸﾞ", "ゲ": "ｹﾞ", "ゴ": "ｺﾞ",
       "ザ": "ｻﾞ", "ジ": "ｼﾞ", "ズ": "ｽﾞ", "ゼ": "ｾﾞ", "ゾ": "ｿﾞ",
@@ -384,8 +421,24 @@ export class UserService {
       .replace(/゜/g, 'ﾟ');
     return val;
   }
-
-  disable_mtbl(form) {
+  getColor(mode: number): string {
+    let ret: string = "";
+    switch (mode) {
+      case 1:
+        ret = 'accent';
+        break;
+      case 2:
+        ret = 'warn';
+        break;
+      case 3:
+        ret = 'primary';
+        break;
+      default:
+        ret = 'basic';
+    }
+    return ret;
+  }
+  disableMtbl(form) {
     (<FormArray>form.get('mtbl'))
       .controls
       .forEach(control => {
@@ -393,7 +446,7 @@ export class UserService {
         control.clearValidators();
       })
   }
-  enable_mtbl(form) {
+  enableMtbl(form) {
     (<FormArray>form.get('mtbl'))
       .controls
       .forEach(control => {
@@ -401,7 +454,7 @@ export class UserService {
         control.clearValidators();
       })
   }
-  openMst(func, value) {
+  openMst(func, value: string) {
     const url = this.router.createUrlTree(['/' + func, '3', value]);
     // window.open(url.toString(),null,'top=100,left=100');
     window.open(url.toString());
@@ -503,9 +556,13 @@ export class UserService {
       });
   }
   getColtxt(tbnm: string, colnm: string): string {
+    let ret: string = "";
     let i: number = this.tbldef.findIndex(obj => obj.table_name == tbnm && obj.column_name == colnm);
     // console.log(tbnm+"."+colnm,i);    
-    return this.tbldef[i]?.description.split('/n')[0];
+    if (i > -1) {
+      ret = this.tbldef[i]?.description.split('/n')[0]
+    }
+    return ret;
   }
   getValiderr(obj, i?: number): string {
     let ret: string = "";
@@ -567,7 +624,7 @@ export class UserService {
     return date;
   }
   toastErr(title, msg) {
-    this.toastr.error(title, msg, { closeButton: true, disableTimeOut: true, tapToDismiss: false });
+    this.toastr.error(title, msg, { closeButton: true, disableTimeOut: true, tapToDismiss: false, positionClass: 'toast-top-center' });
   }
   toastWar(msg) {
     this.toastr.warning(msg);
@@ -579,4 +636,3 @@ export class UserService {
     this.toastr.info(msg);
   }
 }
-
