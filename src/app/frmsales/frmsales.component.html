@@ -316,37 +316,38 @@
         </button>
       </div>
     </div>
+    <div class="flex flex-wrap">
+      <label for="txt1" class="block mx-2">伝票備考</label>
+      <textarea id="txt1" [rows]="getRows('dmemo')" formControlName="dmemo"
+        class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
+      <label for="txt2" class="block mx-2">納品書備考</label>
+      <textarea id="txt2" [rows]="getRows('nmemo')" formControlName="nmemo"
+        class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
+      <label for="txt3" class="block mx-2">送り状備考</label>
+      <textarea id="txt3" [rows]="getRows('omemo')" formControlName="omemo"
+        class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
+      <label for="txt4" class="block mx-2">出荷指示書備考</label>
+      <textarea id="txt4" [rows]="getRows('smemo')" formControlName="smemo"
+        class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
+      <!-- <mat-form-field class="txtar">
+        <mat-label>伝票備考</mat-label>
+        <textarea matInput formControlName="dmemo" matTextareaAutosize></textarea>
+      </mat-form-field>
+      <mat-form-field class="txtar">
+        <mat-label>納品書備考</mat-label>
+        <textarea matInput formControlName="nmemo" matTextareaAutosize></textarea>
+      </mat-form-field>
+      <mat-form-field class="txtar">
+        <mat-label>送り状備考</mat-label>
+        <textarea matInput formControlName="omemo" matTextareaAutosize></textarea>
+      </mat-form-field>
+      <mat-form-field class="txtar">
+        <mat-label>出荷指示書備考</mat-label>
+        <textarea matInput formControlName="smemo" matTextareaAutosize></textarea>
+      </mat-form-field> -->
+    </div>
   </div>
-  <div class="flex flex-wrap">
-    <label for="txt1" class="block mx-2">伝票備考</label>
-    <textarea id="txt1" [rows]="getRows('dmemo')" placeholder="伝票備考" formControlName="dmemo"
-      class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-    <label for="txt2" class="block mx-2">納品書備考</label>
-    <textarea id="txt2" [rows]="getRows('nmemo')" placeholder="納品書備考" formControlName="nmemo"
-      class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-    <label for="txt3" class="block mx-2">送り状備考</label>
-    <textarea id="txt3" [rows]="getRows('omemo')" placeholder="送り状備考" formControlName="omemo"
-      class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-    <label for="txt4" class="block mx-2">出荷指示書備考</label>
-    <textarea id="txt4" [rows]="getRows('smemo')" placeholder="出荷指示書備考" formControlName="smemo"
-      class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-    <!-- <mat-form-field class="txtar">
-      <mat-label>伝票備考</mat-label>
-      <textarea matInput formControlName="dmemo" matTextareaAutosize></textarea>
-    </mat-form-field>
-    <mat-form-field class="txtar">
-      <mat-label>納品書備考</mat-label>
-      <textarea matInput formControlName="nmemo" matTextareaAutosize></textarea>
-    </mat-form-field>
-    <mat-form-field class="txtar">
-      <mat-label>送り状備考</mat-label>
-      <textarea matInput formControlName="omemo" matTextareaAutosize></textarea>
-    </mat-form-field>
-    <mat-form-field class="txtar">
-      <mat-label>出荷指示書備考</mat-label>
-      <textarea matInput formControlName="smemo" matTextareaAutosize></textarea>
-    </mat-form-field> -->
-  </div>
+
   <!-- </mat-card> -->
   <mat-expansion-panel>
     <mat-expansion-panel-header>

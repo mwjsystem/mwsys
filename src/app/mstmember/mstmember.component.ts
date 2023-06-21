@@ -312,6 +312,12 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     }
   }
 
+  getRows(fldnm: string): number {
+    const lines: number = (this.form.get('base').get(fldnm).value + '\n').match(/\n/g).length;
+    return lines;
+  }
+
+
   updKana(event: KeyboardEvent) {
     let val: string = this.usrsrv.convKana((event.target as HTMLInputElement)?.value);
     // console.log(value,val);

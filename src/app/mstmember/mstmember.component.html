@@ -217,14 +217,20 @@
         </mat-form-field>
         <mat-checkbox formControlName="del">削除済</mat-checkbox>
         <div class="flex flex-column" style="width:100%;">
-          <mat-form-field class="txtar">
+          <label for="txt1" class="block mx-2">伝票備考</label>
+          <textarea id="txt1" tabIndex="21" [rows]="getRows('dmemo')" formControlName="dmemo"
+            class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
+          <label for="txt2" class="block mx-2">マスタ備考</label>
+          <textarea id="txt2" tabIndex="22" [rows]="getRows('memo')" formControlName="memo"
+            class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
+          <!-- <mat-form-field class="txtar">
             <mat-label>伝票備考</mat-label>
             <textarea tabIndex="21" matInput formControlName="dmemo" cdkTextareaAutosize></textarea>
-          </mat-form-field>
-          <mat-form-field class="txtar">
+          </mat-form-field> -->
+          <!-- <mat-form-field class="txtar">
             <mat-label>マスタ備考</mat-label>
             <textarea tabIndex="22" matInput formControlName="memo" cdkTextareaAutosize></textarea>
-          </mat-form-field>
+          </mat-form-field> -->
         </div>
       </form>
     </mat-card-content>
