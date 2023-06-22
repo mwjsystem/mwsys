@@ -235,6 +235,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     const lines: number = (this.form.get(fldnm).value + '\n').match(/\n/g).length;
     return lines;
   }
+
   makeFrmKeep() {
     this.dwlsrv.dlKick(this.usrsrv.system.urischema + 'FRM-KEEP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
   }
