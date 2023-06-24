@@ -632,8 +632,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   async save(): Promise<boolean> {
-    console.log(Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')), this.usrsrv.editFrmval(this.form, 'iadr'),);
-    console.log(this.form.get('iadr'), this.usrsrv.editFrmval(this.form, 'iadr'));
+    // console.log(Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')), this.usrsrv.editFrmval(this.form, 'iadr'),);
+    // console.log(this.form.get('iadr'), this.usrsrv.editFrmval(this.form, 'iadr'));
     let jyuden: any = {
       torikbn: Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')),
       updated_at: new Date(),
@@ -679,7 +679,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       genka: this.usrsrv.editFrmval(this.form, 'genka'),
       hgenka: this.usrsrv.editFrmval(this.form, 'hgenka'),
       egenka: this.usrsrv.editFrmval(this.form, 'egenka'),
-      iadr: this.form.get('iadr').value,
+      iadr: this.usrsrv.editFrmval(this.form, 'iadr'),
       total8: this.usrsrv.editFrmval(this.form, 'total8'),
       total10: this.usrsrv.editFrmval(this.form, 'total10'),
       dokono: this.usrsrv.editFrmval(this.form, 'dokono'),
