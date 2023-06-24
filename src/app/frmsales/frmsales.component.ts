@@ -632,7 +632,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   async save(): Promise<boolean> {
-    // console.log(this.form.get('iadr'), this.usrsrv.editFrmval(this.form, 'iadr'));
+    console.log(Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')), this.usrsrv.editFrmval(this.form, 'iadr'),);
+    console.log(this.form.get('iadr'), this.usrsrv.editFrmval(this.form, 'iadr'));
     let jyuden: any = {
       torikbn: Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')),
       updated_at: new Date(),
