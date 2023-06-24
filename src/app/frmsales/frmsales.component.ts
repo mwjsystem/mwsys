@@ -658,7 +658,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       htime: this.usrsrv.editFrmval(this.form, 'htime'),
       okurisuu: this.usrsrv.editFrmval(this.form, 'okurisuu'),
       okurino: this.usrsrv.editFrmval(this.form, 'okurino'),
-      memo: this.usrsrv.editFrmval(this.form, 'memo'),
+      dmemo: this.usrsrv.editFrmval(this.form, 'dmemo'),
       nmemo: this.usrsrv.editFrmval(this.form, 'nmemo'),
       omemo: this.usrsrv.editFrmval(this.form, 'omemo'),
       smemo: this.usrsrv.editFrmval(this.form, 'smemo'),
