@@ -708,15 +708,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             jyumei.forEach(e => {
               // console.log(e, jyuden);
               if (jyuden.skbn != "1") {
-                if (e.gskbn == "0" && e.sday != null) {
-                  const lczaiko: mwI.Zaiko = {
-                    scode: e.scode,
-                    gcode: e.gcode,
-                    day: e.sday,
-                    suu: e.suu
-                  }
-                  this.jmisrv.updZaiko(lczaiko);
-                } else if (e.gskbn == "1" && e.sday != null) {
+                if (e.sday != null) {
                   e.msgzais.forEach(zai => {
                     const lczai: mwI.Zaiko = {
                       scode: e.scode,
@@ -764,15 +756,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             jyumei.forEach(e => {
               // console.log(e, this.form);
               if (jyuden.skbn != "1") {
-                if (e.gskbn == "0" && e.sday != null) {
-                  const lczaiko: mwI.Zaiko = {
-                    scode: e.scode,
-                    gcode: e.gcode,
-                    day: e.sday,
-                    suu: e.suu
-                  }
-                  this.jmisrv.updZaiko(lczaiko);
-                } else if (e.gskbn == "1" && e.sday != null) {
+                if (e.sday != null) {
                   e.msgzais.forEach(zai => {
                     const lczai: mwI.Zaiko = {
                       scode: e.scode,

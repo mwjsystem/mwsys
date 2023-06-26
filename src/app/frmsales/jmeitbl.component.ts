@@ -802,15 +802,7 @@ export class JmeitblComponent implements OnInit {
       i += 1;
       //trzaikoテーブル取り消し用データ作成
       if (data.skbn != "1") {
-        if (e.gskbn == "0" && e.sday != null) {
-          const lczaiko: mwI.Zaiko = {
-            scode: e.scode,
-            gcode: e.gcode,
-            day: e.sday,
-            suu: e.suu * -1
-          }
-          this.jmisrv.trzaiko.push(lczaiko);
-        } else if (e.gskbn == "1" && e.sday != null) {
+        if (e.sday != null) {
           e.trjyumzais.forEach(zai => {
             const lczai: mwI.Zaiko = {
               scode: e.scode,
