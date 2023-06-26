@@ -81,7 +81,7 @@ export class TransService {
         line
         spec
         spdet
-        mbikou
+        mmemo
         suu
         trjyuden{
           tcode
