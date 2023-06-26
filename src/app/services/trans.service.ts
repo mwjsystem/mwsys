@@ -81,7 +81,7 @@ export class TransService {
         line
         spec
         spdet
-        mmemo
+        mbikou
         suu
         trjyuden{
           tcode
@@ -179,7 +179,7 @@ export class TransService {
       hatzn:vnymat(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, hatzn: {_gt: 0}}) {
         denno
         line
-        mbiko
+        mmemo
         yday
         ydaykbn
         hatzn
