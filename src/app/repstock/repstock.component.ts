@@ -171,10 +171,11 @@ export class RepstockComponent implements OnInit, AfterViewInit {
 
   }
   selScd() {
-    console.log(this.stgds);
+    console.log('selScd', this.stgds, this.stcsrv);
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd) {
         let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
+        console.log('selScd2', this.stcsrv.stcs, this.scode);
         if (i > -1) {
           this.stcsrv.stc.stock = this.stcsrv.stcs[i].stock;
           this.stcsrv.stc.juzan = this.stcsrv.stcs[i].juzan;
