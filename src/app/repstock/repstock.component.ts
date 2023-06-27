@@ -37,7 +37,8 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  constructor(private dialog: MatDialog,
+  constructor(
+    private dialog: MatDialog,
     private route: ActivatedRoute,
     private title: Title,
     private apollo: Apollo,
@@ -129,6 +130,8 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     let dialogRef = this.dialog.open(StcscdsComponent, dialogConfig);
+
+
   }
   setGname(): void {
 
