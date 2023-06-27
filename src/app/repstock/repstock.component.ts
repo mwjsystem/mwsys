@@ -174,7 +174,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     // console.log('selScd', this.stgds, this.stcsrv);
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd) {
-        console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0);
+        console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
         if (this.stcsrv.stcs.length !== 0) {
           let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
           console.log('selScd3', this.stcsrv.stcs, this.scode);
@@ -219,6 +219,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           });
         }
       }
+      console.log('selScd4', this.stcsrv.stc);
       this.isLoading3 = true;
       this.trnsrv.getTrans(this.gcode, this.scode, new Date()).then(result => {
         // console.log(result);
