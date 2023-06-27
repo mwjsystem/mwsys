@@ -207,7 +207,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
         if (this.scode && this.gcode) {
           this.isLoading2 = true;
           this.stcsrv.getStock(this.gcode, "0", this.scode).then(result => {
-            // console.log('result',result);
+            console.log('result', result);
             this.isLoading2 = false;
             this.stcsrv.stc.stock = result[0]?.stock;
             this.stcsrv.stc.juzan = result[0]?.juzan;
