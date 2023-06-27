@@ -91,7 +91,15 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     //   history.replaceState('','','./repstock?gcode=' + this.gcode);
     // }else{
     // if (this.scode){
-    console.log('onChange', this.gcode, this.scode);
+    if (this.gcode !== this.stcsrv.stcGcd) {
+      this.stcsrv.stc.stock = 0;
+      this.stcsrv.stc.juzan = 0;
+      this.stcsrv.stc.today = 0;
+      this.stcsrv.stc.keepd = 0;
+      this.stcsrv.stc.hikat = 0;
+      this.stcsrv.stc.tommo = 0;
+    }
+    // console.log('onChange', this.gcode, this.scode);
     this.selScd();
     // }
 
@@ -102,7 +110,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     } else {
       this.scode = this.usrsrv.staff.scode;
     }
-    console.log('onEnter', this.gcode, this.stcsrv.stc);
+    // console.log('onEnter', this.gcode, this.stcsrv.stc);
     this.getZinfo();
     // this.trnsrv.subject.next();
   }
@@ -171,13 +179,13 @@ export class RepstockComponent implements OnInit, AfterViewInit {
 
   }
   selScd() {
-    console.log('selScd', this.stgds, this.stcsrv.stc);
+    // console.log('selScd', this.stgds, this.stcsrv.stc);
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd) {
-        console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
+        // console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
         if (this.stcsrv.stcs.length !== 0) {
           let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
-          console.log('selScd3', this.stcsrv.stcs, this.scode);
+          // console.log('selScd3', this.stcsrv.stcs, this.scode);
           if (i > -1) {
             this.stcsrv.stc.stock = this.stcsrv.stcs[i].stock;
             this.stcsrv.stc.juzan = this.stcsrv.stcs[i].juzan;
@@ -219,7 +227,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           });
         }
       }
-      console.log('selScd4', this.stcsrv.stc);
+      // console.log('selScd4', this.stcsrv.stc);
       this.isLoading3 = true;
       this.trnsrv.getTrans(this.gcode, this.scode, new Date()).then(result => {
         // console.log(result);
@@ -277,7 +285,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     history.replaceState('', '', './repstock?gcode=' + this.gcode + '&scode=' + this.scode);
   }
   getZinfo() {
-    console.log('getZinfo', this.gcode, this.stcsrv.stc);
+    // console.log('getZinfo', this.gcode, this.stcsrv.stc);
     if (this.gcode) {
       // this.stcsrv.stc.stock = 0;
       // this.stcsrv.stc.juzan = 0;
@@ -286,7 +294,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       // this.stcsrv.stc.hikat = 0;
       // this.stcsrv.stc.tommo = 0;
       this.gcode = this.usrsrv.convUpper(this.gcode);
-      console.log('getZinfo2', this.stcsrv.goods);
+      // console.log('getZinfo2', this.stcsrv.goods);
       if (this.stcsrv.goods.length == 0) {
         const GetMast = gql`
         query get_goods($id: smallint!,$gcd:String!) {
