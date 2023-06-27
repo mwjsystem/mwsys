@@ -180,7 +180,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
 
   }
   selScd() {
-    console.log('selScd', this.stgds, this.stcsrv.stc);
+    console.log('selScd', this.scode, this.stgds, this.stcsrv.stc);
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd) {
         console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
@@ -206,6 +206,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       } else {
         if (this.scode && this.gcode) {
           this.isLoading2 = true;
+          console.log('selScd4', this.stcsrv.stcs, this.scode);
           this.stcsrv.getStock(this.gcode, "0", this.scode).then(result => {
             console.log('result', result);
             this.isLoading2 = false;
