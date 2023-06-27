@@ -171,25 +171,27 @@ export class RepstockComponent implements OnInit, AfterViewInit {
 
   }
   selScd() {
-    console.log('selScd', this.stgds, this.stcsrv);
+    // console.log('selScd', this.stgds, this.stcsrv);
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd) {
-        let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
-        console.log('selScd2', this.stcsrv.stcs, this.scode);
-        if (i > -1) {
-          this.stcsrv.stc.stock = this.stcsrv.stcs[i].stock;
-          this.stcsrv.stc.juzan = this.stcsrv.stcs[i].juzan;
-          this.stcsrv.stc.today = this.stcsrv.stcs[i].today;
-          this.stcsrv.stc.keepd = this.stcsrv.stcs[i].keepd;
-          this.stcsrv.stc.hikat = this.stcsrv.stcs[i].hikat;
-          this.stcsrv.stc.tommo = this.stcsrv.stcs[i].tommo;
-        } else {
-          this.stcsrv.stc.stock = 0;
-          this.stcsrv.stc.juzan = 0;
-          this.stcsrv.stc.today = 0;
-          this.stcsrv.stc.keepd = 0;
-          this.stcsrv.stc.hikat = 0;
-          this.stcsrv.stc.tommo = 0;
+        if (this.stcsrv.stcs.length !== 0) {
+          let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
+          // console.log('selScd2', this.stcsrv.stcs, this.scode);
+          if (i > -1) {
+            this.stcsrv.stc.stock = this.stcsrv.stcs[i].stock;
+            this.stcsrv.stc.juzan = this.stcsrv.stcs[i].juzan;
+            this.stcsrv.stc.today = this.stcsrv.stcs[i].today;
+            this.stcsrv.stc.keepd = this.stcsrv.stcs[i].keepd;
+            this.stcsrv.stc.hikat = this.stcsrv.stcs[i].hikat;
+            this.stcsrv.stc.tommo = this.stcsrv.stcs[i].tommo;
+          } else {
+            this.stcsrv.stc.stock = 0;
+            this.stcsrv.stc.juzan = 0;
+            this.stcsrv.stc.today = 0;
+            this.stcsrv.stc.keepd = 0;
+            this.stcsrv.stc.hikat = 0;
+            this.stcsrv.stc.tommo = 0;
+          }
         }
       } else {
         if (this.scode && this.gcode) {
@@ -273,7 +275,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     history.replaceState('', '', './repstock?gcode=' + this.gcode + '&scode=' + this.scode);
   }
   getZinfo() {
-    console.log('getZinfo', this.gcode);
+    // console.log('getZinfo', this.gcode);
     if (this.gcode) {
       this.stcsrv.stc.stock = 0;
       this.stcsrv.stc.juzan = 0;
@@ -282,7 +284,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       this.stcsrv.stc.hikat = 0;
       this.stcsrv.stc.tommo = 0;
       this.gcode = this.usrsrv.convUpper(this.gcode);
-      console.log('getZinfo2', this.stcsrv.goods);
+      // console.log('getZinfo2', this.stcsrv.goods);
       if (this.stcsrv.goods.length == 0) {
         const GetMast = gql`
         query get_goods($id: smallint!,$gcd:String!) {
