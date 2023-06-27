@@ -182,26 +182,25 @@ export class RepstockComponent implements OnInit, AfterViewInit {
   selScd() {
     console.log('selScd', this.scode, this.stgds, this.stcsrv.stc);
     if (this.stgds.gskbn == "0") {
-      if (this.gcode == this.stcsrv.stcGcd) {
+      if (this.gcode == this.stcsrv.stcGcd && this.stcsrv.stcs.length !== 0) {
         console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
-        if (this.stcsrv.stcs.length !== 0) {
-          let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
-          console.log('selScd3', this.stcsrv.stcs, this.scode);
-          if (i > -1) {
-            this.stcsrv.stc.stock = this.stcsrv.stcs[i].stock;
-            this.stcsrv.stc.juzan = this.stcsrv.stcs[i].juzan;
-            this.stcsrv.stc.today = this.stcsrv.stcs[i].today;
-            this.stcsrv.stc.keepd = this.stcsrv.stcs[i].keepd;
-            this.stcsrv.stc.hikat = this.stcsrv.stcs[i].hikat;
-            this.stcsrv.stc.tommo = this.stcsrv.stcs[i].tommo;
-          } else {
-            this.stcsrv.stc.stock = 0;
-            this.stcsrv.stc.juzan = 0;
-            this.stcsrv.stc.today = 0;
-            this.stcsrv.stc.keepd = 0;
-            this.stcsrv.stc.hikat = 0;
-            this.stcsrv.stc.tommo = 0;
-          }
+
+        let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
+        console.log('selScd3', this.stcsrv.stcs, this.scode);
+        if (i > -1) {
+          this.stcsrv.stc.stock = this.stcsrv.stcs[i].stock;
+          this.stcsrv.stc.juzan = this.stcsrv.stcs[i].juzan;
+          this.stcsrv.stc.today = this.stcsrv.stcs[i].today;
+          this.stcsrv.stc.keepd = this.stcsrv.stcs[i].keepd;
+          this.stcsrv.stc.hikat = this.stcsrv.stcs[i].hikat;
+          this.stcsrv.stc.tommo = this.stcsrv.stcs[i].tommo;
+        } else {
+          this.stcsrv.stc.stock = 0;
+          this.stcsrv.stc.juzan = 0;
+          this.stcsrv.stc.today = 0;
+          this.stcsrv.stc.keepd = 0;
+          this.stcsrv.stc.hikat = 0;
+          this.stcsrv.stc.tommo = 0;
         }
       } else {
         if (this.scode && this.gcode) {
