@@ -81,7 +81,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
   }
 
   convUpper(event: KeyboardEvent) {
-    console.log((event.target as HTMLInputElement));
+    // console.log((event.target as HTMLInputElement));
     this.gcode = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
   }
 
@@ -171,6 +171,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
 
   }
   selScd() {
+    console.log(this.stgds);
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd) {
         let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);

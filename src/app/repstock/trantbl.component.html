@@ -3,7 +3,7 @@
         <ng-container matColumnDef="ttype">
             <th mat-header-cell *matHeaderCellDef>区分</th>
             <td mat-cell *matCellDef="let row">
-                <mat-form-field style="width:6em;">
+                <mat-form-field style="width:7em;">
                     <input matInput value="{{row.ttype}}" disabled [ngStyle]="{'color': setColor(row.ttype)}">
                     <button mat-icon-button matSuffix (click)="usrsrv.openFrm(row.ttype,row.denno)"
                         *ngIf="row.ttype !='前残'">
