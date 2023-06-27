@@ -171,7 +171,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
 
   }
   selScd() {
-    // console.log('selScd', this.stgds, this.stcsrv);
+    console.log('selScd', this.stgds, this.stcsrv.stc);
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd) {
         console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
