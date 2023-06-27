@@ -277,14 +277,14 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     history.replaceState('', '', './repstock?gcode=' + this.gcode + '&scode=' + this.scode);
   }
   getZinfo() {
-    console.log('getZinfo', this.gcode);
+    console.log('getZinfo', this.gcode, this.stcsrv.stc);
     if (this.gcode) {
-      this.stcsrv.stc.stock = 0;
-      this.stcsrv.stc.juzan = 0;
-      this.stcsrv.stc.today = 0;
-      this.stcsrv.stc.keepd = 0;
-      this.stcsrv.stc.hikat = 0;
-      this.stcsrv.stc.tommo = 0;
+      // this.stcsrv.stc.stock = 0;
+      // this.stcsrv.stc.juzan = 0;
+      // this.stcsrv.stc.today = 0;
+      // this.stcsrv.stc.keepd = 0;
+      // this.stcsrv.stc.hikat = 0;
+      // this.stcsrv.stc.tommo = 0;
       this.gcode = this.usrsrv.convUpper(this.gcode);
       console.log('getZinfo2', this.stcsrv.goods);
       if (this.stcsrv.goods.length == 0) {
