@@ -91,14 +91,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     //   history.replaceState('','','./repstock?gcode=' + this.gcode);
     // }else{
     // if (this.scode){
-    if (this.gcode !== this.stcsrv.stcGcd) {
-      this.stcsrv.stc.stock = 0;
-      this.stcsrv.stc.juzan = 0;
-      this.stcsrv.stc.today = 0;
-      this.stcsrv.stc.keepd = 0;
-      this.stcsrv.stc.hikat = 0;
-      this.stcsrv.stc.tommo = 0;
-    }
+
     // console.log('onChange', this.gcode, this.scode);
     this.selScd();
     // }
@@ -109,6 +102,14 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     if (this.scode != null) {
     } else {
       this.scode = this.usrsrv.staff.scode;
+    }
+    if (this.gcode !== this.stcsrv.stcGcd) {
+      this.stcsrv.stc.stock = 0;
+      this.stcsrv.stc.juzan = 0;
+      this.stcsrv.stc.today = 0;
+      this.stcsrv.stc.keepd = 0;
+      this.stcsrv.stc.hikat = 0;
+      this.stcsrv.stc.tommo = 0;
     }
     // console.log('onEnter', this.gcode, this.stcsrv.stc);
     this.getZinfo();
@@ -179,13 +180,13 @@ export class RepstockComponent implements OnInit, AfterViewInit {
 
   }
   selScd() {
-    // console.log('selScd', this.stgds, this.stcsrv.stc);
+    console.log('selScd', this.stgds, this.stcsrv.stc);
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd) {
-        // console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
+        console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
         if (this.stcsrv.stcs.length !== 0) {
           let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
-          // console.log('selScd3', this.stcsrv.stcs, this.scode);
+          console.log('selScd3', this.stcsrv.stcs, this.scode);
           if (i > -1) {
             this.stcsrv.stc.stock = this.stcsrv.stcs[i].stock;
             this.stcsrv.stc.juzan = this.stcsrv.stcs[i].juzan;
