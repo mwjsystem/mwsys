@@ -91,7 +91,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     //   history.replaceState('','','./repstock?gcode=' + this.gcode);
     // }else{
     // if (this.scode){
-    // console.log(this.scode); 
+    console.log('onChange', this.gcode, this.scode);
     this.selScd();
     // }
 
@@ -102,9 +102,9 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     } else {
       this.scode = this.usrsrv.staff.scode;
     }
+    console.log('onEnter', this.gcode, this.stcsrv.stc);
     this.getZinfo();
     // this.trnsrv.subject.next();
-    // console.log(this.gcode);
   }
 
   gcdHelp(): void {
