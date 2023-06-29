@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, UntypedFormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
@@ -24,11 +24,11 @@ import { filter } from 'rxjs/operators';
 })
 export class FrmmoveComponent implements OnInit {
   @ViewChild(MovtblComponent) movtbl: MovtblComponent;
-  form: UntypedFormGroup;
+  form: FormGroup;
   denno: number = 0;
   mode: number = 3;
   hktval: mwI.Sval[] = [];
-  rows: UntypedFormArray = this.fb.array([]);
+  rows: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -39,7 +39,7 @@ export class FrmmoveComponent implements OnInit {
     public okrsrv: OkuriService,
     public strsrv: StoreService,
     public movsrv: MovingService,
-    private fb: UntypedFormBuilder,
+    private fb: FormBuilder,
     private dialog: MatDialog,
     private overlay: Overlay,
     private cdRef: ChangeDetectorRef,
@@ -51,18 +51,18 @@ export class FrmmoveComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      day: new UntypedFormControl('', Validators.required),
-      incode: new UntypedFormControl('', Validators.required),
-      outcode: new UntypedFormControl('', Validators.required),
-      tcode: new UntypedFormControl('', Validators.required),
-      hcode: new UntypedFormControl(),
-      hday: new UntypedFormControl(),
-      htime: new UntypedFormControl(),
-      okurisuu: new UntypedFormControl(),
-      okurino: new UntypedFormControl(),
-      bikou: new UntypedFormControl(),
-      sbikou: new UntypedFormControl(),
-      obikou: new UntypedFormControl(),
+      day: new FormControl('', Validators.required),
+      incode: new FormControl('', Validators.required),
+      outcode: new FormControl('', Validators.required),
+      tcode: new FormControl('', Validators.required),
+      hcode: new FormControl(),
+      hday: new FormControl(),
+      htime: new FormControl(),
+      okurisuu: new FormControl(),
+      okurino: new FormControl(),
+      bikou: new FormControl(),
+      sbikou: new FormControl(),
+      obikou: new FormControl(),
       mtbl: this.rows
     });
     this.okrsrv.getHaisou();
@@ -143,8 +143,8 @@ export class FrmmoveComponent implements OnInit {
     }
     this.cdRef.detectChanges();
   }
-  get frmArr(): UntypedFormArray {
-    return this.form.get('mtbl') as UntypedFormArray;
+  get frmArr(): FormArray {
+    return this.form.get('mtbl') as FormArray;
   }
 
   onEnter() {
