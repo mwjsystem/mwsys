@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectorRef } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray } from '@angular/forms';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
-import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { StockService } from './../services/stock.service';
@@ -17,7 +17,7 @@ import { take } from 'rxjs/operators';
   styleUrls: ['./../tbl.component.scss']
 })
 export class MovtblComponent implements OnInit {
-  @Input() parentForm: UntypedFormGroup;
+  @Input() parentForm: FormGroup;
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChildren('gcdInputs') gcdInps: QueryList<ElementRef>;
   private el: HTMLInputElement;
@@ -41,7 +41,7 @@ export class MovtblComponent implements OnInit {
   constructor(private cdRef: ChangeDetectorRef,
     private elementRef: ElementRef,
     private dialog: MatDialog,
-    private fb: UntypedFormBuilder,
+    private fb: FormBuilder,
     private apollo: Apollo,
     public movsrv: MovingService,
     public stcsrv: StockService,
@@ -131,18 +131,17 @@ export class MovtblComponent implements OnInit {
         console.log('error query get_good', error);
       });
   }
-  getMtbl(i: number, fnm: string): UntypedFormArray {
-    return this.frmArr.controls[i].get(fnm) as UntypedFormArray;
+  getMtbl(i: number, fnm: string): FormArray {
+    return this.frmArr.controls[i].get(fnm) as FormArray;
   }
   createRow(i: number, movden?: Movden) {
     let lcArr = this.fb.array([]);
-    if (movden?.msgood.gskbn == "1") {
-      movden.msgood.msgzais.forEach(e => {
-        if (e.msgoods.gskbn == "0") {
-          lcArr.push(this.fb.group({ zcode: e.zcode, irisu: e.irisu, msgoods: e.msgoods }));
-        }
-      });
-    }
+
+    movden.msgood.msgzais.forEach(e => {
+      if (e.msgoods.gskbn == "0") {
+        lcArr.push(this.fb.group({ zcode: e.zcode, irisu: e.irisu, msgoods: e.msgoods }));
+      }
+    });
     return this.fb.group({
       chk: [''],
       line: [{ value: i, disabled: true }],
@@ -213,9 +212,9 @@ export class MovtblComponent implements OnInit {
     }
     this.refresh();
   }
-  get frmArr(): UntypedFormArray {
+  get frmArr(): FormArray {
     // console.log(this.parentForm);    
-    return this.parentForm.get('mtbl') as UntypedFormArray;
+    return this.parentForm.get('mtbl') as FormArray;
   }
   frmVal(i: number, fld: string): string {
     return this.frmArr.getRawValue()[i][fld];
@@ -314,39 +313,23 @@ export class MovtblComponent implements OnInit {
       this.setPable(i, e.gcode, e.msgood.msgzais);
       i += 1;
       // console.log(e);
-      if (e.msgood.gskbn == "0") {
+
+      e.msgood.msgzais.forEach(zai => {
         this.trzaiko.push({
           scode: this.parentForm.get('incode').value,
-          gcode: e.gcode,
+          gcode: zai.zcode,
           day: this.parentForm.get('day').value,
-          movi: e.suu * -1,
+          movi: e.suu * zai.irisu * -1,
           movo: 0
         });
         this.trzaiko.push({
           scode: this.parentForm.get('outcode').value,
-          gcode: e.gcode,
+          gcode: zai.zcode,
           day: this.parentForm.get('day').value,
           movi: 0,
-          movo: e.suu * -1,
+          movo: e.suu * zai.irisu * -1,
         });
-      } else if (e.msgood.gskbn == "1") {
-        e.msgood.msgzais.forEach(zai => {
-          this.trzaiko.push({
-            scode: this.parentForm.get('incode').value,
-            gcode: zai.zcode,
-            day: this.parentForm.get('day').value,
-            movi: e.suu * zai.irisu * -1,
-            movo: 0
-          });
-          this.trzaiko.push({
-            scode: this.parentForm.get('outcode').value,
-            gcode: zai.zcode,
-            day: this.parentForm.get('day').value,
-            movi: 0,
-            movo: e.suu * zai.irisu * -1,
-          });
-        });
-      }
+      });
     });
     this.refresh();
   }
