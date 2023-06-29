@@ -9,8 +9,8 @@ import { FrmmoveComponent } from './frmmove.component';
 import { MovtblComponent } from './movtbl.component';
 import { MdnohelpComponent } from '../share/mdnohelp/mdnohelp.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
-
 import { ClipboardModule } from '@angular/cdk/clipboard';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -42,6 +42,7 @@ registerLocaleData(localeJa);
     FrmmoveRoutingModule,
     FormsModule,
     ReactiveFormsModule,
+
     ClipboardModule,
     MatButtonModule,
     MatCardModule,

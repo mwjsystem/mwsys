@@ -4,8 +4,9 @@ import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { MatLegacySpinner as MatSpinner } from '@angular/material/legacy-progress-spinner';
-import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
+import { MatSpinner } from '@angular/material/spinner';
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+
 import { Zaiko, Movsub, MovingService } from './moving.service';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';

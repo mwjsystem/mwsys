@@ -580,6 +580,12 @@ export class JmeitblComponent implements OnInit {
             if (this.hatden.indexOf(msgds.msggroup.vcode) == -1) {
               this.hatden.push(msgds.msggroup.vcode);
             }
+            // } else { 
+            // 加工品かどうか判定
+            // let msgds.msgstit.forEach(e => {
+
+            // });
+
           }
           msgds.msgzais.forEach(e => {
             let k: number = 0;
