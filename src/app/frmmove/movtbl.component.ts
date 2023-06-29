@@ -2,7 +2,7 @@ import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRe
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { atDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { StockService } from './../services/stock.service';
@@ -135,13 +135,14 @@ export class MovtblComponent implements OnInit {
     return this.frmArr.controls[i].get(fnm) as FormArray;
   }
   createRow(i: number, movden?: Movden) {
-    let lcArr = this.fb.array([]);
-
-    movden.msgood.msgzais.forEach(e => {
-      if (e.msgoods.gskbn == "0") {
-        lcArr.push(this.fb.group({ zcode: e.zcode, irisu: e.irisu, msgoods: e.msgoods }));
-      }
-    });
+    let lcArr: FormArray = this.fb.array([]);
+    if (movden?.msgood.gskbn == "1") {
+      movden.msgood.msgzais.forEach(e => {
+        if (e.msgoods.gskbn == "0") {
+          lcArr.push(this.fb.group({ zcode: e.zcode, irisu: e.irisu, msgoods: e.msgoods }));
+        }
+      });
+    }
     return this.fb.group({
       chk: [''],
       line: [{ value: i, disabled: true }],
