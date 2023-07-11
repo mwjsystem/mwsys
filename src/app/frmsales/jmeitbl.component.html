@@ -157,7 +157,7 @@
       <ng-container matColumnDef="pable">
         <th mat-header-cell *matHeaderCellDef class="i_num">受注可能数</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
-          <mat-form-field style="width:4em;"
+          <mat-form-field style="width: 6em;"
             [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
             <button mat-icon-button matPrefix *ngIf="frmArr.getRawValue()[getIdx(i)]['gcode']"
               (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],frmArr.getRawValue()[getIdx(i)]['scode'])">
@@ -176,6 +176,18 @@
             <mat-select #msel4 formControlName="spec" (keydown.enter)="msel4.close()"
               (selectionChange)="changeSpec(getIdx(i))" [style.background-color]="msel4.value == '0' ? 'red': 'white'">
               <mat-option *ngFor="let sval of bunsrv.kbn.jmeikbn" [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="scode">
+        <th mat-header-cell *matHeaderCellDef>出荷倉庫</th>
+        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
+          <mat-form-field>
+            <mat-select formControlName="scode">
+              <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
             </mat-select>
@@ -207,18 +219,6 @@
           <mat-form-field style="width:6em;">
             <input matInput numInput formControlName="genka" class="i_num" (change)="calcMei(getIdx(i))">
             <!-- <input matInput [value]="frmVal(getIdx(i),'genka') | number" disabled class="i_num"> -->
-          </mat-form-field>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="scode">
-        <th mat-header-cell *matHeaderCellDef>出荷倉庫</th>
-        <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
-          <mat-form-field>
-            <mat-select formControlName="scode">
-              <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
-                {{sval.viewval}}
-              </mat-option>
-            </mat-select>
           </mat-form-field>
         </td>
       </ng-container>

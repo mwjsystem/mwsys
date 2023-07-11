@@ -54,10 +54,10 @@ export class JmeitblComponent implements OnInit {
     'tinmoney',
     'mmemo',
     'pable',
+    'scode',
     'spec',
     'spdet'];
   addCol = ['genka',
-    'scode',
     'sday',
     'tanka1',
     'toutmoney',
