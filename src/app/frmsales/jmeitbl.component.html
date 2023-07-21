@@ -48,12 +48,12 @@
           <button mat-icon-button (click)="insRow(true,getIdx(i)+1)" *ngIf="frmArr.enabled">
             <mat-icon>content_copy</mat-icon>
           </button>
-          <button mat-icon-button (click)="delRow(getIdx(i))" *ngIf="frmArr.enabled">
-            <mat-icon>remove_circle</mat-icon>
-          </button>
           <mat-form-field style="width: 2em;">
             <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
           </mat-form-field>
+          <button mat-icon-button (click)="delRow(getIdx(i))" *ngIf="frmArr.enabled">
+            <mat-icon>remove_circle</mat-icon>
+          </button>
         </td>
       </ng-container>
       <!-- <ng-container matColumnDef="line2" sticky>
