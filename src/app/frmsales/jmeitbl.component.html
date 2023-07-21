@@ -54,10 +54,10 @@
         <th mat-header-cell *matHeaderCellDef style="width: 5em;">操作
         </th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)" style="width: 5em;">
-          <button mat-icon-button matPrefix (click)="insRow(true,getIdx(i)+1)" *ngIf="frmArr.enabled">
+          <button mat-icon-button (click)="insRow(true,getIdx(i)+1)" *ngIf="frmArr.enabled">
             <mat-icon>content_copy</mat-icon>
           </button>
-          <button mat-icon-button matPrefix (click)="delRow(getIdx(i))" *ngIf="frmArr.enabled">
+          <button mat-icon-button (click)="delRow(getIdx(i))" *ngIf="frmArr.enabled">
             <mat-icon>remove_circle</mat-icon>
           </button>
         </td>
