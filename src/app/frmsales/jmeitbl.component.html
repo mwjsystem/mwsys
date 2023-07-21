@@ -169,7 +169,7 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="spec">
-        <th mat-header-cell *matHeaderCellDef>在庫状態</th>
+        <th mat-header-cell *matHeaderCellDef>在庫種別</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;"
             [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">

@@ -142,7 +142,7 @@ export class JmeitblComponent implements OnInit {
     this.jmisrv.subject.next(true);
     // this.jmisrv.subject.complete();
     this.refresh();
-    // console.log(this.frmArr,this.parentForm);
+    console.log(this.frmArr, this.parentForm);
   }
   calcMei(i: number): void {
     const ctrl = this.frmArr.controls[i].value;
