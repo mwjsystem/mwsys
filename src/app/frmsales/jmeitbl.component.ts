@@ -142,7 +142,7 @@ export class JmeitblComponent implements OnInit {
     this.jmisrv.subject.next(true);
     // this.jmisrv.subject.complete();
     this.refresh();
-    console.log(this.frmArr, this.parentForm);
+    // console.log(this.frmArr, this.parentForm);
   }
   calcMei(i: number): void {
     const ctrl = this.frmArr.controls[i].value;
@@ -351,7 +351,7 @@ export class JmeitblComponent implements OnInit {
     this.autoFil();
   }
   insRow(flgCP: boolean, row: number) {
-    console.log(flgCP, row);
+    // console.log(flgCP, row);
     if (flgCP) {
       this.frmArr.insert(row, this.createRow(row, this.frmArr.controls[row - 1].value));
     } else {

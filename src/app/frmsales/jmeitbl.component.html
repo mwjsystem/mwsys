@@ -42,12 +42,11 @@
           </button>
         </th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <button mat-icon-button (click)="insRow(false,getIdx(i)+1)" *ngIf="frmArr.enabled">
+            <mat-icon>add_circle</mat-icon>
+          </button>
           <mat-form-field style="width:5em;">
             <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
-            <button mat-icon-button matPrefix (click)="insRow(false,getIdx(i)+1)" *ngIf="frmArr.enabled">
-              <mat-icon>add_circle</mat-icon>
-            </button>
-
           </mat-form-field>
         </td>
       </ng-container>
