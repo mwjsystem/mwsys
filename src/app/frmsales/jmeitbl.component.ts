@@ -351,6 +351,7 @@ export class JmeitblComponent implements OnInit {
     this.autoFil();
   }
   insRow(flgCP: boolean, row: number) {
+    console.log(flgCP, row);
     if (flgCP) {
       this.frmArr.insert(row, this.createRow(row, this.frmArr.controls[row - 1].value));
     } else {
