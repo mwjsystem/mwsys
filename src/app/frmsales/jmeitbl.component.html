@@ -51,9 +51,9 @@
         </td>
       </ng-container>
       <ng-container matColumnDef="line2" sticky>
-        <th mat-header-cell *matHeaderCellDef>操作
+        <th mat-header-cell *matHeaderCellDef style="width: 5em;">操作
         </th>
-        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)" style="width: 4em;">
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)" style="width: 5em;">
           <button mat-icon-button matPrefix (click)="insRow(true,getIdx(i)+1)" *ngIf="frmArr.enabled">
             <mat-icon>content_copy</mat-icon>
           </button>
