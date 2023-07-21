@@ -44,7 +44,7 @@ export class JmeitblComponent implements OnInit {
   setZai = [];
   defCol = ['chk',
     'line',
-    'line2',
+    // 'line2',
     'gcode',
     'gtext',
     'suu',
@@ -56,13 +56,13 @@ export class JmeitblComponent implements OnInit {
     'pable',
     'scode',
     'spec',
-    'spdet'];
+    'spdet',
+    'mtax'];
   addCol = ['genka',
     'sday',
     'tanka1',
     'toutmoney',
     'money',
-    'mtax',
     'tgenka',
     'taxmoney',
     'taxrate',
