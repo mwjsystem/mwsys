@@ -1,5 +1,11 @@
 <div style="height: 40px;" class="grid grid-row gap-2 mat-elevation-z8">
   <button mat-flat-button color="warn" (click)="toFrmsup()" *ngIf="frmArr.enabled && hatden.length>0">発注伝票登録</button>
+  <button mat-flat-button color="warn" (click)="toFrmsup()"
+    *ngIf="frmArr.enabled && movden.length>0">移動伝票登録(加工)</button>
+  <button mat-flat-button color="warn" (click)="toFrmsup()"
+    *ngIf="frmArr.enabled && movden.length>0">移動伝票登録(加工用)</button>
+  <button mat-flat-button color="warn" (click)="toFrmsup()"
+    *ngIf="frmArr.enabled && movden.length>0">移動伝票登録(加工用)</button>
   <button mat-flat-button color="primary" (click)="toFrmmov()"
     *ngIf="frmArr.enabled && movden.length>0">加工依頼(移動・指示書)</button>
   <mat-form-field style="width: 10em;" *ngIf="frmArr.enabled">
