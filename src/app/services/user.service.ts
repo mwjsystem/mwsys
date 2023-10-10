@@ -7,7 +7,7 @@ import { AbstractControl } from "@angular/forms";
 import { Observable, Subject } from "rxjs";
 import gql from "graphql-tag";
 import { ToastrService } from "ngx-toastr";
-import { environment } from "./../../environments/environment";
+import { environment } from './../../environments/environment';
 
 export class TmStmp {
   created_at: Date;
@@ -139,14 +139,15 @@ export class UserService {
 
   logout(): void {
     // Call this to log the user out of the application
-    this.auth.logout({
-      client_id: environment.AUTH0_CLIENT_ID,
-      logoutParams: {
-        returnTo: document.location.origin,
-
-        localOnly: false,
-      },
-    });
+    this.auth.logout(
+      {
+        clientId: environment.AUTH0_CLIENT_ID,
+        logoutParams: {
+          returnTo: document.location.origin,
+          localOnly: false
+        }
+      }
+    );
   }
 
   async getStaff(mail: string): Promise<mwI.Staff> {
