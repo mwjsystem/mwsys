@@ -138,7 +138,7 @@ export class UserService {
 
   logout(): void {
     // Call this to log the user out of the application
-    this.auth.logout({ logoutParams: { returnTo: window.location.origin } });
+    this.auth.logout({ logoutParams: { returnTo: document.location.origin } });
   }
 
   async getStaff(mail: string): Promise<mwI.Staff> {
