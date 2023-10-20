@@ -95,8 +95,9 @@ export class UserService {
 
     this.auth.user$.subscribe((user) => {
       this.userInfo = user;
-      // console.log(this.userInfo);
+      // console.log('usersrv1', this.userInfo, this.compid);
       this.compid = this.userInfo["https://userids"][0];
+      console.log('usersrv2', this.userInfo, this.compid);
       this.apollo
         .watchQuery<any>({
           query: GetMast,
@@ -113,22 +114,22 @@ export class UserService {
           }
         );
 
-      const color: string = localStorage.getItem(
-        this.userInfo["nickname"] + "MWSYS_COLOR"
-      );
+      // const color: string = localStorage.getItem(
+        // this.userInfo["nickname"] + "MWSYS_COLOR"
+      // );
       // console.log(color);
-      if (color !== null) {
-        var links = document.getElementsByTagName("link");
-        for (var i = 0; i < links.length; i++) {
-          var link = links[i];
-          if (link.id == "themeAsset") {
-            link.href =
-              "https://unpkg.com/@angular/material/prebuilt-themes/" +
-              color +
-              ".css";
-          }
-        }
-      }
+      // if (color !== null) {
+        // var links = document.getElementsByTagName("link");
+        // for (var i = 0; i < links.length; i++) {
+          // var link = links[i];
+          // if (link.id == "themeAsset") {
+            // link.href =
+              // "https://unpkg.com/@angular/material/prebuilt-themes/" +
+              // color +
+              // ".css";
+          // }
+        // }
+      // }
       this.getHolidays();
       this.getStaff(this.userInfo["email"]).then(
         (result) => (this.staff = result)
@@ -139,11 +140,13 @@ export class UserService {
 
   logout(): void {
     // Call this to log the user out of the application
+    console.log(environment.AUTH0_CLIENT_ID);
     this.auth.logout(
       {
         clientId: environment.AUTH0_CLIENT_ID,
         logoutParams: {
           returnTo: document.location.origin,
+		  federated: false,
           localOnly: false
         }
       }

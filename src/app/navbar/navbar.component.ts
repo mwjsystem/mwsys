@@ -9,7 +9,8 @@ import { DownloadService } from './../services/download.service';
 })
 export class NavbarComponent implements OnInit {
   public db: string;
-  constructor(public usrsrv: UserService,
+  constructor(
+	public usrsrv: UserService,
     public dwlsrv: DownloadService,
     public elementRef: ElementRef) { }
 
