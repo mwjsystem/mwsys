@@ -376,6 +376,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
   changeMcd() {
     let lcmcode: string = "";
+	console.log(this.form.value.mcode);
     if (this.form.value.mcode != null) {
       lcmcode = this.usrsrv.convUpper(this.form.value.mcode);
     } else {
