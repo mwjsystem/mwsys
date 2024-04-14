@@ -17,7 +17,7 @@ export class MembsService {
   getMembers(): Promise<Boolean> {
     const GetMast = gql`
     query get_members($id: smallint!) {
-      msmember(where: {id: {_eq: $id}}, order_by: {mcode: asc}) {
+      msmember(where: {id: {_eq: $id},daibunrui: {_iregex: "^(?!2).*$"}}, order_by: {mcode: asc}) {
         mcode
         sei
         mei
