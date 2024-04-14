@@ -376,16 +376,20 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
   changeMcd() {
     let lcmcode: string = "";
-	console.log(this.form.value.mcode);
     if (this.form.value.mcode != null) {
       lcmcode = this.usrsrv.convUpper(this.form.value.mcode);
     } else {
       lcmcode = "";
     }
+    this.getMember(lcmcode, true);	
     this.form.get('mcode').setValue(lcmcode);
-    this.form.get('scde').setValue(lcmcode);
-    this.form.get('ncode').setValue(lcmcode);
-    this.getMember(lcmcode, true);
+	if (this.form.value.scde == null) {
+	　 this.form.get('scde').setValue(lcmcode);      
+	}  
+    if (this.form.value.ncode == null) {
+      this.form.get('ncode').setValue(lcmcode);
+	}
+	// console.log(this.form.value);
   }
 
   changeEda(eda: number) {
@@ -502,7 +506,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           this.iskVal = this.nskVal.concat();
           this.iskVal.unshift({ value: " ", viewval: "通常依頼主" });
           this.changeEda(this.form.value.nadr);
-          // console.log(this.bnssrv.buntype, this.jmisrv.ntype, this.jmisrv.tntype);
+          // console.log("getMember",this.form.value);
           this.cdRef.detectChanges();
         }
       }, (error) => {
