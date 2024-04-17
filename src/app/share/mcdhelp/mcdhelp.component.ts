@@ -50,6 +50,7 @@ export class McdhelpComponent implements OnInit {
   ftcd1: string = "";
   ftcd: string = "";
   feda0: boolean = true;
+  fnorm: boolean = true;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -132,6 +133,9 @@ export class McdhelpComponent implements OnInit {
       } else {
         varWh['where2'] = { "eda": { "_eq": 0 } };
       }
+    }
+	if (this.fnorm) {
+      varWh['where']._and.push({ "daibunrui": { "_iregex": "^(?!2).*$" } });
     }
     // console.log(varWh, varWh['where2'] != null);
     this.mcds = [];
