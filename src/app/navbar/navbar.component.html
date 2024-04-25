@@ -3,7 +3,7 @@
         <mat-icon>dashboard</mat-icon>
     </a>
     <a mat-button routerLink="/frmsales">受注伝票</a>
-    <a mat-button>受注履歴</a>
+    <a mat-button routerLink="/rephistory">受注履歴</a>
     <button mat-button [matMenuTriggerFor]="cust">顧客関連</button>
     <mat-menu #cust="matMenu">
         <button mat-menu-item routerLink="/mstmember">顧客マスタ</button>

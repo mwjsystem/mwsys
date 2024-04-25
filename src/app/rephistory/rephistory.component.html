@@ -1,0 +1,25 @@
+<mat-toolbar class="toolbar mat-elevation-z8" color="primary">
+  <div class="icon-area" class="flex flex-nowrap">
+    <button mat-menu-item (click)="makeLstHist()"><mat-icon>description</mat-icon>受注履歴</button>
+    <button mat-flat-button><a mat-flat-button
+        href="{{usrsrv.manurl + '&ActiveCell=%27sales%27!A1'}}" target="_blank">
+        <mat-icon>help</mat-icon>ヘルプ
+      </a></button>
+  </div>
+</mat-toolbar>
+<form [formGroup]="form">
+    <div class="flex items-center">
+		<mat-form-field style="width: 7em;">
+		  <mat-label>受注先</mat-label>
+		  <input matInput formControlName="mcode" required 
+			(keydown.f4)="mcdHelp()" maxlength="12">
+		</mat-form-field>
+		<button mat-icon-button (click)="mcdHelp()">
+		  <mat-icon>find_replace</mat-icon>
+		</button>
+		<span class="inline-block align-middle">{{form.getRawValue().mcode | mcdtxt}}</span>
+		<button mat-icon-button *ngIf="form.value.mcode" (click)="usrsrv.openMst('mstmember',form.value.mcode)">
+		  <mat-icon>open_in_new</mat-icon>
+		</button>
+	</div>
+</form>

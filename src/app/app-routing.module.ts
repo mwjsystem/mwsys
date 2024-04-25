@@ -19,6 +19,7 @@ const routes: Routes = [
   { path: 'frmtreat', loadChildren: () => import('./frmtreat/frmtreat.module').then(m => m.FrmtreatModule), canActivate: [AuthGuard] },
   { path: 'repstock', loadChildren: () => import('./repstock/repstock.module').then(m => m.RepstockModule), canActivate: [AuthGuard] },
   { path: 'mstgoods', loadChildren: () => import('./mstgoods/mstgoods.module').then(m => m.MstgoodsModule), canActivate: [AuthGuard] },
+  { path: 'rephistory', loadChildren: () => import('./rephistory/rephistory.module').then(m => m.RephistoryModule), canActivate: [AuthGuard] },
   { path: 'mstmember', loadChildren: () => import('./mstmember/mstmember.module').then(m => m.MstmemberModule), canActivate: [AuthGuard] },
   { path: 'mstvendor', loadChildren: () => import('./mstvendor/mstvendor.module').then(m => m.MstvendorModule), canActivate: [AuthGuard] }
 ];
