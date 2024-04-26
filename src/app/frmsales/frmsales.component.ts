@@ -199,7 +199,6 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   makeFrmShip(typ: string) {
-    // console.log(typ);
     if (this.okrsrv.getHinfo(this.form.value.hcode).numbering && !this.form.value.okurino) {
       this.setOkrno().then(() => {
         this.save().then(() => {

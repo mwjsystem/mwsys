@@ -1,7 +1,8 @@
 <mat-toolbar class="toolbar mat-elevation-z8" color="primary">
   <div class="icon-area" class="flex flex-nowrap">
-    <button mat-menu-item (click)="makeLstHist()"><mat-icon>description</mat-icon>受注履歴</button>
-    <button mat-flat-button><a mat-flat-button
+    <button mat-flat-button (click)="makeLstHist()"><mat-icon>description</mat-icon>受注履歴</button>
+    <a id="csv-donwload" data-type="text/csv"></a>
+	<button mat-flat-button><a mat-flat-button
         href="{{usrsrv.manurl + '&ActiveCell=%27sales%27!A1'}}" target="_blank">
         <mat-icon>help</mat-icon>ヘルプ
       </a></button>
