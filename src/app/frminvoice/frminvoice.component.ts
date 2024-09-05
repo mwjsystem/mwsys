@@ -18,6 +18,7 @@ export class FrminvoiceComponent implements OnInit, AfterViewInit {
     // @ViewChild(DepttblComponent) depttbl: DepttblComponent;
     form: FormGroup;
     denno: number = 0;
+	rows: FormArray = this.fb.array([]);
     constructor(public usrsrv: UserService,
         public bunsrv: BunruiService,
         public stfsrv: StaffService,
@@ -33,7 +34,22 @@ export class FrminvoiceComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit(): void {
-    }
+		this.form = this.fb.group({
+		  // kubun: new FormControl(''),
+		  day: new FormControl(''),
+		  scde: new FormControl(''),
+		  code: new FormControl('', Validators.required),
+		  tcode: new FormControl('', Validators.required),
+		  memo: new FormControl(''),
+		  nmoneysum: new FormControl(''),
+		  smoneysum: new FormControl(''),
+		  tmoneysum: new FormControl(''),
+		  totalmoney: new FormControl(''),
+		  jdenno: new FormControl(''),
+		  sdenno: new FormControl(''),
+		  mtbl: this.rows
+		});
+	}
     ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
     }
     onEnter() {
@@ -75,6 +91,8 @@ export class FrminvoiceComponent implements OnInit, AfterViewInit {
             history.replaceState('', '', './frminvoice/' + this.invsrv.mode + '/' + this.denno);
         }
     }
+	test(){
+	}
     async save() {
 
     }
