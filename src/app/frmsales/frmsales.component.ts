@@ -199,6 +199,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   makeFrmShip(typ: string) {
+    // console.log(typ);
     if (this.okrsrv.getHinfo(this.form.value.hcode).numbering && !this.form.value.okurino) {
       this.setOkrno().then(() => {
         this.save().then(() => {
@@ -610,7 +611,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     const ctrls0 = this.form.controls;
     for (const name in ctrls0) {
       if (name == 'yday') {
-        // console.log(ctrls0[name].errors);
+
         if (ctrls0[name].errors?.matDatepickerFilter) {
           ctrls0[name].setErrors(null);
         }
@@ -632,6 +633,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         }
       }
     }
+    console.log(tooltip,form.invalid);
     return tooltip;
   }
 
