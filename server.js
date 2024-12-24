@@ -13,6 +13,7 @@ app.use(express.static(`${__dirname}/dist`));
 // ルートへのアクセス時は念のため dist/index.html を確実に返すようにしておく
 app.get('/*', (req, res) => {
   res.sendFile(path.join(`${__dirname}/dist/index.html`));
+  res.set({ 'Access-Control-Allow-Origin': '*' });
 });
 // サーバ起動
 const server = app.listen(process.env.PORT || 8080, () => {
