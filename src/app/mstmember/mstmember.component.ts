@@ -588,7 +588,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         // console.log('addr1',name);
       }
     }
-    // console.log(tooltip);
+    console.log(tooltip);
     return tooltip;
 
   }
