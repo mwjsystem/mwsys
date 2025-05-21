@@ -180,13 +180,13 @@ export class RepstockComponent implements OnInit, AfterViewInit {
 
   }
   selScd() {
-    // console.log('selScd', this.scode, this.stgds, this.stcsrv.stc);
+    console.log('selScd', this.scode, this.stgds, this.stcsrv.stc);
     if (this.stgds.gskbn == "0") {
       if (this.gcode == this.stcsrv.stcGcd && this.stcsrv.stcs.length !== 0) {
-        // console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
+        console.log('selScd2', this.stcsrv.stcs, this.stcsrv.stcs.length !== 0, this.stcsrv.stc);
 
         let i: number = this.stcsrv.stcs.findIndex(obj => obj.scode == this.scode);
-        // console.log('selScd3', this.stcsrv.stcs, this.scode);
+        console.log('selScd3', this.stcsrv.stcs, this.scode);
         if (i > -1) {
           this.stcsrv.stc.stock = this.stcsrv.stcs[i].stock;
           this.stcsrv.stc.juzan = this.stcsrv.stcs[i].juzan;
@@ -205,9 +205,9 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       } else {
         if (this.scode && this.gcode) {
           this.isLoading2 = true;
-          // console.log('selScd4', this.stcsrv.stcs, this.scode);
+          console.log('selScd4', this.stcsrv.stcs, this.scode);
           this.stcsrv.getStock(this.gcode, "0", this.scode).then(result => {
-            // console.log('result', result);
+            console.log('result', result);
             this.isLoading2 = false;
             this.stcsrv.stc.stock = result[0]?.stock;
             this.stcsrv.stc.juzan = result[0]?.juzan;
@@ -228,10 +228,10 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           });
         }
       }
-      // console.log('selScd4', this.stcsrv.stc);
+      console.log('selScd4', this.stcsrv.stc);
       this.isLoading3 = true;
       this.trnsrv.getTrans(this.gcode, this.scode, new Date()).then(result => {
-        // console.log(result);
+        console.log(result);
         this.trnsrv.tbldata = result;
         this.trnsrv.subject.next(true);
         this.isLoading3 = false;
@@ -243,7 +243,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     } else if (this.stgds.gskbn == "1") {
       this.isLoading2 = true;
       this.stcsrv.getSetZai(this.scode, this.stgds.msgzais).then(result => {
-        // console.log(result);
+        console.log(result);
         this.stcsrv.stcbs = result.sort(function (a, b) {
           return (a.gcode < b.gcode) ? -1 : 1;  //オブジェクトの昇順ソート
         });
@@ -260,7 +260,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       this.isLoading = true;
       if (this.stgds.gskbn == "0") {
         this.stcsrv.getShcount0(this.gcode).then(result => {
-          // console.log(result);
+          console.log(result);
           this.isLoading = false;
           this.stgds.moavg = result.moavg;
           this.stgds.motai = result.motai;
