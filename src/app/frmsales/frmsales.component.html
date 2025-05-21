@@ -15,9 +15,10 @@
       <mat-icon>restore</mat-icon>取消解除
     </button>
     <button mat-flat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode==1 || mode==2"
-      [color]="usrsrv.getColor(mode)">
-      <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
+      [color]="usrsrv.getColor(mode)" matTooltip="{{getInvalid()}}" matTooltipClass="ttips">
+      <mat-icon>save</mat-icon>保存
     </button>
+	<div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" [disabled]="form.valid" *ngIf="mode==1 || mode==2" >修正が必要！</div>
     <button mat-flat-button (click)="cancel()" *ngIf="mode==1 || mode==2" [color]="usrsrv.getColor(mode)">
       <mat-icon>cancel</mat-icon>中止
     </button>
