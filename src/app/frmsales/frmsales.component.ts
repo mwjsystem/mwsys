@@ -633,7 +633,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         }
       }
     }
-    console.log(tooltip,this.form.invalid);
+    // console.log(tooltip,this.form.invalid);
     return tooltip;
   }
 
