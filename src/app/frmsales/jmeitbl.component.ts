@@ -543,6 +543,7 @@ export class JmeitblComponent implements OnInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
+		// console.log(data);  
         let msgds = data.msgoods_by_pk;
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
@@ -555,7 +556,7 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue({ scode: this.parentForm.value.scode });
           let lctanka: number = 0;
           let lcgenka: number = 0;
-          // console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
+          console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
           if (msgds.msgtankas[0].currency == "USD") {
             lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate);
             // lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate) + msgds.msgtankas[0].cost;
@@ -563,13 +564,19 @@ export class JmeitblComponent implements OnInit {
             lcgenka = msgds.msgtankas[0].genka;
             // lcgenka = msgds.msgtankas[0].genka + msgds.msgtankas[0].cost;
           }
-          let j: number = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn);
+		  let j: number = -1;
+		  if ( msgds.msgtankas.length === 0) {
+
+		  }	else {
+		    j = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn)
+		  }		
+		  // console.log(msgds.msgsptnks,this.jmisrv.sptnkbn,j);
           if (j > -1) {
             lctanka = msgds.msgsptnks[j].sptanka;
           } else {
             lctanka = msgds.msgtankas[0]['tanka' + this.jmisrv.tankakbn];
           }
-          // console.log(this.jmisrv.scode);
+          // console.log(i, lctanka);
           this.frmArr.controls[i].patchValue({
             mtax: this.jmisrv.mtax,
             tanka1: msgds.msgtankas[0]['tanka1'],
