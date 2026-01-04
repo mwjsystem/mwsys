@@ -241,7 +241,7 @@ export class TransService {
               zaisu: null,
               yotei: null,
               wait: null,
-              srtdy: e.yday
+              srtdy: e.inday
             };
             trans.push(tran);
           });
