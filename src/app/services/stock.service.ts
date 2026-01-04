@@ -457,15 +457,15 @@ export class StockService {
           }
         }
       }
-      today:trjyumei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $today},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}) {
+      today:vjmeizai_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $today},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}) {
         aggregate { sum { suu }}}
-      keepd:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+      keepd:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
-      hikat:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in:["1","4","5","6"]},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+      hikat:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in:["1","4","5","6"]},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
-      juzan:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+      juzan:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}} 
-      tommo:trjyumei_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $nextd}, trjyuden: {del: {_eq: false}}}) {
+      tommo:vjmeizai_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $nextd}, trjyuden: {del: {_eq: false}}}) {
         aggregate { sum { suu }}}         
     }`;
 
@@ -529,9 +529,9 @@ export class StockService {
           }
         }
       }
-      hikat:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in: ["0","1"]},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+      hikat:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in: ["0","1"]},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}  
-      keepd:trjyumei_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+      keepd:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
       vhatzn(where: {hatzn: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
         yday
