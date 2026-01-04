@@ -45,7 +45,6 @@
             "scripts": []
           },
           "configurations": {
-			"development": {},
             "production": {
               "fileReplacements": [
                 {
@@ -81,6 +80,7 @@
             "browserTarget": "mwsys:build"
           },
           "configurations": {
+			"development": {},
             "production": {
               "browserTarget": "mwsys:build:production"
             }

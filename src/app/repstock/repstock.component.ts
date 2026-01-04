@@ -243,7 +243,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     } else if (this.stgds.gskbn == "1") {
       this.isLoading2 = true;
       this.stcsrv.getSetZai(this.scode, this.stgds.msgzais).then(result => {
-        console.log('this.stcsrv.getSetZai',result);
+        console.log('this.stcsrv.getSetZai',this.stgds,result);
         this.stcsrv.stcbs = result.sort(function (a, b) {
           return (a.gcode < b.gcode) ? -1 : 1;  //オブジェクトの昇順ソート
         });
@@ -326,7 +326,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
             this.stgds.gskbn = data.msgoods_by_pk.gskbn;
             this.stgds.unit = data.msgoods_by_pk.unit;
             this.stgds.msgzais = data.msgoods_by_pk.msgzais;
-            // console.log(this.stgds.msgzais,this.stcsrv.goods);
+            console.log(this.stgds.msgzais,this.stcsrv.goods);
             this.selScd();
           }, (error) => {
             console.log('error query get_goods', error);

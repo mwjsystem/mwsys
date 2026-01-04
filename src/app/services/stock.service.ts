@@ -429,9 +429,12 @@ export class StockService {
   getSetZai(scd: string, gzais): Promise<Stcbs[]> {
     return new Promise(resolve => {
       let lcstcs = [];
+	  console.log('getSetZai1',gzais);
       Promise.all(gzais.map(async item => {
+		console.log('getSetZai2',item,item.msgoods.gskbn);
         if (item.msgoods.gskbn == '0') {
           let lcstc = await this.getStock(item.zcode, '1', scd);
+		  console.log('getSetZai3',item,lcstc);
           lcstcs.push({ irisu: item.irisu, ...lcstc[0] });
         }
       })).then(() => {
