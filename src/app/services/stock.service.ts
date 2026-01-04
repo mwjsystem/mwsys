@@ -388,7 +388,7 @@ export class StockService {
         .subscribe(({ data }) => {
           let lcday: Date = data.trgtana[0]?.day ?? new Date('2000-01-01');
           let lctana: number = data.trgtana[0]?.tana ?? 0;
-          console.log('StockService',lcday,date);
+          // console.log('StockService',lcday,date);
           this.apollo.watchQuery<any>({
             query: GetTran2,
             variables: {
@@ -401,6 +401,7 @@ export class StockService {
           })
             .valueChanges
             .subscribe(({ data }) => {
+              console.log('StockService2',data.trzaiko_aggregate.aggregate.sum,lctana);  				
               lctana = lctana + (data.trzaiko_aggregate.aggregate.sum.hnyu || 0)
                 + (data.trzaiko_aggregate.aggregate.sum.movi || 0)
                 + (data.trzaiko_aggregate.aggregate.sum.teni || 0)
@@ -409,7 +410,7 @@ export class StockService {
                 - (data.trzaiko_aggregate.aggregate.sum.movo || 0)
                 - (data.trzaiko_aggregate.aggregate.sum.teno || 0)
                 - (data.trzaiko_aggregate.aggregate.sum.haki || 0);
-              console.log('StockService2',data.trzaiko_aggregate.aggregate.sum.syuk,lctana);  
+
               return resolve(lctana);
             }, (error) => {
               console.log('error query get_zaiko', error);
