@@ -409,7 +409,7 @@ export class StockService {
                 - (data.trzaiko_aggregate.aggregate.sum.movo || 0)
                 - (data.trzaiko_aggregate.aggregate.sum.teno || 0)
                 - (data.trzaiko_aggregate.aggregate.sum.haki || 0);
-              // console.log(data.trzaiko_aggregate.aggregate.sum.syuk,lctana);  
+              console.log('StockService',data.trzaiko_aggregate.aggregate.sum.syuk,lctana);  
               return resolve(lctana);
             }, (error) => {
               console.log('error query get_zaiko', error);
