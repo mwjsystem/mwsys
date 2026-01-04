@@ -227,7 +227,7 @@ export class TransService {
           });
           data.siire.forEach(e => {
             const tran: Trans = {
-              sday: e.yday,
+              sday: e.inday,
               ttype: '仕入',
               denno: e.denno,
               line: e.line,
@@ -388,7 +388,7 @@ export class TransService {
           trans = trans.concat(element);
         });
         return resolve(this.sortTblData(trans));
-        console.log('Promise.all',this.sortTblData(trans));
+        // console.log('Promise.all',this.sortTblData(trans));
       })
     })
   }
