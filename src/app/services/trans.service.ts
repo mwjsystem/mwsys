@@ -388,6 +388,7 @@ export class TransService {
           trans = trans.concat(element);
         });
         return resolve(this.sortTblData(trans));
+        console.log('Promise.all',this.sortTblData(trans));
       })
     })
   }
