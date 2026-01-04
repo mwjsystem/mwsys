@@ -388,7 +388,7 @@ export class StockService {
         .subscribe(({ data }) => {
           let lcday: Date = data.trgtana[0]?.day ?? new Date('2000-01-01');
           let lctana: number = data.trgtana[0]?.tana ?? 0;
-          // console.log('StockService',lcday,date);
+          console.log('StockService',gcd,scd,lcday,date);
           this.apollo.watchQuery<any>({
             query: GetTran2,
             variables: {
