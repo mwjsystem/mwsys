@@ -82,6 +82,9 @@ export class JyumeiService {
         total10
         dokono
         daibzei
+		vnyuzan {
+          nyuzan
+        }
         trjyumeis(order_by: {line: asc}) {
           line
           gcode

@@ -1,4 +1,7 @@
 declare namespace mwI {
+  interface Vnyuzan {
+    nyuzan: number;
+  }
   interface Jyuden {
     id: number;
     denno: number;
@@ -54,6 +57,8 @@ declare namespace mwI {
     total8: number;
     total10: number;
     dokono: number;
+	daibzei: number;
+	vnyuzan: Vnyuzan;
     // keep:string;
     // gtotal:number;
     // souryou:number;
@@ -73,7 +78,7 @@ declare namespace mwI {
     suu: number;
     spec: string;
     spdet: string;
-  }
+  }  
   interface Jyumei {
     line: number;
     gcode: string;

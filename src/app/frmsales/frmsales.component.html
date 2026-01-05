@@ -19,6 +19,7 @@
       <mat-icon>save</mat-icon>保存
     </button>
 	<div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" *ngIf="(mode==1 || mode==2) && form.invalid" >修正が必要！</div>
+	<div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" *ngIf="this.nyuzan==0" >入金済！</div>
     <button mat-flat-button (click)="cancel()" *ngIf="mode==1 || mode==2" [color]="usrsrv.getColor(mode)">
       <mat-icon>cancel</mat-icon>中止
     </button>
