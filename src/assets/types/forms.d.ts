@@ -1,6 +1,7 @@
 declare namespace mwI {
   interface Vnyuzan {
-    nyuzan: number;
+    denno: number;
+	nyuzan: number;
   }
   interface Jyuden {
     id: number;

@@ -19,7 +19,7 @@
       <mat-icon>save</mat-icon>保存
     </button>
 	<div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" *ngIf="(mode==1 || mode==2) && form.invalid" >修正が必要！</div>
-	<div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" *ngIf="this.nyuzan==0" >入金済！</div>
+	<!-- <div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" *ngIf="this.vnyuzan.nyuzan==0 && this.vnyuzan.denno" >入金済！</div> -->
     <button mat-flat-button (click)="cancel()" *ngIf="mode==1 || mode==2" [color]="usrsrv.getColor(mode)">
       <mat-icon>cancel</mat-icon>中止
     </button>
@@ -319,6 +319,9 @@
       </div>
     </div>
     <div class="flex flex-wrap">
+	  <label for="txt0" class="block mx-2">納品先住所</label>
+      <textarea id="txt0" matInput [value]="jmisrv.address" matTextareaAutosize disabled
+        class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
       <label for="txt1" class="block mx-2">伝票備考</label>
       <textarea id="txt1" [rows]="getRows('dmemo')" formControlName="dmemo"
         class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
@@ -455,10 +458,6 @@
           <input matInput formControlName="eicode">
         </mat-form-field>
       </div>
-      <mat-form-field>
-        <mat-label>納品先住所</mat-label>
-        <textarea matInput [value]="jmisrv.address" matTextareaAutosize disabled></textarea>
-      </mat-form-field>
       <div class="grid-cols-1">
         <div class="flex flex-wrap content-between">
           <mat-form-field style="width: 7em;">

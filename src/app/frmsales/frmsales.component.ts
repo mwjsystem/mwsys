@@ -35,7 +35,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   @ViewChild(JmeitblComponent) jmeitbl: JmeitblComponent;
   form: FormGroup;
   mode: number = 3;
-  nyuzan: number;
+  vnyuzan: mwI.Vnyuzan;
   hktval: mwI.Sval[] = [];
   rows: FormArray = this.fb.array([]);
   getden: number;
@@ -305,7 +305,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             this.jmeitbl.setJyumei(jyuden);
             this.usrsrv.setTmstmp(jyuden);
             this.jmisrv.denno = denno;
-			this.nyuzan = jyuden.vnyuzan.nyuzan;
+			this.vnyuzan = jyuden.vnyuzan;
             this.getMember(jyuden.mcode, false);
             if (jyuden.del == true) {
               this.mode = 4;
