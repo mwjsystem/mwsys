@@ -139,7 +139,7 @@
         <mat-form-field style="width: 7em;">
           <mat-label>納品先選択</mat-label>
           <mat-select #msel01 tabIndex="4" formControlName="nsaki" (selectionChange)="selBetsu($event.value)"
-            (keydown.enter)="msel01.close()" required>
+            (keydown.enter)="msel01.close()" required [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of nskVal" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
