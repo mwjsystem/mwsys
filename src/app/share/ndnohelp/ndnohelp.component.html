@@ -11,7 +11,7 @@
             <button class="mat-raised-button" (click)="get_nyuden()">検索</button>
             <mat-form-field style="width:7em;">
                 <mat-label>締請求</mat-label>
-                <mat-select [(ngModel)]="ftype" [ngModelOptions]="{standalone: true}">
+                <mat-select [(ngModel)]="ftype" [ngModelOptions]="{standalone: true}" [panelClass]="'my-panel-class'">
                     <mat-option value="2">すべて</mat-option>
                     <mat-option value="0">都度伝票のみ</mat-option>
                     <mat-option value="1">締請求のみ</mat-option>
@@ -33,7 +33,7 @@
             </mat-form-field>
             <mat-form-field style="width:7em;">
                 <mat-label>担当者</mat-label>
-                <mat-select [(ngModel)]="ftcd" [ngModelOptions]="{standalone: true}">
+                <mat-select [(ngModel)]="ftcd" [ngModelOptions]="{standalone: true}" [panelClass]="'my-panel-class'">
                     <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
                         {{sval.viewval}}
                     </mat-option>

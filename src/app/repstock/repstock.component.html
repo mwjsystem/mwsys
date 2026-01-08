@@ -75,7 +75,7 @@
         </mat-form-field>
         <mat-form-field style="width:8em;">
           <mat-label>数量区分</mat-label>
-          <mat-select [value]="stgds.gskbn" disabled class="selreadonly">
+          <mat-select [value]="stgds.gskbn" disabled class="selreadonly" [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bunsrv.kbn['gskbn']" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -121,7 +121,7 @@
         <div class="flex flex-row">
           <mat-form-field>
             <mat-label>倉庫</mat-label>
-            <mat-select [(value)]="scode" (openedChange)="onChange()" [disabled]="!stcsrv.stcGcd">
+            <mat-select [(value)]="scode" (openedChange)="onChange()" [disabled]="!stcsrv.stcGcd" [panelClass]="'my-panel-class'">
               <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>

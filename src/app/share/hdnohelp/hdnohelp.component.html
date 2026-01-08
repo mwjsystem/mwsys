@@ -26,7 +26,7 @@
             <span>以降</span>
             <mat-form-field style="width:7em;">
                 <mat-label>担当者</mat-label>
-                <mat-select [(ngModel)]="ftcd" [ngModelOptions]="{standalone: true}">
+                <mat-select [(ngModel)]="ftcd" [ngModelOptions]="{standalone: true}" [panelClass]="'my-panel-class'">
                     <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
                         {{sval.viewval}}
                     </mat-option>

@@ -89,7 +89,7 @@
                         <div fxLayout="row wrap" fxLayoutAlign="start end">
                             <mat-form-field>
                                 <mat-label>担当者</mat-label>
-                                <mat-select formControlName="tcode">
+                                <mat-select formControlName="tcode" [panelClass]="'my-panel-class'">
                                     <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
                                         {{sval.viewval}}
                                     </mat-option>

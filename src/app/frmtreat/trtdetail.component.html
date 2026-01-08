@@ -28,7 +28,7 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>対応者</mat-label>
-        <mat-select formControlName="created_by">
+        <mat-select formControlName="created_by" [panelClass]="'my-panel-class'">
           <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
@@ -36,7 +36,7 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>ジャンル</mat-label>
-        <mat-select formControlName="genre">
+        <mat-select formControlName="genre" [panelClass]="'my-panel-class'">
           <mat-option *ngFor="let sval of bunsrv.kbn.genre" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
@@ -44,7 +44,7 @@
       </mat-form-field>
       <mat-form-field>
         <mat-label>タイプ</mat-label>
-        <mat-select formControlName="trttype">
+        <mat-select formControlName="trttype" [panelClass]="'my-panel-class'">
           <mat-option *ngFor="let sval of bunsrv.kbn.trttype" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>

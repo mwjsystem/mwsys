@@ -71,7 +71,7 @@
                 <span class="nmtxt">{{form.getRawValue().vcode | vcdtxt}}</span>
                 <mat-form-field>
                     <mat-label>倉庫コード</mat-label>
-                    <mat-select formControlName="scode" required>
+                    <mat-select formControlName="scode" required [panelClass]="'my-panel-class'">
                         <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
@@ -79,7 +79,7 @@
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>担当者</mat-label>
-                    <mat-select #msel1 formControlName="tcode" (keydown.enter)="msel1.close()" required>
+                    <mat-select #msel1 formControlName="tcode" (keydown.enter)="msel1.close()" required [panelClass]="'my-panel-class'">
                         <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
@@ -98,7 +98,7 @@
                 </mat-form-field> -->
                 <mat-form-field style="width:4em;">
                     <mat-label>通貨</mat-label>
-                    <mat-select #msel3 formControlName="currency" (keydown.enter)="msel3.close()">
+                    <mat-select #msel3 formControlName="currency" (keydown.enter)="msel3.close()" [panelClass]="'my-panel-class'">
                         <mat-option value="JPY">JPY</mat-option>
                         <mat-option value="USD">USD</mat-option>
                     </mat-select>

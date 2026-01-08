@@ -18,7 +18,7 @@
             <span>以降</span>
             <mat-form-field style="width:7em;">
                 <mat-label>入庫倉庫</mat-label>
-                <mat-select [(ngModel)]="fincd" [ngModelOptions]="{standalone: true}">
+                <mat-select [(ngModel)]="fincd" [ngModelOptions]="{standalone: true}" [panelClass]="'my-panel-class'">
                     <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                         {{sval.viewval}}
                     </mat-option>
@@ -26,7 +26,7 @@
             </mat-form-field>
             <mat-form-field style="width:7em;">
                 <mat-label>出庫倉庫</mat-label>
-                <mat-select [(ngModel)]="foutcd" [ngModelOptions]="{standalone: true}">
+                <mat-select [(ngModel)]="foutcd" [ngModelOptions]="{standalone: true}" [panelClass]="'my-panel-class'">
                     <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                         {{sval.viewval}}
                     </mat-option>
@@ -34,7 +34,7 @@
             </mat-form-field>
             <mat-form-field style="width:7em;">
                 <mat-label>担当者</mat-label>
-                <mat-select [(ngModel)]="ftcd" [ngModelOptions]="{standalone: true}">
+                <mat-select [(ngModel)]="ftcd" [ngModelOptions]="{standalone: true}" [panelClass]="'my-panel-class'">
                     <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
                         {{sval.viewval}}
                     </mat-option>

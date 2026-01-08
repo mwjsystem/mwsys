@@ -74,7 +74,7 @@
           <mat-form-field style="width:4em;">
             <!-- <input [tabIndex]="hidx + i * mcols + 6" matInput formControlName="unit"> -->
             <mat-select [tabIndex]="hidx + i * mcols + 6" #msel10 formControlName="unit" required
-              (keydown.enter)="msel10.close()">
+              (keydown.enter)="msel10.close()" [panelClass]="'my-panel-class'">
               <mat-option value="着">着</mat-option>
               <mat-option value="本">本</mat-option>
               <mat-option value="組">組</mat-option>
@@ -98,7 +98,7 @@
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:8em;">
             <mat-select [tabIndex]="hidx + i * mcols + 7" #msel11 formControlName="gskbn" required
-              (keydown.enter)="msel11.close()">
+              (keydown.enter)="msel11.close()" [panelClass]="'my-panel-class'">
               <mat-option *ngFor="let sval of bunsrv.kbn['gskbn']" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -131,7 +131,7 @@
         <th mat-header-cell *matHeaderCellDef>中止区分</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:5em;">
-            <mat-select #msel12 formControlName="tkbn" required (keydown.enter)="msel12.close()">
+            <mat-select #msel12 formControlName="tkbn" required (keydown.enter)="msel12.close()" [panelClass]="'my-panel-class'">
               <mat-option *ngFor="let sval of bunsrv.kbn['tkbn']" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -152,7 +152,7 @@
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
             <mat-select [tabIndex]="hidx + i * mcols + 10" #msel14 formControlName="send"
-              (keydown.enter)="msel14.close()">
+              (keydown.enter)="msel14.close()" [panelClass]="'my-panel-class'">
               <mat-option value=""></mat-option>
               <mat-option value="A">A</mat-option>
               <mat-option value="B">B</mat-option>
@@ -220,7 +220,7 @@
       <div style="padding:10px; " class="flex flex-row">
         <mat-form-field class="flex flex-row">
           <mat-label>倉庫</mat-label>
-          <mat-select [(value)]="scode">
+          <mat-select [(value)]="scode" [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>

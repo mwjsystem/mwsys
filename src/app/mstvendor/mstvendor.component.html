@@ -47,7 +47,7 @@
         </mat-form-field>
         <mat-form-field style="width:5em">
           <mat-label>税区分</mat-label>
-          <mat-select #msel2 formControlName="mtax" required (keydown.enter)="msel2.close()">
+          <mat-select #msel2 formControlName="mtax" required (keydown.enter)="msel2.close()" [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bunsrv.kbn['mtax']" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -55,7 +55,7 @@
         </mat-form-field>
         <mat-form-field style="width:4em;">
           <mat-label>通貨</mat-label>
-          <mat-select #msel3 formControlName="currency" (keydown.enter)="msel3.close()">
+          <mat-select #msel3 formControlName="currency" (keydown.enter)="msel3.close()" [panelClass]="'my-panel-class'">
             <mat-option value="JPY">JPY</mat-option>
             <mat-option value="USD">USD</mat-option>
           </mat-select>

@@ -17,7 +17,7 @@
             <ng-container matColumnDef="ydaykbn">
                 <th mat-header-cell *matHeaderCellDef>予定区分</th>
                 <td mat-cell *matCellDef="let row">
-                    <mat-select [value]="row.ydaykbn" class="noArrow">
+                    <mat-select [value]="row.ydaykbn" class="noArrow" [panelClass]="'my-panel-class'">
                         <mat-option *ngFor="let sval of bunsrv.kbn.ydaykbn" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>

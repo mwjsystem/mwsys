@@ -74,7 +74,7 @@
           </mat-form-field>
           <mat-form-field style="width:8em">
             <mat-label>商品区分</mat-label>
-            <mat-select tabIndex="3" #msel01 formControlName="gkbn" required (keydown.enter)="msel01.close()">
+            <mat-select tabIndex="3" #msel01 formControlName="gkbn" required (keydown.enter)="msel01.close()" [panelClass]="'my-panel-class'">
               <mat-option *ngFor="let sval of bunsrv.kbn['gkbn']" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -82,7 +82,7 @@
           </mat-form-field>
           <mat-form-field>
             <mat-label>カテゴリ</mat-label>
-            <mat-select tabIndex="4" #msel02 formControlName="category" required (keydown.enter)="msel02.close()">
+            <mat-select tabIndex="4" #msel02 formControlName="category" required (keydown.enter)="msel02.close()" [panelClass]="'my-panel-class'">
               <mat-option *ngFor="let sval of bunsrv.kbn['category']" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
@@ -90,7 +90,7 @@
           </mat-form-field>
           <mat-form-field>
             <mat-label>サブカテゴリ</mat-label>
-            <mat-select tabIndex="5" #msel03 formControlName="subcat" required (keydown.enter)="msel03.close()">
+            <mat-select tabIndex="5" #msel03 formControlName="subcat" required (keydown.enter)="msel03.close()" [panelClass]="'my-panel-class'">
               <mat-option *ngFor="let sval of bunsrv.getSubcat(msel02.value)" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>

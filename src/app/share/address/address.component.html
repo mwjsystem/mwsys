@@ -51,7 +51,7 @@
     </mat-form-field>
     <mat-form-field style="width:4em;">
         <mat-label>敬称</mat-label>
-        <mat-select formControlName="htitle">
+        <mat-select formControlName="htitle" [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bunsrv.kbn['htitle']" [value]="sval.value">
                 {{sval.viewval}}
             </mat-option>
