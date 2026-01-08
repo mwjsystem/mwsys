@@ -1,4 +1,5 @@
-<div style="height: 40px;" class="grid grid-row gap-2 mat-elevation-z8">
+<!-- <div style="height: 40px;" class="grid grid-row gap-2 mat-elevation-z8"> -->
+<mat-toolbar style="height:40px;text-align:center;" class="flex flex-row">
   <button mat-flat-button color="warn" (click)="toFrmsup()" *ngIf="frmArr.enabled && hatden.length>0">発注伝票登録</button>
   <button mat-flat-button color="warn" (click)="toFrmsup()"
     *ngIf="frmArr.enabled && movden.length>0">移動伝票登録(加工用)</button>
@@ -25,7 +26,8 @@
       *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(末尾に追加)</button>
   </mat-menu>
   <!-- <span *ngIf="frmArr.enabled">←ここにExcel等から貼付([ctrl]ｷｰ＋[v]) １列目：商品ｺｰﾄﾞ、2列目：数量、３列目(任意)：単価</span> -->
-</div>
+<!-- </div> -->
+</mat-toolbar>
 <div class="mat-elevation-z8">
   <ng-container [formGroup]="parentForm">
     <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
