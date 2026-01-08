@@ -159,7 +159,7 @@
       </div>
       <mat-form-field style="width:12em">
         <mat-label>納品書タイプ</mat-label>
-        <mat-select #msel02 tabIndex="5" formControlName="buntype" (keydown.enter)="msel02.close()">
+        <mat-select #msel02 tabIndex="5" formControlName="buntype" (keydown.enter)="msel02.close()" [panelClass]="'my-panel-class'">
           <mat-option>選択削除</mat-option>
           <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
             {{sval.name}}
@@ -219,7 +219,7 @@
     <div class="grid grid-cols-1 gap-2">
       <mat-form-field style="width: 8em;">
         <mat-label>担当者</mat-label>
-        <mat-select #msel1 tabIndex="11" formControlName="tcode" (keydown.enter)="msel1.close()">
+        <mat-select #msel1 tabIndex="11" formControlName="tcode" (keydown.enter)="msel1.close()" [panelClass]="'my-panel-class'">
           <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
@@ -227,7 +227,7 @@
       </mat-form-field>
       <mat-form-field style="width: 8em;">
         <mat-label>倉庫</mat-label>
-        <mat-select #msel2 tabIndex="12" formControlName="scode" (keydown.enter)="msel2.close()" required>
+        <mat-select #msel2 tabIndex="12" formControlName="scode" (keydown.enter)="msel2.close()" required [panelClass]="'my-panel-class'">
           <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
@@ -235,7 +235,7 @@
       </mat-form-field>
       <mat-form-field style="width: 8em;">
         <mat-label>出荷対象区分</mat-label>
-        <mat-select #msel3 tabIndex="13" formControlName="skbn" (keydown.enter)="msel3.close()" required>
+        <mat-select #msel3 tabIndex="13" formControlName="skbn" (keydown.enter)="msel3.close()" required [panelClass]="'my-panel-class'">
           <mat-option *ngFor="let sval of bunsrv.kbn.skbn" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
@@ -243,7 +243,7 @@
       </mat-form-field>
       <mat-form-field style="width: 8em;">
         <mat-label>受注方法</mat-label>
-        <mat-select #msel4 tabIndex="14" formControlName="jcode" (keydown.enter)="msel4.close()" required>
+        <mat-select #msel4 tabIndex="14" formControlName="jcode" (keydown.enter)="msel4.close()" required [panelClass]="'my-panel-class'">
           <mat-option *ngFor="let sval of bunsrv.kbn.jcode" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
@@ -251,7 +251,7 @@
       </mat-form-field>
       <mat-form-field style="width: 8em;">
         <mat-label>入金予定</mat-label>
-        <mat-select #msel5 tabIndex="15" formControlName="pcode" (keydown.enter)="msel5.close()" required>
+        <mat-select #msel5 tabIndex="15" formControlName="pcode" (keydown.enter)="msel5.close()" required [panelClass]="'my-panel-class'">
           <mat-option *ngFor="let sval of bunsrv.kbn.pcode" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
@@ -261,7 +261,7 @@
     <div class="grid grid-cols-1 gap-2">
       <mat-form-field style="width: 8em;">
         <mat-label>配送方法</mat-label>
-        <mat-select #msel6 tabIndex="16" formControlName="hcode" (selectionChange)="selHcd($event.value)"
+        <mat-select #msel6 tabIndex="16" formControlName="hcode" (selectionChange)="selHcd($event.value)" [panelClass]="'my-panel-class'"
           (keydown.enter)="msel6.close()">
           <mat-option>選択削除</mat-option>
           <mat-option *ngFor="let sval of okrsrv.hokuri" [value]="sval.code">
@@ -280,7 +280,7 @@
       </div>
       <mat-form-field style="width: 8em;">
         <mat-label>配送希望時間</mat-label>
-        <mat-select #msel7 tabIndex="18" formControlName="htime" (keydown.enter)="msel7.close()">
+        <mat-select #msel7 tabIndex="18" formControlName="htime" (keydown.enter)="msel7.close()" [panelClass]="'my-panel-class'">
           <mat-option *ngFor="let sval of hktval" [value]="sval.value">
             {{sval.viewval}}
           </mat-option>
@@ -378,7 +378,7 @@
         </mat-form-field>
         <mat-form-field style="width:8em">
           <mat-label>顧客税区分</mat-label>
-          <mat-select [value]="jmisrv.mtax" disabled>
+          <mat-select [value]="jmisrv.mtax" disabled [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bunsrv.kbn.mtax" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -388,7 +388,7 @@
       <div class="grid-cols-1">
         <mat-form-field style="width:10em">
           <mat-label>大分類</mat-label>
-          <mat-select formControlName="daibunrui" required>
+          <mat-select formControlName="daibunrui" required [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bunsrv.kbn.daibunrui" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -396,7 +396,7 @@
         </mat-form-field>
         <mat-form-field style="width:10em">
           <mat-label>中分類</mat-label>
-          <mat-select formControlName="chubunrui" required>
+          <mat-select formControlName="chubunrui" required [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bunsrv.kbn.chubunrui" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -404,7 +404,7 @@
         </mat-form-field>
         <mat-form-field style="width:10em">
           <mat-label>小分類</mat-label>
-          <mat-select formControlName="shobunrui">
+          <mat-select formControlName="shobunrui" [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bunsrv.kbn.shobunrui" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -412,7 +412,7 @@
         </mat-form-field>
         <mat-form-field style="width:10em">
           <mat-label>営業担当</mat-label>
-          <mat-select formControlName="tcode1" required>
+          <mat-select formControlName="tcode1" required [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of stfsrv.tcds" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -423,7 +423,7 @@
       <div class="grid-cols-1">
         <mat-form-field style="width:10em">
           <mat-label>顧客単価区分</mat-label>
-          <mat-select [value]="jmisrv.tankakbn" disabled>
+          <mat-select [value]="jmisrv.tankakbn" disabled [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bunsrv.kbn.tankakbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -431,7 +431,7 @@
         </mat-form-field>
         <mat-form-field style="width:10em">
           <mat-label>特別単価区分</mat-label>
-          <mat-select [value]="jmisrv.sptnkbn" disabled>
+          <mat-select [value]="jmisrv.sptnkbn" disabled [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bunsrv.kbn.sptnkbn" [value]="sval.value">
               {{sval.viewval}}
             </mat-option>
@@ -439,7 +439,7 @@
         </mat-form-field>
         <mat-form-field style="width:10em">
           <mat-label>納品書タイプ</mat-label>
-          <mat-select [value]="jmisrv.ntype" disabled>
+          <mat-select [value]="jmisrv.ntype" disabled [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
               {{sval.name}}
             </mat-option>
@@ -447,7 +447,7 @@
         </mat-form-field>
         <mat-form-field style="width:10em">
           <mat-label>直送納品書Type</mat-label>
-          <mat-select [value]="jmisrv.tntype" disabled>
+          <mat-select [value]="jmisrv.tntype" disabled [panelClass]="'my-panel-class'">
             <mat-option *ngFor="let sval of bnssrv.buntype" [value]="sval.code">
               {{sval.name}}
             </mat-option>
@@ -462,7 +462,7 @@
         <div class="flex flex-wrap content-between">
           <mat-form-field style="width: 7em;">
             <mat-label>依頼主表示</mat-label>
-            <mat-select formControlName="isaki" (selectionChange)="selIrai($event.value)">
+            <mat-select formControlName="isaki" (selectionChange)="selIrai($event.value)" [panelClass]="'my-panel-class'">
               <mat-option *ngFor="let sval of iskVal" [value]="sval.value">
                 {{sval.viewval}}
               </mat-option>
