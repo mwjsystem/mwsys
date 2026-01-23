@@ -758,7 +758,7 @@ export class UserService {
     }
     return lcdate;
   }
-  getPrevday(tdy: Date) {
+  getPrevday(tdy: Date) :Date {
     let lcdate: Date = new Date(tdy);
     lcdate.setDate(lcdate.getDate() - 1);
     const day = lcdate.getDay();
@@ -771,13 +771,14 @@ export class UserService {
     }
     return lcdate;
   }
-  getNextMonth(date: Date) {
-    date.setMonth(date.getMonth() + 1);
-    const day = date.getDay();
-    if (this.holidays.includes(this.formatDate(date)) || day == 0 || day == 6) {
-      date = this.getNextday(date);
+  getNextMonth(date: Date) :Date{
+	let lcdate: Date = date;
+    lcdate.setMonth(lcdate.getMonth() + 1);
+    const day = lcdate.getDay();
+    if (this.holidays.includes(this.formatDate(lcdate)) || day == 0 || day == 6) {
+      lcdate = this.getNextday(lcdate);
     }
-    return date;
+    return lcdate;
   }  
   getLastMonth(date: Date) {
     date.setDate(date.getDate() - 30);

@@ -415,8 +415,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 	if (this.form.value.sday != null) {  
 		this.form.get('uday').setValue(this.form.value.sday);
 		if (this.form.value.torikbn == false) {
-		  const lcdate: Date = this.form.value.sday;	
-		  this.form.get('nday').setValue(this.usrsrv.getNextMonth(lcdate));
+		  this.form.get('nday').setValue(this.usrsrv.getNextMonth(this.form.value.sday));
 		}
 	}
 	
@@ -709,7 +708,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         this.jmeitbl.editJyumei(this.jmisrv.denno);
         let jyumei = this.jmisrv.trjyumei;
         let jyumzai = this.jmisrv.trjmzai;
-        // console.log(jyuden);
+        console.log('save変更',jyumzai);
         this.jmisrv.updJyuden(this.jmisrv.denno, { ...jyuden, jdstatus: this.jmisrv.getJdsta(jyumei) }, jyumei, jyumzai)
           .then(result => {
             this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
@@ -746,6 +745,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           });
       });
     } else if (this.mode == 1) {//新規登録
+      console.log('save新規',this.jmisrv.trjmzai);
+	
       this.jmisrv.denno = await this.jmisrv.getDenno();
       return new Promise(resolve => {
         this.jmeitbl.editJyumei(this.jmisrv.denno);
