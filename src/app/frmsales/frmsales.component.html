@@ -191,7 +191,7 @@
         <mat-form-field style="width: 9em;">
           <mat-label>出荷日</mat-label>
           <input tabIndex="8" matInput [matDatepickerFilter]="usrsrv.holidayFltr" [matDatepicker]="picker2"
-            formControlName="sday" (change)="changeSday()">
+            formControlName="sday" (dateInput)="changeSday()" (dateChange)="changeSday()">
           <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
           <mat-datepicker #picker2></mat-datepicker>
         </mat-form-field>
