@@ -758,6 +758,27 @@ export class UserService {
     }
     return lcdate;
   }
+  getPrevday(tdy: Date) {
+    let lcdate: Date = new Date(tdy);
+    lcdate.setDate(lcdate.getDate() -1 1);
+    const day = lcdate.getDay();
+    if (
+      this.holidays.includes(this.formatDate(lcdate)) ||
+      day == 0 ||
+      day == 6
+    ) {
+      lcdate = this.getPrevday(lcdate);
+    }
+    return lcdate;
+  }
+  getNextMonth(date: Date) {
+    date.setMonth(date.getMonth() + 1);
+    const day = date.getDay();
+    if (this.holidays.includes(this.formatDate(date)) || day == 0 || day == 6) {
+      date = this.getNextday(date);
+    }
+    return date;
+  }  
   getLastMonth(date: Date) {
     date.setDate(date.getDate() - 30);
     const day = date.getDay();
