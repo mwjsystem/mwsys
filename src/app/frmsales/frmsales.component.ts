@@ -411,10 +411,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  changeSday(sday) {
-    this.form.get('uday').setValue(sday);
+  changeSday() {
+    this.form.get('uday').setValue(this.form.value.sday);
 	if (this.form.value.torikbn == false) {
-	  this.form.get('yday').setValue(sday);
+	  this.form.get('yday').setValue(this.form.value.sday);
 	}
 	
   }
