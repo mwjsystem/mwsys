@@ -760,7 +760,7 @@ export class UserService {
   }
   getPrevday(tdy: Date) {
     let lcdate: Date = new Date(tdy);
-    lcdate.setDate(lcdate.getDate() -1 1);
+    lcdate.setDate(lcdate.getDate() - 1);
     const day = lcdate.getDay();
     if (
       this.holidays.includes(this.formatDate(lcdate)) ||
