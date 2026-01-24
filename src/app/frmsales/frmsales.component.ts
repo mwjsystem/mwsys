@@ -713,8 +713,6 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           .then(result => {
             this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
             //  zaiko更新処理 (読込時分マイナス)
-
-            // console.log(this.jmisrv.trzaiko, jyumei);
             this.jmisrv.trzaiko.forEach(e => {
               this.jmisrv.updZaiko(e);
             });
