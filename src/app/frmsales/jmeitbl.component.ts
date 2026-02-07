@@ -900,8 +900,8 @@ export class JmeitblComponent implements OnInit {
         });
         // console.log(control.get('trjmzais'));
         (control.get('trjyumzais') as FormArray).controls.forEach(e => {
+		  console.log('edit',e);  
           this.jmisrv.trjmzai.push({
-			console.log('edit',e);  
             id: this.usrsrv.compid,
             denno: dno,
             line: this.usrsrv.editFrmval(control, 'line'),
