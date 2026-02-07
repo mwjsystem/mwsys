@@ -46,7 +46,8 @@ export class TransService {
   }
 
   async getTrans(gcd: string, scd: string, day: Date): Promise<Trans[]> {
-	const lcyago = this.usrsrv.getLastYear(day);
+	const lcday:Date = day;
+	const lcyago = this.usrsrv.getLastYear(lcday);
     const lcmago = this.usrsrv.getLastMonth(day);
     // console.log(lcmago);
     let lcprms1: Promise<Trans[]> = new Promise(resolve => {
