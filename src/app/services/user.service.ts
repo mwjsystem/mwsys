@@ -788,6 +788,14 @@ export class UserService {
     }
     return date;
   }
+  getLastYear(date: Date) {
+    date.setDate(date.getDate() - 365);
+    const day = date.getDay();
+    if (this.holidays.includes(this.formatDate(date)) || day == 0 || day == 6) {
+      date = this.getNextday(date);
+    }
+    return date;
+  }  
   toastErr(title, msg) {
     this.toastr.error(title, msg, {
       closeButton: true,

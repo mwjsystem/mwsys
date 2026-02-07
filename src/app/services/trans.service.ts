@@ -47,6 +47,7 @@ export class TransService {
 
   async getTrans(gcd: string, scd: string, day: Date): Promise<Trans[]> {
     const lcmago = this.usrsrv.getLastMonth(day);
+	const lcyago = this.usrsrv.getLastYear(day);
     // console.log(lcmago);
     let lcprms1: Promise<Trans[]> = new Promise(resolve => {
       this.stcsrv.getStocktrn(gcd, scd, lcmago).then(e => {
@@ -74,7 +75,7 @@ export class TransService {
       })
     })
     const GetTran = gql`
-    query get_trans($id: smallint!, $gcd: String!, $scd: String!, $day: date!, $today: date!) {
+    query get_trans($id: smallint!, $gcd: String!, $scd: String!, $day: date!, $today: date!, $lyday: date!) {
       shukka:vjmeizai(where: {id: {_eq: $id}, gcode: {_eq: $gcd},sday: {_gt: $day,_lte: $today}, scode: {_eq: $scd},trjyuden: {skbn: {_neq: "1"},del: {_eq: false}}}) {
         sday
         denno
@@ -176,7 +177,7 @@ export class TransService {
           }
         }
       } 
-      hatzn:vnymat(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, hatzn: {_gt: 0}}) {
+      hatzn:vnymat(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, hatzn: {_gt: 0},day: {_gt: $lyday }}) {
         denno
         line
         mmemo
@@ -197,7 +198,8 @@ export class TransService {
           gcd: gcd,
           scd: scd,
           day: lcmago,
-          today: new Date()
+          today: new Date(),
+		  lyday: lcyago
         },
       })
         .valueChanges
