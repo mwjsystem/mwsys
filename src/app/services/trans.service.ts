@@ -46,8 +46,8 @@ export class TransService {
   }
 
   async getTrans(gcd: string, scd: string, day: Date): Promise<Trans[]> {
-    const lcmago = this.usrsrv.getLastMonth(day);
 	const lcyago = this.usrsrv.getLastYear(day);
+    const lcmago = this.usrsrv.getLastMonth(day);
     // console.log(lcmago);
     let lcprms1: Promise<Trans[]> = new Promise(resolve => {
       this.stcsrv.getStocktrn(gcd, scd, lcmago).then(e => {
