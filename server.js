@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 const forceSsl = require('force-ssl-heroku');
-const cors = require('cors');
+// const cors = require('cors');
 // const exec = require('child_process').exec;
 // サーバをインスタンス化する 
 const app = express();
