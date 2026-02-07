@@ -1,11 +1,19 @@
 const path = require('path');
 const express = require('express');
 const forceSsl = require('force-ssl-heroku');
+const cors = require('cors');
 // const exec = require('child_process').exec;
 // サーバをインスタンス化する 
 const app = express();
 // http ⇒ https リダイレクト
 app.use(forceSsl);
+
+// CORSエラー対策
+app.use(cors({
+    origin: '*mwsys*.herokuapp.com', //アクセス許可するオリジン
+    credentials: true, //レスポンスヘッダーにAccess-Control-Allow-Credentials追加
+    optionsSuccessStatus: 200 //レスポンスstatusを200に設定
+}))
 
 // 以下の設定だけで dist/index.html も返せてはいる
 app.use(express.static(`${__dirname}/dist`));
