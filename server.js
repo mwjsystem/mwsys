@@ -9,11 +9,11 @@ const app = express();
 app.use(forceSsl);
 
 // CORSエラー対策
-app.use(cors({
-    origin: '*mwsys*.herokuapp.com', //アクセス許可するオリジン
-    credentials: true, //レスポンスヘッダーにAccess-Control-Allow-Credentials追加
-    optionsSuccessStatus: 200 //レスポンスstatusを200に設定
-}));
+// app.use(cors({
+    // origin: '*mwsys*.herokuapp.com', //アクセス許可するオリジン
+    // credentials: true, //レスポンスヘッダーにAccess-Control-Allow-Credentials追加
+    // optionsSuccessStatus: 200 //レスポンスstatusを200に設定
+// }));
 
 // 以下の設定だけで dist/index.html も返せてはいる
 app.use(express.static(`${__dirname}/dist`));
