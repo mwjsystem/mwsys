@@ -906,13 +906,16 @@ export class JmeitblComponent implements OnInit {
         (control.get('trjyumzais') as FormArray).controls.forEach(e => {
 	      console.log('editJyumei trjyumei', control);
 		  console.log('editJyumei trjmzai',e);
-		  let lcsuu:number =  control.value.suu * e.value.irisu; 		  
+		  let j: number = control.value.mszais.findIndex(obj => obj.zcode == e.value.gcode);
+
+		  
+		  let lcsuu:number =  control.value.suu * control.value.mszais[j]['irisu']; 		  
           this.jmisrv.trjmzai.push({
             id: this.usrsrv.compid,
             denno: dno,
             line: this.usrsrv.editFrmval(control, 'line'),
             eda: this.usrsrv.editFrmval(control, 'eda'),
-            gcode: this.usrsrv.editFrmval(e, 'zcode'),
+            gcode: this.usrsrv.editFrmval(e, 'gcode'),
             suu: lcsuu,
             spec: this.usrsrv.editFrmval(control, 'spec'),
             spdet: this.usrsrv.editFrmval(control, 'spdet')
