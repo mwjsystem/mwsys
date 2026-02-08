@@ -556,7 +556,7 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue({ scode: this.parentForm.value.scode });
           let lctanka: number = 0;
           let lcgenka: number = 0;
-          console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
+          // console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
           if (msgds.msgtankas[0].currency == "USD") {
             lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate);
             // lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate) + msgds.msgtankas[0].cost;
@@ -601,7 +601,7 @@ export class JmeitblComponent implements OnInit {
             if (e.msgoods.gskbn == "0") {
               this.getMtbl(i, 'msgzais').push(this.fb.group({ zcode: e.zcode, irisu: e.irisu }));
               k = +1;
-              this.getMtbl(i, 'trjyumzais').push(this.fb.group({ eda: k, gcode: e.zcode, suu: e.irisu, spec: null, spdet: null }));
+              this.getMtbl(i, 'trjyumzais').push(this.fb.group({ eda: k, gcode: e.zcode, suu: e.irisu, spec: '6', spdet: null }));
             }
           });
           // console.log(this.getMtbl(i,'msgzais'),this.getMtbl(i,'trjyumzais'));
