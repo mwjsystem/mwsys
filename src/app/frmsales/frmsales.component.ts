@@ -702,7 +702,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       eicode: this.usrsrv.editFrmval(this.form, 'eicode'),
       del: false
     }
-    console.log(jyuden);
+    // console.log(jyuden);
     if (this.mode == 2) {
       return new Promise(resolve => {
         // let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno); 
@@ -746,7 +746,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           });
       });
     } else if (this.mode == 1) {//新規登録
-      console.log('save新規',this.jmisrv.trjmzai);
+      // console.log('save新規',this.jmisrv.trjmzai);
 	
       this.jmisrv.denno = await this.jmisrv.getDenno();
       return new Promise(resolve => {
