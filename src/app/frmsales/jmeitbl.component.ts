@@ -905,9 +905,9 @@ export class JmeitblComponent implements OnInit {
 
         (control.get('trjyumzais') as FormArray).controls.forEach(e => {
 	      // console.log('editJyumei trjyumei', control);
-		  // console.log('editJyumei trjmzai',e);  
+		  // console.log('editJyumei trjmzai',e);
+		  let lcsuu:number =  control.value.suu * e.value.irisu; 		  
           this.jmisrv.trjmzai.push({
-			let lcsuu:number =  control.value.suu * e.value.irisu; 
             id: this.usrsrv.compid,
             denno: dno,
             line: this.usrsrv.editFrmval(control, 'line'),
