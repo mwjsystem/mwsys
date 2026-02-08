@@ -585,12 +585,14 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.form.get('scode').setValue(this.usrsrv.staff.scode);
     this.form.get('skbn').setValue("0");
     this.jmeitbl.frmArr.clear();
+	this.jmisrv.isSaving = false;
     this.refresh();
     this.jmeitbl.addRows(1);
   }
 
   modeToUpd(): void {
     this.mode = 2;
+	this.jmisrv.isSaving = false;
     this.refresh();
     history.replaceState('', '', './frmsales/' + this.mode + '/' + this.jmisrv.denno);
   }
