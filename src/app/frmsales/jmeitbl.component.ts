@@ -907,12 +907,13 @@ export class JmeitblComponent implements OnInit {
 	      // console.log('editJyumei trjyumei', control);
 		  // console.log('editJyumei trjmzai',e);  
           this.jmisrv.trjmzai.push({
+			let lcsuu:number =  control.value.suu * e.value.irisu; 
             id: this.usrsrv.compid,
             denno: dno,
             line: this.usrsrv.editFrmval(control, 'line'),
             eda: this.usrsrv.editFrmval(control, 'eda'),
-            gcode: this.usrsrv.editFrmval(e, 'gcode'),
-            suu: this.usrsrv.editFrmval(control, 'suu'),
+            gcode: this.usrsrv.editFrmval(e, 'zcode'),
+            suu: lcsuu,
             spec: this.usrsrv.editFrmval(control, 'spec'),
             spdet: this.usrsrv.editFrmval(control, 'spdet')
           });
