@@ -185,7 +185,6 @@ export class JmeitblComponent implements OnInit {
       this.frmArr.controls[i].patchValue({ spec: null });
     } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] >= 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '1' });
-      })
     } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '0' });
     }
