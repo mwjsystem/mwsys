@@ -152,6 +152,7 @@ export class JmeitblComponent implements OnInit {
     let lctoutmoney: number = 0;
     let lctinmoney: number = 0;
     let lcgenka: number = 0;
+	let lcAr2: FormArray = this.fb.array([]);
     switch (this.frmArr.getRawValue()[i]['mtax']) {
       case '0':
         lctaxmoney = Math.round(ctrl.tanka * lctaxrate) * ctrl.suu;
@@ -185,6 +186,11 @@ export class JmeitblComponent implements OnInit {
       this.frmArr.controls[i].patchValue({ spec: null });
     } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] >= 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '1' });
+	  lcAr2 = this.frmArr.controls[i].trjyumzais;
+	  lcAr2.controls
+      .forEach(control => {
+        control.patchValue({ spec: '1' });
+      })
     } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '0' });
     }
@@ -376,7 +382,7 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
   createRow(i: number, jyumei?: mwI.Jyumei) {
-    console.log('createRow',i,jyumei);
+    // console.log('createRow',i,jyumei);
     let lcArr: FormArray = this.fb.array([]);
     let lcAr2: FormArray = this.fb.array([]);
     if (jyumei?.gskbn == "0" || jyumei?.gskbn == "1") { //数量区分"0：在庫品"または、"1：セット品"の場合
@@ -502,7 +508,7 @@ export class JmeitblComponent implements OnInit {
   jyumZai(i: number): void {
     let dialogConfig = new MatDialogConfig();
     let lcdata = [];
-    console.log('jyumZai',this.getMtbl(i,'trjyumzais'),this.frmArr.controls[i].get('trjyumzais'));
+    // console.log('jyumZai',this.getMtbl(i,'trjyumzais'),this.frmArr.controls[i].get('trjyumzais'));
     this.getMtbl(i, 'trjyumzais').controls.forEach(e => {
       let j: number = this.setZai[i].findIndex(obj => obj.gcode == e.value.gcode);
       if (j > -1) {
@@ -601,7 +607,7 @@ export class JmeitblComponent implements OnInit {
             if (e.msgoods.gskbn == "0") {
               this.getMtbl(i, 'msgzais').push(this.fb.group({ zcode: e.zcode, irisu: e.irisu }));
               k = +1;
-              this.getMtbl(i, 'trjyumzais').push(this.fb.group({ eda: k, gcode: e.zcode, suu: e.irisu, spec: '6', spdet: null }));
+              this.getMtbl(i, 'trjyumzais').push(this.fb.group({ eda: k, gcode: e.zcode, suu: e.irisu, spec: null, spdet: null }));
             }
           });
           // console.log(this.getMtbl(i,'msgzais'),this.getMtbl(i,'trjyumzais'));
@@ -651,6 +657,7 @@ export class JmeitblComponent implements OnInit {
         this.frmArr.controls[i].patchValue({ pable: lcpable });
         if (lcpable > 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
           this.frmArr.controls[i].patchValue({ spec: '1' });
+		  
         } else if (lcpable < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
           this.usrsrv.toastWar('品番' + gcd + 'の受注可能数が' + lcpable + 'です');
         }
