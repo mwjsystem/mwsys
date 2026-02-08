@@ -152,7 +152,6 @@ export class JmeitblComponent implements OnInit {
     let lctoutmoney: number = 0;
     let lctinmoney: number = 0;
     let lcgenka: number = 0;
-	let lcAr2: FormArray = this.fb.array([]);
     switch (this.frmArr.getRawValue()[i]['mtax']) {
       case '0':
         lctaxmoney = Math.round(ctrl.tanka * lctaxrate) * ctrl.suu;
@@ -186,10 +185,6 @@ export class JmeitblComponent implements OnInit {
       this.frmArr.controls[i].patchValue({ spec: null });
     } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] >= 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '1' });
-	  lcAr2 = this.frmArr.controls[i].trjyumzais;
-	  lcAr2.controls
-      .forEach(control => {
-        control.patchValue({ spec: '1' });
       })
     } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '0' });
@@ -657,7 +652,6 @@ export class JmeitblComponent implements OnInit {
         this.frmArr.controls[i].patchValue({ pable: lcpable });
         if (lcpable > 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
           this.frmArr.controls[i].patchValue({ spec: '1' });
-		  
         } else if (lcpable < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
           this.usrsrv.toastWar('品番' + gcd + 'の受注可能数が' + lcpable + 'です');
         }

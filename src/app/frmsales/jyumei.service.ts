@@ -25,6 +25,7 @@ export class JyumeiService {
   public trzaiko: mwI.Zaiko[] = [];
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
+  public isSaving: boolean;
 
   private GetTran = gql`
     query get_jyuden($id: smallint!,$dno: Int!) {

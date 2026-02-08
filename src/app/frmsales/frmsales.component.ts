@@ -646,6 +646,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   async save(): Promise<boolean> {
+	this.jmisrv.isSaving = true;  
     // console.log(Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')), this.usrsrv.editFrmval(this.form, 'iadr'),);
     // console.log(this.form.get('iadr'), this.usrsrv.editFrmval(this.form, 'iadr'));
     let jyuden: any = {
@@ -736,10 +737,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             this.form.markAsPristine();
             this.cancel();
             return resolve(true);
+			this.jmisrv.isSaving = false;
           }).catch(error => {
             this.usrsrv.toastErr('データベースエラー', '受注伝票' + this.jmisrv.denno + 'の変更保存ができませんでした');
             console.log('error update_jyuen', error);
             return resolve(false);
+			this.jmisrv.isSaving = false;
           });
       });
     } else if (this.mode == 1) {//新規登録
@@ -792,10 +795,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             this.form.markAsPristine();
             this.cancel();
             return resolve(true);
+			this.jmisrv.isSaving = false;
           }).catch(error => {
             this.usrsrv.toastErr('データベースエラー', '受注伝票の新規登録ができませんでした');
             console.log('error insert_jyuden', error);
             return resolve(false);
+			this.jmisrv.isSaving = false; 
           });
       });
     } else {//照会
