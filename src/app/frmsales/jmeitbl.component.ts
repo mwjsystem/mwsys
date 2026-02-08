@@ -376,7 +376,7 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
   createRow(i: number, jyumei?: mwI.Jyumei) {
-    // console.log(i,jyumei);
+    console.log('createRow',i,jyumei);
     let lcArr: FormArray = this.fb.array([]);
     let lcAr2: FormArray = this.fb.array([]);
     if (jyumei?.gskbn == "0" || jyumei?.gskbn == "1") { //数量区分"0：在庫品"または、"1：セット品"の場合
@@ -502,7 +502,7 @@ export class JmeitblComponent implements OnInit {
   jyumZai(i: number): void {
     let dialogConfig = new MatDialogConfig();
     let lcdata = [];
-    // console.log(this.getMtbl(i,'trjyumzais'),this.frmArr.controls[i].get('trjyumzais'));
+    console.log('jyumZai',this.getMtbl(i,'trjyumzais'),this.frmArr.controls[i].get('trjyumzais'));
     this.getMtbl(i, 'trjyumzais').controls.forEach(e => {
       let j: number = this.setZai[i].findIndex(obj => obj.gcode == e.value.gcode);
       if (j > -1) {
