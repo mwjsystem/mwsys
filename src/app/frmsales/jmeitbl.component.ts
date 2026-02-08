@@ -906,7 +906,7 @@ export class JmeitblComponent implements OnInit {
         (control.get('trjyumzais') as FormArray).controls.forEach(e => {
 	      console.log('editJyumei trjyumei', control);
 		  console.log('editJyumei trjmzai',e);
-		  let j: number = control.value.mszais.findIndex(obj => obj.zcode == e.value.gcode);
+		  let j: number = control.mszais.findIndex(obj => obj.zcode == e.value.gcode);
 
 		  
 		  let lcsuu:number =  control.value.suu * control.value.mszais[j]['irisu']; 		  
