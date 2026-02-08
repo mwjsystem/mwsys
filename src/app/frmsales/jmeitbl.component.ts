@@ -908,7 +908,7 @@ export class JmeitblComponent implements OnInit {
 		  console.log('editJyumei trjmzai',control.value.suu,e.value.gcode);
 		  let j: number = control.value.msgzais.findIndex(obj => obj.zcode == e.value.gcode);
 
-		  console.log('editJyumei trjmzai',j,control.value.mszais[j]);
+		  console.log('findindex',e,j,control.value.mszais[j]);
 		  let lcsuu:number =  control.value.suu * control.value.mszais[j].irisu; 		  
           this.jmisrv.trjmzai.push({
             id: this.usrsrv.compid,
