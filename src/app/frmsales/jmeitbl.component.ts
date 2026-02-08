@@ -911,7 +911,7 @@ export class JmeitblComponent implements OnInit {
             denno: dno,
             line: this.usrsrv.editFrmval(control, 'line'),
             eda: lceda,
-            gcode: this.usrsrv.editFrmval(e, 'zcode'),
+            gcode: e.zcode,
             suu: lcsuu,
             spec: this.usrsrv.editFrmval(control, 'spec'),
             spdet: this.usrsrv.editFrmval(control, 'spdet')
