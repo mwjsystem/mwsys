@@ -902,25 +902,39 @@ export class JmeitblComponent implements OnInit {
           gskbn: this.usrsrv.editFrmval(control, 'gskbn'),
           currency: this.usrsrv.editFrmval(control, 'currency')
         });
-
-        (control.get('trjyumzais') as FormArray).controls.forEach(e => {
-	      console.log('editJyumei trjyumei', control,control.value.msgzais);
-		  console.log('editJyumei trjmzai',control.value.suu,e.value.gcode);
-		  let j: number = control.value.msgzais.findIndex(obj => obj.zcode == e.value.gcode);
-
-		  console.log('findindex',e,j,control.value.mszais[j]);
-		  let lcsuu:number =  control.value.suu * control.value.mszais[j].irisu; 		  
-          this.jmisrv.trjmzai.push({
+		let lceda:number = 0;
+        control.value.msgzais.forEach(e => {
+   	      let lcsuu:number =  control.value.suu * e.irisu; 
+          lceda = ++1;
+		  this.jmisrv.trjmzai.push({
             id: this.usrsrv.compid,
             denno: dno,
             line: this.usrsrv.editFrmval(control, 'line'),
-            eda: this.usrsrv.editFrmval(control, 'eda'),
-            gcode: this.usrsrv.editFrmval(e, 'gcode'),
+            eda: lceda,
+            gcode: this.usrsrv.editFrmval(e, 'zcode'),
             suu: lcsuu,
             spec: this.usrsrv.editFrmval(control, 'spec'),
             spdet: this.usrsrv.editFrmval(control, 'spdet')
-          });
+          });			
         })
+        // (control.get('trjyumzais') as FormArray).controls.forEach(e => {
+	      // console.log('editJyumei trjyumei', control,control.value.msgzais);
+		  // console.log('editJyumei trjmzai',control.value.suu,e.value.gcode);
+		  // let j: number = control.value.msgzais.findIndex(obj => obj.zcode == e.value.gcode);
+
+		  // console.log('findindex',e,j,control.value.mszais[j]);
+		  // let lcsuu:number =  control.value.suu * control.value.mszais[j].irisu; 		  
+          // this.jmisrv.trjmzai.push({
+            // id: this.usrsrv.compid,
+            // denno: dno,
+            // line: this.usrsrv.editFrmval(control, 'line'),
+            // eda: this.usrsrv.editFrmval(control, 'eda'),
+            // gcode: this.usrsrv.editFrmval(e, 'gcode'),
+            // suu: lcsuu,
+            // spec: this.usrsrv.editFrmval(control, 'spec'),
+            // spdet: this.usrsrv.editFrmval(control, 'spdet')
+          // });
+        // })
 
       });
 	console.log('editJyumei',this.jmisrv.trjmzai);
