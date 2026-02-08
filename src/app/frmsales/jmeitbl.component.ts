@@ -208,12 +208,13 @@ export class JmeitblComponent implements OnInit {
     let sour: { [key: string]: number; } = {};
     let kogu: number = 0;
     let mall: number = 0;
+    let obi: number = 0;
     this.frmArr.controls.forEach(control => {
-      // console.log(control.value);
+      console.log('setKoguchi',control.value);
       if (!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02') || control.value.gcode == 'MALL') {
         forDel.push(i);
         // console.log(control.value.gcode,i);
-      } else if (control.value.gskbn == '0') {
+      } else if (control.value.gskbn == '0' || control.value.gskbn == '1') {
         if (/^CB.*SV$/.test(control.value.gcode)) {
           mall += +control.value.suu;
         } else if (control.value.koguchi) {
@@ -230,6 +231,9 @@ export class JmeitblComponent implements OnInit {
             calc[control.value.send] = (+control.value.suu / +control.value.max);
           }
         }
+        if (/^CB.*$/.test(control.value.gcode)) {
+          obi += +control.value.suu;
+        }		
       }
       i += 1;
     })
@@ -906,7 +910,7 @@ export class JmeitblComponent implements OnInit {
             id: this.usrsrv.compid,
             denno: dno,
             line: this.usrsrv.editFrmval(control, 'line'),
-            eda: this.usrsrv.editFrmval(e, 'eda'),
+            eda: this.usrsrv.editFrmval(control, 'eda'),
             gcode: this.usrsrv.editFrmval(e, 'gcode'),
             suu: this.usrsrv.editFrmval(control, 'suu'),
             spec: this.usrsrv.editFrmval(control, 'spec'),
