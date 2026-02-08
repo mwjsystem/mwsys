@@ -900,8 +900,8 @@ export class JmeitblComponent implements OnInit {
         });
 
         (control.get('trjyumzais') as FormArray).controls.forEach(e => {
-	      console.log('editJyumei trjyumei', control);
-		  console.log('editJyumei trjmzai',e);  
+	      // console.log('editJyumei trjyumei', control);
+		  // console.log('editJyumei trjmzai',e);  
           this.jmisrv.trjmzai.push({
             id: this.usrsrv.compid,
             denno: dno,
@@ -915,6 +915,7 @@ export class JmeitblComponent implements OnInit {
         })
 
       });
+	console.log('editJyumei',this.jmisrv.trjmzai);
   }
 
 }
