@@ -898,18 +898,19 @@ export class JmeitblComponent implements OnInit {
           gskbn: this.usrsrv.editFrmval(control, 'gskbn'),
           currency: this.usrsrv.editFrmval(control, 'currency')
         });
-        // console.log(control.get('trjmzais'));
+
         (control.get('trjyumzais') as FormArray).controls.forEach(e => {
-		  console.log('edit',e);  
+	      console.log('editJyumei trjyumei', control));
+		  console.log('editJyumei trjmzai',e);  
           this.jmisrv.trjmzai.push({
             id: this.usrsrv.compid,
             denno: dno,
             line: this.usrsrv.editFrmval(control, 'line'),
             eda: this.usrsrv.editFrmval(e, 'eda'),
             gcode: this.usrsrv.editFrmval(e, 'gcode'),
-            suu: this.usrsrv.editFrmval(e, 'suu'),
-            spec: this.usrsrv.editFrmval(e, 'spec'),
-            spdet: this.usrsrv.editFrmval(e, 'spdet')
+            suu: this.usrsrv.editFrmval(control, 'suu'),
+            spec: this.usrsrv.editFrmval(control, 'spec'),
+            spdet: this.usrsrv.editFrmval(control, 'spdet')
           });
         })
 
