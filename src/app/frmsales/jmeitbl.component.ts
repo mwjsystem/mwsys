@@ -905,7 +905,7 @@ export class JmeitblComponent implements OnInit {
 		let lceda:number = 0;
         control.value.msgzais.forEach(e => {
    	      let lcsuu:number =  control.value.suu * e.irisu; 
-          lceda = ++1;
+          lceda++;
 		  this.jmisrv.trjmzai.push({
             id: this.usrsrv.compid,
             denno: dno,
