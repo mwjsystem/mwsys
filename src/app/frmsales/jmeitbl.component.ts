@@ -210,7 +210,7 @@ export class JmeitblComponent implements OnInit {
     let mall: number = 0;
     let obi: number = 0;
     this.frmArr.controls.forEach(control => {
-      console.log('setKoguchi',control.value);
+      // console.log('setKoguchi',control.value);
       if (!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02') || control.value.gcode == 'MALL') {
         forDel.push(i);
         // console.log(control.value.gcode,i);
@@ -904,8 +904,8 @@ export class JmeitblComponent implements OnInit {
         });
 
         (control.get('trjyumzais') as FormArray).controls.forEach(e => {
-	      // console.log('editJyumei trjyumei', control);
-		  // console.log('editJyumei trjmzai',e);
+	      console.log('editJyumei trjyumei', control);
+		  console.log('editJyumei trjmzai',e);
 		  let lcsuu:number =  control.value.suu * e.value.irisu; 		  
           this.jmisrv.trjmzai.push({
             id: this.usrsrv.compid,
