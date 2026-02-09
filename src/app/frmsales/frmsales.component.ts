@@ -585,7 +585,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.form.get('tcode').setValue(this.usrsrv.staff.code);
     this.form.get('day').setValue(new Date());
     this.form.get('yday').setValue(this.usrsrv.getNextday(new Date()));
-    this.form.get('scode').setValue(this.usrsrv.staff.scode);
+    // this.form.get('scode').setValue(this.usrsrv.staff.scode);
     this.form.get('skbn').setValue("0");
     this.jmeitbl.frmArr.clear();
 	this.jmisrv.isSaving = false;

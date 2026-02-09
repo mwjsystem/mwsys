@@ -211,7 +211,7 @@ export class JmeitblComponent implements OnInit {
     let obi: number = 0;
     let shohin: number = 0;
     this.frmArr.controls.forEach(control => {
-      // console.log('setKoguchi',control.value);
+      console.log('setKoguchi',control.value,control.value.gcode.indexOf('CB'));
       if (!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02') || control.value.gcode == 'MALL') {
         forDel.push(i);
         // console.log(control.value.gcode,i);
