@@ -22,7 +22,7 @@ export class JyumeiService {
   public tntype: string;           //顧客マスタ「直送納品書タイプ」
   public address: string = "";
   public dmemo: string = "";
-  public obisu: string = "";
+  public obisu: number = "";
   public iaddress: string = "";
   public trzaiko: mwI.Zaiko[] = [];
   public subject = new Subject<boolean>();

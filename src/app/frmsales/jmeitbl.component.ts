@@ -236,7 +236,7 @@ export class JmeitblComponent implements OnInit {
         }		
       }
       i += 1;
-	  this.jmisrv.obisu ＝ obi;
+	  this.jmisrv.obisu = obi;
     })
     forDel.reverse().forEach(fordel => {
       this.frmArr.removeAt(fordel);
