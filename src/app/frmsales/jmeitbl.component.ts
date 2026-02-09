@@ -275,10 +275,12 @@ export class JmeitblComponent implements OnInit {
 	// 代引き手数料計算	  
       if (this.parentForm.value.pcode == '9') {		  
  	    const arr = this.frmArr.getRawValue();
+		
 		for (let i = 0; i < arr.length; i++) {
 		  if (arr[i]['gkbn'] == '0' || arr[i]['gkbn'] == '1' ) {
+			console.log('daibiki bef',shohin);
 		    shohin += arr[i]['toutmoney'];
-			console.log('daibiki',shohin,arr);
+			console.log('daibiki aft',shohin);
 		  }
 	    }
 		console.log('daibiki hantei',shohin,shohin < 100000);
