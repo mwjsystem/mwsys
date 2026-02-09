@@ -286,6 +286,13 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
+	  <div class="flex flex-wrap content-between">
+        <mat-form-field style="width: 4em;">
+          <mat-label>帯本数</mat-label>
+          <input type="number" disabled matInput formControlName="jmisrv.obisu" class="i_num">
+        </mat-form-field>
+        <span class="ybtxt">　本</span>
+      </div>
       <div class="flex flex-wrap content-between" *ngIf="msel6.triggerValue.indexOf('同梱') == -1">
         <mat-form-field style="width: 4em;">
           <mat-label>荷物個数</mat-label>

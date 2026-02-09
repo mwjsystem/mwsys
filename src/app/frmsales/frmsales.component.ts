@@ -403,7 +403,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         this.form.get('nmemo').setValue(adr.nmemo);
         this.form.get('smemo').setValue(adr.smemo);
         this.form.get('omemo').setValue(adr.omemo);
-		console.log('getmember',adr.extendadr.extend,(adr.extend ?? ''));
+		console.log('getmember',adr.extend,adr.extend,(adr.extend ?? ''));
         this.jmisrv.address = adr.zip + '\n' + adr.region + adr.local + '\n' + adr.street + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
       } else {
         this.usrsrv.toastInf("別納品先枝番" + eda + "は登録されていません");
