@@ -281,10 +281,11 @@ export class JmeitblComponent implements OnInit {
 			console.log('daibiki',shohin,arr);
 		  }
 	    }
+		console.log('daibiki hantei',shohin,shohin < 100000);
 		if (shohin < 100000){
-		  // this.insRows(["Z02" + "\t" + "1" + "\t" + "300"], false);	
+		  this.insRows(["Z02" + "\t" + "1"], false);	
 		} else { 
-		  this.insRows(["Z02" + "\t" + "1" + "\t" + "600"], false);	
+		  this.insRows(["Z02-2" + "\t" + "1"], false);	
 	    }
       }
 	  
