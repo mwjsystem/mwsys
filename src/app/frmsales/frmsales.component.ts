@@ -404,7 +404,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         this.form.get('smemo').setValue(adr.smemo);
         this.form.get('omemo').setValue(adr.omemo);
 		console.log('changeeda',adr.street ,adr.extend,(adr.extend ?? ''));
-        this.jmisrv.address = adr.zip + '\n' + adr.region + adr.local + '\n' + adr.street + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
+        this.jmisrv.address = adr.zip + '\n' + adr.region + adr.local + '\n' + (adr.street ?? '') + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
       } else {
         this.usrsrv.toastInf("別納品先枝番" + eda + "は登録されていません");
         this.form.get('nadr').setErrors({ 'incorrect': true });
@@ -428,7 +428,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       if (i > -1) {
         this.form.get('iadr').setErrors(null);
         const adr = this.memsrv.adrs[i];
-        this.jmisrv.iaddress = adr.zip + '\n' + adr.region + adr.local + '\n' + adr.street + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
+        this.jmisrv.iaddress = adr.zip + '\n' + adr.region + adr.local + '\n' + (adr.street ?? '') + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
       } else {
         this.usrsrv.toastInf("依頼主枝番" + eda + "は登録されていません");
         this.form.get('iadr').setErrors({ 'incorrect': true });
@@ -514,7 +514,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           this.nskVal.push({ value: "2", viewval: "別納" });
           this.iskVal = this.nskVal.concat();
           this.iskVal.unshift({ value: " ", viewval: "通常依頼主" });
-          console.log("getMember changeeda call",this.form.value);
+          // console.log("getMember changeeda call",this.form.value);
           this.changeEda(this.form.value.nadr);
           this.cdRef.detectChanges();
         }
