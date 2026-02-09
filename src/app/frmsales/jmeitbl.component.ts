@@ -232,7 +232,7 @@ export class JmeitblComponent implements OnInit {
             calc[control.value.send] = (+control.value.suu / +control.value.max);
           }
         }
-        if (control.value.gcode.indexOf('CB')) {
+        if (control.value.gcode.indexOf('CB') > -1) {
 			
           obi += +control.value.suu;
         }		
@@ -240,7 +240,7 @@ export class JmeitblComponent implements OnInit {
       i += 1;
 
     })	  
-	console.log('kogu',obi,this.jmisrv.obisu); 
+	// console.log('kogu',obi,this.jmisrv.obisu); 
 	this.jmisrv.obisu = obi;
     forDel.reverse().forEach(fordel => {
       this.frmArr.removeAt(fordel);
@@ -275,11 +275,11 @@ export class JmeitblComponent implements OnInit {
 	// 代引き手数料計算	  
       if (this.parentForm.value.pcode == '9') {		  
  	    const arr = this.frmArr.getRawValue();
-		  for (let i = 0; i < arr.length; i++) {
-    		const lcmoney: number = arr[i]['tanka'] * arr[i]['suu'];
-		    if (arr[i]['gkbn'] == '0' || arr[i]['gkbn'] == '1' ) {
-			  shohin += lcmoney;
-		    }
+		for (let i = 0; i < arr.length; i++) {
+		  const lcmoney: number = arr[i]['tanka'] * arr[i]['suu'];
+		  if (arr[i]['gkbn'] == '0' || arr[i]['gkbn'] == '1' ) {
+		    shohin += lcmoney;
+		  }
 	    }
 		if (shohin < 100000){
 		  this.insRows(["Z02" + "\t" + "1" + "\t" + "300"], false);	
@@ -287,6 +287,7 @@ export class JmeitblComponent implements OnInit {
 		  this.insRows(["Z02" + "\t" + "1" + "\t" + "600"], false);	
 	    }
       }
+	  
       if (mall > 0) {
         this.insRows(["MALL" + "\t" + mall], false);
       }
