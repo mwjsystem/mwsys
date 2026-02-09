@@ -491,6 +491,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           this.memsrv.edas = [];
           this.memsrv.adrs = [];
 		  this.jmisrv.dmemo = member.dmemo;
+		  this.memo = "";
           this.nskVal = [];
           this.nskVal.push({ value: "0", viewval: "基本住所" });
           for (let j = 0; j < msmadrs.length; j++) {

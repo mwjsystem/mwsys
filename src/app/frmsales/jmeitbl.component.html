@@ -16,11 +16,11 @@
   <button mat-flat-button class="w-24" color="primary" (click)="setJmeikbn(jmeikbn)"
     *ngIf="frmArr.enabled">一括設定</button>
   <button mat-flat-button class="w-48" color="accent" (click)="setKoguchi()" [disabled]="parentForm.invalid"
-    *ngIf="frmArr.enabled" matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
+    *ngIf="frmArr.enabled" matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips"　*ngIf="usrsrv.compid == 1">>個口送料等計算</button>
   <button mat-flat-button class="w-24 m-1" color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
   <mat-menu #cnp="matMenu">
     <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
-    <button mat-menu-item (click)="pasteFromClipboard(true)"
+    <button mat-menu-item (click)="pasteFromClipboardtrue)" == 1
       *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(明細洗替)</button>
     <button mat-menu-item (click)="pasteFromClipboard(false)"
       *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(末尾に追加)</button>
