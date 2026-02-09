@@ -275,8 +275,8 @@ export class JmeitblComponent implements OnInit {
 	// 代引き手数料計算	  
       if (this.parentForm.value.pcode == '9') {		  
  	    const arr = this.frmArr.getRawValue();
-		console.log('kogu',arr)
 		for (let i = 0; i < arr.length; i++) {
+		  console.log('kogu',arr,arr[i]['toutmoney']);
 		  const lcmoney: number = arr[i]['tanka'] * arr[i]['suu'];
 		  if (arr[i]['gkbn'] == '0' || arr[i]['gkbn'] == '1' ) {
 		    shohin += lcmoney;
