@@ -211,7 +211,7 @@ export class JmeitblComponent implements OnInit {
     let obi: number = 0;
     let shohin: number = 0;
     this.frmArr.controls.forEach(control => {
-      console.log('setKoguchi',control.value,control.value.gcode.indexOf('CB'));
+      // console.log('setKoguchi',control.value,control.value.gcode.indexOf('CB'));
       if (!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02') || control.value.gcode == 'MALL') {
         forDel.push(i);
         // console.log(control.value.gcode,i);
@@ -275,6 +275,7 @@ export class JmeitblComponent implements OnInit {
 	// 代引き手数料計算	  
       if (this.parentForm.value.pcode == '9') {		  
  	    const arr = this.frmArr.getRawValue();
+		console.log('kogu',arr)
 		for (let i = 0; i < arr.length; i++) {
 		  const lcmoney: number = arr[i]['tanka'] * arr[i]['suu'];
 		  if (arr[i]['gkbn'] == '0' || arr[i]['gkbn'] == '1' ) {
