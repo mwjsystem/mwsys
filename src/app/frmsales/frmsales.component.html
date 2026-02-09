@@ -322,6 +322,9 @@
 	  <label for="txt0" class="block mx-2">納品先住所</label>
       <textarea id="txt0" matInput [value]="jmisrv.address" matTextareaAutosize disabled
         class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
+	  <label for="txt0" class="block mx-2">顧客マスタ備考</label>
+      <textarea id="txt0" matInput [value]="jmisrv.dmemo" matTextareaAutosize disabled
+        class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
       <label for="txt1" class="block mx-2">伝票備考</label>
       <textarea id="txt1" [rows]="getRows('dmemo')" formControlName="dmemo"
         class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>

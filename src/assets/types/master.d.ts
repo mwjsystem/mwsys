@@ -171,7 +171,7 @@ declare namespace mwI {
     tcode1: string;
     tcode: string;
     del: boolean;
-    memo: string;
+    dmemo: string;
     inmemo: string;
     sptnkbn: string;
     daibunuri: string;
