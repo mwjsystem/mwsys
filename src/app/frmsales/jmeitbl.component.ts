@@ -276,10 +276,8 @@ export class JmeitblComponent implements OnInit {
       if (this.parentForm.value.pcode == '9') {		  
  	    const arr = this.frmArr.getRawValue();
 		for (let i = 0; i < arr.length; i++) {
-		  console.log('kogu',arr,arr[i]['toutmoney']);
-		  const lcmoney: number = arr[i]['tanka'] * arr[i]['suu'];
 		  if (arr[i]['gkbn'] == '0' || arr[i]['gkbn'] == '1' ) {
-		    shohin += lcmoney;
+		    shohin += arr[i]['toutmoney'];
 		  }
 	    }
 		if (shohin < 100000){
