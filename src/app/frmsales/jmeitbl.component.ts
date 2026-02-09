@@ -282,7 +282,7 @@ export class JmeitblComponent implements OnInit {
 		  }
 	    }
 		if (shohin < 100000){
-		  this.insRows(["Z02" + "\t" + "1" + "\t" + "300"], false);	
+		  // this.insRows(["Z02" + "\t" + "1" + "\t" + "300"], false);	
 		} else { 
 		  this.insRows(["Z02" + "\t" + "1" + "\t" + "600"], false);	
 	    }
