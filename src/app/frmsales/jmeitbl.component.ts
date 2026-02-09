@@ -278,6 +278,7 @@ export class JmeitblComponent implements OnInit {
 		for (let i = 0; i < arr.length; i++) {
 		  if (arr[i]['gkbn'] == '0' || arr[i]['gkbn'] == '1' ) {
 		    shohin += arr[i]['toutmoney'];
+			console.log('daibiki',shohin,arr);
 		  }
 	    }
 		if (shohin < 100000){
@@ -299,9 +300,9 @@ export class JmeitblComponent implements OnInit {
   async setJmeikbn(kbn: string) {
     let i: number = 0;
     // console.log(kbn);
-    if (this.parentForm.value.jdstatus == null) {
-      this.parentForm.get('jdstatus').setValue("0");
-    }
+    // if (this.parentForm.value.jdstatus == null) {
+      // this.parentForm.get('jdstatus').setValue("0");
+    // }
     this.frmArr.controls
       .forEach(control => {
         if (control.value.chk) {
