@@ -278,12 +278,9 @@ export class JmeitblComponent implements OnInit {
 		
 		for (let i = 0; i < arr.length; i++) {
 		  if (arr[i]['gkbn'] == '0' || arr[i]['gkbn'] == '1' ) {
-			console.log('daibiki bef',shohin);
 		    shohin += arr[i]['toutmoney'];
-			console.log('daibiki aft',shohin);
 		  }
 	    }
-		console.log('daibiki hantei',shohin,shohin < 100000);
 		if (shohin < 100000){
 		  this.insRows(["Z02" + "\t" + "1"], false);	
 		} else { 
