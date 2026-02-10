@@ -215,7 +215,6 @@ export class FrmmoveComponent implements OnInit {
   }
 
   async save() {
-
     let movsub: any = {
       day: this.usrsrv.editFrmday(this.form, 'day'),
       outcode: this.usrsrv.editFrmval(this.form, 'outcode'),
@@ -233,6 +232,7 @@ export class FrmmoveComponent implements OnInit {
       updated_by: this.usrsrv.staff.code,
     }
 
+    console.log('save',movsub)
     if (this.mode == 2) {
       let movmei = this.movtbl.getMovmei(this.denno);
       this.movsrv.updMovden(this.denno, movsub, movmei)
