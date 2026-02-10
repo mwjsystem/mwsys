@@ -715,7 +715,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         let jyumei = this.jmisrv.trjyumei;
         let jyumzai = this.jmisrv.trjmzai;
         console.log('save変更',jyumzai);
-        this.jmisrv.updJyuden(this.jmisrv.denno, { ...jyuden, jdstatus: this.jmisrv.getJdsta(jyumei) }, jyumei, jyumzai)
+        this.jmisrv.updJyuden(this.jmisrv.denno, { ...jyuden }, jyumei, jyumzai)
           .then(result => {
             this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
             //  zaiko更新処理 (読込時分マイナス)
@@ -764,7 +764,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             denno: this.jmisrv.denno,
             created_at: new Date(),
             created_by: this.usrsrv.staff.code,
-            jdstatus: this.jmisrv.getJdsta(jyumei)
+            // jdstatus: this.jmisrv.getJdsta(jyumei)
           }
           , ...jyuden,
         }]

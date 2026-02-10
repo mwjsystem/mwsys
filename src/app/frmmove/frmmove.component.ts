@@ -298,6 +298,7 @@ export class FrmmoveComponent implements OnInit {
         }
         , ...movsub,
       }]
+	  console.log('ins bef',trmovsub, movmei)
       this.movsrv.insMovden(trmovsub, movmei)
         .then(result => {
           this.usrsrv.toastSuc('移動伝票' + this.denno + 'を新規登録しました');
