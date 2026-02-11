@@ -287,7 +287,9 @@ export class FrmmoveComponent implements OnInit {
           console.log('error update_movsub', error);
         });
     } else {//新規登録
-      this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
+      cosole.log('sinki0',this.denno);
+      
+	  this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
 	  
       const movmei = this.movtbl.getMovmei(this.denno);
 	  cosole.log('sinki',movmei);
