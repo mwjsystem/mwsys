@@ -289,7 +289,7 @@ export class MovtblComponent implements OnInit {
           gcode: this.usrsrv.editFrmval(control, 'gcode'),
           gtext: this.usrsrv.editFrmval(control, 'gtext'),
           suu: this.usrsrv.editFrmval(control, 'suu'),
-          memo: this.usrsrv.editFrmval(control, 'mbiko')
+          memo: this.usrsrv.editFrmval(control, 'memo')
         });
       });
     return movmei;

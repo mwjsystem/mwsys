@@ -53,7 +53,7 @@
                 </div>
                 <mat-form-field>
                     <mat-label>出庫倉庫</mat-label>
-                    <mat-select formControlName="outcode" required [panelClass]="'my-panel-class'" tabIndex="2">
+                    <mat-select formControlName="outcode" #msel01 required [panelClass]="'my-panel-class'" tabIndex="2" (keydown.enter)="msel01.close()">
                         <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
@@ -62,7 +62,7 @@
                 <div style="padding-top: 20px;"><span>⇒</span></div>
                 <mat-form-field>
                     <mat-label>入庫倉庫</mat-label>
-                    <mat-select formControlName="incode" required [panelClass]="'my-panel-class'"tabIndex="3">
+                    <mat-select formControlName="incode" #msel02 required [panelClass]="'my-panel-class'"tabIndex="3" (keydown.enter)="msel02.close()">
                         <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
