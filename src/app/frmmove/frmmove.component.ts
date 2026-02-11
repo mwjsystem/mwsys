@@ -292,7 +292,7 @@ export class FrmmoveComponent implements OnInit {
 	  this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
 	  
       const movmei = this.movtbl.getMovmei(this.denno);
-	  cosole.log('sinki',movmei);
+	  console.log('sinki',movmei);
       const trmovsub: Movsub[] = [{
         ...{
           id: this.usrsrv.compid,
