@@ -287,7 +287,7 @@ export class MovtblComponent implements OnInit {
           denno: dno,
           line: this.usrsrv.editFrmval(control, 'line'),
           gcode: this.usrsrv.editFrmval(control, 'gcode'),
-          gtext: this.usrsrv.editFrmval(control, 'gtext'),
+          // gtext: this.usrsrv.editFrmval(control, 'gtext'),
           suu: this.usrsrv.editFrmval(control, 'suu'),
           memo: this.usrsrv.editFrmval(control, 'memo')
         });
