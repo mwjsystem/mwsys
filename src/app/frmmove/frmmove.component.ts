@@ -232,7 +232,7 @@ export class FrmmoveComponent implements OnInit {
       updated_by: this.usrsrv.staff.code,
     }
 
-    console.log('save',his.form,movsub)
+    console.log('save',this.form,movsub)
     if (this.mode == 2) {
       let movmei = this.movtbl.getMovmei(this.denno);
       this.movsrv.updMovden(this.denno, movsub, movmei)
@@ -288,7 +288,9 @@ export class FrmmoveComponent implements OnInit {
         });
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
+	  
       const movmei = this.movtbl.getMovmei(this.denno);
+	  cosole.log('sinki',movmei);
       const trmovsub: Movsub[] = [{
         ...{
           id: this.usrsrv.compid,
