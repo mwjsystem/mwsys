@@ -60,9 +60,9 @@ export class FrmmoveComponent implements OnInit {
       htime: new FormControl(),
       okurisuu: new FormControl(),
       okurino: new FormControl(),
-      bikou: new FormControl(),
-      sbikou: new FormControl(),
-      obikou: new FormControl(),
+      memo: new FormControl(),
+      smemo: new FormControl(),
+      omemo: new FormControl(),
       mtbl: this.rows
     });
     this.okrsrv.getHaisou();
@@ -225,14 +225,14 @@ export class FrmmoveComponent implements OnInit {
       htime: this.usrsrv.editFrmval(this.form, 'htime'),
       okurisuu: this.usrsrv.editFrmval(this.form, 'okurisuu'),
       okurino: this.usrsrv.editFrmval(this.form, 'okurino'),
-      bikou: this.usrsrv.editFrmval(this.form, 'bikou'),
-      obikou: this.usrsrv.editFrmval(this.form, 'obikou'),
-      sbikou: this.usrsrv.editFrmval(this.form, 'sbikou'),
+      memo: this.usrsrv.editFrmval(this.form, 'memo'),
+      omemo: this.usrsrv.editFrmval(this.form, 'omemo'),
+      smemo: this.usrsrv.editFrmval(this.form, 'smemo'),
       updated_at: new Date(),
       updated_by: this.usrsrv.staff.code,
     }
 
-    console.log('save',this.mode,this.form)
+    // console.log('save',this.mode,this.form)
     if (this.mode == 2) {
       let movmei = this.movtbl.getMovmei(this.denno);
       this.movsrv.updMovden(this.denno, movsub, movmei)
@@ -287,10 +287,10 @@ export class FrmmoveComponent implements OnInit {
           console.log('error update_movsub', error);
         });
     } else {//新規登録
-      console.log('sinki0',this.denno);
+      // console.log('sinki0',this.denno);
       
 	  this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
-	  console.log('sinki1',this.denno);
+	  // console.log('sinki1',this.denno);
       const movmei = this.movtbl.getMovmei(this.denno);
 	  console.log('sinki',movmei);
       const trmovsub: Movsub[] = [{
