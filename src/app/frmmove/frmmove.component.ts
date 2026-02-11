@@ -232,7 +232,7 @@ export class FrmmoveComponent implements OnInit {
       updated_by: this.usrsrv.staff.code,
     }
 
-    console.log('save',movsub)
+    console.log('save',his.form,movsub)
     if (this.mode == 2) {
       let movmei = this.movtbl.getMovmei(this.denno);
       this.movsrv.updMovden(this.denno, movsub, movmei)
