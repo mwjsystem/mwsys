@@ -232,7 +232,7 @@ export class FrmmoveComponent implements OnInit {
       updated_by: this.usrsrv.staff.code,
     }
 
-    console.log('save',this.form)
+    console.log('save',this.mode,this.form)
     if (this.mode == 2) {
       let movmei = this.movtbl.getMovmei(this.denno);
       this.movsrv.updMovden(this.denno, movsub, movmei)
@@ -287,7 +287,7 @@ export class FrmmoveComponent implements OnInit {
           console.log('error update_movsub', error);
         });
     } else {//新規登録
-      cosole.log('sinki0',this.denno);
+      console.log('sinki0',this.denno);
       
 	  this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
 	  
