@@ -43,7 +43,7 @@
         <mat-card-content class="grid-cols-1">
             <div class="flex flex-wrap">
                 <div class="flex flex-wrap content-between">
-                    <mat-form-field style="width: 9em;">
+                    <mat-form-field style="width: 9em;" tabIndex="1">
                         <mat-label>移動日</mat-label>
                         <input matInput [matDatepicker]="picker" formControlName="day">
                         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -53,7 +53,7 @@
                 </div>
                 <mat-form-field>
                     <mat-label>出庫倉庫</mat-label>
-                    <mat-select formControlName="outcode" required [panelClass]="'my-panel-class'">
+                    <mat-select formControlName="outcode" required [panelClass]="'my-panel-class'" tabIndex="2">
                         <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>
@@ -62,7 +62,7 @@
                 <div style="padding-top: 20px;"><span>⇒</span></div>
                 <mat-form-field>
                     <mat-label>入庫倉庫</mat-label>
-                    <mat-select formControlName="incode" required [panelClass]="'my-panel-class'">
+                    <mat-select formControlName="incode" required [panelClass]="'my-panel-class'"tabIndex="3">
                         <mat-option *ngFor="let sval of strsrv.scds" [value]="sval.value">
                             {{sval.viewval}}
                         </mat-option>

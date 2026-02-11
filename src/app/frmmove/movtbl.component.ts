@@ -25,6 +25,8 @@ export class MovtblComponent implements OnInit {
   copyToClipboard: string;
   navCli = navigator.clipboard;
   setZai = [];
+  hidx = 5; //tabindex用ヘッダ項目数
+  mcols = 3; //tabindex用明細列数  
   public trzaiko: Zaiko[] = [];
   displayedColumns: string[] = ['line',
     'gcode',
