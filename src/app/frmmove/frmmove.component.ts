@@ -60,7 +60,7 @@ export class FrmmoveComponent implements OnInit {
       htime: new FormControl(),
       okurisuu: new FormControl(),
       okurino: new FormControl(),
-      memo: new FormControl(),
+      dmemo: new FormControl(),
       smemo: new FormControl(),
       omemo: new FormControl(),
       mtbl: this.rows
@@ -225,7 +225,7 @@ export class FrmmoveComponent implements OnInit {
       htime: this.usrsrv.editFrmval(this.form, 'htime'),
       okurisuu: this.usrsrv.editFrmval(this.form, 'okurisuu'),
       okurino: this.usrsrv.editFrmval(this.form, 'okurino'),
-      memo: this.usrsrv.editFrmval(this.form, 'memo'),
+      dmemo: this.usrsrv.editFrmval(this.form, 'dmemo'),
       omemo: this.usrsrv.editFrmval(this.form, 'omemo'),
       smemo: this.usrsrv.editFrmval(this.form, 'smemo'),
       updated_at: new Date(),
@@ -292,7 +292,7 @@ export class FrmmoveComponent implements OnInit {
 	  this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
 	  // console.log('sinki1',this.denno);
       const movmei = this.movtbl.getMovmei(this.denno);
-	  console.log('sinki',movmei);
+	  // console.log('sinki',movmei);
       const trmovsub: Movsub[] = [{
         ...{
           id: this.usrsrv.compid,
