@@ -439,8 +439,8 @@ export class UserService {
     // 全角は半角にして、大文字に変換
     const val = value
       .toUpperCase()
-      .replace(/[^A-ZＡ-Ｚ0-9０-９－-]/g, "")
-      .replace(/[０-９Ａ-Ｚ－]/g, function (s) {
+      .replace(/[^A-ZＡ-Ｚ0-9０-９／/－-]/g, "")
+      .replace(/[０-９Ａ-Ｚ／－]/g, function (s) {
         return String.fromCharCode(s.charCodeAt(0) - 65248);
       });
     return val;
