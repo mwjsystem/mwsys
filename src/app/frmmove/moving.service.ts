@@ -51,7 +51,7 @@ export class Movsub {
   incode: string;
   outcode: string;
   tcode: string;
-  obikou: string;
+  omemo: string;
   hday: Date;
   htime: string;
   hcode: string;
@@ -81,7 +81,7 @@ export class MovingService {
         incode
         outcode
         tcode
-        obikou
+        omemo
         hday
         htime
         hcode
