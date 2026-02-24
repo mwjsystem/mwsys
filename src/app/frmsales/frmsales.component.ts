@@ -707,7 +707,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       eicode: this.usrsrv.editFrmval(this.form, 'eicode'),
       del: false
     }
-    // console.log(jyuden);
+    console.log('save jyuden',jyuden);
     if (this.mode == 2) {
       return new Promise(resolve => {
         // let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno); 
