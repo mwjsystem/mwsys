@@ -661,7 +661,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       mcode: this.usrsrv.editFrmval(this.form, 'mcode'),
       scde: this.usrsrv.editFrmval(this.form, 'scde'),
       ncode: this.usrsrv.editFrmval(this.form, 'ncode'),
-      nadr: +this.usrsrv.editFrmval(this.form, 'iadr'),
+      nadr: +this.usrsrv.editFrmval(this.form, 'nadr'),
       buntype: this.usrsrv.editFrmval(this.form, 'buntype'),
       day: this.usrsrv.editFrmday(this.form, 'day'),
       yday: this.usrsrv.editFrmday(this.form, 'yday'),
