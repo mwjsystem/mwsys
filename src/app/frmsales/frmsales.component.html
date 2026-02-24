@@ -14,8 +14,9 @@
       [color]="usrsrv.getColor(mode)">
       <mat-icon>restore</mat-icon>取消解除
     </button>
-    <button mat-flat-button (click)="save()" [disabled]="form.invalid || this.jmisrv.isSaving" *ngIf="mode==1 || mode==2"
-      [color]="usrsrv.getColor(mode)" matTooltip="{{getInvalid()}}" matTooltipClass="ttips">
+    <button mat-flat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode==1 || mode==2"
+      [color]="usrsrv.getColor(mode
+	  " matTooltip="{{getInvalid()}}" matTooltipClass="ttips">
       <mat-icon>save</mat-icon>保存
     </button>
 	<div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" *ngIf="(mode==1 || mode==2) && form.invalid" >修正が必要！</div>
@@ -71,7 +72,7 @@
   <!-- <mat-card> -->
   <div class="flex justify-between items-center space-x-4 p-3">
     <span class="inline-block align-middle">
-      {{mode|modetxt}}【受注売上伝票】基本情報
+      {{mode|modetxt}}基本情報
     </span>
     <!-- <mat-form-field>
         <mat-label>受注伝票ステータス</mat-label>
@@ -191,7 +192,7 @@
         <mat-form-field style="width: 9em;">
           <mat-label>出荷日</mat-label>
           <input tabIndex="8" matInput [matDatepickerFilter]="usrsrv.holidayFltr" [matDatepicker]="picker2"
-            formControlName="sday" (dateChange)="changeSday()">
+            formControlName="sday">
           <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
           <mat-datepicker #picker2></mat-datepicker>
         </mat-form-field>
@@ -286,13 +287,6 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-	  <div class="flex flex-wrap content-between">
-        <mat-form-field style="width: 4em;">
-          <mat-label>帯本数</mat-label>
-          <input type="number" disabled matInput formControlName="jmisrv.obisu" class="i_num">
-        </mat-form-field>
-        <span class="ybtxt">　本</span>
-      </div>
       <div class="flex flex-wrap content-between" *ngIf="msel6.triggerValue.indexOf('同梱') == -1">
         <mat-form-field style="width: 4em;">
           <mat-label>荷物個数</mat-label>
@@ -328,9 +322,6 @@
     <div class="flex flex-wrap">
 	  <label for="txt0" class="block mx-2">納品先住所</label>
       <textarea id="txt0" matInput [value]="jmisrv.address" matTextareaAutosize disabled
-        class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-	  <label for="txt5" class="block mx-2">顧客マスタ備考</label>
-      <textarea id="txt5" matInput [value]="jmisrv.dmemo" matTextareaAutosize disabled
         class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
       <label for="txt1" class="block mx-2">伝票備考</label>
       <textarea id="txt1" [rows]="getRows('dmemo')" formControlName="dmemo"

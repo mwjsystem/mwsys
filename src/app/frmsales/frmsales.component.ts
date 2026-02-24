@@ -413,12 +413,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   changeSday() {
-	if (this.form.value.sday != null) {  
-		this.form.get('uday').setValue(this.form.value.sday);
-		if (this.form.value.torikbn == false) {
-		  this.form.get('nday').setValue(this.usrsrv.getNextMonth(this.form.value.sday));
-		}
-	}
+//	if (this.form.value.sday != null) {  
+//		this.form.get('uday').setValue(this.form.value.sday);
+//		if (this.form.value.torikbn == false) {
+//		  this.form.get('nday').setValue(this.usrsrv.getNextMonth(this.form.value.sday));
+//		}
+//	}
 	
   }
 
