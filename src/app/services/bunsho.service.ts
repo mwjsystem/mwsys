@@ -18,7 +18,7 @@ export class BunshoService {
     if (this.bunsho.length == 0) {
       const GetMast = gql`
       query get_bunsho($id: smallint!) {
-        msbuntype(where: {id: {_eq: $id}}) {
+        msbuntype(where: {id: {_eq: $id}},order_by: {code: asc}) {
           code
           name
           first
@@ -35,7 +35,16 @@ export class BunshoService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          this.buntype = data.msbuntype
+          // this.buntype = data.msbuntype
+		  data.msbuntype.forEach(element => {
+            this.buntype.push({ code: element.code, 
+			                    name: element.code + ' ' + element.name,
+								first: element.first,
+								saki: element.saki,	
+								second: element.second,	
+								sksec: element.sksec
+								});
+          });
         }, (error) => {
           console.log('error query get_buntype', error);
         });

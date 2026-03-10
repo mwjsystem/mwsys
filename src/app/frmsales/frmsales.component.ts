@@ -133,6 +133,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.okrsrv.getHktime();
     this.strsrv.getStore();
     this.bunsrv.getBunrui();
+	// console.log('納品書タイプ',this.bnssrv.buntype);
   }
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
     this.memsrv.getMembers().then(result => {
@@ -152,6 +153,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         this.cdRef.detectChanges();
       });
     });
+	console.log('納品書タイプ',this.bnssrv.buntype);
   }
   selHcd(value: string) {
     const i: number = this.okrsrv.hokuri.findIndex(obj => obj.code == value);
