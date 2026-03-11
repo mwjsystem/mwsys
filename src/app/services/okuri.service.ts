@@ -19,7 +19,7 @@ export class OkuriService {
   getHokuri(): void {
     const GetMast = gql`
     query get_okuri($id: smallint!) {
-      mshokuri(where: {id: {_eq: $id}}) {
+      mshokuri(where: {id: {_eq: $id}},order_by: {order: asc}) {
         code
         name
         htype
@@ -43,7 +43,20 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.hokuri = data.mshokuri;
+            this.hokuri.push({ code: data.code, 
+			                   name: data.code + ' ' + data.name,
+							   htype: data.htype,
+							   binshu: data.binshu,	
+							   mtchaku: data.mtchaku,	
+							   daibiki: data.daibiki,	
+							   scode: data.scode,	
+							   csvimp: data.csvimp,	
+							   cuscode: data.cuscode,	
+							   order: data.order,	
+							   hscode: data.hscode,	
+							   onmin: data.onmin,	
+							   onmax: data.donmax
+							});		  
       }, (error) => {
         console.log('error query get_hokuri', error);
       });
