@@ -43,20 +43,22 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-            this.hokuri.push({ code: data.code, 
-			                   name: data.code + ' ' + data.name,
-							   htype: data.htype,
-							   binshu: data.binshu,	
-							   mtchaku: data.mtchaku,	
-							   daibiki: data.daibiki,	
-							   scode: data.scode,	
-							   csvimp: data.csvimp,	
-							   cuscode: data.cuscode,	
-							   ordering: data.order,	
-							   hscode: data.hscode,	
-							   onmin: data.onmin,	
-							   onmax: data.donmax
-							});		  
+		 data.mshokuri.forEach(element => {
+            this.hokuri.push({ code: element.code, 
+			                   name: element.code + ' ' + element.name,
+							   htype: element.htype,
+							   binshu: element.binshu,	
+							   mtchaku: element.mtchaku,	
+							   daibiki: element.daibiki,	
+							   scode: element.scode,	
+							   csvimp: element.csvimp,	
+							   cuscode: element.cuscode,	
+							   ordering: element.order,	
+							   hscode: element.hscode,	
+							   onmin: element.onmin,	
+							   onmax: element.donmax
+							});	
+            });							
       }, (error) => {
         console.log('error query get_hokuri', error);
       });
