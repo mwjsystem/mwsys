@@ -52,7 +52,7 @@ export class OkuriService {
 							   scode: data.scode,	
 							   csvimp: data.csvimp,	
 							   cuscode: data.cuscode,	
-							   order: data.order,	
+							   ordering: data.order,	
 							   hscode: data.hscode,	
 							   onmin: data.onmin,	
 							   onmax: data.donmax
