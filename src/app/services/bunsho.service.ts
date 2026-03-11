@@ -38,7 +38,7 @@ export class BunshoService {
           // this.buntype = data.msbuntype
 		  data.msbuntype.forEach(element => {
             this.buntype.push({ code: element.code, 
-			                    name: element.code + ' ' + element.name,
+			                    name: String(Number(element.code)) + ' ' + element.name,
 								first: element.first,
 								saki: element.saki,	
 								second: element.second,	
