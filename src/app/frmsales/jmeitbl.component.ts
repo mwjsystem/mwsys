@@ -169,7 +169,7 @@ export class JmeitblComponent implements OnInit {
         lctinmoney = lcmoney;
         break;
     }
-    // console.log(ctrl);
+    console.log('calc_mei',ctrl);
     lcgenka = Math.round(ctrl.genka * ctrl.suu);
     this.frmArr.controls[i].patchValue({
       money: lcmoney,
@@ -179,7 +179,6 @@ export class JmeitblComponent implements OnInit {
       tinmoney: lctinmoney
     });
 
-
     // console.log(+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'],this.frmArr.getRawValue()[i]['spec'] == null);
     if (this.frmArr.getRawValue()[i]['pable'] == null) {
       this.frmArr.controls[i].patchValue({ spec: null });
@@ -188,7 +187,6 @@ export class JmeitblComponent implements OnInit {
     } else if (+this.frmArr.getRawValue()[i]['pable'] - +this.frmArr.getRawValue()[i]['suu'] < 10 && this.frmArr.getRawValue()[i]['spec'] == null) {
       this.frmArr.controls[i].patchValue({ spec: '0' });
     }
-
 
     this.calcTot();
   }
