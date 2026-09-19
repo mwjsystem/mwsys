@@ -117,7 +117,7 @@ export class UserService {
       // const color: string = localStorage.getItem(
         // this.userInfo["nickname"] + "MWSYS_COLOR"
       // );
-      // console.log(color);
+      console.log('UserService constructor',data);
       // if (color !== null) {
         // var links = document.getElementsByTagName("link");
         // for (var i = 0; i < links.length; i++) {

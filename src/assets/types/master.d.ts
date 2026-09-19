@@ -33,7 +33,14 @@ declare namespace mwI {
     // second: string;
     // include: number;
   }
-
+  
+  interface Navmenu {
+    smenu: string;
+    tag: string;
+    link: string;
+    sort: number;
+  }
+  
   interface Hokuri {
     code: string;
     name: string;
