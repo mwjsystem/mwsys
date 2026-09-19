@@ -3,8 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthGuard } from '@auth0/auth0-angular';
 import { LoginComponent } from './login/login.component';
-import { REMOVE_STYLES_ON_COMPONENT_DESTROY } from '@angular/platform-browser';
-
 
 const routes: Routes = [
   { path: '', loadChildren: () => import('./home/home.module').then(m => m.HomeModule), canActivate: [AuthGuard] },
