@@ -24,10 +24,7 @@ export class NavbarComponent implements OnInit {
       this.db = 'テスト環境';
     }
 	this.navsrv.getNavmenu();
-<<<<<<< HEAD
-=======
 	console.log('navmenu',this.navsrv.menu);
->>>>>>> 5f4947e9fe47ec96d3ebe4a1bd05c6e6cf7d25b3
     // const color: string = localStorage.getItem(this.usrsrv.userInfo['nickname'] + 'MWSYS_COLOR');
     // console.log(color)
     // if (color !== null) { this.setColor(color); }
