@@ -59,6 +59,7 @@ import { MatToolbarModule } from "@angular/material/toolbar";
     UserService,
     BeforeunloadGuard,
     { provide: MAT_DATE_LOCALE, useValue: "ja-JP" },
+	{ provide: REMOVE_STYLES_ON_COMPONENT_DESTROY, useValue: false },
   ],
   bootstrap: [AppComponent],
 })

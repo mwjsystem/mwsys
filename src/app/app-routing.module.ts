@@ -25,7 +25,9 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [CommonModule, RouterModule.forRoot(routes)],
+  imports: [CommonModule, RouterModule.forRoot(routes, {
+      paramsInheritanceStrategy: 'always' // ← ここで指定します
+    }))],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
