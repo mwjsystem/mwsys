@@ -1,5 +1,6 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import { UserService } from './../services/user.service';
+import { NavmenuService } from './../services/navmenu.service';
 import { DownloadService } from './../services/download.service';
 
 @Component({
@@ -11,7 +12,8 @@ export class NavbarComponent implements OnInit {
   public db: string;
   constructor(
 	public usrsrv: UserService,
-    public dwlsrv: DownloadService,
+    public navsrv: NavmenuService,
+	public dwlsrv: DownloadService,
     public elementRef: ElementRef) { }
 
   ngOnInit(): void {
@@ -21,8 +23,9 @@ export class NavbarComponent implements OnInit {
     } else {
       this.db = 'テスト環境';
     }
+	this.navsrv.getNavmenu();
     // const color: string = localStorage.getItem(this.usrsrv.userInfo['nickname'] + 'MWSYS_COLOR');
-    // console.log(color);
+    // console.log(color)
     // if (color !== null) { this.setColor(color); }
   }
   // setColor(colorname: string): void {
