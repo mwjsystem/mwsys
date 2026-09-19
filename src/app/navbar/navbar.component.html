@@ -88,9 +88,12 @@
             ﾏｽﾀﾒﾝﾃﾅﾝｽ(一括更新)
         </button>
         <mat-menu #mstmenu="matMenu">
-            <button mat-menu-item (click)="dlKick('MST-BUNRUI_')">分類ﾏｽﾀﾒﾝﾃ</button>
-            <button mat-menu-item (click)="dlKick('MST-GOODS_')">商品ﾏｽﾀﾒﾝﾃ</button>
-            <button mat-menu-item (click)="dlKick('MST-MEMBER_')">顧客ﾏｽﾀﾒﾝﾃ</button>
+		    <button mat-menu-item *ngFor="let elm of navsrv.menu['mstmenu']" (click)="elm.tag">
+		      {{elm.smenu}}
+			</button>
+            <!-- <button mat-menu-item (click)="dlKick('MST-BUNRUI_')">分類ﾏｽﾀﾒﾝﾃ</button> -->
+            <!-- <button mat-menu-item (click)="dlKick('MST-GOODS_')">商品ﾏｽﾀﾒﾝﾃ</button> -->
+            <!-- <button mat-menu-item (click)="dlKick('MST-MEMBER_')">顧客ﾏｽﾀﾒﾝﾃ</button> -->
         </mat-menu>
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="syst">システム</button>

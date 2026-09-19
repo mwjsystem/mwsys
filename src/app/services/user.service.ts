@@ -108,6 +108,7 @@ export class UserService {
         .valueChanges.subscribe(
           ({ data }) => {
             this.system = data.mssystem[0];
+			console.log('UserService constructor',data);
           },
           (error) => {
             console.log("error query get_system", error);
@@ -117,7 +118,7 @@ export class UserService {
       // const color: string = localStorage.getItem(
         // this.userInfo["nickname"] + "MWSYS_COLOR"
       // );
-      // console.log(color);
+     
       // if (color !== null) {
         // var links = document.getElementsByTagName("link");
         // for (var i = 0; i < links.length; i++) {

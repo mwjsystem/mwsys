@@ -4,6 +4,7 @@ import { NgModule } from "@angular/core";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { REMOVE_STYLES_ON_COMPONENT_DESTROY } from '@angular/platform-browser';
 
 import { CommonModule } from "@angular/common";
 import { AuthModule } from "@auth0/auth0-angular";
@@ -59,6 +60,7 @@ import { MatToolbarModule } from "@angular/material/toolbar";
     UserService,
     BeforeunloadGuard,
     { provide: MAT_DATE_LOCALE, useValue: "ja-JP" },
+	{ provide: REMOVE_STYLES_ON_COMPONENT_DESTROY, useValue: false },
   ],
   bootstrap: [AppComponent],
 })
