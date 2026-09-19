@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthGuard } from '@auth0/auth0-angular';
 import { LoginComponent } from './login/login.component';
+import { REMOVE_STYLES_ON_COMPONENT_DESTROY } from '@angular/platform-browser';
 
 
 const routes: Routes = [
@@ -27,7 +28,7 @@ const routes: Routes = [
 @NgModule({
   imports: [CommonModule, RouterModule.forRoot(routes, {
       paramsInheritanceStrategy: 'always' // ← ここで指定します
-    }))],
+    })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
