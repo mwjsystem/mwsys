@@ -5,18 +5,24 @@
       <mat-icon>add_box</mat-icon>
       新規
     </button>
-    <button mat-button (click)="modeToUpd()" *ngIf="mode==3">
-      <mat-icon>edit</mat-icon>
-      編集
-    </button>
-    <button mat-flat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3">
-      <span class="material-icons" matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</span>
-      保存
-    </button>
-    <button mat-flat-button (click)="cancel()" *ngIf="mode!=3">
-      <span class="material-icons">cancel</span>
-      中止
-    </button>
+    @if (mode==3) {
+      <button mat-button (click)="modeToUpd()">
+        <mat-icon>edit</mat-icon>
+        編集
+      </button>
+    }
+    @if (mode!=3) {
+      <button mat-flat-button (click)="save()" [disabled]="form.invalid">
+        <span class="material-icons" matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</span>
+        保存
+      </button>
+    }
+    @if (mode!=3) {
+      <button mat-flat-button (click)="cancel()">
+        <span class="material-icons">cancel</span>
+        中止
+      </button>
+    }
   </div>
   <!-- <mat-form-field class="flex items-end"> -->
   <label>枝番</label>
@@ -32,8 +38,8 @@
   <button mat-icon-button matSuffix (click)="edaHelp()">
     <mat-icon>find_replace</mat-icon>
   </button>
-  <!-- </div> -->
-  <!-- </mat-form-field> -->
+<!-- </div> -->
+<!-- </mat-form-field> -->
 </mat-toolbar>
 <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>{{mode|modetxt}}{{memsrv.mcode}} 別納先
 </h1>
@@ -45,5 +51,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-raised-button (click)="close()">閉じる</button>
-  <button mat-raised-button [color]="'primary'" (click)="setEda()" *ngIf="flg">枝番をセット</button>
+  @if (flg) {
+    <button mat-raised-button [color]="'primary'" (click)="setEda()">枝番をセット</button>
+  }
 </mat-dialog-actions>

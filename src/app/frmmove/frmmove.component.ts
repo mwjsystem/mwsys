@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -21,6 +21,7 @@ import { filter } from 'rxjs/operators';
     selector: 'app-frmmove',
     templateUrl: './frmmove.component.html',
     styleUrls: ['./../app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FrmmoveComponent implements OnInit {

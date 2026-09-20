@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Stcbs, StockService } from './../services/stock.service';
 
@@ -6,6 +6,7 @@ import { Stcbs, StockService } from './../services/stock.service';
     selector: 'app-gzaitbl',
     templateUrl: './gzaitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class GzaitblComponent implements OnInit {

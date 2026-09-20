@@ -17,6 +17,7 @@ import { take } from 'rxjs/operators';
     selector: 'app-simeitbl',
     templateUrl: './simeitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class SimeitblComponent implements OnInit {

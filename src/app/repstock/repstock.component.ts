@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -22,6 +22,7 @@ import { StcscdsComponent } from './../share/stcscds/stcscds.component';
     selector: 'app-repstock',
     templateUrl: './repstock.component.html',
     styleUrls: ['./../app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class RepstockComponent implements OnInit, AfterViewInit {

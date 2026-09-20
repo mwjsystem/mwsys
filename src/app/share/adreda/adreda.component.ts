@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Apollo } from 'apollo-angular';
@@ -12,6 +12,7 @@ import { AddressComponent } from './../address/address.component';
     selector: 'app-adreda',
     templateUrl: './adreda.component.html',
     styleUrls: ['./../../help.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class AdredaComponent implements OnInit, AfterViewInit {

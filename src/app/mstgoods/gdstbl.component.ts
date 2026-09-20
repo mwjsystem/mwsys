@@ -18,6 +18,7 @@ import { GzaiComponent } from './../share/gzai/gzai.component';
     templateUrl: './gdstbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class GdstblComponent {

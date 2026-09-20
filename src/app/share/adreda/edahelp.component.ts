@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { MembsService } from './../../mstmember/membs.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -8,6 +8,7 @@ import { MatDialogRef } from "@angular/material/dialog";
     selector: 'app-edahelp',
     templateUrl: './edahelp.component.html',
     styleUrls: ['./../../help.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class EdahelpComponent implements OnInit {

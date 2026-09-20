@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { MatLegacySpinner as MatSpinner } from '@angular/material/legacy-progress-spinner';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
-import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
+import { MatSpinner } from '@angular/material/progress-spinner';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { TrtdetailComponent } from './trtdetail.component';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
@@ -22,6 +22,7 @@ import { filter } from 'rxjs/operators';
     selector: 'app-frmtreat',
     templateUrl: './frmtreat.component.html',
     styleUrls: ['./../app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FrmtreatComponent implements OnInit {

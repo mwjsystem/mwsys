@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
 // import { Apollo } from 'apollo-angular';
 // import gql from 'graphql-tag';
-import { MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 // import { UserService } from './../services/user.service';
 import { InvoiceService } from './invoice.service';
@@ -21,6 +21,7 @@ interface Jyuden {
     selector: 'app-jdentbl',
     templateUrl: './jdentbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class JdentblComponent implements OnInit {

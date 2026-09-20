@@ -1,80 +1,82 @@
 <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" matSort class="full-width-table" aria-label="Elements">
-        <ng-container matColumnDef="ttype">
-            <th mat-header-cell *matHeaderCellDef>区分</th>
-            <td mat-cell *matCellDef="let row">
-                <mat-form-field style="width:7em;">
-                    <input matInput value="{{row.ttype}}" disabled [ngStyle]="{'color': setColor(row.ttype)}">
-                    <button mat-icon-button matSuffix (click)="usrsrv.openFrm(row.ttype,row.denno)"
-                        *ngIf="row.ttype !='前残'">
-                        <mat-icon>open_in_new</mat-icon>
-                    </button>
-                </mat-form-field>
-            </td>
-        </ng-container>
-        <ng-container matColumnDef="sday">
-            <th mat-header-cell *matHeaderCellDef>変動日</th>
-            <td mat-cell *matCellDef="let row">{{row.sday | blank }}</td>
-        </ng-container>
-        <ng-container matColumnDef="yday">
-            <th mat-header-cell *matHeaderCellDef>予定日</th>
-            <td mat-cell *matCellDef="let row">{{row.yday | blank }}</td>
-        </ng-container>
-        <ng-container matColumnDef="aitec">
-            <th mat-header-cell *matHeaderCellDef>相手先</th>
-            <td mat-cell *matCellDef="let row">{{row.aitec | blank }}</td>
-        </ng-container>
-        <ng-container matColumnDef="aiten">
-            <th mat-header-cell *matHeaderCellDef>名称</th>
-            <td mat-cell *matCellDef="let row">{{row.aiten }}</td>
-        </ng-container>
-        <ng-container matColumnDef="tcode">
-            <th mat-header-cell *matHeaderCellDef>担当者</th>
-            <td mat-cell *matCellDef="let row">{{row.tcode | staff }}</td>
-        </ng-container>
-        <ng-container matColumnDef="biko">
-            <th mat-header-cell *matHeaderCellDef>備考</th>
-            <td mat-cell *matCellDef="let row">{{row.biko | blank }}</td>
-        </ng-container>
-        <ng-container matColumnDef="denno">
-            <th mat-header-cell *matHeaderCellDef>伝票No</th>
-            <td mat-cell *matCellDef="let row">{{row.denno | blank }}</td>
-        </ng-container>
-        <ng-container matColumnDef="mline">
-            <th mat-header-cell *matHeaderCellDef>明細No</th>
-            <td mat-cell *matCellDef="let row">{{row.mline | blank }}</td>
-        </ng-container>
-        <ng-container matColumnDef="insuu">
-            <th mat-header-cell *matHeaderCellDef class="i_num">入庫数</th>
-            <td mat-cell *matCellDef="let row" style="text-align:right;" [ngStyle]="{'color': setColor(row.ttype)}">
-                {{row.insuu | blank }}</td>
-        </ng-container>
-        <ng-container matColumnDef="ousuu">
-            <th mat-header-cell *matHeaderCellDef class="i_num">出庫数</th>
-            <td mat-cell *matCellDef="let row" style="text-align:right;" [ngStyle]="{'color': setColor(row.ttype)}">
-                {{row.ousuu | blank }}</td>
-        </ng-container>
-        <ng-container matColumnDef="zaisu">
-            <th mat-header-cell *matHeaderCellDef style="font-weight:bolder;" class="i_num">在庫数</th>
-            <td mat-cell *matCellDef="let row" style="text-align:right;font-weight:bolder;">{{row.zaisu}}</td>
-        </ng-container>
-        <ng-container matColumnDef="yotei">
-            <th mat-header-cell *matHeaderCellDef>入荷予定</th>
-            <td mat-cell *matCellDef="let row" style="text-align:right;" [ngStyle]="{'color': setColor(row.ttype)}">
-                {{row.yotei | blank }}</td>
-        </ng-container>
-        <ng-container matColumnDef="wait">
-            <th mat-header-cell *matHeaderCellDef>入荷待ち</th>
-            <td mat-cell *matCellDef="let row" style="text-align:right;" [ngStyle]="{'color': setColor(row.ttype)}">
-                {{row.wait | blank }}</td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-    <mat-toolbar class="flex flex-wrap space-x-4">
-        <button mat-raised-button (click)="chFlg()">日付並び順反転</button>
-        <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0" [pageSize]="15"
-            [pageSizeOptions]="[15, 30, 50, 100]">
-        </mat-paginator>
-    </mat-toolbar>
+  <table mat-table [dataSource]="dataSource" matSort class="full-width-table" aria-label="Elements">
+    <ng-container matColumnDef="ttype">
+      <th mat-header-cell *matHeaderCellDef>区分</th>
+      <td mat-cell *matCellDef="let row">
+        <mat-form-field style="width:7em;">
+          <input matInput value="{{row.ttype}}" disabled [ngStyle]="{'color': setColor(row.ttype)}">
+          @if (row.ttype !='前残') {
+            <button mat-icon-button matSuffix (click)="usrsrv.openFrm(row.ttype,row.denno)"
+              >
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="sday">
+      <th mat-header-cell *matHeaderCellDef>変動日</th>
+      <td mat-cell *matCellDef="let row">{{row.sday | blank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="yday">
+      <th mat-header-cell *matHeaderCellDef>予定日</th>
+      <td mat-cell *matCellDef="let row">{{row.yday | blank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="aitec">
+      <th mat-header-cell *matHeaderCellDef>相手先</th>
+      <td mat-cell *matCellDef="let row">{{row.aitec | blank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="aiten">
+      <th mat-header-cell *matHeaderCellDef>名称</th>
+      <td mat-cell *matCellDef="let row">{{row.aiten }}</td>
+    </ng-container>
+    <ng-container matColumnDef="tcode">
+      <th mat-header-cell *matHeaderCellDef>担当者</th>
+      <td mat-cell *matCellDef="let row">{{row.tcode | staff }}</td>
+    </ng-container>
+    <ng-container matColumnDef="biko">
+      <th mat-header-cell *matHeaderCellDef>備考</th>
+      <td mat-cell *matCellDef="let row">{{row.biko | blank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="denno">
+      <th mat-header-cell *matHeaderCellDef>伝票No</th>
+      <td mat-cell *matCellDef="let row">{{row.denno | blank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="mline">
+      <th mat-header-cell *matHeaderCellDef>明細No</th>
+      <td mat-cell *matCellDef="let row">{{row.mline | blank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="insuu">
+      <th mat-header-cell *matHeaderCellDef class="i_num">入庫数</th>
+      <td mat-cell *matCellDef="let row" style="text-align:right;" [ngStyle]="{'color': setColor(row.ttype)}">
+      {{row.insuu | blank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="ousuu">
+      <th mat-header-cell *matHeaderCellDef class="i_num">出庫数</th>
+      <td mat-cell *matCellDef="let row" style="text-align:right;" [ngStyle]="{'color': setColor(row.ttype)}">
+      {{row.ousuu | blank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="zaisu">
+      <th mat-header-cell *matHeaderCellDef style="font-weight:bolder;" class="i_num">在庫数</th>
+      <td mat-cell *matCellDef="let row" style="text-align:right;font-weight:bolder;">{{row.zaisu}}</td>
+    </ng-container>
+    <ng-container matColumnDef="yotei">
+      <th mat-header-cell *matHeaderCellDef>入荷予定</th>
+      <td mat-cell *matCellDef="let row" style="text-align:right;" [ngStyle]="{'color': setColor(row.ttype)}">
+      {{row.yotei | blank }}</td>
+    </ng-container>
+    <ng-container matColumnDef="wait">
+      <th mat-header-cell *matHeaderCellDef>入荷待ち</th>
+      <td mat-cell *matCellDef="let row" style="text-align:right;" [ngStyle]="{'color': setColor(row.ttype)}">
+      {{row.wait | blank }}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  <mat-toolbar class="flex flex-wrap space-x-4">
+    <button mat-raised-button (click)="chFlg()">日付並び順反転</button>
+    <mat-paginator #paginators [length]="$safeNavigationMigration(dataSource?.data.length)" [pageIndex]="0" [pageSize]="15"
+      [pageSizeOptions]="[15, 30, 50, 100]">
+    </mat-paginator>
+  </mat-toolbar>
 </div>

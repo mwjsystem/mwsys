@@ -1,46 +1,50 @@
 <mat-dialog-actions class="flex flex-row space-x-4" style="margin-bottom:10px;">
-    <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品画像</h1>
-    <button mat-flat-button (click)="close()">閉じる</button>
+  <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品画像</h1>
+  <button mat-flat-button (click)="close()">閉じる</button>
 </mat-dialog-actions>
 <mat-dialog-content>
-    <div class="flex flex-column inline-grid">
-        <mat-form-field style="width: 100%;">
-            <mat-label>カタログコメント</mat-label>
-            <textarea matInput [(ngModel)]=cat matTextareaAutosize></textarea>
-        </mat-form-field>
-        <div class="flex flex-row" style="width: 100%;margin-top: 5px;">
-            <mat-form-field style="width:70em;height:30px;" appearance="outline">
-                <mat-label>仕様書Excel URL</mat-label>
-                <input type="url" matInput [(ngModel)]=url style="height:30px;">
-            </mat-form-field>
-            <button mat-flat-button matSuffix color="accent" (click)="openXlsx()" *ngIf="url"
-                style="margin-top:5px;">開く</button>
-            <button mat-flat-button matSuffix (click)="saveUrl()" color="primary"
-                style="margin-top:5px;">URL・ｺﾒﾝﾄを保存</button>
-        </div>
-        <mat-grid-list cols="3">
-            <ng-container *ngFor="let row of noimgs;let i=index">
-                <mat-grid-tile>
-                    <img #img
-                        src="{{usrsrv.system.imgurl + 'goods/' + grpcd + '_' + i.toString() + '.jpg?' + usrsrv.formatTime()}}"
-                        width="300" height="300" onload="row=0;"
-                        onError="this.onError=null;this.src='assets/noimage.gif';">
-                    <mat-grid-tile-footer class="flex flex-wrap space-x-4" style="height:30px;">
-                        <input name="upfile" style="display: none" type="file" #upfile accept=".jpg"
-                            (change)="onchange(upfile.files,i.toString())" capture="enviroment" />
-                        <button mat-raised-button color="primary" class="file-select-button"
-                            (click)="onClickFileInputButton(i)">
-                            ファイルを選択して登録
-                        </button>
-                        <!-- <button mat-flat-button matSuffix color="accent" (click)="test(img['src'].includes('noimage.gif'))">画像削除</button> -->
-                        <button mat-flat-button matSuffix color="accent" (click)="delImg(i.toString())"
-                            *ngIf="!img['src'].includes('noimage.gif')">画像取消</button>
-                    </mat-grid-tile-footer>
-                </mat-grid-tile>
-            </ng-container>
-        </mat-grid-list>
+  <div class="flex flex-column inline-grid">
+    <mat-form-field style="width: 100%;">
+      <mat-label>カタログコメント</mat-label>
+      <textarea matInput [(ngModel)]=cat matTextareaAutosize></textarea>
+    </mat-form-field>
+    <div class="flex flex-row" style="width: 100%;margin-top: 5px;">
+      <mat-form-field style="width:70em;height:30px;" appearance="outline">
+        <mat-label>仕様書Excel URL</mat-label>
+        <input type="url" matInput [(ngModel)]=url style="height:30px;">
+      </mat-form-field>
+      @if (url) {
+        <button mat-flat-button matSuffix color="accent" (click)="openXlsx()"
+        style="margin-top:5px;">開く</button>
+      }
+      <button mat-flat-button matSuffix (click)="saveUrl()" color="primary"
+      style="margin-top:5px;">URL・ｺﾒﾝﾄを保存</button>
     </div>
-</mat-dialog-content>
-<!-- <mat-dialog-actions>
-    <button class="mat-raised-button" (click)="close()">閉じる</button>
+    <mat-grid-list cols="3">
+      @for (row of noimgs; track row; let i = $index) {
+        <mat-grid-tile>
+          <img #img
+            src="{{usrsrv.system.imgurl + 'goods/' + grpcd + '_' + i.toString() + '.jpg?' + usrsrv.formatTime()}}"
+            width="300" height="300" onload="row=0;"
+            onError="this.onError=null;this.src='assets/noimage.gif';">
+            <mat-grid-tile-footer class="flex flex-wrap space-x-4" style="height:30px;">
+              <input name="upfile" style="display: none" type="file" #upfile accept=".jpg"
+                (change)="onchange(upfile.files,i.toString())" capture="enviroment" />
+              <button mat-raised-button color="primary" class="file-select-button"
+                (click)="onClickFileInputButton(i)">
+                ファイルを選択して登録
+              </button>
+              <!-- <button mat-flat-button matSuffix color="accent" (click)="test(img['src'].includes('noimage.gif'))">画像削除</button> -->
+              @if (!img['src'].includes('noimage.gif')) {
+                <button mat-flat-button matSuffix color="accent" (click)="delImg(i.toString())"
+                >画像取消</button>
+              }
+            </mat-grid-tile-footer>
+          </mat-grid-tile>
+        }
+      </mat-grid-list>
+    </div>
+  </mat-dialog-content>
+  <!-- <mat-dialog-actions>
+  <button class="mat-raised-button" (click)="close()">閉じる</button>
 </mat-dialog-actions> -->

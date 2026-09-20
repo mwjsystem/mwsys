@@ -43,7 +43,7 @@
               "node_modules/tailwindcss/base.css",
               "node_modules/tailwindcss/components.css",
               "node_modules/tailwindcss/utilities.css",
-              "node_modules/ngx-toastr/toastr.css"
+              "node_modules/@damjantonkli/ngx-toastr/toastr.css"
             ],
             "scripts": [],
             "browser": "src/main.ts"

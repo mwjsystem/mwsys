@@ -6,7 +6,7 @@ import { Apollo } from "apollo-angular";
 import { AbstractControl } from "@angular/forms";
 import { Observable, Subject } from "rxjs";
 import gql from "graphql-tag";
-import { ToastrService } from "ngx-toastr";
+import { ToastrService } from "@damjantonkli/ngx-toastr";
 import { environment } from './../../environments/environment';
 
 export class TmStmp {

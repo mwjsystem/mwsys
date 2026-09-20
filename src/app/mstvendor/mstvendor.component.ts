@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, HostListener, ElementRef, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, HostListener, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -18,6 +18,7 @@ import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
     styleUrls: ['./../app.component.scss'],
     encapsulation: ViewEncapsulation.None //グローバルにCSSが効く
     ,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MstvendorComponent implements OnInit, AfterViewInit {

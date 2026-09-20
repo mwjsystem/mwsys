@@ -1,9 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { MatLegacySpinner as MatSpinner } from '@angular/material/legacy-progress-spinner';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { MatSpinner } from '@angular/material/progress-spinner';
+import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
@@ -22,6 +22,7 @@ interface GetOpe {
     selector: 'app-frmkeep',
     templateUrl: './frmkeep.component.html',
     styleUrls: ['./../app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FrmkeepComponent implements OnInit {

@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-// import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+// import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
 import { Nyuhis, DepositService } from './deposit.service';
 
@@ -8,6 +8,7 @@ import { Nyuhis, DepositService } from './deposit.service';
     selector: 'app-histtbl',
     templateUrl: './histtbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class HisttblComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef } from "@angular/material/dialog";
@@ -35,6 +35,7 @@ interface Vendor {
     selector: 'app-vcdhelp',
     templateUrl: './vcdhelp.component.html',
     styleUrls: ['./../../help.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class VcdhelpComponent implements OnInit {

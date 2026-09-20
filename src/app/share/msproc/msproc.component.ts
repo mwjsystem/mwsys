@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectorRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -14,6 +14,7 @@ import gql from 'graphql-tag';
     selector: 'app-msproc',
     templateUrl: './msproc.component.html',
     styleUrls: ['./../../help.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MsprocComponent implements OnInit {

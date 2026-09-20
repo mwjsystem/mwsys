@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { UserService } from './../services/user.service';
 import { NavmenuService } from './../services/navmenu.service';
 import { DownloadService } from './../services/download.service';
@@ -7,6 +7,7 @@ import { DownloadService } from './../services/download.service';
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
     styleUrls: ['./../app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class NavbarComponent implements OnInit {

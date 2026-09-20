@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef, OnInit, Inject, ViewChildren, QueryList, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, OnInit, Inject, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { UserService } from './../../services/user.service';
 import gql from 'graphql-tag';
@@ -10,6 +10,7 @@ import { HttpClient } from '@angular/common/http';
     selector: 'app-gdsimage',
     templateUrl: './gdsimage.component.html',
     styleUrls: ['./../../help.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class GdsimageComponent implements OnInit, AfterViewInit {

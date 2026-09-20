@@ -1,238 +1,268 @@
 <div fxLayout="row wrap" fxLayoutAlign="start end" fxLayoutGap="10px" style="height: 40px;">
-    <mat-form-field style="width: 10em;" *ngIf="frmArr.enabled">
-        <mat-label>入荷予定日一括設定</mat-label>
-        <input matInput [(ngModel)]="yday" [matDatepicker]="picker0">
-        <mat-datepicker-toggle matSuffix [for]="picker0"></mat-datepicker-toggle>
-        <mat-datepicker #picker0></mat-datepicker>
+  @if (frmArr.enabled) {
+    <mat-form-field style="width: 10em;">
+      <mat-label>入荷予定日一括設定</mat-label>
+      <input matInput [(ngModel)]="yday" [matDatepicker]="picker0">
+      <mat-datepicker-toggle matSuffix [for]="picker0"></mat-datepicker-toggle>
+      <mat-datepicker #picker0></mat-datepicker>
     </mat-form-field>
-    <button mat-flat-button color="primary" (click)="setYday('1')" *ngIf="frmArr.enabled">暫定一括設定</button>
-    <button mat-flat-button color="warn" (click)="setYday('0')" *ngIf="frmArr.enabled">確定一括設定</button>
-    <button mat-flat-button color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
-    <mat-menu #cnp="matMenu">
-        <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
-        <button mat-menu-item (click)="pasteFromClipboard(true)"
-            *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(明細洗替)</button>
-        <button mat-menu-item (click)="pasteFromClipboard(false)"
-            *ngIf="frmArr.enabled && navCli">ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(末尾に追加)</button>
-    </mat-menu>
+  }
+  @if (frmArr.enabled) {
+    <button mat-flat-button color="primary" (click)="setYday('1')">暫定一括設定</button>
+  }
+  @if (frmArr.enabled) {
+    <button mat-flat-button color="warn" (click)="setYday('0')">確定一括設定</button>
+  }
+  <button mat-flat-button color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
+  <mat-menu #cnp="matMenu">
+    <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
+    @if (frmArr.enabled && navCli) {
+      <button mat-menu-item (click)="pasteFromClipboard(true)"
+      >ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(明細洗替)</button>
+    }
+    @if (frmArr.enabled && navCli) {
+      <button mat-menu-item (click)="pasteFromClipboard(false)"
+      >ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(末尾に追加)</button>
+    }
+  </mat-menu>
 </div>
 <div class="mat-elevation-z8">
-    <ng-container [formGroup]="parentForm">
-        <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
-            <ng-container matColumnDef="chk">
-                <th mat-header-cell *matHeaderCellDef class="i_num">
-                    <mat-checkbox (change)="setAll($event.checked)" *ngIf="frmArr.enabled">
-                    </mat-checkbox>
-                </th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-checkbox formControlName="chk" *ngIf="frmArr.enabled"></mat-checkbox>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="line">
-                <th mat-header-cell *matHeaderCellDef class="i_num">
-                    <button mat-icon-button matPrefix (click)="insRow(0)" *ngIf="frmArr.enabled"
-                        style="height:14px !important;width:14px !important;font-size:14px !important;">
-                        <mat-icon
-                            style="height:14px !important;width:14px !important;font-size:14px !important;vertical-align: text-top!important;">
-                            add_circle</mat-icon>
-                    </button>
-                    行番号
-                </th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width: 5em;">
-                        <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
-                        <button mat-icon-button matPrefix (click)="insRow(getIdx(i)+1)" *ngIf="frmArr.enabled">
-                            <mat-icon>add_circle</mat-icon>
-                        </button>
-                        <button mat-icon-button matPrefix (click)="delRow(getIdx(i))" *ngIf="frmArr.enabled">
-                            <mat-icon>remove_circle</mat-icon>
-                        </button>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="gcode">
-                <th mat-header-cell *matHeaderCellDef>商品コード</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field>
-                        <input #gcdInputs tabIndex="3 + i * 4" matInput formControlName="gcode"
-                            (change)="updGds(i,$event.target.value)" maxlength="20" (keydown.f4)="gcdHelp(getIdx(i))">
-                        <button mat-icon-button matSuffix (click)="gcdHelp(getIdx(i))" *ngIf="frmArr.enabled">
-                            <mat-icon>find_replace</mat-icon>
-                        </button>
-                        <button mat-icon-button matSuffix *ngIf="frmArr.getRawValue()[getIdx(i)]['gcode']"
-                            (click)="usrsrv.openMst('mstgoods',frmArr.getRawValue()[getIdx(i)]['gcode'])">
-                            <mat-icon>open_in_new</mat-icon>
-                        </button>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="gtext">
-                <th mat-header-cell *matHeaderCellDef>商品テキスト</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:20em;">
-                        <input matInput formControlName="gtext">
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="suu">
-                <th mat-header-cell *matHeaderCellDef>数量</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:4em;">
-                        <input tabIndex="4 + i * 4" type="number" matInput formControlName="suu" class="i_num"
-                            (change)="calcTot()">
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="unit">
-                <th mat-header-cell *matHeaderCellDef>単位</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:4em;">
-                        <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['unit']" disabled>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="genka">
-                <th mat-header-cell *matHeaderCellDef>単価</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:6em;">
-                        <input tabIndex="5 + i * 4" matInput formControlName="genka" numInput class="i_num"
-                            (change)="calcTot()">
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="money">
-                <th mat-header-cell *matHeaderCellDef>金額</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:6em;">
-                        <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['money'] | number" class="i_num"
-                            disabled>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="taxrate">
-                <th mat-header-cell *matHeaderCellDef>消費税率</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:4em;">
-                        <mat-select #msel3 formControlName="taxrate" (keydown.enter)="msel3.close()" class="i_num"
-                            (change)="calcTot()" [panelClass]="'my-panel-class'" [panelClass]="'my-panel-class'">
-                            <mat-option *ngFor="let sval of bunsrv.kbn.taxrate" [value]="sval.value">
-                                {{sval.viewval}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="mmemo">
-                <th mat-header-cell *matHeaderCellDef>明細備考</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field>
-                        <input tabIndex="6 + i * 4" matInput formControlName="mmemo"
-                            (keydown.control)="addNewrow(getIdx(i))">
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="spec">
-                <th mat-header-cell *matHeaderCellDef>特殊在庫</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field>
-                        <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['spec']" disabled>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="jdenno">
-                <th mat-header-cell *matHeaderCellDef>受注番号</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:6em;">
-                        <input matInput formControlName="jdenno">
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="jline">
-                <th mat-header-cell *matHeaderCellDef>受注行</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:4em;">
-                        <input matInput formControlName="jline">
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="day">
-                <th mat-header-cell *matHeaderCellDef>発注日</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width: 7em;">
-                        <input matInput formControlName="day" [matDatepicker]="picker1">
-                        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-                        <mat-datepicker #picker1></mat-datepicker>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="yday">
-                <th mat-header-cell *matHeaderCellDef>入荷予定日</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width: 7em;">
-                        <input matInput formControlName="yday" [matDatepicker]="picker3">
-                        <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
-                        <mat-datepicker #picker3></mat-datepicker>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="ydaykbn">
-                <th mat-header-cell *matHeaderCellDef>確定</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:4em;">
-                        <mat-select #msel4 formControlName="ydaykbn" (keydown.enter)="msel4.close()" class="i_num" [panelClass]="'my-panel-class'" [panelClass]="'my-panel-class'">
-                            <mat-option *ngFor="let sval of bunsrv.kbn.ydaykbn" [value]="sval.value">
-                                {{sval.viewval}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="inday">
-                <th mat-header-cell *matHeaderCellDef>入荷日</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width: 7em;">
-                        <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['inday']" disabled>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="mtax">
-                <th mat-header-cell *matHeaderCellDef>税</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:4em;">
-                        <mat-select #msel4 formControlName="mtax" (keydown.enter)="msel4.close()" class="i_num"
-                            (selectionChange)="calcTot()" [panelClass]="'my-panel-class'">
-                            <mat-option *ngFor="let sval of bunsrv.kbn.mtax" [value]="sval.value">
-                                {{sval.viewval}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <ng-container matColumnDef="currency">
-                <th mat-header-cell *matHeaderCellDef>原価通貨</th>
-                <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-                    <mat-form-field style="width:4em;">
-                        <mat-select #msel05 formControlName="currency" (keydown.enter)="msel05.close()" [panelClass]="'my-panel-class'">
-                            <mat-option value="JPY">JPY</mat-option>
-                            <mat-option value="USD">USD</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-            </ng-container>
-            <!-- <ng-container matColumnDef="action">
-                <th mat-header-cell *matHeaderCellDef>Action</th>
-                <td mat-cell *matCellDef="let row; let i = index" class="i_num" fxLayout="row">
-                    <button mat-icon-button focusable="false" (click)="del_row(i)">
-                        <mat-icon>remove_circle</mat-icon>
-                    </button>
-                    <button mat-icon-button focusable="false" (click)="ins_row(i)">
-                        <mat-icon>add_circle</mat-icon>
-                    </button>
-                </td>
-            </ng-container> -->
-            <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-    </ng-container>
-    <mat-paginator [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons></mat-paginator>
+  <ng-container [formGroup]="parentForm">
+    <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
+      <ng-container matColumnDef="chk">
+        <th mat-header-cell *matHeaderCellDef class="i_num">
+          @if (frmArr.enabled) {
+            <mat-checkbox (change)="setAll($event.checked)">
+            </mat-checkbox>
+          }
+        </th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          @if (frmArr.enabled) {
+            <mat-checkbox formControlName="chk"></mat-checkbox>
+          }
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="line">
+        <th mat-header-cell *matHeaderCellDef class="i_num">
+          @if (frmArr.enabled) {
+            <button mat-icon-button matPrefix (click)="insRow(0)"
+              style="height:14px !important;width:14px !important;font-size:14px !important;">
+              <mat-icon
+                style="height:14px !important;width:14px !important;font-size:14px !important;vertical-align: text-top!important;">
+              add_circle</mat-icon>
+            </button>
+          }
+          行番号
+        </th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width: 5em;">
+            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
+            @if (frmArr.enabled) {
+              <button mat-icon-button matPrefix (click)="insRow(getIdx(i)+1)">
+                <mat-icon>add_circle</mat-icon>
+              </button>
+            }
+            @if (frmArr.enabled) {
+              <button mat-icon-button matPrefix (click)="delRow(getIdx(i))">
+                <mat-icon>remove_circle</mat-icon>
+              </button>
+            }
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="gcode">
+        <th mat-header-cell *matHeaderCellDef>商品コード</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field>
+            <input #gcdInputs tabIndex="3 + i * 4" matInput formControlName="gcode"
+              (change)="updGds(i,$event.target.value)" maxlength="20" (keydown.f4)="gcdHelp(getIdx(i))">
+            @if (frmArr.enabled) {
+              <button mat-icon-button matSuffix (click)="gcdHelp(getIdx(i))">
+                <mat-icon>find_replace</mat-icon>
+              </button>
+            }
+            @if (frmArr.getRawValue()[getIdx(i)]['gcode']) {
+              <button mat-icon-button matSuffix
+                (click)="usrsrv.openMst('mstgoods',frmArr.getRawValue()[getIdx(i)]['gcode'])">
+                <mat-icon>open_in_new</mat-icon>
+              </button>
+            }
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="gtext">
+        <th mat-header-cell *matHeaderCellDef>商品テキスト</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:20em;">
+            <input matInput formControlName="gtext">
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="suu">
+        <th mat-header-cell *matHeaderCellDef>数量</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
+            <input tabIndex="4 + i * 4" type="number" matInput formControlName="suu" class="i_num"
+              (change)="calcTot()">
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="unit">
+        <th mat-header-cell *matHeaderCellDef>単位</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
+            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['unit']" disabled>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="genka">
+        <th mat-header-cell *matHeaderCellDef>単価</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:6em;">
+            <input tabIndex="5 + i * 4" matInput formControlName="genka" numInput class="i_num"
+              (change)="calcTot()">
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="money">
+        <th mat-header-cell *matHeaderCellDef>金額</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:6em;">
+            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['money'] | number" class="i_num"
+              disabled>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="taxrate">
+        <th mat-header-cell *matHeaderCellDef>消費税率</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
+            <mat-select #msel3 formControlName="taxrate" (keydown.enter)="msel3.close()" class="i_num"
+              (change)="calcTot()" [panelClass]="'my-panel-class'" [panelClass]="'my-panel-class'">
+              @for (sval of bunsrv.kbn.taxrate; track sval) {
+                <mat-option [value]="sval.value">
+                  {{sval.viewval}}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="mmemo">
+        <th mat-header-cell *matHeaderCellDef>明細備考</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field>
+            <input tabIndex="6 + i * 4" matInput formControlName="mmemo"
+              (keydown.control)="addNewrow(getIdx(i))">
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="spec">
+        <th mat-header-cell *matHeaderCellDef>特殊在庫</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field>
+            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['spec']" disabled>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="jdenno">
+        <th mat-header-cell *matHeaderCellDef>受注番号</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:6em;">
+            <input matInput formControlName="jdenno">
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="jline">
+        <th mat-header-cell *matHeaderCellDef>受注行</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
+            <input matInput formControlName="jline">
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="day">
+        <th mat-header-cell *matHeaderCellDef>発注日</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width: 7em;">
+            <input matInput formControlName="day" [matDatepicker]="picker1">
+            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="yday">
+        <th mat-header-cell *matHeaderCellDef>入荷予定日</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width: 7em;">
+            <input matInput formControlName="yday" [matDatepicker]="picker3">
+            <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+            <mat-datepicker #picker3></mat-datepicker>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="ydaykbn">
+        <th mat-header-cell *matHeaderCellDef>確定</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
+            <mat-select #msel4 formControlName="ydaykbn" (keydown.enter)="msel4.close()" class="i_num" [panelClass]="'my-panel-class'" [panelClass]="'my-panel-class'">
+              @for (sval of bunsrv.kbn.ydaykbn; track sval) {
+                <mat-option [value]="sval.value">
+                  {{sval.viewval}}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="inday">
+        <th mat-header-cell *matHeaderCellDef>入荷日</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width: 7em;">
+            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['inday']" disabled>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="mtax">
+        <th mat-header-cell *matHeaderCellDef>税</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
+            <mat-select #msel4 formControlName="mtax" (keydown.enter)="msel4.close()" class="i_num"
+              (selectionChange)="calcTot()" [panelClass]="'my-panel-class'">
+              @for (sval of bunsrv.kbn.mtax; track sval) {
+                <mat-option [value]="sval.value">
+                  {{sval.viewval}}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="currency">
+        <th mat-header-cell *matHeaderCellDef>原価通貨</th>
+        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
+          <mat-form-field style="width:4em;">
+            <mat-select #msel05 formControlName="currency" (keydown.enter)="msel05.close()" [panelClass]="'my-panel-class'">
+              <mat-option value="JPY">JPY</mat-option>
+              <mat-option value="USD">USD</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </ng-container>
+      <!-- <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef>Action</th>
+      <td mat-cell *matCellDef="let row; let i = index" class="i_num" fxLayout="row">
+        <button mat-icon-button focusable="false" (click)="del_row(i)">
+          <mat-icon>remove_circle</mat-icon>
+        </button>
+        <button mat-icon-button focusable="false" (click)="ins_row(i)">
+          <mat-icon>add_circle</mat-icon>
+        </button>
+      </td>
+    </ng-container> -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</ng-container>
+<mat-paginator [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons></mat-paginator>
 </div>

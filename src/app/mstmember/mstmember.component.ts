@@ -30,6 +30,7 @@ class Sval {
     selector: 'app-mstmember',
     templateUrl: './mstmember.component.html',
     styleUrls: ['./../app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MstmemberComponent implements OnInit, AfterViewInit {

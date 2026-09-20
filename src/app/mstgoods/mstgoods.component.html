@@ -1,54 +1,68 @@
 <mat-toolbar [color]="usrsrv.getColor(mode)" class="toolbar mat-elevation-z8">
   <div class="icon-area" class="flex flex-nowrap">
-    <button mat-flat-button (click)="modeToCre()" *ngIf="mode==3" [color]="usrsrv.getColor(mode)">
-      <mat-icon>add_box</mat-icon>新規
-    </button>
-    <button mat-flat-button (click)="modeToUpd()" *ngIf="mode==3 && this.gdssrv.grpcd" [color]="usrsrv.getColor(mode)">
-      <mat-icon>edit</mat-icon>編集
-    </button>
-    <button mat-flat-button (click)="save()" [disabled]="form.invalid" *ngIf="mode!=3" [color]="usrsrv.getColor(mode)">
-      <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
-    </button>
-    <button mat-flat-button (click)="cancel()" *ngIf="mode!=3" [color]="usrsrv.getColor(mode)">
-      <mat-icon>cancel</mat-icon>中止
-    </button>
+    @if (mode==3) {
+      <button mat-flat-button (click)="modeToCre()" [color]="usrsrv.getColor(mode)">
+        <mat-icon>add_box</mat-icon>新規
+      </button>
+    }
+    @if (mode==3 && this.gdssrv.grpcd) {
+      <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)">
+        <mat-icon>edit</mat-icon>編集
+      </button>
+    }
+    @if (mode!=3) {
+      <button mat-flat-button (click)="save()" [disabled]="form.invalid" [color]="usrsrv.getColor(mode)">
+        <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
+      </button>
+    }
+    @if (mode!=3) {
+      <button mat-flat-button (click)="cancel()" [color]="usrsrv.getColor(mode)">
+        <mat-icon>cancel</mat-icon>中止
+      </button>
+    }
     <mat-form-field>
       <!-- <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label> -->
       <input [ngModel]="gdssrv.grpcd" matInput (change)="convUpper($any($event))" (keydown.f4)="grpcdHelp()"
         [disabled]="mode==2 && form.dirty" (keyup.enter)="getGgroup(gdssrv.grpcd)" (blur)="refresh()"
         [ngModelOptions]="{standalone: true}" placeholder="商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ">
       <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" [style.display]="mode==3 ? 'inline-block' : 'none'">
-          <mat-icon>keyboard_arrow_up</mat-icon>
-        </button>
-        <button mat-button mat-icon-button matSuffix (click)="setPrev()" [style.display]="mode==3 ? 'inline-block' : 'none'">
-          <mat-icon>keyboard_arrow_down</mat-icon>
-        </button> -->
-    </mat-form-field>
-    <button mat-icon-button matSuffix (click)="grpcdHelp()" *ngIf="mode==3" matTooltip="ｸﾞﾙｰﾌﾟｺｰﾄﾞ検索">
+      <mat-icon>keyboard_arrow_up</mat-icon>
+    </button>
+    <button mat-button mat-icon-button matSuffix (click)="setPrev()" [style.display]="mode==3 ? 'inline-block' : 'none'">
+      <mat-icon>keyboard_arrow_down</mat-icon>
+    </button> -->
+  </mat-form-field>
+  @if (mode==3) {
+    <button mat-icon-button matSuffix (click)="grpcdHelp()" matTooltip="ｸﾞﾙｰﾌﾟｺｰﾄﾞ検索">
       <mat-icon>find_replace</mat-icon>
     </button>
-    <button mat-icon-button matSuffix (click)="gcdHelp()" *ngIf="mode==3" matTooltip="商品ｺｰﾄﾞ検索">
+  }
+  @if (mode==3) {
+    <button mat-icon-button matSuffix (click)="gcdHelp()" matTooltip="商品ｺｰﾄﾞ検索">
       <mat-icon>find_replace</mat-icon>
     </button>
-    <button mat-flat-button (click)="diaImage()" [color]="usrsrv.getColor(mode)">
-      <mat-icon>perm_media</mat-icon>画像・仕様書
-    </button>
-    <!-- <button mat-button (click)="toTreat()" *ngIf="mode!==1">
-        <mat-icon>question_answer</mat-icon>問合せ
-      </button> -->
-    <button mat-flat-button [color]="usrsrv.getColor(mode)"><a mat-flat-button [routerLink]="['/frmtreat']"
-        [queryParams]="{ grpcd: gdssrv.grpcd}" *ngIf="mode!==1" target="_blank" [color]="usrsrv.getColor(mode)">
-        <mat-icon>question_answer</mat-icon>問合せ
-      </a></button>
-    <button mat-flat-button (click)="test()" [color]="usrsrv.getColor(mode)">
-      <!-- <button mat-button (click)="refresh()"> -->
-      <mat-icon>autorenew</mat-icon>再表示
-    </button>
-    <button mat-flat-button [color]="usrsrv.getColor(mode)"><a mat-flat-button
-        href="{{usrsrv.manurl + '&ActiveCell=%27goods%27!A1'}}" target="_blank" [color]="usrsrv.getColor(mode)">
-        <mat-icon>help</mat-icon>ヘルプ
-      </a></button>
-  </div>
+  }
+  <button mat-flat-button (click)="diaImage()" [color]="usrsrv.getColor(mode)">
+    <mat-icon>perm_media</mat-icon>画像・仕様書
+  </button>
+  <!-- <button mat-button (click)="toTreat()" *ngIf="mode!==1">
+  <mat-icon>question_answer</mat-icon>問合せ
+</button> -->
+<button mat-flat-button [color]="usrsrv.getColor(mode)">@if (mode!==1) {
+  <a mat-flat-button [routerLink]="['/frmtreat']"
+    [queryParams]="{ grpcd: gdssrv.grpcd}" target="_blank" [color]="usrsrv.getColor(mode)">
+    <mat-icon>question_answer</mat-icon>問合せ
+  </a>
+}</button>
+<button mat-flat-button (click)="test()" [color]="usrsrv.getColor(mode)">
+  <!-- <button mat-button (click)="refresh()"> -->
+  <mat-icon>autorenew</mat-icon>再表示
+</button>
+<button mat-flat-button [color]="usrsrv.getColor(mode)"><a mat-flat-button
+  href="{{usrsrv.manurl + '&ActiveCell=%27goods%27!A1'}}" target="_blank" [color]="usrsrv.getColor(mode)">
+  <mat-icon>help</mat-icon>ヘルプ
+</a></button>
+</div>
 </mat-toolbar>
 <form [formGroup]="form" class="flex flex-wrap" (keydown.enter)="canEnter($any($event))">
   <!-- <div > -->
@@ -75,76 +89,84 @@
           <mat-form-field style="width:8em">
             <mat-label>商品区分</mat-label>
             <mat-select tabIndex="3" #msel01 formControlName="gkbn" required (keydown.enter)="msel01.close()" [panelClass]="'my-panel-class'">
-              <mat-option *ngFor="let sval of bunsrv.kbn['gkbn']" [value]="sval.value">
-                {{sval.viewval}}
-              </mat-option>
+              @for (sval of bunsrv.kbn['gkbn']; track sval) {
+                <mat-option [value]="sval.value">
+                  {{sval.viewval}}
+                </mat-option>
+              }
             </mat-select>
           </mat-form-field>
           <mat-form-field>
             <mat-label>カテゴリ</mat-label>
             <mat-select tabIndex="4" #msel02 formControlName="category" required (keydown.enter)="msel02.close()" [panelClass]="'my-panel-class'">
-              <mat-option *ngFor="let sval of bunsrv.kbn['category']" [value]="sval.value">
-                {{sval.viewval}}
-              </mat-option>
+              @for (sval of bunsrv.kbn['category']; track sval) {
+                <mat-option [value]="sval.value">
+                  {{sval.viewval}}
+                </mat-option>
+              }
             </mat-select>
           </mat-form-field>
           <mat-form-field>
             <mat-label>サブカテゴリ</mat-label>
             <mat-select tabIndex="5" #msel03 formControlName="subcat" required (keydown.enter)="msel03.close()" [panelClass]="'my-panel-class'">
-              <mat-option *ngFor="let sval of bunsrv.getSubcat(msel02.value)" [value]="sval.value">
-                {{sval.viewval}}
-              </mat-option>
+              @for (sval of bunsrv.getSubcat(msel02.value); track sval) {
+                <mat-option [value]="sval.value">
+                  {{sval.viewval}}
+                </mat-option>
+              }
             </mat-select>
           </mat-form-field>
           <!-- <mat-form-field>
-            <mat-label>ジャンル</mat-label>
-            <mat-select tabIndex="4" #msel02 formControlName="genre" required (keydown.enter)="msel02.close()">
-              <mat-option *ngFor="let sval of bunsrv.kbn.genre" [value]="sval.value">
-                {{sval.viewval}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>           -->
-          <mat-form-field style="width: 7em;">
-            <mat-label>仕入先</mat-label>
-            <input tabIndex="6" matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
-            <button mat-icon-button matSuffix (click)="vcdHelp()" *ngIf="mode!==3">
+          <mat-label>ジャンル</mat-label>
+          <mat-select tabIndex="4" #msel02 formControlName="genre" required (keydown.enter)="msel02.close()">
+            <mat-option *ngFor="let sval of bunsrv.kbn.genre" [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>           -->
+        <mat-form-field style="width: 7em;">
+          <mat-label>仕入先</mat-label>
+          <input tabIndex="6" matInput formControlName="vcode" (keydown.f4)="vcdHelp()">
+          @if (mode!==3) {
+            <button mat-icon-button matSuffix (click)="vcdHelp()">
               <mat-icon>find_replace</mat-icon>
             </button>
-          </mat-form-field>
-          <!-- <span class="nmtxt">{{form.value.vcode.toString()}}</span> -->
-          <span class="nmtxt">{{form.value.vcode | vcdtxt}}</span>
-          <mat-form-field>
-            <mat-label>素材</mat-label>
-            <input tabIndex="7" matInput formControlName="sozai">
-          </mat-form-field>
-          <!-- <mat-checkbox formControlName="del">削除済</mat-checkbox> -->
-        </div>
-        <mat-form-field class="txtar">
-          <mat-label>備考</mat-label>
-          <textarea tabIndex="8" matInput formControlName="memo" matTextareaAutosize></textarea>
+          }
         </mat-form-field>
+        <!-- <span class="nmtxt">{{form.value.vcode.toString()}}</span> -->
+        <span class="nmtxt">{{form.value.vcode | vcdtxt}}</span>
+        <mat-form-field>
+          <mat-label>素材</mat-label>
+          <input tabIndex="7" matInput formControlName="sozai">
+        </mat-form-field>
+        <!-- <mat-checkbox formControlName="del">削除済</mat-checkbox> -->
       </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        商品コード一覧
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <app-gdstbl [parentForm]="form" (action)="insTnkrow($event)"></app-gdstbl>
-    </mat-card-content>
-  </mat-card>
+      <mat-form-field class="txtar">
+        <mat-label>備考</mat-label>
+        <textarea tabIndex="8" matInput formControlName="memo" matTextareaAutosize></textarea>
+      </mat-form-field>
+    </div>
+  </mat-card-content>
+</mat-card>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      商品コード一覧
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <app-gdstbl [parentForm]="form" (action)="insTnkrow($event)"></app-gdstbl>
+  </mat-card-content>
+</mat-card>
 
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        商品単価一覧
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <app-gtnktbl [parentForm]="form"></app-gtnktbl>
-    </mat-card-content>
-  </mat-card>
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>
+      商品単価一覧
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <app-gtnktbl [parentForm]="form"></app-gtnktbl>
+  </mat-card-content>
+</mat-card>
 </form>

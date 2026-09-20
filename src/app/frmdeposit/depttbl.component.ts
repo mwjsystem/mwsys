@@ -1,6 +1,6 @@
-import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray } from '@angular/forms';
-// import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+// import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/table';
 import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
@@ -10,6 +10,7 @@ import { DepositService } from './deposit.service';
     selector: 'app-depttbl',
     templateUrl: './depttbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class DepttblComponent implements OnInit {

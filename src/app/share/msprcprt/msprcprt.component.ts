@@ -1,7 +1,7 @@
-import { Component, Inject, OnInit, ChangeDetectorRef, HostListener, ViewChildren, QueryList, ElementRef } from '@angular/core';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
+import { Component, Inject, OnInit, ChangeDetectorRef, HostListener, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
 import { UntypedFormGroup, UntypedFormBuilder, FormControl, UntypedFormArray, Validators } from '@angular/forms';
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef, MatLegacyDialog as MatDialog, MatLegacyDialogConfig as MatDialogConfig } from "@angular/material/legacy-dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { UserService } from './../../services/user.service';
 import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
 import { Apollo } from 'apollo-angular';
@@ -12,6 +12,7 @@ import { HttpClient } from '@angular/common/http';
     selector: 'app-msprcprt',
     templateUrl: './msprcprt.component.html',
     styleUrls: ['./../../tbl.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class MsprcprtComponent implements OnInit {

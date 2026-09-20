@@ -9,11 +9,11 @@ import { REMOVE_STYLES_ON_COMPONENT_DESTROY } from '@angular/platform-browser';
 import { CommonModule } from "@angular/common";
 import { AuthModule } from "@auth0/auth0-angular";
 import { Apollo } from "apollo-angular";
-import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from "@angular/common/http";
 import { environment } from "./../environments/environment";
 import { BeforeunloadGuard } from "./beforeunload.guard";
 import { GraphQLModule } from "./graphql.module";
-import { ToastrModule } from "ngx-toastr";
+import { ToastrModule } from "@damjantonkli/ngx-toastr";
 import { CoreModule } from "./core/core.module";
 
 import { UserService } from "./services/user.service";
@@ -55,6 +55,6 @@ import { MatToolbarModule } from "@angular/material/toolbar";
         BeforeunloadGuard,
         { provide: MAT_DATE_LOCALE, useValue: "ja-JP" },
         { provide: REMOVE_STYLES_ON_COMPONENT_DESTROY, useValue: false },
-        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
     ] })
 export class AppModule {}

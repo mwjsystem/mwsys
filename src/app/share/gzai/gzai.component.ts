@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
@@ -13,6 +13,7 @@ import gql from 'graphql-tag';
     selector: 'app-gzai',
     templateUrl: './gzai.component.html',
     styleUrls: ['./../../tbl.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class GzaiComponent implements OnInit {

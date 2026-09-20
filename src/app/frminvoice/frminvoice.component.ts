@@ -13,6 +13,7 @@ import { StaffService } from './../services/staff.service';
     selector: 'app-frminvoice',
     templateUrl: './frminvoice.component.html',
     styleUrls: ['./../app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FrminvoiceComponent implements OnInit, AfterViewInit {
