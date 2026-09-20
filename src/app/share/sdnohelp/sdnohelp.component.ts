@@ -29,9 +29,10 @@ interface Siiden {
 }
 
 @Component({
-  selector: 'app-sdnohelp',
-  templateUrl: './sdnohelp.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-sdnohelp',
+    templateUrl: './sdnohelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class SdnohelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

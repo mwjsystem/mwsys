@@ -7,9 +7,10 @@ import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
 
 @Component({
-  selector: 'app-gtnktbl',
-  templateUrl: './gtnktbl.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-gtnktbl',
+    templateUrl: './gtnktbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class GtnktblComponent implements OnInit, AfterViewInit {
   @Input() parentForm: FormGroup;

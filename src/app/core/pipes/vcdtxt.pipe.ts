@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { VendsService } from './../../mstvendor/vends.service';
 
 @Pipe({
-  name: 'vcdtxt'
+    name: 'vcdtxt',
+    standalone: false
 })
 export class VcdtxtPipe implements PipeTransform {
   constructor(private vensrv: VendsService) { }

@@ -9,9 +9,10 @@ import { EdahelpComponent } from './edahelp.component';
 import { AddressComponent } from './../address/address.component';
 
 @Component({
-  selector: 'app-adreda',
-  templateUrl: './adreda.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-adreda',
+    templateUrl: './adreda.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class AdredaComponent implements OnInit, AfterViewInit {
   @ViewChild(AddressComponent, { static: false })

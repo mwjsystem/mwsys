@@ -19,10 +19,11 @@ import * as Query from './queries.frms';
 import { take } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-jmeitbl',
-  templateUrl: './jmeitbl.component.html',
-  styleUrls: ['./../tbl.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-jmeitbl',
+    templateUrl: './jmeitbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class JmeitblComponent implements OnInit {
   @Input() parentForm: FormGroup;

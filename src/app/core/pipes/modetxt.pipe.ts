@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'modetxt'
+    name: 'modetxt',
+    standalone: false
 })
 export class ModetxtPipe implements PipeTransform {
 

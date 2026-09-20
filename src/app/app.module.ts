@@ -9,7 +9,7 @@ import { REMOVE_STYLES_ON_COMPONENT_DESTROY } from '@angular/platform-browser';
 import { CommonModule } from "@angular/common";
 import { AuthModule } from "@auth0/auth0-angular";
 import { Apollo } from "apollo-angular";
-import { HttpClientModule } from "@angular/common/http";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { environment } from "./../environments/environment";
 import { BeforeunloadGuard } from "./beforeunload.guard";
 import { GraphQLModule } from "./graphql.module";
@@ -29,39 +29,32 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatNativeDateModule, MAT_DATE_LOCALE } from "@angular/material/core";
 import { MatToolbarModule } from "@angular/material/toolbar";
 
-@NgModule({
-  declarations: [AppComponent, LoginComponent, NavbarComponent],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    AuthModule.forRoot({
-      domain: environment.AUTH0_DOMAIN,
-      clientId: environment.AUTH0_CLIENT_ID,
-      authorizationParams: {
-        redirect_uri: window.location.origin,
-      },
-    }),
-    BrowserAnimationsModule,
-    GraphQLModule,
-    ToastrModule.forRoot(),
-    HttpClientModule,
-
-    MatButtonModule,
-    MatCardModule,
-    MatDatepickerModule,
-    MatIconModule,
-    MatInputModule,
-    MatMenuModule,
-    MatNativeDateModule,
-    MatToolbarModule,
-  ],
-  providers: [
-    Apollo,
-    UserService,
-    BeforeunloadGuard,
-    { provide: MAT_DATE_LOCALE, useValue: "ja-JP" },
-	{ provide: REMOVE_STYLES_ON_COMPONENT_DESTROY, useValue: false },
-  ],
-  bootstrap: [AppComponent],
-})
+@NgModule({ declarations: [AppComponent, LoginComponent, NavbarComponent],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        AuthModule.forRoot({
+            domain: environment.AUTH0_DOMAIN,
+            clientId: environment.AUTH0_CLIENT_ID,
+            authorizationParams: {
+                redirect_uri: window.location.origin,
+            },
+        }),
+        BrowserAnimationsModule,
+        GraphQLModule,
+        ToastrModule.forRoot(),
+        MatButtonModule,
+        MatCardModule,
+        MatDatepickerModule,
+        MatIconModule,
+        MatInputModule,
+        MatMenuModule,
+        MatNativeDateModule,
+        MatToolbarModule], providers: [
+        Apollo,
+        UserService,
+        BeforeunloadGuard,
+        { provide: MAT_DATE_LOCALE, useValue: "ja-JP" },
+        { provide: REMOVE_STYLES_ON_COMPONENT_DESTROY, useValue: false },
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule {}

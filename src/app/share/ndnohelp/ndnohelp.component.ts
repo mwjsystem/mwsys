@@ -31,9 +31,10 @@ interface Nyusub {
 }
 
 @Component({
-  selector: 'app-ndnohelp',
-  templateUrl: './ndnohelp.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-ndnohelp',
+    templateUrl: './ndnohelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class NdnohelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

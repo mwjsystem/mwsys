@@ -5,9 +5,10 @@ import { UserService } from './../services/user.service';
 import { Nyuhis, DepositService } from './deposit.service';
 
 @Component({
-  selector: 'app-histtbl',
-  templateUrl: './histtbl.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-histtbl',
+    templateUrl: './histtbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class HisttblComponent implements OnInit {
   // @Input() parentForm: FormGroup;

@@ -37,9 +37,10 @@ interface Hatmei {
 }
 
 @Component({
-  selector: 'app-hmeihelp',
-  templateUrl: './hmeihelp.component.html',
-  styleUrls: ['./../../help.component.scss'],
+    selector: 'app-hmeihelp',
+    templateUrl: './hmeihelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class HmeihelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

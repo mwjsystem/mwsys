@@ -7,9 +7,10 @@ import { Apollo } from 'apollo-angular';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-gdsimage',
-  templateUrl: './gdsimage.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-gdsimage',
+    templateUrl: './gdsimage.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class GdsimageComponent implements OnInit, AfterViewInit {
   public noimgs: Boolean[] = [];

@@ -19,10 +19,11 @@ interface Ggrp {
 }
 
 @Component({
-  selector: 'app-grpcdhelp',
-  templateUrl: './grpcdhelp.component.html',
-  styleUrls: ['./../../help.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-grpcdhelp',
+    templateUrl: './grpcdhelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class GrpcdhelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

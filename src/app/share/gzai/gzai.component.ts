@@ -10,9 +10,10 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
 @Component({
-  selector: 'app-gzai',
-  templateUrl: './gzai.component.html',
-  styleUrls: ['./../../tbl.component.scss']
+    selector: 'app-gzai',
+    templateUrl: './gzai.component.html',
+    styleUrls: ['./../../tbl.component.scss'],
+    standalone: false
 })
 export class GzaiComponent implements OnInit {
   form: FormGroup;

@@ -14,10 +14,11 @@ import { BunruiService } from './../services/bunrui.service';
 import { GzaiComponent } from './../share/gzai/gzai.component';
 
 @Component({
-  selector: 'app-gdstbl',
-  templateUrl: './gdstbl.component.html',
-  styleUrls: ['./../tbl.component.scss'],
-  encapsulation: ViewEncapsulation.None
+    selector: 'app-gdstbl',
+    templateUrl: './gdstbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class GdstblComponent {
   @Input() parentForm: FormGroup;

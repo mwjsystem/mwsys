@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./../app.component.scss']
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class HomeComponent implements OnInit {
   // userInfo: {[key: string]: any} = {};

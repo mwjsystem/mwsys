@@ -7,9 +7,10 @@ import { BunruiService } from './../services/bunrui.service';
 import { DepositService } from './deposit.service';
 
 @Component({
-  selector: 'app-depttbl',
-  templateUrl: './depttbl.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-depttbl',
+    templateUrl: './depttbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class DepttblComponent implements OnInit {
   @Input() parentForm: UntypedFormGroup;

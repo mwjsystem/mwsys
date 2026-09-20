@@ -19,10 +19,11 @@ import { HatmeiService } from './hatmei.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-frmsupply',
-  templateUrl: './frmsupply.component.html',
-  styleUrls: ['./../app.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-frmsupply',
+    templateUrl: './frmsupply.component.html',
+    styleUrls: ['./../app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FrmsupplyComponent implements OnInit, AfterViewInit {
   @ViewChild(HmeitblComponent) hmeitbl: HmeitblComponent;

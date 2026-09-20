@@ -25,11 +25,12 @@ import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 
 @Component({
-  selector: 'app-frmsales',
-  templateUrl: './frmsales.component.html',
-  styleUrls: ['./../app.component.scss'],
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-frmsales',
+    templateUrl: './frmsales.component.html',
+    styleUrls: ['./../app.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FrmsalesComponent implements OnInit, AfterViewInit {
   @ViewChild(JmeitblComponent) jmeitbl: JmeitblComponent;

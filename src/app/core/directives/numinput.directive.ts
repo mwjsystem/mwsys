@@ -1,7 +1,8 @@
 import { Directive, HostListener, ElementRef, OnInit  } from '@angular/core';
 
 @Directive({
-  selector: '[numInput]'
+    selector: '[numInput]',
+    standalone: false
 })
 export class NuminputDirective {
   

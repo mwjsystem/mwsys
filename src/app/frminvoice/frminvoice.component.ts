@@ -12,7 +12,8 @@ import { StaffService } from './../services/staff.service';
 @Component({
     selector: 'app-frminvoice',
     templateUrl: './frminvoice.component.html',
-    styleUrls: ['./../app.component.scss']
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class FrminvoiceComponent implements OnInit, AfterViewInit {
     // @ViewChild(DepttblComponent) depttbl: DepttblComponent;

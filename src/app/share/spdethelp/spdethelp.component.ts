@@ -21,9 +21,10 @@ interface Nymat {
 }
 
 @Component({
-  selector: 'app-spdethelp',
-  templateUrl: './spdethelp.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-spdethelp',
+    templateUrl: './spdethelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class SpdethelpComponent implements OnInit {
   dataSource: MatTableDataSource<Nymat>;

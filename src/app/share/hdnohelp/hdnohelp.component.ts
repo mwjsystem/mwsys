@@ -28,9 +28,10 @@ interface Hatden {
 }
 
 @Component({
-  selector: 'app-hdnohelp',
-  templateUrl: './hdnohelp.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-hdnohelp',
+    templateUrl: './hdnohelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class HdnohelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

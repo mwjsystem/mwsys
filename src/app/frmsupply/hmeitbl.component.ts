@@ -14,9 +14,10 @@ import gql from 'graphql-tag';
 import { take } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-hmeitbl',
-  templateUrl: './hmeitbl.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-hmeitbl',
+    templateUrl: './hmeitbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class HmeitblComponent implements OnInit {
   @Input() parentForm: FormGroup;

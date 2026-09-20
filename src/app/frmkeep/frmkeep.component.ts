@@ -19,9 +19,10 @@ interface GetOpe {
 }
 
 @Component({
-  selector: 'app-frmkeep',
-  templateUrl: './frmkeep.component.html',
-  styleUrls: ['./../app.component.scss']
+    selector: 'app-frmkeep',
+    templateUrl: './frmkeep.component.html',
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class FrmkeepComponent implements OnInit {
   denno: number;

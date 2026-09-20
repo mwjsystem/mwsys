@@ -5,9 +5,10 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef } from "@angular/material/dialog";
 
 @Component({
-  selector: 'app-edahelp',
-  templateUrl: './edahelp.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-edahelp',
+    templateUrl: './edahelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class EdahelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

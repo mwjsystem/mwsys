@@ -39,9 +39,10 @@ interface Jyuden {
 }
 
 @Component({
-  selector: 'app-jdnohelp',
-  templateUrl: './jdnohelp.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-jdnohelp',
+    templateUrl: './jdnohelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class JdnohelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

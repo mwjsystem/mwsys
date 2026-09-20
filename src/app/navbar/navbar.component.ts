@@ -4,9 +4,10 @@ import { NavmenuService } from './../services/navmenu.service';
 import { DownloadService } from './../services/download.service';
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./../app.component.scss']
+    selector: 'app-navbar',
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class NavbarComponent implements OnInit {
   public db: string;

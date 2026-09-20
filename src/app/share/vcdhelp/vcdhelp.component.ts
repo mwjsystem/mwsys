@@ -32,9 +32,10 @@ interface Vendor {
 }
 
 @Component({
-  selector: 'app-vcdhelp',
-  templateUrl: './vcdhelp.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-vcdhelp',
+    templateUrl: './vcdhelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class VcdhelpComponent implements OnInit {
   // public vcds: Vendor[]=[];

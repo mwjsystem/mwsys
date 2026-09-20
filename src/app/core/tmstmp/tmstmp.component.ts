@@ -2,10 +2,11 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@
 import { UserService } from './../../services/user.service';
 
 @Component({
-  selector: 'app-tmstmp',
-  templateUrl: './tmstmp.component.html',
-  styleUrls: ['./tmstmp.component.scss'],
-  changeDetection:ChangeDetectionStrategy.OnPush
+    selector: 'app-tmstmp',
+    templateUrl: './tmstmp.component.html',
+    styleUrls: ['./tmstmp.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class TmstmpComponent implements OnInit {
   constructor(

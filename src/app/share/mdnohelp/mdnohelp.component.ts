@@ -24,9 +24,10 @@ interface Movsub {
 }
 
 @Component({
-  selector: 'app-mdnohelp',
-  templateUrl: './mdnohelp.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-mdnohelp',
+    templateUrl: './mdnohelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class MdnohelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

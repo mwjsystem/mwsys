@@ -14,9 +14,10 @@ import gql from 'graphql-tag';
 import { take } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-simeitbl',
-  templateUrl: './simeitbl.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-simeitbl',
+    templateUrl: './simeitbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class SimeitblComponent implements OnInit {
   @Input() parentForm: FormGroup;

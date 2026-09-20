@@ -19,9 +19,10 @@ import { StcscdsComponent } from './../share/stcscds/stcscds.component';
 // import * as Query from './queries.frms';
 
 @Component({
-  selector: 'app-repstock',
-  templateUrl: './repstock.component.html',
-  styleUrls: ['./../app.component.scss']
+    selector: 'app-repstock',
+    templateUrl: './repstock.component.html',
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class RepstockComponent implements OnInit, AfterViewInit {
   public stgds: StGds = new StGds();

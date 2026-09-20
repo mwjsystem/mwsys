@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { MembsService } from './../../mstmember/membs.service';
 
 @Pipe({
-  name: 'mcdtxt'
+    name: 'mcdtxt',
+    standalone: false
 })
 export class McdtxtPipe implements PipeTransform {
   constructor(private memsrv: MembsService) { }

@@ -14,10 +14,11 @@ import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { NdnohelpComponent } from './../share/ndnohelp/ndnohelp.component';
 
 @Component({
-  selector: 'app-frmdeposit',
-  templateUrl: './frmdeposit.component.html',
-  styleUrls: ['./../app.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-frmdeposit',
+    templateUrl: './frmdeposit.component.html',
+    styleUrls: ['./../app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FrmdepositComponent implements OnInit, AfterViewInit {
   @ViewChild(DepttblComponent) depttbl: DepttblComponent;

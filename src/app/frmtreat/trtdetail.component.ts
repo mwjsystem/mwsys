@@ -12,9 +12,10 @@ import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-trtdetail',
-  templateUrl: './trtdetail.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-trtdetail',
+    templateUrl: './trtdetail.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class TrtdetailComponent implements OnInit {
 

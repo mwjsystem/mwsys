@@ -19,9 +19,10 @@ import { filter } from 'rxjs/operators';
 
 
 @Component({
-  selector: 'app-frmtreat',
-  templateUrl: './frmtreat.component.html',
-  styleUrls: ['./../app.component.scss']
+    selector: 'app-frmtreat',
+    templateUrl: './frmtreat.component.html',
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class FrmtreatComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

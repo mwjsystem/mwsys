@@ -11,9 +11,10 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
 @Component({
-  selector: 'app-msproc',
-  templateUrl: './msproc.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-msproc',
+    templateUrl: './msproc.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class MsprocComponent implements OnInit {
   mcode: number;

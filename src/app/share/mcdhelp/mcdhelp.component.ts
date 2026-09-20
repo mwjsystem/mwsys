@@ -31,10 +31,11 @@ export interface Mcd {
 
 
 @Component({
-  selector: 'app-mcdhelp',
-  templateUrl: './mcdhelp.component.html',
-  styleUrls: ['./../../help.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-mcdhelp',
+    templateUrl: './mcdhelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class McdhelpComponent implements OnInit {
 

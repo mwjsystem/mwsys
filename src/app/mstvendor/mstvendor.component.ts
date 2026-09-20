@@ -13,10 +13,12 @@ import { VendsService } from './vends.service';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 
 @Component({
-  selector: 'app-mstvendor',
-  templateUrl: './mstvendor.component.html',
-  styleUrls: ['./../app.component.scss'],
-  encapsulation: ViewEncapsulation.None //グローバルにCSSが効く
+    selector: 'app-mstvendor',
+    templateUrl: './mstvendor.component.html',
+    styleUrls: ['./../app.component.scss'],
+    encapsulation: ViewEncapsulation.None //グローバルにCSSが効く
+    ,
+    standalone: false
 })
 export class MstvendorComponent implements OnInit, AfterViewInit {
   vcd: string;

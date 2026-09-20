@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { StaffService } from './../../services/staff.service';
 
 @Pipe({
-  name: 'staff'
+    name: 'staff',
+    standalone: false
 })
 export class StaffPipe implements PipeTransform {
   constructor(private stfsrv: StaffService) { }

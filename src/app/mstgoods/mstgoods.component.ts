@@ -21,9 +21,10 @@ import { BunruiService } from './../services/bunrui.service';
 import { VendsService } from './../mstvendor/vends.service';
 
 @Component({
-  selector: 'app-mstgoods',
-  templateUrl: './mstgoods.component.html',
-  styleUrls: ['./../app.component.scss']
+    selector: 'app-mstgoods',
+    templateUrl: './mstgoods.component.html',
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class MstgoodsComponent implements OnInit, AfterViewInit {
   @ViewChild(GdstblComponent) gdstbl: GdstblComponent;

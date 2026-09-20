@@ -12,9 +12,10 @@ import gql from 'graphql-tag';
 import { take } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-movtbl',
-  templateUrl: './movtbl.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-movtbl',
+    templateUrl: './movtbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class MovtblComponent implements OnInit {
   @Input() parentForm: FormGroup;

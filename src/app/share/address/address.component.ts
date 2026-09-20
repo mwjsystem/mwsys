@@ -8,15 +8,16 @@ import { DownloadService } from './../../services/download.service';
 import { Observable, Subject } from 'rxjs';
 
 @Component({
-  selector: 'app-address',
-  templateUrl: './address.component.html',
-  styleUrls: ['./../../help.component.scss'],
-  viewProviders: [
-    {
-      provide: ControlContainer,
-      useExisting: FormGroupDirective
-    }
-  ]
+    selector: 'app-address',
+    templateUrl: './address.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    viewProviders: [
+        {
+            provide: ControlContainer,
+            useExisting: FormGroupDirective
+        }
+    ],
+    standalone: false
 })
 export class AddressComponent implements OnInit {
   @Input() formName: string;

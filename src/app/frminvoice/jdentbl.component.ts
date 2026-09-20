@@ -18,9 +18,10 @@ interface Jyuden {
 }
 
 @Component({
-  selector: 'app-jdentbl',
-  templateUrl: './jdentbl.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-jdentbl',
+    templateUrl: './jdentbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class JdentblComponent implements OnInit {
   // @Input() parentForm: FormGroup;

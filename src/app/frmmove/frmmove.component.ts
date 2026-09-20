@@ -18,9 +18,10 @@ import { MovtblComponent } from './movtbl.component';
 import { filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-frmmove',
-  templateUrl: './frmmove.component.html',
-  styleUrls: ['./../app.component.scss']
+    selector: 'app-frmmove',
+    templateUrl: './frmmove.component.html',
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class FrmmoveComponent implements OnInit {
   @ViewChild(MovtblComponent) movtbl: MovtblComponent;

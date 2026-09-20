@@ -3,9 +3,10 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Stcbs, StockService } from './../services/stock.service';
 
 @Component({
-  selector: 'app-gzaitbl',
-  templateUrl: './gzaitbl.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-gzaitbl',
+    templateUrl: './gzaitbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class GzaitblComponent implements OnInit {
   public dataSource: MatTableDataSource<Stcbs>;

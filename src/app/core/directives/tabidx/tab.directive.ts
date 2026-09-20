@@ -4,7 +4,8 @@ type IKNOWISNUMBER = any;
 type IKNOWISSTRING = any;
 
 @Directive({
-  selector: '[tabIndex]'
+    selector: '[tabIndex]',
+    standalone: false
 })
 export class TabDirective implements AfterViewInit  {
 

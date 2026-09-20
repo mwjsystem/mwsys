@@ -21,11 +21,12 @@ import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
 @Component({
-  selector: 'app-frmsiire',
-  templateUrl: './frmsiire.component.html',
-  styleUrls: ['./../app.component.scss'],
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-frmsiire',
+    templateUrl: './frmsiire.component.html',
+    styleUrls: ['./../app.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class FrmsiireComponent implements OnInit, AfterViewInit {
   @ViewChild(SimeitblComponent) simeitbl: SimeitblComponent;

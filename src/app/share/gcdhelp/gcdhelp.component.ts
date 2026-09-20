@@ -23,9 +23,10 @@ export interface Gcd {
 }
 
 @Component({
-  selector: 'app-gcdhelp',
-  templateUrl: './gcdhelp.component.html',
-  styleUrls: ['./../../help.component.scss']
+    selector: 'app-gcdhelp',
+    templateUrl: './gcdhelp.component.html',
+    styleUrls: ['./../../help.component.scss'],
+    standalone: false
 })
 export class GcdhelpComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

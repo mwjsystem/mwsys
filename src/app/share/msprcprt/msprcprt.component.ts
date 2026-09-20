@@ -9,9 +9,10 @@ import gql from 'graphql-tag';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-msprcprt',
-  templateUrl: './msprcprt.component.html',
-  styleUrls: ['./../../tbl.component.scss']
+    selector: 'app-msprcprt',
+    templateUrl: './msprcprt.component.html',
+    styleUrls: ['./../../tbl.component.scss'],
+    standalone: false
 })
 export class MsprcprtComponent implements OnInit {
   mcode: number;

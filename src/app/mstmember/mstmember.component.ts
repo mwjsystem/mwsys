@@ -27,9 +27,10 @@ class Sval {
 }
 
 @Component({
-  selector: 'app-mstmember',
-  templateUrl: './mstmember.component.html',
-  styleUrls: ['./../app.component.scss']
+    selector: 'app-mstmember',
+    templateUrl: './mstmember.component.html',
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class MstmemberComponent implements OnInit, AfterViewInit {
   @ViewChildren(AddressComponent)

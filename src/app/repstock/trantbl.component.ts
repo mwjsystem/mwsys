@@ -7,9 +7,10 @@ import { UserService } from './../services/user.service';
 
 
 @Component({
-  selector: 'app-trantbl',
-  templateUrl: './trantbl.component.html',
-  styleUrls: ['./../tbl.component.scss']
+    selector: 'app-trantbl',
+    templateUrl: './trantbl.component.html',
+    styleUrls: ['./../tbl.component.scss'],
+    standalone: false
 })
 export class TrantblComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;

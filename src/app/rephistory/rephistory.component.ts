@@ -7,9 +7,10 @@ import { UserService } from './../services/user.service';
 import { DownloadService } from './../services/download.service';
 
 @Component({
-  selector: 'app-rephistory',
-  templateUrl: './rephistory.component.html',
-  styleUrls: ['./../app.component.scss']
+    selector: 'app-rephistory',
+    templateUrl: './rephistory.component.html',
+    styleUrls: ['./../app.component.scss'],
+    standalone: false
 })
 export class RephistoryComponent {
   form: FormGroup;
