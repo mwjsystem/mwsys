@@ -9,11 +9,11 @@ const app = express();
 app.use(forceSsl);
 
 // 以下の設定だけで dist/index.html も返せてはいる
-app.use(express.static(`${__dirname}/dist`));
+app.use(express.static(`${__dirname}/dist/browser`));
 
 // ルートへのアクセス時は念のため dist/index.html を確実に返すようにしておく
 app.get('/*', (req, res) => {
-  res.sendFile(path.join(`${__dirname}/dist/index.html`));
+  res.sendFile(path.join(`${__dirname}/dist/browser/index.html`));
   res.set({ 'Access-Control-Allow-Origin': '*' });
 });
 // サーバ起動
