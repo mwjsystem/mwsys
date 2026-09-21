@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MembsService } from './../../mstmember/membs.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -12,7 +12,7 @@ import { MatDialogRef } from "@angular/material/dialog";
     standalone: false
 })
 export class EdahelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   public filters: any = [{ id: 'adrname', value: '' },
   { id: 'region', value: '' },
   { id: 'local', value: '' },
@@ -27,7 +27,7 @@ export class EdahelpComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
     // this.edasrv.observe.subscribe();
     this.dataSource.filterPredicate = (data: mwI.Edahlp, filtersJson: string) => {
       const matchFilter: any[] = [];
@@ -56,7 +56,7 @@ export class EdahelpComponent implements OnInit {
   updateData(): void {
     //tableのデータソース更新
     this.dataSource = new MatTableDataSource<mwI.Edahlp>(this.memsrv.edas);
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
   }
   selEda(selected: any) {
     // console.log("select",selected);

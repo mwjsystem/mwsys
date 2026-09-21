@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, Inject, viewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
@@ -26,8 +26,7 @@ interface Ggrp {
     standalone: false
 })
 export class GrpcdhelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<Ggrp>;
   displayedColumns = ['code', 'name', 'kana', 'gkbn', 'sozai', 'vcode', 'tcode'];
   public ggrps!: Ggrp[];
@@ -54,7 +53,7 @@ export class GrpcdhelpComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
     this.dataSource = new MatTableDataSource<Ggrp>(this.ggrps);
     this.observe.subscribe((flg) => this.refresh());
 
@@ -132,7 +131,7 @@ export class GrpcdhelpComponent implements OnInit {
   refresh(): void {
     //tableのデータソース更新
     this.dataSource = new MatTableDataSource<Ggrp>(this.ggrps);
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
   }
 
 }

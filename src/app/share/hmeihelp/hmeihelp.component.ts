@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, Inject, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -44,8 +44,7 @@ interface Hatmei {
     standalone: false
 })
 export class HmeihelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -155,7 +154,7 @@ export class HmeihelpComponent implements OnInit {
             srcdata.push(element);
           });
           this.dataSource = new MatTableDataSource<Hatmei>(srcdata);
-          this.dataSource.paginator = this.paginator;
+          this.dataSource.paginator = this.paginator() ?? null;
         }
         this.overlayRef.detach();
         this.cdRef.detectChanges();

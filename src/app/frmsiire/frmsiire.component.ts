@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, viewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -32,8 +32,7 @@ import { Apollo } from 'apollo-angular';
     }
 })
 export class FrmsiireComponent implements OnInit, AfterViewInit {
-  @ViewChild(SimeitblComponent)
-    simeitbl!: SimeitblComponent;
+  readonly simeitbl = viewChild(SimeitblComponent);
   form!: FormGroup;
   denno: number = 0;
   hdenno: number = 0;
@@ -131,7 +130,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
             // this.form.patchValue(siiden.msvendor[0]);
             this.usrsrv.setTmstmp(siiden);
             this.smisrv.siimei = siiden.trsiimeis;
-            this.simeitbl.setSiimei();
+            this.simeitbl()!.setSiimei();
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             // this.denno = denno;
             // history.replaceState('', '', './frmsupply/' + this.mode + '/' + this.denno);
@@ -168,7 +167,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
             this.form.patchValue({ inday: hatden.vhatzns[0].yday });
             // this.usrsrv.setTmstmp(hatden);
             this.smisrv.convHatmei(denno, hatden.vhatzns);
-            this.simeitbl.setSiimei();
+            this.simeitbl()!.setSiimei();
           }
           this.refresh();
           this.overlayRef.detach();
@@ -187,7 +186,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
 
   test(value: any) {
     // this.toastr.info(this.form.value.yday);
-    console.log(this.simeitbl.getSiimei(this.denno));
+    console.log(this.simeitbl()!.getSiimei(this.denno));
     this.refresh();
     // this.router.navigate(['/mstmember','3',value]);
     // const url = this.router.createUrlTree(['/mstmember','3',value]);
@@ -254,8 +253,8 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
     this.form.get('inday')!.setValue(new Date());
     this.form.get('scode')!.setValue(this.usrsrv.staff.scode);
-    this.simeitbl.frmArr.clear();
-    this.simeitbl.addRows(1);
+    this.simeitbl()!.frmArr.clear();
+    this.simeitbl()!.addRows(1);
     this.refresh();
   }
 
@@ -294,7 +293,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     }
 
     if (this.mode == 2) {
-      let siimei = this.simeitbl.getSiimei(this.denno);
+      let siimei = this.simeitbl()!.getSiimei(this.denno);
       this.smisrv.updSiiden(this.denno, siiden, siimei)
         .then(result => {
           // console.log('update_hatden',result);
@@ -307,7 +306,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
         });
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('sdenno', 1, this.denno);
-      const siimei = this.simeitbl.getSiimei(this.denno);
+      const siimei = this.simeitbl()!.getSiimei(this.denno);
       const trsiiden: mwI.Trsiiden[] = [{
         ...{
           id: this.usrsrv.compid,

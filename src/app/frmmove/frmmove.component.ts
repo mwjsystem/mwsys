@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -28,8 +28,7 @@ import { filter } from 'rxjs/operators';
     }
 })
 export class FrmmoveComponent implements OnInit {
-  @ViewChild(MovtblComponent)
-    movtbl!: MovtblComponent;
+  readonly movtbl = viewChild(MovtblComponent);
   form!: FormGroup;
   denno: number = 0;
   mode: number = 3;
@@ -91,7 +90,7 @@ export class FrmmoveComponent implements OnInit {
               if (k == "stkey") {
                 const stra = JSON.parse(localStorage.getItem(params[k])!);
                 this.form.patchValue({ incode: stra.incode, outcode: stra.outcode });
-                this.movtbl.insRows(stra.mei, true);
+                this.movtbl()!.insRows(stra.mei, true);
                 localStorage.removeItem(params[k]);
               }
             })
@@ -131,7 +130,7 @@ export class FrmmoveComponent implements OnInit {
             let movsub: Movsub = result;
             this.form.patchValue(movsub);
             this.usrsrv.setTmstmp(movsub);
-            this.movtbl.setMovmei(movsub.trmovdens);
+            this.movtbl()!.setMovmei(movsub.trmovdens);
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             this.denno = denno;
             history.replaceState('', '', './frmmove/' + this.mode + '/' + this.denno);
@@ -240,13 +239,13 @@ export class FrmmoveComponent implements OnInit {
 
     // console.log('save',this.mode,this.form)
     if (this.mode == 2) {
-      let movmei = this.movtbl.getMovmei(this.denno);
+      let movmei = this.movtbl()!.getMovmei(this.denno);
       this.movsrv.updMovden(this.denno, movsub, movmei)
         .then(result => {
           this.usrsrv.toastSuc('移動伝票' + this.denno + 'の変更を保存しました');
 
           //  zaiko更新処理 (読込時分マイナス)
-          this.movtbl.trzaiko.forEach(e => {
+          this.movtbl()!.trzaiko.forEach(e => {
             this.movsrv.updZaiko(e);
           });
 
@@ -297,7 +296,7 @@ export class FrmmoveComponent implements OnInit {
       
 	  this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
 	  // console.log('sinki1',this.denno);
-      const movmei = this.movtbl.getMovmei(this.denno);
+      const movmei = this.movtbl()!.getMovmei(this.denno);
 	  // console.log('sinki',movmei);
       const trmovsub: Movsub[] = [{
         ...{
@@ -328,8 +327,8 @@ export class FrmmoveComponent implements OnInit {
     this.denno = 0;
     this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
     this.form.get('day')!.setValue(new Date());
-    this.movtbl.frmArr.clear();
-    this.movtbl.addRows(1);
+    this.movtbl()!.frmArr.clear();
+    this.movtbl()!.addRows(1);
     this.refresh();
 
   }

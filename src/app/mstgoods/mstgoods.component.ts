@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, ViewEncapsulation, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -31,10 +31,8 @@ import { VendsService } from './../mstvendor/vends.service';
     }
 })
 export class MstgoodsComponent implements OnInit, AfterViewInit {
-  @ViewChild(GdstblComponent)
-    gdstbl!: GdstblComponent;
-  @ViewChild(GtnktblComponent)
-    gtnktbl!: GtnktblComponent;
+  readonly gdstbl = viewChild(GdstblComponent);
+  readonly gtnktbl = viewChild(GtnktblComponent);
 
   form!: FormGroup;
   mode: number = 3;
@@ -239,8 +237,8 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
                     this.gdssrv.gtnks.push(Object.assign({ gcode: ggroup.msgoods[i].gcode }, ggroup.msgoods[i].msgtankas[j]));
                   }
                 }
-                this.gdstbl.setGoods();
-                this.gtnktbl.setGtanka();
+                this.gdstbl()!.setGoods();
+                this.gtnktbl()!.setGtanka();
                 // if(this.mode==3){
                 //   this.form.disable();
                 // }else{
@@ -284,7 +282,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     this.form.reset();
     this.frmArr.clear();
     this.frmArr2.clear();
-    this.gdstbl.insRow(false, 0);
+    this.gdstbl()!.insRow(false, 0);
     this.form.markAsPristine();
     this.refresh();
     // this.gdssrv.grpcd="新規登録"; 
@@ -496,9 +494,9 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   insTnkrow(emitParam: any) {
     // console.log(emitParam);
     if (emitParam.flg) {
-      this.gtnktbl.insRow(emitParam.row, emitParam.flgCP);
+      this.gtnktbl()!.insRow(emitParam.row, emitParam.flgCP);
     } else {
-      this.gtnktbl.delRow(emitParam.row);
+      this.gtnktbl()!.delRow(emitParam.row);
     }
 
   }

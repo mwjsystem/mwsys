@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -36,8 +36,7 @@ interface Siiden {
     standalone: false
 })
 export class SdnohelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -166,7 +165,7 @@ export class SdnohelpComponent implements OnInit {
             srcdata.push({ ...rest, ...gcd });
           });
           this.dataSource = new MatTableDataSource<Siiden>(srcdata);
-          this.dataSource.paginator = this.paginator;
+          this.dataSource.paginator = this.paginator() ?? null;
         }
         this.overlayRef.detach();
         this.cdRef.detectChanges();

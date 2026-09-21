@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, viewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -24,8 +24,7 @@ import { NdnohelpComponent } from './../share/ndnohelp/ndnohelp.component';
     }
 })
 export class FrmdepositComponent implements OnInit, AfterViewInit {
-  @ViewChild(DepttblComponent)
-    depttbl!: DepttblComponent;
+  readonly depttbl = viewChild(DepttblComponent);
   form!: FormGroup;
   denno: number = 0;
   rows: FormArray = this.fb.array([]);
@@ -113,7 +112,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
                 }
               );
             }
-            this.depttbl.setTbl();
+            this.depttbl()!.setTbl();
             this.form.get('day')!.setValue(result.day);
             this.form.get('code')!.setValue(result.code);
             this.form.get('tcode')!.setValue(result.tcode);
@@ -256,8 +255,8 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     this.denno = 0;
     this.jyuden = new Jyuden();
     this.depsrv.subHis.next([new Nyuhis()]);
-    this.depttbl.frmArr.clear();
-    this.depttbl.insRow(1);
+    this.depttbl()!.frmArr.clear();
+    this.depttbl()!.insRow(1);
     this.refresh();
   }
   modeToUpd(): void {
@@ -286,7 +285,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     }
 
     if (this.depsrv.mode == 2) {
-      let dept = this.depttbl.getMtbl(this.denno);
+      let dept = this.depttbl()!.getMtbl(this.denno);
       this.depsrv.updNyuden(this.denno, head, dept)
         .then(result => {
           // console.log('update_hatden',result);
@@ -301,7 +300,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
 
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('ndenno', 1, this.denno);
-      let dept = this.depttbl.getMtbl(this.denno);
+      let dept = this.depttbl()!.getMtbl(this.denno);
       const trnyusub = [{
         ...{
           id: this.usrsrv.compid,

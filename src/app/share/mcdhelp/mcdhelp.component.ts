@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, viewChild } from '@angular/core';
 import { MatDialogRef } from "@angular/material/dialog";
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -39,7 +39,7 @@ export interface Mcd {
 })
 export class McdhelpComponent implements OnInit {
 
-  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<Mcd>;
   displayedColumns = ['mcode', 'sei', 'kana', 'tcode1', 'tcode2', 'eda', 'zip', 'region', 'local', 'street', 'extend', 'extend2', 'adrname', 'tel', 'mail', 'webid'];
   fname: string = "";
@@ -71,7 +71,7 @@ export class McdhelpComponent implements OnInit {
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff.code;
     this.dataSource = new MatTableDataSource<Mcd>(this.mcds);
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
   }
 
   convKana(event: KeyboardEvent): string {

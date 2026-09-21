@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewEncapsulation, ViewChildren, QueryList, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChildren } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 
 import { Title } from '@angular/platform-browser';
@@ -37,8 +37,7 @@ class Sval {
     }
 })
 export class MstmemberComponent implements OnInit, AfterViewInit {
-  @ViewChildren(AddressComponent)
-    private children!: QueryList<AddressComponent>;
+  private readonly children = viewChildren(AddressComponent);
   form!: FormGroup;
   mcd: string = "";
   mode: number = 3;
@@ -498,10 +497,10 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       }).subscribe(({ data }) => {
         // console.log('update_msmember', data);
         this.form.get('addr0')!.patchValue({ dmemo: member.dmemo, memo: member.memo });
-        this.children.toArray()[0].saveMadr(this.mcd, 0, this.mode);
+        this.children()[0].saveMadr(this.mcd, 0, this.mode);
         // console.log(this.form.get('addr1').value);
         if (this.form.get('addr1')!.value.zip != null) {
-          this.children.toArray()[1].saveMadr(this.mcd, 1, this.flgadr1);
+          this.children()[1].saveMadr(this.mcd, 1, this.flgadr1);
         }
         this.usrsrv.toastSuc('顧客コード' + this.mcd + 'の変更を保存しました');
         this.mode = 3;
@@ -533,10 +532,10 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         },
       }).subscribe(({ data }) => {
         console.log('Insert_msmember', data);
-        this.children.toArray()[0].saveMadr(this.mcd, 0, this.mode);
+        this.children()[0].saveMadr(this.mcd, 0, this.mode);
         // console.log(this.form.get('addr1').get('zip'),);
         if (this.form.get('addr1')!.value.zip != null) {
-          this.children.toArray()[1].saveMadr(this.mcd, 1, this.flgadr1);
+          this.children()[1].saveMadr(this.mcd, 1, this.flgadr1);
         }
 
         this.usrsrv.toastSuc('顧客コード' + this.mcd + 'を新規登録しました');

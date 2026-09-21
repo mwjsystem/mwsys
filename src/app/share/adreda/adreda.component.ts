@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Inject, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Apollo } from 'apollo-angular';
@@ -16,8 +16,7 @@ import { AddressComponent } from './../address/address.component';
     standalone: false
 })
 export class AdredaComponent implements OnInit, AfterViewInit {
-  @ViewChild(AddressComponent, { static: false })
-    private child!: AddressComponent;
+  private readonly child = viewChild(AddressComponent);
   mode: number = 3;
   form!: FormGroup;
   eda: number | string;
@@ -64,7 +63,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     if (this.mode == 3) {
       this.dialogRef.close(this.eda);
     } else {
-      this.child.saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
+      this.child()!.saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
         this.updateAdrs(madr);
         this.eda = madr.eda;
         this.mode = 3;
@@ -96,7 +95,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   }
 
   save(): void {
-    this.child.saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
+    this.child()!.saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
       this.updateAdrs(madr);
       this.eda = madr.eda;
       this.mode = 3;

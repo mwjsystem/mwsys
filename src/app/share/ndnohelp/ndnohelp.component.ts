@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Inject, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -38,8 +38,7 @@ interface Nyusub {
     standalone: false
 })
 export class NdnohelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -179,7 +178,7 @@ export class NdnohelpComponent implements OnInit {
         } else {
           let srcdata = data.trnyusub;
           this.dataSource = new MatTableDataSource<Nyusub>(srcdata);
-          this.dataSource.paginator = this.paginator;
+          this.dataSource.paginator = this.paginator() ?? null;
         }
         this.overlayRef.detach();
         this.cdRef.detectChanges();

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Inject, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -46,7 +46,7 @@ interface Jyuden {
     standalone: false
 })
 export class JdnohelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -244,7 +244,7 @@ export class JdnohelpComponent implements OnInit {
             srcdata.push({ ...rest, ...gcd });
           });
           this.dataSource = new MatTableDataSource<Jyuden>(srcdata);
-          this.dataSource.paginator = this.paginator;
+          this.dataSource.paginator = this.paginator() ?? null;
         }
         this.overlayRef.detach();
         this.cdRef.detectChanges();

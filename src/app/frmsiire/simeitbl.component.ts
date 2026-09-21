@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input, viewChild, viewChildren } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -22,10 +22,8 @@ import { take } from 'rxjs/operators';
 })
 export class SimeitblComponent implements OnInit {
   readonly parentForm = input.required<FormGroup>();
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
-  @ViewChildren('gcdInputs')
-    gcdInps!: QueryList<ElementRef>;
+  readonly paginator = viewChild(MatPaginator);
+  readonly gcdInps = viewChildren<ElementRef>('gcdInputs');
   private el!: HTMLInputElement;
   dataSource = new MatTableDataSource();
   copyToClipboard!: string;
@@ -116,7 +114,7 @@ export class SimeitblComponent implements OnInit {
   }
 
   refresh(): void {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
     this.dataSource.data = this.frmArr.controls;
   }
 
@@ -185,8 +183,9 @@ export class SimeitblComponent implements OnInit {
     this.usrsrv.toastInf('クリップボードにコピーしました');
   }
   getIdx(index: number) {
-    if (this.paginator) {
-      return index + this.paginator.pageSize * this.paginator.pageIndex;
+    const paginator = this.paginator() ?? null;
+    if (paginator) {
+      return index + paginator.pageSize * paginator.pageIndex;
     } else {
       return index;
     }

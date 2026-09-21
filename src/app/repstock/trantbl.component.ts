@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,8 +14,7 @@ import { UserService } from './../services/user.service';
     standalone: false
 })
 export class TrantblComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   public dataSource!: MatTableDataSource<Trans>;
   public displayedColumns = ['ttype', 'sday', 'yday', 'aitec', 'aiten', 'denno', 'mline', 'tcode', 'biko', 'insuu',
     'ousuu', 'zaisu', 'yotei', 'wait'];
@@ -75,7 +74,7 @@ export class TrantblComponent implements OnInit {
   refresh(): void {
     // console.log(this.trnsrv.tbldata);
     this.dataSource = new MatTableDataSource<Trans>(this.trnsrv.sortTblData(this.trnsrv.tbldata));
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
     this.cdRef.detectChanges();
   }
 

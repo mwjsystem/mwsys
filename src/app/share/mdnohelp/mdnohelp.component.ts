@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Inject, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef, MatDialog } from "@angular/material/dialog";
@@ -31,8 +31,7 @@ interface Movsub {
     standalone: false
 })
 export class MdnohelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -107,7 +106,7 @@ export class MdnohelpComponent implements OnInit {
         } else {
           let srcdata = data.trmovsub;
           this.dataSource = new MatTableDataSource<Movsub>(srcdata);
-          this.dataSource.paginator = this.paginator;
+          this.dataSource.paginator = this.paginator() ?? null;
         }
         this.overlayRef.detach();
         this.cdRef.detectChanges();

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input, viewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -27,8 +27,7 @@ import { take } from 'rxjs/operators';
 })
 export class JmeitblComponent implements OnInit {
   readonly parentForm = input.required<FormGroup>();
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   @ViewChildren('gcdInputs')
     gcdInps!: QueryList<ElementRef>;
   private el!: HTMLInputElement;
@@ -812,7 +811,7 @@ export class JmeitblComponent implements OnInit {
     return result.toString() + "\n";
   }
   refresh(): void {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
     this.dataSource.data = this.frmArr.controls;
     this.jmisrv.subject.next(true);
     // console.log(this.frmArr.controls);
@@ -869,8 +868,9 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
   getIdx(index: number) {
-    if (this.paginator) {
-      return index + this.paginator.pageSize * this.paginator.pageIndex;
+    const paginator = this.paginator() ?? null;
+    if (paginator) {
+      return index + paginator.pageSize * paginator.pageIndex;
     } else {
       return index;
     }

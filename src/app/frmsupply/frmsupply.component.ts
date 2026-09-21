@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, viewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -29,8 +29,7 @@ import { filter } from 'rxjs/operators';
     }
 })
 export class FrmsupplyComponent implements OnInit, AfterViewInit {
-  @ViewChild(HmeitblComponent)
-    hmeitbl!: HmeitblComponent;
+  readonly hmeitbl = viewChild(HmeitblComponent);
   form!: FormGroup;
   denno: number = 0;
   mode: number = 3;
@@ -100,7 +99,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
                   const stra = JSON.parse(localStorage.getItem(params[k])!);
                   this.form.patchValue({ vcode: stra.vcd });
                   this.updVcd(stra.vcd);
-                  this.hmeitbl.insRows(stra.mei, true);
+                  this.hmeitbl()!.insRows(stra.mei, true);
                   // console.log(stra.hdno,this.denno);
                   localStorage.removeItem(params[k]);
                 }
@@ -143,7 +142,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
             this.form.patchValue(hatden.msvendor[0]);
             this.usrsrv.setTmstmp(hatden);
             this.hmisrv.hatmei = hatden.vhatzns;
-            this.hmeitbl.setHatmei();
+            this.hmeitbl()!.setHatmei();
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             this.denno = denno;
             history.replaceState('', '', './frmsupply/' + this.mode + '/' + this.denno);
@@ -170,7 +169,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     // this.usrsrv.getNumber('denno',2).subscribe(value => {
     //   console.log(value);
     // });
-    console.log(this.hmeitbl.getHatmei(this.denno));
+    console.log(this.hmeitbl()!.getHatmei(this.denno));
     this.refresh();
     // this.router.navigate(['/mstmember','3',value]);
     // const url = this.router.createUrlTree(['/mstmember','3',value]);
@@ -266,9 +265,10 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.form.get('day')!.setValue(new Date());
     this.form.get('scode')!.setValue(this.usrsrv.staff.scode);
     // this.form.get('hdstatus').setValue("0"); 
-    this.hmeitbl.frmArr.clear();
-    console.log(this.hmeitbl.frmArr);
-    this.hmeitbl.addRows(1);
+    this.hmeitbl()!.frmArr.clear();
+    const hmeitbl = this.hmeitbl()!;
+    console.log(hmeitbl.frmArr);
+    hmeitbl.addRows(1);
     this.refresh();
   }
 
@@ -311,7 +311,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     }
 
     if (this.mode == 2) {
-      let hatmei = this.hmeitbl.getHatmei(this.denno);
+      let hatmei = this.hmeitbl()!.getHatmei(this.denno);
       this.hmisrv.updHatden(this.denno, hatden, hatmei)
         .then(result => {
           // console.log('update_hatden',result);
@@ -324,7 +324,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
         });
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('hdenno', 1, this.denno);
-      const hatmei = this.hmeitbl.getHatmei(this.denno);
+      const hatmei = this.hmeitbl()!.getHatmei(this.denno);
       const trhatden: mwI.Trhatden[] = [{
         ...{
           id: this.usrsrv.compid,

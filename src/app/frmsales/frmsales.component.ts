@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ViewChild, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 
 import { Title } from '@angular/platform-browser';
@@ -36,8 +36,7 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
     }
 })
 export class FrmsalesComponent implements OnInit, AfterViewInit {
-  @ViewChild(JmeitblComponent)
-    jmeitbl!: JmeitblComponent;
+  readonly jmeitbl = viewChild(JmeitblComponent);
   form!: FormGroup;
   mode: number = 3;
   vnyuzan!: mwI.Vnyuzan;
@@ -309,7 +308,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               this.form.get('isaki')!.setValue(jyuden.nadr.toString());
             }
             this.form.patchValue(jyuden);
-            this.jmeitbl.setJyumei(jyuden);
+            this.jmeitbl()!.setJyumei(jyuden);
             this.usrsrv.setTmstmp(jyuden);
             this.jmisrv.denno = denno;
 			this.vnyuzan = jyuden.vnyuzan;
@@ -333,8 +332,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       );
     } else {
       this.form.reset();
-      this.jmeitbl.frmArr.clear();
-      this.jmeitbl.addRows(1);
+      this.jmeitbl()!.frmArr.clear();
+      this.jmeitbl()!.addRows(1);
       this.overlayRef.detach();
     }
     this.cdRef.detectChanges();
@@ -594,10 +593,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.form.get('yday')!.setValue(this.usrsrv.getNextday(new Date()));
     // this.form.get('scode').setValue(this.usrsrv.staff.scode);
     this.form.get('skbn')!.setValue("0");
-    this.jmeitbl.frmArr.clear();
+    this.jmeitbl()!.frmArr.clear();
 	this.jmisrv.isSaving = false;
     this.refresh();
-    this.jmeitbl.addRows(1);
+    this.jmeitbl()!.addRows(1);
   }
 
   modeToUpd(): void {
@@ -718,7 +717,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     if (this.mode == 2) {
       return new Promise(resolve => {
         // let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno); 
-        this.jmeitbl.editJyumei(this.jmisrv.denno);
+        this.jmeitbl()!.editJyumei(this.jmisrv.denno);
         let jyumei = this.jmisrv.trjyumei;
         let jyumzai = this.jmisrv.trjmzai;
         console.log('save変更',jyumzai);
@@ -762,7 +761,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 	
       this.jmisrv.denno = await this.jmisrv.getDenno();
       return new Promise(resolve => {
-        this.jmeitbl.editJyumei(this.jmisrv.denno);
+        this.jmeitbl()!.editJyumei(this.jmisrv.denno);
         const jyumei = this.jmisrv.trjyumei;
         let jyumzai = this.jmisrv.trjmzai;
         const trjyuden: mwI.Trjyuden[] = [{

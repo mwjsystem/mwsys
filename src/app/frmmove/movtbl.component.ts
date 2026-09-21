@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input, viewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -20,8 +20,7 @@ import { take } from 'rxjs/operators';
 })
 export class MovtblComponent implements OnInit {
   readonly parentForm = input.required<FormGroup>();
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   @ViewChildren('gcdInputs')
     gcdInps!: QueryList<ElementRef>;
   private el!: HTMLInputElement;
@@ -308,7 +307,7 @@ export class MovtblComponent implements OnInit {
     return result.toString() + "\n";
   }
   refresh(): void {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
     this.dataSource.data = this.frmArr.controls;
     this.movsrv.subject.next(true);
   }
@@ -361,8 +360,9 @@ export class MovtblComponent implements OnInit {
     // ((this.frmArr.at(i+1) as FormGroup).controls['gcode']as any).nativeElement.focus();
   }
   getIdx(index: number) {
-    if (this.paginator) {
-      return index + this.paginator.pageSize * this.paginator.pageIndex;
+    const paginator = this.paginator() ?? null;
+    if (paginator) {
+      return index + paginator.pageSize * paginator.pageIndex;
     } else {
       return index;
     }

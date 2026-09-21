@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Overlay } from '@angular/cdk/overlay';
@@ -26,7 +26,7 @@ import { filter } from 'rxjs/operators';
     standalone: false
 })
 export class FrmtreatComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<mwI.Trtreat>;
   displayedColumns = ['created_at', 'created_by', 'genre', 'trttype', 'mcode', 'grpcode', 'gcode', 'tel', 'email', 'question', 'answer', 'kaizen', 'result'];
   fmcode: string = "";
@@ -50,7 +50,7 @@ export class FrmtreatComponent implements OnInit {
     // private toastr: ToastrService,
     private overlay: Overlay) {
     this.dataSource = new MatTableDataSource<mwI.Trtreat>(this.trtsrv.trts);
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
     title.setTitle('問合せ一覧(MWSystem)');
   }
 
@@ -164,6 +164,6 @@ export class FrmtreatComponent implements OnInit {
   refresh(): void {
     //tableのデータソース更新
     this.dataSource = new MatTableDataSource<mwI.Trtreat>(this.trtsrv.trts);
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
   }
 }

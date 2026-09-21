@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, Inject, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -30,8 +30,7 @@ export interface Gcd {
     standalone: false
 })
 export class GcdhelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false })
-    paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<Gcd>;
   displayedColumns = ['code', 'gcode', 'gtext', 'size', 'color', 'jan', 'unit', 'gskbn', 'tkbn'];
   public gcds!: Gcd[];
@@ -154,7 +153,7 @@ export class GcdhelpComponent implements OnInit {
   refresh(): void {
     //tableのデータソース更新
     this.dataSource = new MatTableDataSource<Gcd>(this.gcds);
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
   }
 
 }

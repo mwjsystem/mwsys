@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ChangeDetectorRef, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
@@ -22,8 +22,7 @@ export class TrtdetailComponent implements OnInit {
 
   public idx: number = 0;
   public form!: UntypedFormGroup;
-  @ViewChildren('upfile', { read: ElementRef })
-    inputs!: QueryList<ElementRef>;
+  readonly inputs = viewChildren('upfile', { read: ElementRef });
   constructor(public trtsrv: TreatService,
     public usrsrv: UserService,
     public bunsrv: BunruiService,
@@ -135,7 +134,7 @@ export class TrtdetailComponent implements OnInit {
 
   onClickFileInputButton(num: number) {
     // console.log(this.inputs);
-    this.inputs.toArray()[num].nativeElement.click();
+    this.inputs()[num].nativeElement.click();
   }
 
   async save() {

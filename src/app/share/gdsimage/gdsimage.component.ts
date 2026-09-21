@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef, OnInit, Inject, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, OnInit, Inject, ElementRef, ChangeDetectionStrategy, viewChildren } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { UserService } from './../../services/user.service';
 import gql from 'graphql-tag';
@@ -18,7 +18,7 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
   public url: string = "";
   public cat: string = "";
   public grpcd: string = "";
-  @ViewChildren('upfile', { read: ElementRef }) inputs!: QueryList<ElementRef>;
+  readonly inputs = viewChildren('upfile', { read: ElementRef });
   constructor(public usrsrv: UserService,
     public cdRef: ChangeDetectorRef,
     private apollo: Apollo,
@@ -92,7 +92,7 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
   }
   onClickFileInputButton(num: number) {
     // console.log(this.inputs);
-    this.inputs.toArray()[num].nativeElement.click();
+    this.inputs()[num].nativeElement.click();
   }
   //アップロードの実行
   onchange(list: any, num: string) {

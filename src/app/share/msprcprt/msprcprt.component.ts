@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ChangeDetectorRef, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { UntypedFormGroup, UntypedFormBuilder, FormControl, UntypedFormArray, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -24,8 +24,7 @@ export class MsprcprtComponent implements OnInit {
   form!: UntypedFormGroup;
   selrow: any;
   dataSource = new MatTableDataSource();
-  @ViewChildren('upfile', { read: ElementRef })
-    inputs!: QueryList<ElementRef>;
+  readonly inputs = viewChildren('upfile', { read: ElementRef });
   displayedColumns = ['line', 'partno', 'seq', 'pic'];
   constructor(private fb: UntypedFormBuilder,
     private http: HttpClient,

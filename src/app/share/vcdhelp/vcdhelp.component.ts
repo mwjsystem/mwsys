@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef } from "@angular/material/dialog";
@@ -40,7 +40,7 @@ interface Vendor {
 })
 export class VcdhelpComponent implements OnInit {
   // public vcds: Vendor[]=[];
-  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
+  readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<mwI.Vendor>;
   displayedColumns = ['code', 'adrname', 'kana', 'tanto', 'tel', 'tel2', 'tel3', 'fax', 'mail1', 'mail2', 'mail3', 'mail4', 'mail5', 'zip', 'region', 'local', 'url'];
   filter: string = "";
@@ -55,7 +55,7 @@ export class VcdhelpComponent implements OnInit {
   ngOnInit(): void {
     // this.vensrv.observe.subscribe(value => {
     this.dataSource = new MatTableDataSource<mwI.Vendor>(this.vensrv.vends);
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator() ?? null;
     // });
   }
 
