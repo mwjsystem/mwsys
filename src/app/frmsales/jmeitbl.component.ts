@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -26,8 +26,7 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class JmeitblComponent implements OnInit {
-  @Input()
-    parentForm!: FormGroup;
+  readonly parentForm = input.required<FormGroup>();
   @ViewChild(MatPaginator, { static: false })
     paginator!: MatPaginator;
   @ViewChildren('gcdInputs')
@@ -132,7 +131,7 @@ export class JmeitblComponent implements OnInit {
       lcgenka += arr[i]['tgenka'];
     }
     lctotal = lcgtotalzn + lcsoryozn + lctesuzn + lcnebikizn + lctaxtotal;
-    this.parentForm.patchValue({
+    this.parentForm().patchValue({
       gtotalzn: lcgtotalzn,
       soryozn: lcsoryozn,
       tesuzn: lctesuzn,
@@ -248,7 +247,8 @@ export class JmeitblComponent implements OnInit {
       this.frmArr.removeAt(fordel);
     })
     // console.log(calc,sour);
-    let j: number = this.memsrv.adrs.findIndex(obj => obj.eda == this.parentForm.getRawValue()['nadr']);
+    let j: number = this.memsrv.adrs.findIndex(obj => obj.eda == this.parentForm().getRawValue()['nadr']);
+    const parentForm = this.parentForm();
     if (j > -1) {
       let sufi: string = "";
       // console.log(this.parentForm.value,j);
@@ -275,7 +275,7 @@ export class JmeitblComponent implements OnInit {
         this.insRows([lcgcd + "\t" + sour[kbn]], false);
       }
 	// 代引き手数料計算	  
-      if (this.parentForm.value.pcode == '9') {		  
+      if (parentForm.value.pcode == '9') {		  
  	    const arr = this.frmArr.getRawValue();
 		
 		for (let i = 0; i < arr.length; i++) {
@@ -296,7 +296,7 @@ export class JmeitblComponent implements OnInit {
     }  
 
     this.autoFil();
-    this.parentForm.get('okurisuu')!.setValue(kogu);
+    parentForm.get('okurisuu')!.setValue(kogu);
   }
 
   async setJmeikbn(kbn: string) {
@@ -362,7 +362,7 @@ export class JmeitblComponent implements OnInit {
       })
     localStorage.setItem(this.jmisrv.denno + 'MWSYS_FRMMOVE',
       JSON.stringify({
-        outcode: this.parentForm.value.scode,
+        outcode: this.parentForm().value.scode,
         incode: this.movden[0],
         mei: jmei
       }));
@@ -561,8 +561,8 @@ export class JmeitblComponent implements OnInit {
       variables: {
         id: this.usrsrv.compid,
         gds: val,
-        day: this.parentForm.value.day,
-        mcd: this.parentForm.value.mcode,
+        day: this.parentForm().value.day,
+        mcd: this.parentForm().value.mcode,
         sptnk: this.jmisrv.sptnkbn
       },
     })
@@ -578,7 +578,7 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msggroup);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
-          this.frmArr.controls[i].patchValue({ scode: this.parentForm.value.scode });
+          this.frmArr.controls[i].patchValue({ scode: this.parentForm().value.scode });
           let lctanka: number = 0;
           let lcgenka: number = 0;
           // console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
@@ -702,7 +702,7 @@ export class JmeitblComponent implements OnInit {
     }
   }
   get frmArr(): FormArray {
-    return this.parentForm.get('mtbl') as FormArray;
+    return this.parentForm().get('mtbl') as FormArray;
   }
 
   getMtbl(i: number, fnm: string): FormArray {
@@ -734,7 +734,7 @@ export class JmeitblComponent implements OnInit {
         let rowData = text.split("\n");
         this.insRows(rowData, flg);
         // console.log(this.frmArr.length);
-        this.parentForm.markAsDirty();
+        this.parentForm().markAsDirty();
       });
     // }
   }
@@ -763,7 +763,7 @@ export class JmeitblComponent implements OnInit {
           spdet: null,
           pable: 0,
           genka: 0,
-          scode: this.parentForm.get('scode')!.value,
+          scode: this.parentForm().get('scode')!.value,
           sday: null,
           tanka1: 0,
           money: 0,

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -21,8 +21,7 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class HmeitblComponent implements OnInit {
-  @Input()
-    parentForm!: FormGroup;
+  readonly parentForm = input.required<FormGroup>();
   @ViewChild(MatPaginator, { static: false })
     paginator!: MatPaginator;
   @ViewChildren('gcdInputs')
@@ -87,7 +86,7 @@ export class HmeitblComponent implements OnInit {
           }
         }
       })
-    this.parentForm.patchValue({ gtotal: lcgtotal, tax: lctax, total: lcgtotal + lctax });
+    this.parentForm().patchValue({ gtotal: lcgtotal, tax: lctax, total: lcgtotal + lctax });
     this.hmisrv.subject.next(true);
     // this.hmisrv.subject.complete();
     this.refresh();
@@ -173,7 +172,7 @@ export class HmeitblComponent implements OnInit {
       variables: {
         id: this.usrsrv.compid,
         gds: val,
-        day: this.parentForm.get('day')!.value
+        day: this.parentForm().get('day')!.value
       },
     })
       .valueChanges
@@ -188,7 +187,7 @@ export class HmeitblComponent implements OnInit {
           this.frmArr.controls[i].get('gcode')!.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
-          this.frmArr.controls[i].patchValue({ day: this.parentForm.get('day')!.value, mtax: this.parentForm.get('mtax')!.value });
+          this.frmArr.controls[i].patchValue({ day: this.parentForm().get('day')!.value, mtax: this.parentForm().get('mtax')!.value });
           this.calcTot();
         }
         this.hmisrv.subject.next(true);
@@ -247,7 +246,7 @@ export class HmeitblComponent implements OnInit {
   }
   get frmArr(): FormArray {
     // console.log(this.parentForm);    
-    return this.parentForm.get('mtbl') as FormArray;
+    return this.parentForm().get('mtbl') as FormArray;
   }
 
   frmVal(i: number, fld: string): string {
@@ -260,7 +259,7 @@ export class HmeitblComponent implements OnInit {
         console.log(text);
         let rowData = text.split("\n");
         this.insRows(rowData, flg);
-        this.parentForm.markAsDirty();
+        this.parentForm().markAsDirty();
       });
     // }
   }

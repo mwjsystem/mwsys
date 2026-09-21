@@ -1,5 +1,5 @@
 <div class="mat-elevation-z8">
-  <ng-container [formGroup]="parentForm">
+  <ng-container [formGroup]="parentForm()">
     <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
       <ng-container matColumnDef="line" sticky>
         <th mat-header-cell *matHeaderCellDef>行番号

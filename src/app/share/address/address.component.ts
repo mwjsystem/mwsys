@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, input } from '@angular/core';
 import { FormGroupDirective, FormGroup, FormControl, Validators, ControlContainer, FormArray, FormBuilder } from '@angular/forms';
 import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
@@ -21,7 +21,7 @@ import { Observable, Subject } from 'rxjs';
     standalone: false
 })
 export class AddressComponent implements OnInit {
-  @Input() formName!: string;
+  readonly formName = input.required<string>();
   constructor(private parent: FormGroupDirective,
     private usrsrv: UserService,
     public bunsrv: BunruiService,
@@ -31,7 +31,7 @@ export class AddressComponent implements OnInit {
   ngOnInit(): void {
     const form = this.parent.form;
     // if (this.formName=='addr1') {
-    form.addControl(this.formName, new FormGroup({
+    form.addControl(this.formName(), new FormGroup({
       zip: new FormControl(''),
       region: new FormControl(''),
       local: new FormControl(''),
@@ -54,13 +54,13 @@ export class AddressComponent implements OnInit {
   updTel(fldnm: string, event: KeyboardEvent) {
     let val: string = this.usrsrv.convTel((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
-    this.parent.form.get(this.formName)!.get(fldnm)!.setValue(val);
+    this.parent.form.get(this.formName())!.get(fldnm)!.setValue(val);
   }
 
   async getAdr(event: KeyboardEvent) {
     this.dwlsrv.getAdr((event.target as HTMLInputElement)?.value).then(result => {
       // console.log(result, result.results)
-      this.parent.form.get(this.formName)!.patchValue({
+      this.parent.form.get(this.formName())!.patchValue({
         region: result.results[0].address1,
         local: result.results[0].address2,
         street: result.results[0].address3
@@ -75,24 +75,24 @@ export class AddressComponent implements OnInit {
       id: this.usrsrv.compid,
       mcode: mcode,
       eda: eda,
-      zip: this.usrsrv.editFrmval(form.get(this.formName)!, 'zip'),
-      region: this.usrsrv.editFrmval(form.get(this.formName)!, 'region'),
-      local: this.usrsrv.editFrmval(form.get(this.formName)!, 'local'),
-      street: this.usrsrv.editFrmval(form.get(this.formName)!, 'street'),
-      extend: this.usrsrv.editFrmval(form.get(this.formName)!, 'extend'),
-      tel: this.usrsrv.editFrmval(form.get(this.formName)!, 'tel'),
-      fax: this.usrsrv.editFrmval(form.get(this.formName)!, 'fax'),
-      tel2: this.usrsrv.editFrmval(form.get(this.formName)!, 'tel2'),
-      tel3: this.usrsrv.editFrmval(form.get(this.formName)!, 'tel3'),
-      extend2: this.usrsrv.editFrmval(form.get(this.formName)!, 'extend2'),
-      adrname: this.usrsrv.editFrmval(form.get(this.formName)!, 'adrname'),
-      nmemo: this.usrsrv.editFrmval(form.get(this.formName)!, 'nmemo'),
-      smemo: this.usrsrv.editFrmval(form.get(this.formName)!, 'smemo'),
-      omemo: this.usrsrv.editFrmval(form.get(this.formName)!, 'omemo'),
-      del: this.usrsrv.editFrmval(form.get(this.formName)!, 'del'),
-      ftel: this.usrsrv.editFtel(form.get(this.formName)!, 'tel', 'fax', 'tel2', 'tel3'),
-      target: Boolean(form.get(this.formName)!.value.target),
-      htitle: this.usrsrv.editFrmval(form.get(this.formName)!, 'htitle')
+      zip: this.usrsrv.editFrmval(form.get(this.formName())!, 'zip'),
+      region: this.usrsrv.editFrmval(form.get(this.formName())!, 'region'),
+      local: this.usrsrv.editFrmval(form.get(this.formName())!, 'local'),
+      street: this.usrsrv.editFrmval(form.get(this.formName())!, 'street'),
+      extend: this.usrsrv.editFrmval(form.get(this.formName())!, 'extend'),
+      tel: this.usrsrv.editFrmval(form.get(this.formName())!, 'tel'),
+      fax: this.usrsrv.editFrmval(form.get(this.formName())!, 'fax'),
+      tel2: this.usrsrv.editFrmval(form.get(this.formName())!, 'tel2'),
+      tel3: this.usrsrv.editFrmval(form.get(this.formName())!, 'tel3'),
+      extend2: this.usrsrv.editFrmval(form.get(this.formName())!, 'extend2'),
+      adrname: this.usrsrv.editFrmval(form.get(this.formName())!, 'adrname'),
+      nmemo: this.usrsrv.editFrmval(form.get(this.formName())!, 'nmemo'),
+      smemo: this.usrsrv.editFrmval(form.get(this.formName())!, 'smemo'),
+      omemo: this.usrsrv.editFrmval(form.get(this.formName())!, 'omemo'),
+      del: this.usrsrv.editFrmval(form.get(this.formName())!, 'del'),
+      ftel: this.usrsrv.editFtel(form.get(this.formName())!, 'tel', 'fax', 'tel2', 'tel3'),
+      target: Boolean(form.get(this.formName())!.value.target),
+      htitle: this.usrsrv.editFrmval(form.get(this.formName())!, 'htitle')
     }
     if (mode == 2) {
       this.apollo.mutate<any>({
@@ -140,7 +140,7 @@ export class AddressComponent implements OnInit {
           }).subscribe(({ data }) => {
             console.log('Insert_msmadr', data);
           }, (error) => {
-            console.log('error Insert_msmadr ' + this.formName, error);
+            console.log('error Insert_msmadr ' + this.formName(), error);
           });
         }, (error) => {
           console.log('error query get_maxeda', error);

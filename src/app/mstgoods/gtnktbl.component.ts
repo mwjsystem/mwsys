@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, input } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,8 +14,7 @@ import { BunruiService } from './../services/bunrui.service';
     standalone: false
 })
 export class GtnktblComponent implements OnInit, AfterViewInit {
-  @Input()
-    parentForm!: FormGroup;
+  readonly parentForm = input.required<FormGroup>();
   private paginator!: MatPaginator;
   @ViewChild(MatPaginator, { static: false }) set matPaginator(mp: MatPaginator) {
     this.paginator = mp;
@@ -93,7 +92,7 @@ export class GtnktblComponent implements OnInit, AfterViewInit {
   }
 
   get frmArr(): FormArray {
-    return this.parentForm.get('mtbl2') as FormArray;
+    return this.parentForm().get('mtbl2') as FormArray;
   }
 
   getTeika(i: number): number {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, input } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
@@ -13,7 +13,7 @@ import { DepositService, Nyuden } from './deposit.service';
     standalone: false
 })
 export class DepttblComponent implements OnInit {
-  @Input() parentForm!: UntypedFormGroup;
+  readonly parentForm = input.required<UntypedFormGroup>();
   dataSource = new MatTableDataSource();
   displayedColumns: string[] = ['line',
     'ptype',
@@ -36,7 +36,7 @@ export class DepttblComponent implements OnInit {
     });
   }
   get frmArr(): UntypedFormArray {
-    return this.parentForm.get('mtbl') as UntypedFormArray;
+    return this.parentForm().get('mtbl') as UntypedFormArray;
   }
   delRow(row: number) {
     this.frmArr.removeAt(row);
@@ -58,7 +58,7 @@ export class DepttblComponent implements OnInit {
       lctmoneysum += arr[i]['tmoney'];
       lctotalmoney += arr[i]['total'];
     }
-    this.parentForm.patchValue({
+    this.parentForm().patchValue({
       nmoneysum: lcnmoneysum,
       smoneysum: lcsmoneysum,
       tmoneysum: lctmoneysum,
@@ -106,7 +106,7 @@ export class DepttblComponent implements OnInit {
           id: this.usrsrv.compid,
           kubun: 0,
           denno: dno,
-          day: this.usrsrv.editFrmday(this.parentForm, 'day'),
+          day: this.usrsrv.editFrmday(this.parentForm(), 'day'),
           line: this.usrsrv.editFrmval(control, 'line'),
           ptype: this.usrsrv.editFrmval(control, 'ptype'),
           nmoney: this.usrsrv.editFrmval(control, 'nmoney'),

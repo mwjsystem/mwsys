@@ -1,5 +1,5 @@
 <div class="mat-elevation-z8">
-  <ng-container [formGroup]="parentForm">
+  <ng-container [formGroup]="parentForm()">
     <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
       <!-- <table mat-table multiTemplateDataRows formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements"> -->
       <ng-container matColumnDef="action">

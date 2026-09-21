@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -19,8 +19,7 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class MovtblComponent implements OnInit {
-  @Input()
-    parentForm!: FormGroup;
+  readonly parentForm = input.required<FormGroup>();
   @ViewChild(MatPaginator, { static: false })
     paginator!: MatPaginator;
   @ViewChildren('gcdInputs')
@@ -171,25 +170,25 @@ export class MovtblComponent implements OnInit {
   setPable(i: number, gcd: string, msgzais: any) {
     // console.log(gcd, this.parentForm.get('incode').value);
     if (this.frmArr.controls[i].value.gskbn == "0") {
-      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('outcode')!.value).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm().get('outcode')!.value).then(result => {
         // console.log(result);
         this.frmArr.controls[i].patchValue({ pable: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
         // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
-      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('incode')!.value).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm().get('incode')!.value).then(result => {
         // console.log(result);
         this.frmArr.controls[i].patchValue({ stock: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
         // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
     } else if (this.frmArr.controls[i].value.gskbn == "1") {
-      this.stcsrv.getSetZai(this.parentForm.get('outcode')!.value, msgzais).then(result => {
+      this.stcsrv.getSetZai(this.parentForm().get('outcode')!.value, msgzais).then(result => {
         this.setZai[i] = result;
         this.frmArr.controls[i].patchValue({ pable: this.stcsrv.getPaabl(result) });
         this.movsrv.subject.next(true);
       });
-      this.stcsrv.getSetZai(this.parentForm.get('incode')!.value, msgzais).then(result => {
+      this.stcsrv.getSetZai(this.parentForm().get('incode')!.value, msgzais).then(result => {
         this.setZai[i] = result;
         this.frmArr.controls[i].patchValue({ stock: this.stcsrv.getPaabl(result) });
         this.movsrv.subject.next(true);
@@ -222,7 +221,7 @@ export class MovtblComponent implements OnInit {
   }
   get frmArr(): FormArray {
     // console.log(this.parentForm);    
-    return this.parentForm.get('mtbl') as FormArray;
+    return this.parentForm().get('mtbl') as FormArray;
   }
   frmVal(i: number, fld: string): string {
     return this.frmArr.getRawValue()[i][fld];
@@ -234,7 +233,7 @@ export class MovtblComponent implements OnInit {
         console.log(text);
         let rowData = text.split("\n");
         this.insRows(rowData, flg);
-        this.parentForm.markAsDirty();
+        this.parentForm().markAsDirty();
       });
     // }
   }
@@ -323,17 +322,18 @@ export class MovtblComponent implements OnInit {
       // console.log(e);
 
       e.msgood.msgzais.forEach(zai => {
+        const parentForm = this.parentForm();
         this.trzaiko.push({
-          scode: this.parentForm.get('incode')!.value,
+          scode: parentForm.get('incode')!.value,
           gcode: zai.zcode,
-          day: this.parentForm.get('day')!.value,
+          day: parentForm.get('day')!.value,
           movi: e.suu * zai.irisu * -1,
           movo: 0
         });
         this.trzaiko.push({
-          scode: this.parentForm.get('outcode')!.value,
+          scode: parentForm.get('outcode')!.value,
           gcode: zai.zcode,
-          day: this.parentForm.get('day')!.value,
+          day: parentForm.get('day')!.value,
           movi: 0,
           movo: e.suu * zai.irisu * -1,
         });

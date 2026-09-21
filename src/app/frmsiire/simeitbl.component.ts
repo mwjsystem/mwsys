@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -21,8 +21,7 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class SimeitblComponent implements OnInit {
-  @Input()
-    parentForm!: FormGroup;
+  readonly parentForm = input.required<FormGroup>();
   @ViewChild(MatPaginator, { static: false })
     paginator!: MatPaginator;
   @ViewChildren('gcdInputs')
@@ -77,7 +76,7 @@ export class SimeitblComponent implements OnInit {
           }
         }
       })
-    this.parentForm.patchValue({ gtotal: lcgtotal, tax: lctax, total: lcgtotal + lctax });
+    this.parentForm().patchValue({ gtotal: lcgtotal, tax: lctax, total: lcgtotal + lctax });
     this.smisrv.subject.next(true);
     this.refresh();
   }
@@ -129,7 +128,7 @@ export class SimeitblComponent implements OnInit {
   }
   get frmArr(): FormArray {
     // console.log(this.parentForm);    
-    return this.parentForm.get('mtbl') as FormArray;
+    return this.parentForm().get('mtbl') as FormArray;
   }
   pasteFromClipboard(flg: boolean) {
     // if(navigator.clipboard){
@@ -138,7 +137,7 @@ export class SimeitblComponent implements OnInit {
         console.log(text);
         let rowData = text.split("\n");
         this.insRows(rowData, flg);
-        this.parentForm.markAsDirty();
+        this.parentForm().markAsDirty();
       });
     // }
   }
@@ -221,7 +220,7 @@ export class SimeitblComponent implements OnInit {
     dialogConfig.height = '98%';
     dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.data = {
-      vcode: this.parentForm.value.vcode,
+      vcode: this.parentForm().value.vcode,
       gcode: this.frmArr.controls[i].value.gcode
     };
     let dialogRef = this.dialog.open(HmeihelpComponent, dialogConfig);

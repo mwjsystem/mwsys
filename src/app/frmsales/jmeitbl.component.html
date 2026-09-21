@@ -28,7 +28,7 @@
     >一括設定</button>
   }
   @if (frmArr.enabled) {
-    <button mat-flat-button class="w-48" color="accent" (click)="setKoguchi()" [disabled]="parentForm.invalid"
+    <button mat-flat-button class="w-48" color="accent" (click)="setKoguchi()" [disabled]="parentForm().invalid"
     matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips"　*ngIf="usrsrv.compid == 1">個口送料等計算</button>
   }
   <button mat-flat-button class="w-24 m-1" color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
@@ -47,7 +47,7 @@
 <!-- </div> -->
 </mat-toolbar>
 <div class="mat-elevation-z8">
-  <ng-container [formGroup]="parentForm">
+  <ng-container [formGroup]="parentForm()">
     <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
       <ng-container matColumnDef="chk" sticky>
         <th mat-header-cell *matHeaderCellDef class="i_num">

@@ -13,7 +13,7 @@
   </mat-menu>
 </div>
 <div class="mat-elevation-z8">
-  <ng-container [formGroup]="parentForm">
+  <ng-container [formGroup]="parentForm()">
     <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
       <ng-container matColumnDef="chk">
         <th mat-header-cell *matHeaderCellDef class="i_num">
@@ -107,7 +107,7 @@
             [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
             @if (frmArr.getRawValue()[getIdx(i)]['gcode']) {
               <button mat-icon-button matPrefix
-                (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],parentForm.getRawValue()['incode'])">
+                (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],parentForm().getRawValue()['incode'])">
                 <mat-icon>open_in_new</mat-icon>
               </button>
             }
@@ -123,7 +123,7 @@
             [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
             @if (frmArr.getRawValue()[getIdx(i)]['gcode']) {
               <button mat-icon-button matPrefix
-                (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],parentForm.getRawValue()['outcode'])">
+                (click)="usrsrv.openRepstc(frmArr.getRawValue()[getIdx(i)]['gcode'],parentForm().getRawValue()['outcode'])">
                 <mat-icon>open_in_new</mat-icon>
               </button>
             }

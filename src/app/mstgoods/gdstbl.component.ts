@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter, ViewChild, ViewEncapsulation, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ViewEncapsulation, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, output, input } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -22,14 +22,13 @@ import { GzaiComponent } from './../share/gzai/gzai.component';
     standalone: false
 })
 export class GdstblComponent {
-  @Input()
-    parentForm!: FormGroup;
+  readonly parentForm = input.required<FormGroup>();
   private paginator!: MatPaginator;
   @ViewChild(MatPaginator, { static: false }) set matPaginator(mp: MatPaginator) {
     this.paginator = mp;
     this.dataSource.paginator = this.paginator;
   }
-  @Output() action = new EventEmitter();
+  readonly action = output<{ flg: boolean; row: number; flgCP?: boolean }>();
   dataSource = new MatTableDataSource();
   displayedColumns = ['action', 'gcode', 'gtext', 'size', 'color', 'unit', 'gskbn', 'jan', 'weight', 'tkbn', 'max', 'send', 'ordering', 'koguchi', 'lot', 'vgcode', 'hgcode'];
   hidx = 6; //tabindex用ヘッダ項目数
@@ -67,7 +66,7 @@ export class GdstblComponent {
       this.frmArr.insert(row, this.createRow(false));
     }
     this.action.emit({ flg: true, row: row, flgCP: flgCP });//mstgoods.componentのメソッドins_throwに渡す引数
-    this.parentForm.markAsDirty();
+    this.parentForm().markAsDirty();
     this.refresh();
   }
 
@@ -111,7 +110,7 @@ export class GdstblComponent {
   }
 
   get frmArr(): FormArray {
-    return this.parentForm.get('mtbl') as FormArray;
+    return this.parentForm().get('mtbl') as FormArray;
   }
 
   frmVal(i: number, fld: string): string {
@@ -168,7 +167,7 @@ export class GdstblComponent {
           this.frmArr.controls[i].get('gcode')!.setErrors({ 'exist': true });
         }
       });
-    (this.parentForm.get('mtbl2') as FormArray).controls[i].get('gcode')!.setValue(val);
+    (this.parentForm().get('mtbl2') as FormArray).controls[i].get('gcode')!.setValue(val);
   }
   createRow(flg: boolean, goods?: mwI.Goods) {
     return this.fb.group({
