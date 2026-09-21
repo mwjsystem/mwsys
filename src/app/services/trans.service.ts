@@ -210,7 +210,7 @@ export class TransService {
       }                   
     }`;
     let lcprms2: Promise<Trans[]> = new Promise(resolve => {
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<TransQueryResult>({
         query: GetTran,
         variables: {
           id: this.usrsrv.compid,
@@ -224,7 +224,7 @@ export class TransService {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log('出荷',data);
-          const rows: TransQueryResult = data;
+          const rows = data as TransQueryResult;
           let trans: Trans[] = [];
           rows.shukka.forEach(e => {
             let lcsrtdy = e.sday ?? e.yday;

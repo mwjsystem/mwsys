@@ -57,7 +57,7 @@ export class GtnktblComponent implements OnInit, AfterViewInit {
     this.frmArr.removeAt(row);
     this.refresh();
   }
-  insRow(row: number, flgCp: any) {
+  insRow(row: number, flgCp?: boolean) {
     // console.log(row,value);
     if (flgCp) {
       this.frmArr.insert(row, this.createRow(this.frmArr.controls[row - 1].value));

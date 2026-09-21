@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class BlankPipe implements PipeTransform {
 
-  transform(value: any): any {
+  transform<T>(value: T): T | '' {
     if (typeof value == 'undefined') {
       return "";
     } else if (value === "none") {

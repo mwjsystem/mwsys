@@ -3,6 +3,9 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
 
+/** get_members クエリの結果 */
+interface MembersResult { msmember: mwI.Mcode[] }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,7 +29,7 @@ export class MembsService {
       }
     }`;
     return new Promise<Boolean>(resolve => {
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<MembersResult>({
         query: GetMast,
         variables: {
           id: this.usrsrv.compid
@@ -34,7 +37,7 @@ export class MembsService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          this.membs = data.msmember;
+          this.membs = (data as MembersResult).msmember;
           resolve(true);
         }, (error) => {
           console.log('error query get_members', error);

@@ -79,6 +79,9 @@ export type MovsubSet = Pick<Movsub, 'outcode' | 'incode' | 'tcode' | 'hcode' | 
 /** 保存時に移動明細（trmovden）へ渡す値 */
 export interface MovmeiInput { id: number; denno: number; line: number; gcode: string; suu: number; memo: string }
 
+/** 新規登録時に移動伝票（trmovsub）へ渡す値 */
+export type MovsubNew = MovsubSet & { id: number; denno: number; created_at: Date; created_by: string };
+
 interface AffectedRows { affected_rows: number }
 /** get_movden クエリの結果 */
 interface MovdenResult { trmovsub_by_pk: Movsub | null }
@@ -241,7 +244,7 @@ export class MovingService {
       });
     });
   }
-  insMovden(movsub: Movsub[], movmei: MovmeiInput[]): Promise<InsMovdenResult> {
+  insMovden(movsub: MovsubNew[], movmei: MovmeiInput[]): Promise<InsMovdenResult> {
     const InsertTran = gql`
       mutation ins_movsub($obj:[trmovsub_insert_input!]!,$objm:[trmovden_insert_input!]!) {
         insert_trmovsub(objects: $obj)  {

@@ -8,7 +8,7 @@ import { BunruiService } from './../../services/bunrui.service';
 // import { ToastrService } from 'ngx-toastr';
 
 
-interface Nymat {
+export interface Nymat {
   denno: number;
   line: number;
   yday: string;

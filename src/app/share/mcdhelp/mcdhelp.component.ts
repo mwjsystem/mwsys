@@ -9,6 +9,7 @@ import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
 import { StaffService } from './../../services/staff.service';
+import { HasuraCond, HasuraWhere } from './../help-where';
 
 export interface Mcd {
   mcode: string;
@@ -30,6 +31,13 @@ export interface Mcd {
 }
 
 
+/** 顧客検索の条件。where2 は住所（msmadrs）側の条件 */
+type McdWhere = HasuraWhere & { where2?: { _and?: HasuraCond[] } & HasuraCond };
+/** get_members クエリの住所 */
+interface McdAdr { eda: number; zip: string; region: string; local: string; street: string; extend: string; extend2: string; adrname: string; tel: string; tel2: string; tel3: string; fax: string }
+/** get_members クエリの顧客 */
+interface McdMember { mcode: string | number; sei: string; mei: string; kana: string; mail: string; mail2: string; mail3: string; mail4: string; mail5: string; tcode1: string; tcode2: string; msmadrs: McdAdr[] }
+interface McdResult { msmember: McdMember[] }
 @Component({
     selector: 'app-mcdhelp',
     templateUrl: './mcdhelp.component.html',
@@ -81,7 +89,7 @@ export class McdhelpComponent implements OnInit {
   }
 
   filterMcd() {
-    let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
+    let varWh: McdWhere = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     // console.log(varWh,varWh.where);
     if (this.fname) {
       varWh['where']._and.push({
@@ -118,7 +126,7 @@ export class McdhelpComponent implements OnInit {
     }
     if (this.ftel) {
       if (varWh['where2'] != null) {
-        varWh['where2']._and.push({ "ftel": { "_like": "%" + this.ftel + "%" } });
+        varWh['where2']._and!.push({ "ftel": { "_like": "%" + this.ftel + "%" } }); // ※ 住所名の条件が無いと _and が未設定で例外になる（既知の不具合。従来のまま）
       } else {
         varWh['where2'] = { "ftel": { "_like": "%" + this.ftel + "%" } };
       }
@@ -132,7 +140,7 @@ export class McdhelpComponent implements OnInit {
     }
     if (this.feda0) {
       if (varWh['where2'] != null) {
-        varWh['where2']._and.push({ "eda": { "_eq": 0 } });
+        varWh['where2']._and!.push({ "eda": { "_eq": 0 } }); // ※ 電話番号のみの条件だと _and が未設定で例外になる（既知の不具合。従来のまま）
       } else {
         varWh['where2'] = { "eda": { "_eq": 0 } };
       }
@@ -143,12 +151,13 @@ export class McdhelpComponent implements OnInit {
     // console.log(varWh, varWh['where2'] != null);
     this.mcds = [];
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<McdResult>({
       query: Query.GetMast,
       variables: varWh
     })
       .valueChanges
-      .subscribe(({ data }) => {
+      .subscribe(({ data: raw }) => {
+        const data = raw as McdResult;
         for (let i = 0; i < data.msmember.length; i++) {
           for (let j = 0; j < data.msmember[i].msmadrs.length; j++) {
             this.mcds.push({

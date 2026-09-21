@@ -7,7 +7,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
-import { Zaiko, Movsub, MovingService } from './moving.service';
+import { Zaiko, Movsub, MovingService, MovsubSet, MovsubNew } from './moving.service';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
@@ -160,7 +160,7 @@ export class FrmmoveComponent implements OnInit {
     this.getMovden(this.denno);
   }
 
-  openOkuri(hcode: any, value: string) {
+  openOkuri(hcode: string, value: string) {
     window.open(this.okrsrv.getUrl(hcode) + value, '_blank');
   }
 
@@ -223,7 +223,7 @@ export class FrmmoveComponent implements OnInit {
   }
 
   async save() {
-    let movsub: any = {
+    let movsub: MovsubSet = {
       day: this.usrsrv.editFrmday(this.form, 'day'),
       outcode: this.usrsrv.editFrmval(this.form, 'outcode'),
       incode: this.usrsrv.editFrmval(this.form, 'incode'),
@@ -272,7 +272,7 @@ export class FrmmoveComponent implements OnInit {
 	  // console.log('sinki1',this.denno);
       const movmei = this.movtbl()!.getMovmei(this.denno);
 	  // console.log('sinki',movmei);
-      const trmovsub: Movsub[] = [{
+      const trmovsub: MovsubNew[] = [{
         ...{
           id: this.usrsrv.compid,
           denno: this.denno,

@@ -11,7 +11,7 @@ import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
 
 import { JmeitblComponent } from './jmeitbl.component';
-import { JyumeiService } from './jyumei.service';
+import { JyumeiService, JyudenSet, JyudenNew } from './jyumei.service';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { BunshoService } from './../services/bunsho.service';
@@ -667,7 +667,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 	this.jmisrv.isSaving = true;  
     // console.log(Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')), this.usrsrv.editFrmval(this.form, 'iadr'),);
     // console.log(this.form.get('iadr'), this.usrsrv.editFrmval(this.form, 'iadr'));
-    let jyuden: any = {
+    let jyuden: JyudenSet = {
       torikbn: Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')),
       updated_at: new Date(),
       updated_by: this.usrsrv.staff.code,
@@ -758,7 +758,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
         this.jmeitbl()!.editJyumei(this.jmisrv.denno);
         const jyumei = this.jmisrv.trjyumei;
         let jyumzai = this.jmisrv.trjmzai;
-        const trjyuden: mwI.Trjyuden[] = [{
+        const trjyuden: JyudenNew[] = [{
           ...{
             id: this.usrsrv.compid,
             denno: this.jmisrv.denno,

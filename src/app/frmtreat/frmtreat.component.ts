@@ -18,6 +18,10 @@ import { filter } from 'rxjs/operators';
 // import { ToastrService } from 'ngx-toastr';
 
 
+/** get_treat クエリの変数。mcode は顧客コード、grpcd は商品グループ（あいまい検索） */
+interface TreatVars { id: number; mcode?: number; grpcd?: string }
+/** get_treat クエリの結果 */
+interface TreatResult { trtreat: mwI.Trtreat[] }
 @Component({
     selector: 'app-frmtreat',
     templateUrl: './frmtreat.component.html',
@@ -75,7 +79,7 @@ export class FrmtreatComponent implements OnInit {
       filter(p => Object.keys(p).length !== 0)
     ).subscribe(
       params => {
-        let vars: { [key: string]: any } = { "id": this.usrsrv.compid };
+        let vars: TreatVars = { "id": this.usrsrv.compid };
         // console.log(params);
         Object.keys(params).map(k => {
           if (k == "mcode") {
@@ -112,7 +116,7 @@ export class FrmtreatComponent implements OnInit {
 
 
 
-  getTreat(params: { [key: string]: any }) {
+  getTreat(params: TreatVars) {
     const GetTrt = gql`
     query get_treat($id: smallint!, $mcode: Int, $grpcd: String) {
       trtreat(where: {id: {_eq: $id}, mcode: {_eq: $mcode}, grpcode: {_ilike: $grpcd}}, order_by: {seq: asc}) {
@@ -134,13 +138,13 @@ export class FrmtreatComponent implements OnInit {
     }`;
 
     // console.log(params);
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<TreatResult>({
       query: GetTrt,
       variables: params,
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.trtsrv.trts = data.trtreat;
+        this.trtsrv.trts = (data as TreatResult).trtreat;
         if (this.trtsrv.trts.length == 0) {
           this.usrsrv.toastInf("条件に一致する問合せ記録はありません");
         }

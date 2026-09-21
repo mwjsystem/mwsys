@@ -13,6 +13,9 @@ export interface Ggrp {
   tcode: string;
 }
 
+/** get_groups クエリの結果 */
+interface GgroupsResult { msggroup: Ggrp[] }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -42,7 +45,7 @@ export class GoodsService {
         }
       }`;
     return new Promise<Boolean>(resolve => {
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<GgroupsResult>({
         query: GetMast,
         variables: {
           id: this.usrsrv.compid
@@ -50,7 +53,7 @@ export class GoodsService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          this.ggrps = data.msggroup;
+          this.ggrps = (data as GgroupsResult).msggroup;
           resolve(true);
         }, (error) => {
           console.log('error query get_ggroups', error);

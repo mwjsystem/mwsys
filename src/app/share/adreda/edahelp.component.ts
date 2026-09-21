@@ -16,7 +16,7 @@ export class EdahelpComponent implements OnInit {
   private dialogRef = inject<MatDialogRef<EdahelpComponent>>(MatDialogRef);
 
   readonly paginator = viewChild(MatPaginator);
-  public filters: any = [{ id: 'adrname', value: '' },
+  public filters: { id: string; value: string }[] = [{ id: 'adrname', value: '' },
   { id: 'region', value: '' },
   { id: 'local', value: '' },
   { id: 'tel', value: '' },
@@ -62,7 +62,7 @@ export class EdahelpComponent implements OnInit {
     this.dataSource = new MatTableDataSource<mwI.Edahlp>(this.memsrv.edas);
     this.dataSource.paginator = this.paginator() ?? null;
   }
-  selEda(selected: any) {
+  selEda(selected: mwI.Edahlp) {
     // console.log("select",selected);
     this.dialogRef.close(selected);
   }

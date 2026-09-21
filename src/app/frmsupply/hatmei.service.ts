@@ -18,6 +18,9 @@ export type HatdenSet = Pick<mwI.Hatden, 'vcode' | 'scode' | 'tcode' | 'dmemo' |
   updated_at: Date;
 };
 
+/** 新規登録時に発注伝票（trhatden）へ渡す値。hdstatus は発注状況 */
+export type HatdenNew = HatdenSet & { id: number; denno: number; created_at: Date; created_by: string; hdstatus: string };
+
 interface AffectedRows { affected_rows: number }
 /** get_hatden クエリの結果 */
 interface HatdenResult { trhatden_by_pk: mwI.Trhatden | null }
@@ -143,7 +146,7 @@ export class HatmeiService {
       });
     });
   }
-  insHatden(hatden: mwI.Trhatden[], hatmei: HatmeiInput[]): Promise<InsHatdenResult> {
+  insHatden(hatden: HatdenNew[], hatmei: HatmeiInput[]): Promise<InsHatdenResult> {
     const InsertTran = gql`
       mutation ins_hatden($obj:[trhatden_insert_input!]!,$objm:[trhatmei_insert_input!]!) {
         insert_trhatden(objects: $obj)  {

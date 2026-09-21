@@ -12,6 +12,9 @@ import { VendsService } from './vends.service';
 // import { ToastrService } from 'ngx-toastr';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 
+/** get_vendor クエリの結果 */
+interface VendorResult { msvendor_by_pk: mwI.Vendor & { created_at: Date; updated_at: Date; created_by: string; updated_by: string } }
+
 @Component({
     selector: 'app-mstvendor',
     templateUrl: './mstvendor.component.html',
@@ -148,7 +151,7 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
         updated_by
       }
     }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<VendorResult>({
       query: GetMast,
       variables: {
         id: this.usrsrv.compid,
@@ -157,9 +160,10 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.form.patchValue(data.msvendor_by_pk);
-        console.log(data.msvendor_by_pk);
-        this.usrsrv.setTmstmp(data.msvendor_by_pk);
+        const vendor = (data as VendorResult).msvendor_by_pk;
+        this.form.patchValue(vendor);
+        console.log(vendor);
+        this.usrsrv.setTmstmp(vendor);
         history.replaceState('', '', './mstvendor/' + this.mode + '/' + this.vcd);
         if (this.mode == 3) {
           this.form.disable();

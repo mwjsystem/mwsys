@@ -13,6 +13,7 @@ import { StaffService } from './../../services/staff.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { McdhelpComponent } from './../mcdhelp/mcdhelp.component';
 import { JdnohelpComponent } from './../jdnohelp/jdnohelp.component';
+import { HasuraWhere } from './../help-where';
 
 interface Nyusub {
   denno: number;
@@ -29,6 +30,9 @@ interface Nyusub {
   smoney: number;
   tmoney: number;
 }
+
+/** get_nyuden クエリの結果 */
+interface NyusubResult { trnyusub: Nyusub[] }
 
 @Component({
     selector: 'app-ndnohelp',
@@ -125,7 +129,7 @@ export class NdnohelpComponent implements OnInit {
   }
 
   get_nyuden(): void {
-    let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
+    let varWh: HasuraWhere = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     if (this.ftype == "0") {
       varWh.where._and.push({ "kubun": { "_eq": 0 } });
     } else if (this.ftype == "1") {
@@ -164,7 +168,7 @@ export class NdnohelpComponent implements OnInit {
       }
     }`;
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<NyusubResult>({
       query: GetTran,
       variables: varWh
     })
@@ -172,10 +176,10 @@ export class NdnohelpComponent implements OnInit {
       .subscribe(({ data }) => {
         // console.log(data);
         // this.subject.next(data.trjyuden);
-        if (data.trnyusub.length == 0) {
+        if ((data as NyusubResult).trnyusub.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          let srcdata = data.trnyusub;
+          let srcdata = (data as NyusubResult).trnyusub;
           this.dataSource = new MatTableDataSource<Nyusub>(srcdata);
           this.dataSource.paginator = this.paginator() ?? null;
         }

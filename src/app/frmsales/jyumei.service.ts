@@ -14,6 +14,21 @@ export type TrjyumeiRow = Pick<mwI.Jyumei, 'line' | 'gcode' | 'gtext' | 'suu' | 
 };
 /** 受注明細の在庫内訳（trjyumzai_insert_input） */
 export interface TrjmzaiRow { id: number; denno: number; line: number; eda: number; gcode: string; suu: number; spec: string | null; spdet: string | null }
+/** 保存時に受注伝票（trjyuden）へ渡す値。日付は日付文字列（未入力は null） */
+export type JyudenSet = Pick<mwI.Jyuden, 'torikbn' | 'updated_by' | 'mcode' | 'scde' | 'ncode' | 'nadr' | 'tcode' | 'scode' | 'skbn' | 'jcode' | 'pcode' | 'hcode' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'nmemo' | 'omemo' | 'smemo' | 'cusden' | 'ryoate' | 'daibiki' | 'daibzei' | 'daibunrui' | 'chubunrui' | 'shobunrui' | 'tcode1' | 'gtotalzn' | 'soryozn' | 'tesuzn' | 'nebikizn' | 'taxtotal' | 'total' | 'genka' | 'hgenka' | 'egenka' | 'iadr' | 'total8' | 'total10' | 'dokono' | 'del'> & {
+  updated_at: Date;
+  buntype: string;
+  eidome: string | null;
+  eicode: string | null;
+  day: string | null;
+  yday: string | null;
+  sday: string | null;
+  uday: string | null;
+  nday: string | null;
+  hday: string | null;
+};
+/** 新規登録時に受注伝票（trjyuden）へ渡す値 */
+export type JyudenNew = JyudenSet & { id: number; denno: number; created_at: Date; created_by: string };
 interface JyudenResult { trjyuden_by_pk: mwI.Trjyuden }
 interface ZaikoUpdateResult { update_trzaiko: AffectedRows }
 interface ZaikoInsertResult { insert_trzaiko: AffectedRows }
@@ -237,7 +252,7 @@ export class JyumeiService {
     });
   }
 
-  updJyuden(denno: number, jyuden: Partial<mwI.Jyuden>, jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[]): Promise<JyudenUpdateResult> {
+  updJyuden(denno: number, jyuden: JyudenSet, jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[]): Promise<JyudenUpdateResult> {
     const UpdateTran = gql`
       mutation upd_jyuden($id: smallint!, $hdno: Int!,$_set: trjyuden_set_input!,$obj:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
         update_trjyuden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -282,7 +297,7 @@ export class JyumeiService {
     });
   }
 
-  insJyuden(jyuden: mwI.Trjyuden[], jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[]): Promise<JyudenInsertResult> {
+  insJyuden(jyuden: JyudenNew[], jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[]): Promise<JyudenInsertResult> {
     const InsertTran = gql`
       mutation ins_jyuden($obj:[trjyuden_insert_input!]!,$objm:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
         insert_trjyuden(objects: $obj)  {

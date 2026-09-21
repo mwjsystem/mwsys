@@ -8,13 +8,16 @@ import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstg';
 import { UserService } from './../services/user.service';
 import { StoreService } from './../services/store.service';
-import { StockService } from './../services/stock.service';
+import { StockService, GzaiRef } from './../services/stock.service';
 import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
 import { GzaiComponent } from './../share/gzai/gzai.component';
 
 /** 単価行の追加(flg=true)・削除(flg=false)を、親の mstgoods へ伝えるイベントの値 */
 export type TnkAction = { flg: boolean; row: number; flgCP?: boolean };
+
+/** 商品コードの重複確認クエリの結果（登録済みの商品グループ） */
+interface GoodsCheckResult { msgoods: { msggroup: { code: string } }[] }
 
 @Component({
     selector: 'app-gdstbl',
@@ -142,7 +145,7 @@ export class GdstblComponent {
     let val: string = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);  //小文字全角→大文字半角変換
     this.frmArr.controls[i].get('gcode')!.setErrors(null);
     this.frmArr.controls[i].get('gcode')!.setValue(val);
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<GoodsCheckResult>({
       query: Query.GetMast2,
       variables: {
         id: this.usrsrv.compid,
@@ -152,7 +155,7 @@ export class GdstblComponent {
     }).valueChanges
       .subscribe(({ data }) => {
         // console.log(data); 
-        if (data.msgoods.length == 0) {
+        if ((data as GoodsCheckResult).msgoods.length == 0) {
           let j: number = 0;
           this.frmArr.controls
             .forEach(control => {
@@ -164,7 +167,7 @@ export class GdstblComponent {
               j += 1;
             });
         } else {
-          this.usrsrv.toastErr(val + 'は商品ｸﾞﾙｰﾌﾟ' + data.msgoods[0].msggroup.code + 'で登録済です', '商品コード入力エラー');
+          this.usrsrv.toastErr(val + 'は商品ｸﾞﾙｰﾌﾟ' + (data as GoodsCheckResult).msgoods[0].msggroup.code + 'で登録済です', '商品コード入力エラー');
           this.frmArr.controls[i].get('gcode')!.setErrors({ 'exist': true });
         }
       });
@@ -236,7 +239,7 @@ export class GdstblComponent {
     });
   }
 
-  getPable(i: number, gcd: string, msgzais: any) {
+  getPable(i: number, gcd: string, msgzais: GzaiRef[]) {
     // console.log(this.frmArr.controls[i].value,i);
     if (this.frmArr.controls[i].value.gskbn == "0") {
       // console.log(this.scode);

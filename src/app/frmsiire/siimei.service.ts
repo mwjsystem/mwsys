@@ -15,6 +15,9 @@ export type SiidenSet = Pick<mwI.Siiden, 'vcode' | 'scode' | 'tcode' | 'dmemo' |
   updated_at: Date;
 };
 
+/** 新規登録時に仕入伝票（trsiiden）へ渡す値 */
+export type SiidenNew = SiidenSet & { id: number; denno: number; created_at: Date; created_by: string };
+
 interface AffectedRows { affected_rows: number }
 /** get_siiden クエリの結果 */
 interface SiidenResult { trsiiden_by_pk: mwI.Trsiiden | null }
@@ -154,7 +157,7 @@ export class SiimeiService {
       });
     });
   }
-  insSiiden(siiden: mwI.Trsiiden[], siimei: SiimeiInput[]): Promise<InsSiidenResult> {
+  insSiiden(siiden: SiidenNew[], siimei: SiimeiInput[]): Promise<InsSiidenResult> {
     const InsertTran = gql`
       mutation ins_siiden($obj:[trsiiden_insert_input!]!,$objm:[trsiimei_insert_input!]!) {
         insert_trsiiden(objects: $obj)  {

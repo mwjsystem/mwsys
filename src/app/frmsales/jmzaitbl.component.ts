@@ -1,13 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { SpdethelpComponent } from './../share/spdethelp/spdethelp.component';
+import { SpdethelpComponent, Nymat } from './../share/spdethelp/spdethelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 // import { StockService } from './../services/stock.service';
 // import { ToastrService } from 'ngx-toastr';
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
+
+/** get_nymat クエリの結果（入荷予定） */
+interface NymatResult { vnymat: Nymat[] }
 
 export class Jmzai {
   eda!: number;
@@ -50,7 +53,7 @@ export class JmzaitblComponent implements OnInit {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width = '100vw';
     dialogConfig.height = '98%';
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<NymatResult>({
       query: Query.GetTran,
       variables: {
         id: this.usrsrv.compid,
@@ -60,11 +63,11 @@ export class JmzaitblComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        if (data.vnymat.length == 0) {
+        if ((data as NymatResult).vnymat.length == 0) {
           this.usrsrv.toastWar("入荷予定が見つかりません");
         } else {
           dialogConfig.data = {
-            nymat: data.vnymat,
+            nymat: (data as NymatResult).vnymat,
             suu: this.dataSource.data[i].suu
           };
           let dialogRef = this.dialog.open(SpdethelpComponent, dialogConfig);
@@ -84,7 +87,7 @@ export class JmzaitblComponent implements OnInit {
 
   }
 
-  edited(selected: any) {
+  edited(selected: Jmzai[]) {
     this.dialogRef.close(selected);
   }
 

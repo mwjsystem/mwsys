@@ -15,7 +15,7 @@ import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
 import { VendsService } from './../mstvendor/vends.service';
-import { SiimeiService } from './siimei.service';
+import { SiimeiService, SiidenSet, SiidenNew } from './siimei.service';
 import { HatmeiService } from './../frmsupply/hatmei.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
@@ -188,7 +188,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
   }
 
 
-  test(value: any) {
+  test(value: unknown) {
     // this.toastr.info(this.form.value.yday);
     console.log(this.simeitbl()!.getSiimei(this.denno));
     this.refresh();
@@ -279,7 +279,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
   }
   async save() {
 
-    let siiden: any = {
+    let siiden: SiidenSet = {
       // id: this.usrsrv.compid,
       // denno: this.denno,
       vcode: this.usrsrv.editFrmval(this.form, 'vcode'),
@@ -311,7 +311,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('sdenno', 1, this.denno);
       const siimei = this.simeitbl()!.getSiimei(this.denno);
-      const trsiiden: mwI.Trsiiden[] = [{
+      const trsiiden: SiidenNew[] = [{
         ...{
           id: this.usrsrv.compid,
           denno: this.denno,

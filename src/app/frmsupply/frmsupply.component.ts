@@ -15,7 +15,7 @@ import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
 import { VendsService } from './../mstvendor/vends.service';
 import { DownloadService } from './../services/download.service';
-import { HatmeiService } from './hatmei.service';
+import { HatmeiService, HatdenSet, HatdenNew } from './hatmei.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -167,7 +167,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     let vend = this.vensrv.getVendor(value);
     this.form.patchValue({ mtax: vend?.mtax, currency: vend?.currency });
   }
-  test(value: any) {
+  test(value: unknown) {
     this.usrsrv.toastInf(this.form.value.yday);
     // this.usrsrv.getNumber('denno',2).subscribe(value => {
     //   console.log(value);
@@ -293,7 +293,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
 
   async save() {
 
-    let hatden: any = {
+    let hatden: HatdenSet = {
       // id: this.usrsrv.compid,
       // denno: this.denno,
       vcode: this.usrsrv.editFrmval(this.form, 'vcode'),
@@ -328,7 +328,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('hdenno', 1, this.denno);
       const hatmei = this.hmeitbl()!.getHatmei(this.denno);
-      const trhatden: mwI.Trhatden[] = [{
+      const trhatden: HatdenNew[] = [{
         ...{
           id: this.usrsrv.compid,
           denno: this.denno,

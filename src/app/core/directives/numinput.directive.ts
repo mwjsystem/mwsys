@@ -12,7 +12,7 @@ export class NuminputDirective {
 
   
   private el: HTMLInputElement;
-  private value: any;
+  private value: string = '';
   
   constructor() {
     this.el = this.elementRef.nativeElement;
@@ -25,7 +25,7 @@ export class NuminputDirective {
 
   // }
 
-  onBlur(value: any) {
+  onBlur(value: string) {
     this.transform(value)
   }
 

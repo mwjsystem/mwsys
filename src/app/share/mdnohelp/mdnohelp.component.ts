@@ -11,6 +11,7 @@ import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { StoreService } from './../../services/store.service';
 import { StaffService } from './../../services/staff.service';
+import { HasuraWhere } from './../help-where';
 
 interface Movsub {
   denno: number;
@@ -22,6 +23,9 @@ interface Movsub {
   updated_at: Date;
   updated_by: string
 }
+
+/** get_movden クエリの結果 */
+interface MovsubResult { trmovsub: Movsub[] }
 
 @Component({
     selector: 'app-mdnohelp',
@@ -69,7 +73,7 @@ export class MdnohelpComponent implements OnInit {
     this.fday.setMonth(this.fday.getMonth() - 1);
   }
   get_movden(): void {
-    let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
+    let varWh: HasuraWhere = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     if (this.fday) {
       varWh.where._and.push({ "day": { "_gt": this.fday } });
     }
@@ -96,16 +100,16 @@ export class MdnohelpComponent implements OnInit {
       }
     }`;
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<MovsubResult>({
       query: GetTran,
       variables: varWh
     })
       .valueChanges
       .subscribe(({ data }) => {
-        if (data.trmovsub.length == 0) {
+        if ((data as MovsubResult).trmovsub.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          let srcdata = data.trmovsub;
+          let srcdata = (data as MovsubResult).trmovsub;
           this.dataSource = new MatTableDataSource<Movsub>(srcdata);
           this.dataSource.paginator = this.paginator() ?? null;
         }
