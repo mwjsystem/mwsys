@@ -124,6 +124,7 @@ export class MovtblComponent implements OnInit {
           console.log(msgds);
           this.frmArr.controls[i].get('gcode')!.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
+          this.getMtbl(i, 'msgzais').clear(); // 商品コードを変えたとき、前の商品の構成品を残さない
           msgds.msgzais.forEach(e => {
             let arr = []
             if (e.msgoods.gskbn == "0") {
@@ -142,7 +143,7 @@ export class MovtblComponent implements OnInit {
   }
   createRow(i: number, movden?: Movden) {
     let lcArr: FormArray = this.fb.array([]);
-    if (movden?.msgood.gskbn == "1") {
+    if (movden?.msgood.gskbn == "0" || movden?.msgood.gskbn == "1") { // 数量区分 0:在庫品 1:セット品（構成品ごとの在庫を更新するため）
       movden.msgood.msgzais.forEach(e => {
         if (e.msgoods.gskbn == "0") {
           lcArr.push(this.fb.group({ zcode: e.zcode, irisu: e.irisu, msgoods: e.msgoods }));
@@ -298,6 +299,27 @@ export class MovtblComponent implements OnInit {
       });
     return movmei;
   }
+  /** 保存後に加算する在庫データ（setMovmei が作る読込時の取り消し用 trzaiko と対）。各明細の構成品ごとに、入庫先へ加算・出庫元から減算する */
+  getZaikoNew(day: string | null, incode: string, outcode: string): Zaiko[] {
+    const zaikoNew: Zaiko[] = [];
+    if (day == null) {
+      return zaikoNew;
+    }
+    const lcday: string = day;
+    this.frmArr.controls
+      .forEach(control => {
+        control.value.msgzais.forEach((zai: Pick<Gzai, 'zcode' | 'irisu'>) => {
+          const lcsuu: number = control.value.suu * zai.irisu;
+          zaikoNew.push({ scode: incode, gcode: zai.zcode, day: lcday, movi: lcsuu, movo: 0 });
+          zaikoNew.push({ scode: outcode, gcode: zai.zcode, day: lcday, movi: 0, movo: lcsuu });
+        });
+      });
+    return zaikoNew;
+  }
+  /** 保存した内容の取り消し用データに入れ替える（保存後にもう一度変更保存したとき、保存済みの内容を戻せるようにする） */
+  setTrzaikoFrom(zaikoNew: Zaiko[]) {
+    this.trzaiko = zaikoNew.map(z => ({ ...z, movi: z.movi == 0 ? 0 : z.movi * -1, movo: z.movo == 0 ? 0 : z.movo * -1 }));
+  }
   objectToArray(obj: object): string {
     var result = Object.keys(obj).map((key: string) => {
       let value = (obj as Record<string, unknown>)[key];
@@ -314,6 +336,7 @@ export class MovtblComponent implements OnInit {
   }
   setMovmei(movdens: Movden[]) {
     this.frmArr.clear();
+    this.trzaiko = []; // 別の伝票を読み込んだとき、前の伝票の取り消し用データを残さない
     let i: number = 0;
     movdens.forEach(e => {
       this.frmArr.push(this.createRow(i + 1, e));

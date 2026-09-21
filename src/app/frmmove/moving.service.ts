@@ -78,8 +78,6 @@ export type MovsubSet = Pick<Movsub, 'outcode' | 'incode' | 'tcode' | 'hcode' | 
 };
 /** 保存時に移動明細（trmovden）へ渡す値 */
 export interface MovmeiInput { id: number; denno: number; line: number; gcode: string; suu: number; memo: string }
-/** 移動明細に商品（msgood）の情報が付いた形。読込時の Movden と同じ */
-export type MovmeiWithGood = MovmeiInput & { msgood: Movden['msgood'] };
 
 interface AffectedRows { affected_rows: number }
 /** get_movden クエリの結果 */

@@ -7,7 +7,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
-import { Zaiko, Movsub, MovmeiWithGood, MovingService } from './moving.service';
+import { Zaiko, Movsub, MovingService } from './moving.service';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
@@ -252,43 +252,13 @@ export class FrmmoveComponent implements OnInit {
             this.movsrv.updZaiko(e);
           });
 
-          //  zaiko更新処理 (通常分プラス)
-          // ※ getMovmei の行には msgood が無いため、ここで e.msgood が undefined になる（既知の不具合。従来の動作のまま型だけ明示）
-          (movmei as MovmeiWithGood[]).forEach(e => {
-            if (e.msgood.gskbn == "0") {
-              this.movsrv.updZaiko({
-                scode: movsub.incode,
-                gcode: e.gcode,
-                day: movsub.day,
-                movi: e.suu,
-                movo: 0
-              });
-              this.movsrv.updZaiko({
-                scode: movsub.outcode,
-                gcode: e.gcode,
-                day: movsub.day,
-                movi: 0,
-                movo: e.suu
-              });
-            } else if (e.msgood.gskbn == "1") {
-              e.msgood.msgzais.forEach(zai => {
-                this.movsrv.updZaiko({
-                  scode: movsub.incode,
-                  gcode: zai.zcode,
-                  day: movsub.day,
-                  movi: e.suu * zai.irisu,
-                  movo: 0
-                });
-                this.movsrv.updZaiko({
-                  scode: movsub.outcode,
-                  gcode: zai.zcode,
-                  day: movsub.day,
-                  movi: 0,
-                  movo: e.suu * zai.irisu
-                });
-              });
-            }
+          //  zaiko更新処理 (通常分プラス)。各明細の構成品ごとに、入庫先へ加算・出庫元から減算
+          const zaikoNew = this.movtbl()!.getZaikoNew(movsub.day, movsub.incode, movsub.outcode);
+          zaikoNew.forEach(z => {
+            this.movsrv.updZaiko(z);
           });
+          //  保存後にもう一度変更保存しても在庫が狂わないよう、取り消し用データを今回の内容に入れ替える
+          this.movtbl()!.setTrzaikoFrom(zaikoNew);
           this.form.markAsPristine();
           this.cancel();
         }).catch(error => {
