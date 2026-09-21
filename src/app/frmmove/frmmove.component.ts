@@ -7,7 +7,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
-import { Zaiko, Movsub, MovingService } from './moving.service';
+import { Zaiko, Movsub, MovmeiWithGood, MovingService } from './moving.service';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
@@ -253,7 +253,8 @@ export class FrmmoveComponent implements OnInit {
           });
 
           //  zaiko更新処理 (通常分プラス)
-          movmei.forEach(e => {
+          // ※ getMovmei の行には msgood が無いため、ここで e.msgood が undefined になる（既知の不具合。従来の動作のまま型だけ明示）
+          (movmei as MovmeiWithGood[]).forEach(e => {
             if (e.msgood.gskbn == "0") {
               this.movsrv.updZaiko({
                 scode: movsub.incode,
@@ -270,7 +271,7 @@ export class FrmmoveComponent implements OnInit {
                 movo: e.suu
               });
             } else if (e.msgood.gskbn == "1") {
-              e.msgood.msgzais.forEach((zai: { zcode: any; irisu: number; }) => {
+              e.msgood.msgzais.forEach(zai => {
                 this.movsrv.updZaiko({
                   scode: movsub.incode,
                   gcode: zai.zcode,

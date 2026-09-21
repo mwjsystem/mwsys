@@ -67,6 +67,30 @@ export class Movsub {
   }
 }
 
+/** 保存時に移動伝票（trmovsub）の更新へ渡す値。day / hday は日付文字列（未入力は null） */
+export type MovsubSet = Pick<Movsub, 'outcode' | 'incode' | 'tcode' | 'hcode' | 'htime' | 'okurisuu' | 'okurino' | 'omemo'> & {
+  day: string | null;
+  hday: string | null;
+  dmemo: string;
+  smemo: string;
+  updated_at: Date;
+  updated_by: string;
+};
+/** 保存時に移動明細（trmovden）へ渡す値 */
+export interface MovmeiInput { id: number; denno: number; line: number; gcode: string; suu: number; memo: string }
+/** 移動明細に商品（msgood）の情報が付いた形。読込時の Movden と同じ */
+export type MovmeiWithGood = MovmeiInput & { msgood: Movden['msgood'] };
+
+interface AffectedRows { affected_rows: number }
+/** get_movden クエリの結果 */
+interface MovdenResult { trmovsub_by_pk: Movsub | null }
+/** upd_zaiko / ins_zaiko ミューテーションの結果 */
+interface UpdZaikoResult { update_trzaiko: AffectedRows }
+interface InsZaikoResult { insert_trzaiko: AffectedRows }
+/** upd_movsub ミューテーションの結果 */
+export interface UpdMovdenResult { update_trmovsub: AffectedRows; delete_trmovden: AffectedRows; insert_trmovden: AffectedRows }
+/** ins_movsub ミューテーションの結果 */
+export interface InsMovdenResult { insert_trmovsub: AffectedRows; insert_trmovden: AffectedRows }
 @Injectable({
   providedIn: 'root'
 })
@@ -115,9 +139,9 @@ export class MovingService {
       }
     }`;
 
-  qryMovden(denno: number): Observable<Movsub> {
-    let observable: Observable<Movsub> = new Observable<Movsub>(observer => {
-      this.apollo.watchQuery<any>({
+  qryMovden(denno: number): Observable<Movsub | null> {
+    let observable: Observable<Movsub | null> = new Observable<Movsub | null>(observer => {
+      this.apollo.watchQuery<MovdenResult>({
         query: this.GetTran,
         variables: {
           id: this.usrsrv.compid,
@@ -126,7 +150,7 @@ export class MovingService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          observer.next(data.trmovsub_by_pk);
+          observer.next((data as MovdenResult).trmovsub_by_pk);
         }, (error) => {
           observer.error(error);
         });
@@ -134,7 +158,7 @@ export class MovingService {
     return observable;
   }
 
-  updZaiko(zai: any) {
+  updZaiko(zai: Zaiko) {
     const UpdateTran = gql`
       mutation upd_zaiko($id:smallint!,$scd:String!,$gcd:String!,$day:date!,$inc: trzaiko_inc_input!) {
         update_trzaiko(where:{id:{_eq:$id},scode:{_eq:$scd},gcode:{_eq:$gcd},day:{_eq:$day}}, _inc: $inc)  {
@@ -147,7 +171,7 @@ export class MovingService {
           affected_rows
         }
       }`;
-    this.apollo.mutate<any>({
+    this.apollo.mutate<UpdZaikoResult>({
       mutation: UpdateTran,
       variables: {
         id: this.usrsrv.compid,
@@ -158,8 +182,8 @@ export class MovingService {
       },
     }).subscribe(({ data }) => {
       // console.log(zai, data);
-      if (data.update_trzaiko.affected_rows == 0) {
-        this.apollo.mutate<any>({
+      if ((data as UpdZaikoResult).update_trzaiko.affected_rows == 0) {
+        this.apollo.mutate<InsZaikoResult>({
           mutation: InsertTran,
           variables: {
             obj: [{
@@ -182,7 +206,7 @@ export class MovingService {
     });
   }
 
-  updMovden(denno: number, movsub: any, movmei: any[]): Promise<string> {
+  updMovden(denno: number, movsub: MovsubSet, movmei: MovmeiInput[]): Promise<UpdMovdenResult> {
     const UpdateTran = gql`
       mutation upd_movsub($id: smallint!, $dno: Int!,$_set: trmovsub_set_input!,$obj:[trmovden_insert_input!]!) {
         update_trmovsub(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: $_set)  {
@@ -196,7 +220,7 @@ export class MovingService {
         }
       }`;
     return new Promise((resolve, reject) => {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<UpdMovdenResult>({
         mutation: UpdateTran,
         variables: {
           id: this.usrsrv.compid,
@@ -213,13 +237,13 @@ export class MovingService {
             },
           }],
       }).subscribe(({ data }) => {
-        return resolve(data);
+        return resolve(data as UpdMovdenResult);
       }, (error) => {
         return reject(error);
       });
     });
   }
-  insMovden(movsub: Movsub[], movmei: any[]): Promise<string> {
+  insMovden(movsub: Movsub[], movmei: MovmeiInput[]): Promise<InsMovdenResult> {
     const InsertTran = gql`
       mutation ins_movsub($obj:[trmovsub_insert_input!]!,$objm:[trmovden_insert_input!]!) {
         insert_trmovsub(objects: $obj)  {
@@ -230,14 +254,14 @@ export class MovingService {
         }
       }`;
     return new Promise((resolve, reject) => {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<InsMovdenResult>({
         mutation: InsertTran,
         variables: {
           obj: movsub,
           objm: movmei
         },
       }).subscribe(({ data }) => {
-        return resolve(data);
+        return resolve(data as InsMovdenResult);
       }, (error) => {
         return reject(error);
       });

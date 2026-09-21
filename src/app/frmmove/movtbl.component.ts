@@ -5,12 +5,14 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
-import { StockService } from './../services/stock.service';
-import { Zaiko, Gzai, Movden, MovingService } from './moving.service';
+import { StockService, StcbsZai } from './../services/stock.service';
+import { Zaiko, Gzai, Movden, MovmeiInput, MovingService } from './moving.service';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { take } from 'rxjs/operators';
 
+/** get_good クエリの結果 */
+interface GoodResult { msgoods_by_pk: { gcode: string; gtext: string; unit: string; gskbn: string; msgzais: Gzai[] } | null }
 @Component({
     selector: 'app-movtbl',
     templateUrl: './movtbl.component.html',
@@ -36,7 +38,7 @@ export class MovtblComponent implements OnInit {
   dataSource = new MatTableDataSource();
   copyToClipboard!: string;
   navCli = navigator.clipboard;
-  setZai: any[] = [];
+  setZai: StcbsZai[][] = [];
   hidx = 5; //tabindex用ヘッダ項目数
   mcols = 3; //tabindex用明細列数  
   public trzaiko: Zaiko[] = [];
@@ -104,7 +106,7 @@ export class MovtblComponent implements OnInit {
         }
       }
     }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<GoodResult>({
       query: GetGood,
       variables: {
         id: this.usrsrv.compid,
@@ -113,7 +115,7 @@ export class MovtblComponent implements OnInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        let msgds = data.msgoods_by_pk;
+        let msgds = (data as GoodResult).msgoods_by_pk;
 
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
@@ -122,7 +124,7 @@ export class MovtblComponent implements OnInit {
           console.log(msgds);
           this.frmArr.controls[i].get('gcode')!.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
-          msgds.msgzais.forEach((e: { msgoods: { gskbn: string; }; zcode: any; irisu: any; }) => {
+          msgds.msgzais.forEach(e => {
             let arr = []
             if (e.msgoods.gskbn == "0") {
               this.getMtbl(i, 'msgzais').push(this.fb.group({ zcode: e.zcode, irisu: e.irisu }));
@@ -165,7 +167,7 @@ export class MovtblComponent implements OnInit {
     });
   }
 
-  setPable(i: number, gcd: string, msgzais: any) {
+  setPable(i: number, gcd: string, msgzais: Gzai[]) {
     // console.log(gcd, this.parentForm.get('incode').value);
     if (this.frmArr.controls[i].value.gskbn == "0") {
       this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm().get('outcode')!.value).then(result => {
@@ -235,7 +237,7 @@ export class MovtblComponent implements OnInit {
       });
     // }
   }
-  insRows(rowData: any[], flg: boolean) {
+  insRows(rowData: string[], flg: boolean) {
     let i: number = 0;
     if (flg) {
       this.frmArr.clear();
@@ -281,7 +283,7 @@ export class MovtblComponent implements OnInit {
   }
 
   getMovmei(dno: number) {
-    let movmei: any[] = [];
+    let movmei: MovmeiInput[] = [];
     this.frmArr.controls
       .forEach(control => {
         movmei.push({
