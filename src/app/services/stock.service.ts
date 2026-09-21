@@ -74,6 +74,35 @@ export class StGds {
   }
 }
 
+/** 在庫内訳（構成品）の 1 行。irisu は入り数 */
+export type GzaiRef = { zcode: string; irisu: number | string; msgoods: { gskbn: string } };
+/** getSetZai の結果。構成品ごとの在庫（Stcbs）に入り数が付く */
+export type StcbsZai = Stcbs & { irisu: number | string };
+
+/** trzaiko_aggregate の合計値（該当なしは null） */
+interface ZaikoSum { hnyu: number | null; movi: number | null; teni: number | null; nyuk: number | null; syuk: number | null; movo: number | null; teno: number | null; haki: number | null }
+interface ZaikoAgg { aggregate: { sum: ZaikoSum } }
+interface SuuAgg { aggregate: { sum: { suu: number | null } } }
+interface HatznAgg { aggregate: { sum: { hatzn: number } } }
+interface ShukkaRow { gcode: string; to_char: string; sum: number }
+/** vhatzn（入荷予定）の行。yday は日付、ydaykbn は入荷予定日の区分（0:確定 1:仮確定 2:暫定） */
+interface HatznRow { gcode: string; yday: Date; ydaykbn: number | string; hatzn: number }
+
+/** get_goods クエリの結果 */
+interface GoodsResult { msgoods: Goods[] }
+/** get_shcount クエリの結果（getShcount1 は vshukka のみ） */
+interface Shcount1Result { vshukka: ShukkaRow[] }
+interface Shcount0Result extends Shcount1Result { vhatzn: HatznRow[]; vhatzn_aggregate: HatznAgg }
+/** get_gcdscd クエリの結果（vgstana: 在庫の棚卸） */
+interface GstanaResult { vgstana: { code: string; gcode: string; tana: number | null; day: Date | null }[] }
+/** get_gcdscd クエリの結果（trgtana: 商品別の棚卸） */
+interface GtanaResult { trgtana: { scode: string; gcode: string; tana: number | null; day: Date | null }[] }
+/** get_zaiko クエリの結果（入出庫の合計のみ） */
+interface ZaikoSumResult { trzaiko_aggregate: ZaikoAgg }
+/** get_zaiko クエリの結果（getZaiko） */
+interface ZaikoResult extends ZaikoSumResult { today: SuuAgg; keepd: SuuAgg; hikat: SuuAgg; juzan: SuuAgg; tommo: SuuAgg }
+/** get_zaiko クエリの結果（getZaiko1: 内訳用） */
+interface Zaiko1Result extends ZaikoSumResult { hikat: SuuAgg; keepd: SuuAgg; vhatzn: { yday: Date; hatzn: number }[]; vhatzn_aggregate: HatznAgg }
 @Injectable({
   providedIn: 'root'
 })
@@ -91,7 +120,7 @@ export class StockService {
   private shcym: string[] = [];
   private shlym: string[] = [];
   public paabl: number = 0;
-  public stcbs: Stcbs[] = [];
+  public stcbs: StcbsZai[] = [];
   public shGcd!: string;
   public stcGcd!: string;
   // public isLoading:boolean=false;
@@ -132,14 +161,15 @@ export class StockService {
         }
       }
     }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<GoodsResult>({
       query: GetMast,
       variables: {
         id: this.usrsrv.compid
       },
     })
       .valueChanges
-      .subscribe(({ data }) => {
+      .subscribe(({ data: raw }) => {
+        const data = raw as GoodsResult;
         this.goods = data.msgoods;
       }, (error) => {
         console.log('error query get_goods', error);
@@ -171,7 +201,7 @@ export class StockService {
     }`;
     let stgds: StGds = new StGds();
     return new Promise(resolve => {
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<Shcount0Result>({
         query: GetTran,
         variables: {
           id: this.usrsrv.compid,
@@ -181,7 +211,8 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data }) => {
+        .subscribe(({ data: raw }) => {
+          const data = raw as Shcount0Result;
           // console.log(data);
           for (let i = 0; i < 12; i++) {
             const j: number = data.vshukka.findIndex((obj: { to_char: string; }) => obj.to_char == this.shcym[i]);
@@ -245,7 +276,7 @@ export class StockService {
     }`;
     let stgds: StGds = new StGds();
     return new Promise(resolve => {
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<Shcount1Result>({
         query: GetTran,
         variables: {
           id: this.usrsrv.compid,
@@ -255,7 +286,8 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data }) => {
+        .subscribe(({ data: raw }) => {
+          const data = raw as Shcount1Result;
           // console.log(data);
           for (let i = 0; i < 12; i++) {
             const j: number = data.vshukka.findIndex((obj: { to_char: string; }) => obj.to_char == this.shcym[i]);
@@ -309,10 +341,10 @@ export class StockService {
       lcdate = new Date();
     }
     // console.log(date,lcdate);
-    let lcstcs: any[] = [];
+    let lcstcs: Stock[] = [];
     return new Promise(resolve => {
       // console.log(lcdate);
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<GstanaResult>({
         query: GetView,
         variables: {
           id: this.usrsrv.compid,
@@ -322,23 +354,24 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data }) => {
+        .subscribe(({ data: raw }) => {
+          const data = raw as GstanaResult;
           // console.log(data);
           // this.stgds.gtext=data.vgstana[0]?.gtext;
           // this.stgds.gskbn=data.vgstana[0]?.gskbn;
           // this.stgds.unit=data.vgstana[0]?.unit;
 
-          Promise.all(data.vgstana.map(async (item: { day: Date; tana: number; code: string; }) => {
+          Promise.all(data.vgstana.map(async item => {
             // console.log(item);
             let lcday: Date = item.day ?? new Date('2000-01-01');
             let lctana: number = item.tana ?? 0;
-            let lcstc;
+            let lcstc: Stock | Stcbs | undefined;
             if (gskbn == "0") {
               lcstc = await this.getZaiko(gcd, item.code, lcday, lctana, lcdate);
             } else if (gskbn == "1") {
               lcstc = await this.getZaiko1(gcd, item.code, lcday, lctana);
             }
-            lcstcs.push(lcstc);
+            lcstcs.push(lcstc as Stock); // gskbn が 1 のときは内訳用（Stcbs）が入る。従来どおり Stock[] として返す
           })).then(() => {
             return resolve(lcstcs);
           });
@@ -376,7 +409,7 @@ export class StockService {
       }
     }`;
     return new Promise(resolve => {
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<GtanaResult>({
         query: GetTrans,
         variables: {
           id: this.usrsrv.compid,
@@ -386,11 +419,12 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data }) => {
+        .subscribe(({ data: raw }) => {
+          const data = raw as GtanaResult;
           let lcday: Date = data.trgtana[0]?.day ?? new Date('2000-01-01');
           let lctana: number = data.trgtana[0]?.tana ?? 0;
           // console.log('StockService',gcd,scd,lcday,date);
-          this.apollo.watchQuery<any>({
+          this.apollo.watchQuery<ZaikoSumResult>({
             query: GetTran2,
             variables: {
               id: this.usrsrv.compid,
@@ -401,7 +435,8 @@ export class StockService {
             },
           })
             .valueChanges
-            .subscribe(({ data }) => {
+            .subscribe(({ data: raw }) => {
+              const data = raw as ZaikoSumResult;
               // console.log('StockService2',data.trzaiko_aggregate.aggregate.sum,lctana);  				
               lctana = lctana + (data.trzaiko_aggregate.aggregate.sum.hnyu || 0)
                 + (data.trzaiko_aggregate.aggregate.sum.movi || 0)
@@ -427,16 +462,16 @@ export class StockService {
     });
 
   }
-  getSetZai(scd: string, gzais: any[]): Promise<Stcbs[]> {
+  getSetZai(scd: string, gzais: GzaiRef[]): Promise<StcbsZai[]> {
     return new Promise(resolve => {
-      let lcstcs: any[] = [];
+      let lcstcs: StcbsZai[] = [];
 	  // console.log('getSetZai1',gzais);
       Promise.all(gzais.map(async (item) => {
 		// console.log('getSetZai2',item,item.msgoods.gskbn);
         if (item.msgoods.gskbn == '0') {
           let lcstc = await this.getStock(item.zcode, '1', scd);
 		  // console.log('getSetZai3',item,lcstc);
-          lcstcs.push({ irisu: item.irisu, ...lcstc[0] });
+          lcstcs.push({ irisu: item.irisu, ...(lcstc[0] as unknown as Stcbs) }); // gskbn 1 で取得するため実体は Stcbs
         }
       })).then(() => {
         return resolve(lcstcs);
@@ -476,7 +511,7 @@ export class StockService {
 
     return new Promise<Stock>(resolve => {
 
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<ZaikoResult>({
         query: GetTran,
         variables: {
           id: this.usrsrv.compid,
@@ -488,7 +523,8 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data }) => {
+        .subscribe(({ data: raw }) => {
+          const data = raw as ZaikoResult;
           // console.log(this.usrsrv.getNextday(tdy), data);
           let lcstcs: Stock = {
             gcode: gcd,
@@ -553,7 +589,7 @@ export class StockService {
 
     return new Promise<Stcbs>(resolve => {
       // console.log(this.usrsrv.getNextday(new Date()));
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<Zaiko1Result>({
         query: GetTran,
         variables: {
           id: this.usrsrv.compid,
@@ -564,7 +600,8 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data }) => {
+        .subscribe(({ data: raw }) => {
+          const data = raw as Zaiko1Result;
           let lcstcs: Stcbs = {
             gcode: gcd,
             scode: scd,
@@ -591,10 +628,10 @@ export class StockService {
     });
   }
 
-  getPaabl(stcbs: string | any[]): number {
+  getPaabl(stcbs: StcbsZai[]): number {
     let paabl: number = 9999;
     for (let i = 0; i < stcbs.length; i++) {
-      const wAble = Math.floor((stcbs[i].stock - stcbs[i].hikat - stcbs[i].keepd) / stcbs[i].irisu);
+      const wAble = Math.floor((stcbs[i].stock - stcbs[i].hikat - stcbs[i].keepd) / Number(stcbs[i].irisu));
       if (wAble < paabl) {
         paabl = wAble;
       }
