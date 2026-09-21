@@ -296,9 +296,9 @@ export class MovtblComponent implements OnInit {
       });
     return movmei;
   }
-  objectToArray(obj: any): string {
+  objectToArray(obj: object): string {
     var result = Object.keys(obj).map((key: string) => {
-      let value = obj[key];
+      let value = (obj as Record<string, unknown>)[key];
       // console.log(value)
       return value;
     });
