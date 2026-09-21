@@ -1,5 +1,5 @@
 <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-between" style="margin-bottom:10px;">
-  <h3 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">移動伝票検索</h3>
+  <h3 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">移動伝票番号検索</h3>
   <mat-paginator #paginators [length]="$safeNavigationMigration(dataSource?.data.length)" [pageIndex]="0"
     [pageSizeOptions]="[20, 50, 100, 250, 1000]">
   </mat-paginator>
