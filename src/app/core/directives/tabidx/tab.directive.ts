@@ -1,11 +1,14 @@
-import { Directive, Input, ElementRef, HostListener, AfterViewInit } from '@angular/core';
+import { Directive, Input, ElementRef, AfterViewInit } from '@angular/core';
 import { TabService } from './tab.service';
 type IKNOWISNUMBER = any;
 type IKNOWISSTRING = any;
 
 @Directive({
     selector: '[tabIndex]',
-    standalone: false
+    standalone: false,
+    host: {
+        '(keydown)': 'onInput($event)'
+    }
 })
 export class TabDirective implements AfterViewInit  {
 
@@ -18,7 +21,6 @@ export class TabDirective implements AfterViewInit  {
     this._index = parseInt(i);
   }
 
-  @HostListener('keydown', ['$event'])
   onInput(e: any) {
     // console.log(e,this.tabService.selectedInput);
     if (e.which === 13) {

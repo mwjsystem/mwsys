@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, HostListener, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -14,7 +14,10 @@ import { StaffService } from './../services/staff.service';
     templateUrl: './frminvoice.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    standalone: false,
+    host: {
+        '(window:beforeunload)': 'beforeUnload($event)'
+    }
 })
 export class FrminvoiceComponent implements OnInit, AfterViewInit {
     // @ViewChild(DepttblComponent) depttbl: DepttblComponent;
@@ -113,7 +116,6 @@ export class FrminvoiceComponent implements OnInit, AfterViewInit {
         return this.form.dirty;
     }
 
-    @HostListener('window:beforeunload', ['$event'])
     beforeUnload(e: Event) {
         if (this.shouldConfirmOnBeforeunload()) {
             e.returnValue = true;

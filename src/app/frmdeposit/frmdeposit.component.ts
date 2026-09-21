@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, HostListener, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -18,7 +18,10 @@ import { NdnohelpComponent } from './../share/ndnohelp/ndnohelp.component';
     templateUrl: './frmdeposit.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+    standalone: false,
+    host: {
+        '(window:beforeunload)': 'beforeUnload($event)'
+    }
 })
 export class FrmdepositComponent implements OnInit, AfterViewInit {
   @ViewChild(DepttblComponent)
@@ -348,7 +351,6 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     return this.form.dirty;
   }
 
-  @HostListener('window:beforeunload', ['$event'])
   beforeUnload(e: Event) {
     if (this.shouldConfirmOnBeforeunload()) {
       e.returnValue = true;

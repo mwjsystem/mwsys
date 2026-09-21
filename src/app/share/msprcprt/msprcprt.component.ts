@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ChangeDetectorRef, HostListener, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectorRef, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { UntypedFormGroup, UntypedFormBuilder, FormControl, UntypedFormArray, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -13,7 +13,10 @@ import { HttpClient } from '@angular/common/http';
     templateUrl: './msprcprt.component.html',
     styleUrls: ['./../../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    standalone: false,
+    host: {
+        '(window:beforeunload)': 'beforeUnload($event)'
+    }
 })
 export class MsprcprtComponent implements OnInit {
   mcode: number;
@@ -134,7 +137,6 @@ export class MsprcprtComponent implements OnInit {
   shouldConfirmOnBeforeunload(): boolean {
     return this.form.dirty;
   }
-  @HostListener('window:beforeunload', ['$event'])
   beforeUnload(e: Event) {
     if (this.shouldConfirmOnBeforeunload()) {
       e.returnValue = true;

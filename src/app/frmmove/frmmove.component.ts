@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -22,7 +22,10 @@ import { filter } from 'rxjs/operators';
     templateUrl: './frmmove.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    standalone: false,
+    host: {
+        '(window:beforeunload)': 'beforeUnload($event)'
+    }
 })
 export class FrmmoveComponent implements OnInit {
   @ViewChild(MovtblComponent)
@@ -371,7 +374,6 @@ export class FrmmoveComponent implements OnInit {
     return this.form.dirty;
   }
 
-  @HostListener('window:beforeunload', ['$event'])
   beforeUnload(e: Event) {
     if (this.shouldConfirmOnBeforeunload()) {
       e.returnValue = true;

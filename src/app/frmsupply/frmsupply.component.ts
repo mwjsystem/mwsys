@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, HostListener, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -23,7 +23,10 @@ import { filter } from 'rxjs/operators';
     templateUrl: './frmsupply.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+    standalone: false,
+    host: {
+        '(window:beforeunload)': 'beforeUnload($event)'
+    }
 })
 export class FrmsupplyComponent implements OnInit, AfterViewInit {
   @ViewChild(HmeitblComponent)
@@ -374,7 +377,6 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     return this.form.dirty;
   }
 
-  @HostListener('window:beforeunload', ['$event'])
   beforeUnload(e: Event) {
     if (this.shouldConfirmOnBeforeunload()) {
       e.returnValue = true;

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, HostListener, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -19,7 +19,10 @@ import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
     encapsulation: ViewEncapsulation.None //グローバルにCSSが効く
     ,
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    standalone: false,
+    host: {
+        '(window:beforeunload)': 'beforeUnload($event)'
+    }
 })
 export class MstvendorComponent implements OnInit, AfterViewInit {
   vcd!: string;
@@ -221,7 +224,6 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
     return this.form.dirty;
   }
 
-  @HostListener('window:beforeunload', ['$event'])
   beforeUnload(e: Event) {
     if (this.shouldConfirmOnBeforeunload()) {
       e.returnValue = true;

@@ -1,8 +1,11 @@
-import { Directive, HostListener, ElementRef, OnInit  } from '@angular/core';
+import { Directive, ElementRef, OnInit  } from '@angular/core';
 
 @Directive({
     selector: '[numInput]',
-    standalone: false
+    standalone: false,
+    host: {
+        '(blur)': 'onBlur($any($event.target).value)'
+    }
 })
 export class NuminputDirective {
   
@@ -20,7 +23,6 @@ export class NuminputDirective {
 
   // }
 
-  @HostListener("blur", ["$any($event.target).value"])
   onBlur(value: any) {
     this.transform(value)
   }

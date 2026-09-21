@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { SpdethelpComponent } from './../share/spdethelp/spdethelp.component';

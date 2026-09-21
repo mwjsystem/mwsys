@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ChangeDetectorRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -15,7 +15,10 @@ import gql from 'graphql-tag';
     templateUrl: './msproc.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    standalone: false,
+    host: {
+        '(window:beforeunload)': 'beforeUnload($event)'
+    }
 })
 export class MsprocComponent implements OnInit {
   mcode: number;
@@ -149,7 +152,6 @@ export class MsprocComponent implements OnInit {
   shouldConfirmOnBeforeunload(): boolean {
     return this.form.dirty;
   }
-  @HostListener('window:beforeunload', ['$event'])
   beforeUnload(e: Event) {
     if (this.shouldConfirmOnBeforeunload()) {
       e.returnValue = true;

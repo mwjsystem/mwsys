@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,7 +14,10 @@ import gql from 'graphql-tag';
     templateUrl: './gzai.component.html',
     styleUrls: ['./../../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    standalone: false,
+    host: {
+        '(window:beforeunload)': 'beforeUnload($event)'
+    }
 })
 export class GzaiComponent implements OnInit {
   form: FormGroup;
@@ -200,7 +203,6 @@ export class GzaiComponent implements OnInit {
   shouldConfirmOnBeforeunload(): boolean {
     return this.form.dirty;
   }
-  @HostListener('window:beforeunload', ['$event'])
   beforeUnload(e: Event) {
     if (this.shouldConfirmOnBeforeunload()) {
       e.returnValue = true;
