@@ -9,6 +9,11 @@ import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
+interface AffectedRows { affected_rows: number }
+/** get_goods クエリの結果（構成品の商品名・単位・数量区分） */
+interface GoodsNameResult { msgoods_by_pk: { gtext: string; unit: string; gskbn: string } | null }
+/** upd_msgzai ミューテーションの結果 */
+interface UpdGzaiResult { delete_msgzai: AffectedRows; insert_msgzai: AffectedRows }
 @Component({
     selector: 'app-gzai',
     templateUrl: './gzai.component.html',
@@ -46,6 +51,7 @@ export class GzaiComponent implements OnInit {
           zcode: [e.zcode],
           gtext: [{ value: e.msgoods.gtext, disabled: true }],
           irisu: [e.irisu],
+          gskbn: [e.msgoods.gskbn], // 構成品の数量区分。保存後に商品リストへ戻すために保持する（画面には出さない）
           unit: [{ value: e.msgoods.unit, disabled: true }]
         }));
       });
@@ -67,6 +73,7 @@ export class GzaiComponent implements OnInit {
       zcode: [""],
       gtext: [{ value: "", disabled: true }],
       irisu: [0],
+      gskbn: [""],
       unit: [{ value: "", disabled: true }]
     }));
     this.autoFil();
@@ -101,9 +108,10 @@ export class GzaiComponent implements OnInit {
       msgoods_by_pk(id:$id, gcode:$gcode) {
         gtext
         unit
+        gskbn
       }
     }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<GoodsNameResult>({
       query: GetMast,
       variables: {
         id: this.usrsrv.compid,
@@ -113,7 +121,7 @@ export class GzaiComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data.msgoods_by_pk);
-        this.frmArr.controls[i].patchValue(data.msgoods_by_pk);
+        this.frmArr.controls[i].patchValue((data as GoodsNameResult).msgoods_by_pk ?? {});
       }, (error) => {
         this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
         this.frmArr.controls[i].get('zcode')!.setErrors({ 'incorrect': true });
@@ -145,8 +153,8 @@ export class GzaiComponent implements OnInit {
           affected_rows
         }
       }`;
-    let objGzai: { id: number; gcode: string; zcode: any; irisu: any; }[] = [];
-    let gzai: any[] = []
+    let objGzai: { id: number; gcode: string; zcode: string; irisu: number; }[] = [];
+    let gzai: mwI.Gzai[] = [];
     this.frmArr.controls
       .forEach(control => {
         objGzai.push({
@@ -160,11 +168,12 @@ export class GzaiComponent implements OnInit {
           irisu: control.value.irisu,
           msgoods: {
             gtext: control.value.gtext,
-            unit: control.value.unit
+            unit: control.value.unit,
+            gskbn: control.value.gskbn // 構成品の数量区分（セット在庫の計算は 0 の構成品だけを対象にする）
           }
         });
       });
-    this.apollo.mutate<any>({
+    this.apollo.mutate<UpdGzaiResult>({
       mutation: UpdateTran,
       variables: {
         id: this.usrsrv.compid,
