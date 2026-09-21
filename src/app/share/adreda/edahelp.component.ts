@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MembsService } from './../../mstmember/membs.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -12,6 +12,9 @@ import { MatDialogRef } from "@angular/material/dialog";
     standalone: false
 })
 export class EdahelpComponent implements OnInit {
+  memsrv = inject(MembsService);
+  private dialogRef = inject<MatDialogRef<EdahelpComponent>>(MatDialogRef);
+
   readonly paginator = viewChild(MatPaginator);
   public filters: any = [{ id: 'adrname', value: '' },
   { id: 'region', value: '' },
@@ -21,8 +24,7 @@ export class EdahelpComponent implements OnInit {
   dataSource: MatTableDataSource<mwI.Edahlp>;
   displayedColumns = ['eda', 'adrname', 'zip', 'region', 'local', 'street', 'extend', 'extend2', 'tel'];
 
-  constructor(public memsrv: MembsService,
-    private dialogRef: MatDialogRef<EdahelpComponent>) {
+  constructor() {
     this.dataSource = new MatTableDataSource<mwI.Edahlp>(this.memsrv.edas);
   }
 

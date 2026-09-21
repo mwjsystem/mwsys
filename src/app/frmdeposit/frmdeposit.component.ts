@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, viewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -24,23 +24,27 @@ import { NdnohelpComponent } from './../share/ndnohelp/ndnohelp.component';
     }
 })
 export class FrmdepositComponent implements OnInit, AfterViewInit {
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  stfsrv = inject(StaffService);
+  memsrv = inject(MembsService);
+  depsrv = inject(DepositService);
+  private fb = inject(FormBuilder);
+  private title = inject(Title);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private elementRef = inject(ElementRef);
+  private dialog = inject(MatDialog);
+  private cdRef = inject(ChangeDetectorRef);
+
   readonly depttbl = viewChild(DepttblComponent);
   form!: FormGroup;
   denno: number = 0;
   rows: FormArray = this.fb.array([]);
   jyuden: Jyuden = new Jyuden();
-  constructor(public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    public stfsrv: StaffService,
-    public memsrv: MembsService,
-    public depsrv: DepositService,
-    private fb: FormBuilder,
-    private title: Title,
-    private route: ActivatedRoute,
-    private router: Router,
-    private elementRef: ElementRef,
-    private dialog: MatDialog,
-    private cdRef: ChangeDetectorRef) {
+  constructor() {
+    const title = this.title;
+
     title.setTitle('入金伝票(MWSystem)');
   }
 

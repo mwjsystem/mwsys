@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input, viewChild } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input, viewChild, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -21,6 +21,16 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class HmeitblComponent implements OnInit {
+  private cdRef = inject(ChangeDetectorRef);
+  private elementRef = inject(ElementRef);
+  private dialog = inject(MatDialog);
+  private fb = inject(FormBuilder);
+  private apollo = inject(Apollo);
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  hmisrv = inject(HatmeiService);
+  strsrv = inject(StoreService);
+
   readonly parentForm = input.required<FormGroup>();
   readonly paginator = viewChild(MatPaginator);
   @ViewChildren('gcdInputs')
@@ -51,16 +61,6 @@ export class HmeitblComponent implements OnInit {
     'mtax',
     // 'currency'
   ];
-  constructor(private cdRef: ChangeDetectorRef,
-    private elementRef: ElementRef,
-    private dialog: MatDialog,
-    private fb: FormBuilder,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    public hmisrv: HatmeiService,
-    public strsrv: StoreService) { }
 
   ngOnInit(): void {
     this.addRows(1);

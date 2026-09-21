@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -20,21 +20,25 @@ import { StaffService } from './../services/staff.service';
     }
 })
 export class FrminvoiceComponent implements OnInit, AfterViewInit {
+    usrsrv = inject(UserService);
+    bunsrv = inject(BunruiService);
+    stfsrv = inject(StaffService);
+    invsrv = inject(InvoiceService);
+    private fb = inject(FormBuilder);
+    private title = inject(Title);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private elementRef = inject(ElementRef);
+    private dialog = inject(MatDialog);
+    private cdRef = inject(ChangeDetectorRef);
+
     // @ViewChild(DepttblComponent) depttbl: DepttblComponent;
     form!: FormGroup;
     denno: number = 0;
 	rows: FormArray = this.fb.array([]);
-    constructor(public usrsrv: UserService,
-        public bunsrv: BunruiService,
-        public stfsrv: StaffService,
-        public invsrv: InvoiceService,
-        private fb: FormBuilder,
-        private title: Title,
-        private route: ActivatedRoute,
-        private router: Router,
-        private elementRef: ElementRef,
-        private dialog: MatDialog,
-        private cdRef: ChangeDetectorRef) {
+    constructor() {
+        const title = this.title;
+
         title.setTitle('請求伝票(MWSystem)');
     }
 

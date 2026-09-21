@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 import { VendsService } from './../../mstvendor/vends.service';
 
 @Pipe({
@@ -6,7 +6,8 @@ import { VendsService } from './../../mstvendor/vends.service';
     standalone: false
 })
 export class VcdtxtPipe implements PipeTransform {
-  constructor(private vensrv: VendsService) { }
+  private vensrv = inject(VendsService);
+
   transform(value: string): string {
     return this.vensrv.getVcdtxt(value);
   }

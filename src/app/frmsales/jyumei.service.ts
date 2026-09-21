@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 // import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
@@ -10,6 +10,10 @@ import { Apollo } from 'apollo-angular';
   providedIn: 'root'
 })
 export class JyumeiService {
+  private usrsrv = inject(UserService);
+  private okrsrv = inject(OkuriService);
+  private apollo = inject(Apollo);
+
   // public jyumei: mwI.Jyumei[] = []; //frmsales⇒jmeitblコンポーネントへ渡すときのみ使用
   public trjyumei: any[] = [];
   public trjmzai: any[] = [];
@@ -141,12 +145,6 @@ export class JyumeiService {
         }
       }
     }`;
-
-  constructor(private usrsrv: UserService,
-    private okrsrv: OkuriService,
-    private apollo: Apollo
-    // private toastr: ToastrService
-  ) { }
 
   qryJyuden(denno: number): Observable<mwI.Trjyuden> {
     let observable: Observable<mwI.Trjyuden> = new Observable<mwI.Trjyuden>(observer => {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -9,8 +9,10 @@ import { Title } from '@angular/platform-browser';
     standalone: false
 })
 export class HomeComponent implements OnInit {
+  private title = inject(Title);
+
   // userInfo: {[key: string]: any} = {};
-  constructor(private title: Title) {
+  constructor() {
     this.title.setTitle('ホーム(MWSystem)');
   }
 

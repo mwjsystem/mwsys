@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -46,6 +46,16 @@ interface Jyuden {
     standalone: false
 })
 export class JdnohelpComponent implements OnInit {
+  usrsrv = inject(UserService);
+  stfsrv = inject(StaffService);
+  memsrv = inject(MembsService);
+  bunsrv = inject(BunruiService);
+  cdRef = inject(ChangeDetectorRef);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+  private dialog = inject(MatDialog);
+  private dialogRef = inject<MatDialogRef<JdnohelpComponent>>(MatDialogRef);
+
   readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -93,16 +103,9 @@ export class JdnohelpComponent implements OnInit {
   fjdst: string = "";
   fjsst: string = "";
 
-  constructor(public usrsrv: UserService,
-    public stfsrv: StaffService,
-    public memsrv: MembsService,
-    public bunsrv: BunruiService,
-    public cdRef: ChangeDetectorRef,
-    private apollo: Apollo,
-    private overlay: Overlay,
-    private dialog: MatDialog,
-    private dialogRef: MatDialogRef<JdnohelpComponent>,
-    @Inject(MAT_DIALOG_DATA) data: any) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.dataSource = new MatTableDataSource<Jyuden>();
     if (data?.ftype) {
       this.ftype = data.ftype;

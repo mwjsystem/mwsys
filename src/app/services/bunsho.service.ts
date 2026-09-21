@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
@@ -7,12 +7,12 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class BunshoService {
+  private usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
 
   buntype: mwI.Buntype[] = [];
   bunsho: mwI.Bunsho[] = [];
-  constructor(private usrsrv: UserService,
-    private apollo: Apollo) {
-  }
 
   getBuntype(): void {
     if (this.bunsho.length == 0) {

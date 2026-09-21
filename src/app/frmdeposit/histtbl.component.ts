@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
 import { Nyuhis, DepositService } from './deposit.service';
@@ -11,6 +11,10 @@ import { Nyuhis, DepositService } from './deposit.service';
     standalone: false
 })
 export class HisttblComponent implements OnInit {
+  private cdRef = inject(ChangeDetectorRef);
+  depsrv = inject(DepositService);
+  usrsrv = inject(UserService);
+
   // @Input() parentForm: FormGroup;
   dataSource = new MatTableDataSource<Nyuhis>();
   displayedColumns: string[] = [
@@ -20,10 +24,6 @@ export class HisttblComponent implements OnInit {
     'tmoney',
     'total',
     'memo'];
-
-  constructor(private cdRef: ChangeDetectorRef,
-    public depsrv: DepositService,
-    public usrsrv: UserService) { }
 
   ngOnInit(): void {
     this.depsrv.observeH.subscribe((nyuhis) => {

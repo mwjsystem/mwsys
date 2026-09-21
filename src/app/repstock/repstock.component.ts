@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -26,6 +26,20 @@ import { StcscdsComponent } from './../share/stcscds/stcscds.component';
     standalone: false
 })
 export class RepstockComponent implements OnInit, AfterViewInit {
+  private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  private title = inject(Title);
+  private apollo = inject(Apollo);
+  private elementRef = inject(ElementRef);
+  private overlay = inject(Overlay);
+  cdRef = inject(ChangeDetectorRef);
+  strsrv = inject(StoreService);
+  bunsrv = inject(BunruiService);
+  memsrv = inject(MembsService);
+  stcsrv = inject(StockService);
+  trnsrv = inject(TransService);
+  usrsrv = inject(UserService);
+
   public stgds: StGds = new StGds();
   public gcode: string = "";
   public scode: string = "";
@@ -39,21 +53,9 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  constructor(
-    private dialog: MatDialog,
-    private route: ActivatedRoute,
-    private title: Title,
-    private apollo: Apollo,
-    private elementRef: ElementRef,
-    private overlay: Overlay,
-    // private toastr: ToastrService,
-    public cdRef: ChangeDetectorRef,
-    public strsrv: StoreService,
-    public bunsrv: BunruiService,
-    public memsrv: MembsService,
-    public stcsrv: StockService,
-    public trnsrv: TransService,
-    public usrsrv: UserService) {
+  constructor() {
+    const title = this.title;
+
     title.setTitle('現在庫確認(MWSystem)');
   }
 

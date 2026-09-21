@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -31,6 +31,19 @@ import { VendsService } from './../mstvendor/vends.service';
     }
 })
 export class MstgoodsComponent implements OnInit, AfterViewInit {
+  private fb = inject(FormBuilder);
+  private el = inject(ElementRef);
+  private title = inject(Title);
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+  cdRef = inject(ChangeDetectorRef);
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  vensrv = inject(VendsService);
+  gdssrv = inject(GoodsService);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+
   readonly gdstbl = viewChild(GdstblComponent);
   readonly gtnktbl = viewChild(GtnktblComponent);
 
@@ -43,20 +56,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  constructor(private fb: FormBuilder,
-    private el: ElementRef,
-    private title: Title,
-    private route: ActivatedRoute,
-    private dialog: MatDialog,
-    public cdRef: ChangeDetectorRef,
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    public vensrv: VendsService,
-    public gdssrv: GoodsService,
-    // public stfsrv: StaffService,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    private overlay: Overlay) {
+  constructor() {
     this.title.setTitle('商品マスタ(MWSystem)');
   }
 

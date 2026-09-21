@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
@@ -8,6 +8,9 @@ import { Apollo } from 'apollo-angular';
   providedIn: 'root'
 })
 export class HatmeiService {
+  usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
   public hatmei: mwI.Hatmei[] = []; //読込時にfrmsupply⇒hmeitblコンポーネントへ渡すときのみ使用
   // public subject = new Subject<mwI.Hatmei[]>();
   public subject = new Subject<boolean>();
@@ -58,9 +61,6 @@ export class HatmeiService {
         }
       }
     }`;
-
-  constructor(public usrsrv: UserService,
-    private apollo: Apollo) { }
 
   qryHatden(denno: number): Observable<mwI.Trhatden> {
     // console.log(denno);

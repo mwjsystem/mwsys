@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
@@ -8,12 +8,11 @@ import { UserService } from './user.service';
 })
 
 export class BunruiService {
+  private usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
 
   public kbn: { [key: string]: mwI.Sval[]; } = {};
-
-  constructor(private usrsrv: UserService,
-    private apollo: Apollo) {
-  }
 
   getBunrui(): void {
     this.qryBunrui();

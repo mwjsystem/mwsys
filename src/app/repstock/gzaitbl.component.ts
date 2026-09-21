@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Stcbs, StockService } from './../services/stock.service';
 
@@ -10,12 +10,11 @@ import { Stcbs, StockService } from './../services/stock.service';
     standalone: false
 })
 export class GzaitblComponent implements OnInit {
+  stcsrv = inject(StockService);
+  cdRef = inject(ChangeDetectorRef);
+
   public dataSource!: MatTableDataSource<Stcbs>;
   public displayedColumns = ['gcode', 'irisu', 'pable', 'stock', 'hikat', 'yday', 'suu', 'htzan'];
-
-
-  constructor(public stcsrv: StockService,
-    public cdRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.stcsrv.observe.subscribe(() => this.refresh());

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, viewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, viewChild, inject } from '@angular/core';
 import { MatDialogRef } from "@angular/material/dialog";
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -38,6 +38,13 @@ export interface Mcd {
     standalone: false
 })
 export class McdhelpComponent implements OnInit {
+  private dialogRef = inject<MatDialogRef<McdhelpComponent>>(MatDialogRef);
+  usrsrv = inject(UserService);
+  stfsrv = inject(StaffService);
+  private overlay = inject(Overlay);
+  private cdRef = inject(ChangeDetectorRef);
+  private apollo = inject(Apollo);
+
 
   readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<Mcd>;
@@ -59,12 +66,7 @@ export class McdhelpComponent implements OnInit {
   });
   public mcds: Mcd[] = [];
 
-  constructor(private dialogRef: MatDialogRef<McdhelpComponent>,
-    public usrsrv: UserService,
-    public stfsrv: StaffService,
-    private overlay: Overlay,
-    private cdRef: ChangeDetectorRef,
-    private apollo: Apollo) {
+  constructor() {
     this.dataSource = new MatTableDataSource<Mcd>(this.mcds);
   }
 

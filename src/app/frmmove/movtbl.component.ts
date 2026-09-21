@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input, viewChild } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input, viewChild, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -19,6 +19,15 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class MovtblComponent implements OnInit {
+  private cdRef = inject(ChangeDetectorRef);
+  private elementRef = inject(ElementRef);
+  private dialog = inject(MatDialog);
+  private fb = inject(FormBuilder);
+  private apollo = inject(Apollo);
+  movsrv = inject(MovingService);
+  stcsrv = inject(StockService);
+  usrsrv = inject(UserService);
+
   readonly parentForm = input.required<FormGroup>();
   readonly paginator = viewChild(MatPaginator);
   @ViewChildren('gcdInputs')
@@ -41,16 +50,6 @@ export class MovtblComponent implements OnInit {
     'memo',
     'jdenno',
     'jline'];
-
-
-  constructor(private cdRef: ChangeDetectorRef,
-    private elementRef: ElementRef,
-    private dialog: MatDialog,
-    private fb: FormBuilder,
-    private apollo: Apollo,
-    public movsrv: MovingService,
-    public stcsrv: StockService,
-    public usrsrv: UserService) { }
 
   ngOnInit(): void {
     this.addRows(1);

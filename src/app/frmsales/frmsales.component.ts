@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 
 import { Title } from '@angular/platform-browser';
@@ -36,6 +36,26 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
     }
 })
 export class FrmsalesComponent implements OnInit, AfterViewInit {
+  usrsrv = inject(UserService);
+  private fb = inject(FormBuilder);
+  private title = inject(Title);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private elementRef = inject(ElementRef);
+  private dialog = inject(MatDialog);
+  bunsrv = inject(BunruiService);
+  bnssrv = inject(BunshoService);
+  stfsrv = inject(StaffService);
+  okrsrv = inject(OkuriService);
+  memsrv = inject(MembsService);
+  strsrv = inject(StoreService);
+  jmisrv = inject(JyumeiService);
+  private dwlsrv = inject(DownloadService);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+  private cdRef = inject(ChangeDetectorRef);
+  private zone = inject(NgZone);
+
   readonly jmeitbl = viewChild(JmeitblComponent);
   form!: FormGroup;
   mode: number = 3;
@@ -52,25 +72,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  constructor(public usrsrv: UserService,
-    private fb: FormBuilder,
-    private title: Title,
-    private route: ActivatedRoute,
-    private router: Router,
-    private elementRef: ElementRef,
-    private dialog: MatDialog,
-    public bunsrv: BunruiService,
-    public bnssrv: BunshoService,
-    public stfsrv: StaffService,
-    public okrsrv: OkuriService,
-    public memsrv: MembsService,
-    public strsrv: StoreService,
-    public jmisrv: JyumeiService,
-    private dwlsrv: DownloadService,
-    private apollo: Apollo,
-    private overlay: Overlay,
-    private cdRef: ChangeDetectorRef,
-    private zone: NgZone) {
+  constructor() {
+    const title = this.title;
+
     title.setTitle('受注伝票(MWSystem)');
   }
 

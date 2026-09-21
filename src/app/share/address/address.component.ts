@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, input, inject } from '@angular/core';
 import { FormGroupDirective, FormGroup, FormControl, Validators, ControlContainer, FormArray, FormBuilder } from '@angular/forms';
 import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
@@ -21,12 +21,13 @@ import { Observable, Subject } from 'rxjs';
     standalone: false
 })
 export class AddressComponent implements OnInit {
+  private parent = inject(FormGroupDirective);
+  private usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  private dwlsrv = inject(DownloadService);
+  private apollo = inject(Apollo);
+
   readonly formName = input.required<string>();
-  constructor(private parent: FormGroupDirective,
-    private usrsrv: UserService,
-    public bunsrv: BunruiService,
-    private dwlsrv: DownloadService,
-    private apollo: Apollo) { }
 
   ngOnInit(): void {
     const form = this.parent.form;

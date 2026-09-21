@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChildren } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChildren, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 
 import { Title } from '@angular/platform-browser';
@@ -37,6 +37,21 @@ class Sval {
     }
 })
 export class MstmemberComponent implements OnInit, AfterViewInit {
+  usrsrv = inject(UserService);
+  private fb = inject(FormBuilder);
+  private title = inject(Title);
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+  bunsrv = inject(BunruiService);
+  bnssrv = inject(BunshoService);
+  stfsrv = inject(StaffService);
+  okrsrv = inject(OkuriService);
+  memsrv = inject(MembsService);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+  private cdRef = inject(ChangeDetectorRef);
+  private zone = inject(NgZone);
+
   private readonly children = viewChildren(AddressComponent);
   form!: FormGroup;
   mcd: string = "";
@@ -53,20 +68,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       .position().global().centerHorizontally().centerVertically()
   });
 
-  constructor(public usrsrv: UserService,
-    private fb: FormBuilder,
-    private title: Title,
-    private route: ActivatedRoute,
-    private dialog: MatDialog,
-    public bunsrv: BunruiService,
-    public bnssrv: BunshoService,
-    public stfsrv: StaffService,
-    public okrsrv: OkuriService,
-    public memsrv: MembsService,
-    private apollo: Apollo,
-    private overlay: Overlay,
-    private cdRef: ChangeDetectorRef,
-    private zone: NgZone) {
+  constructor() {
     this.title.setTitle('顧客マスタ(MWSystem)');
   }
 

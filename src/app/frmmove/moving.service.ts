@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
@@ -71,6 +71,9 @@ export class Movsub {
   providedIn: 'root'
 })
 export class MovingService {
+  usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
   // public movmei: Movden[] = []; //読込時にfrmsupply⇒hmeitblコンポーネントへ渡すときのみ使用
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
@@ -111,9 +114,6 @@ export class MovingService {
         }
       }
     }`;
-
-  constructor(public usrsrv: UserService,
-    private apollo: Apollo) { }
 
   qryMovden(denno: number): Observable<Movsub> {
     let observable: Observable<Movsub> = new Observable<Movsub>(observer => {

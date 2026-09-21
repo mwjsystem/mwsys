@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 import { MembsService } from './../../mstmember/membs.service';
 
 @Pipe({
@@ -6,7 +6,8 @@ import { MembsService } from './../../mstmember/membs.service';
     standalone: false
 })
 export class McdtxtPipe implements PipeTransform {
-  constructor(private memsrv: MembsService) { }
+  private memsrv = inject(MembsService);
+
 
   transform(value: string): string {
     return this.memsrv.getMcdtxt(value);

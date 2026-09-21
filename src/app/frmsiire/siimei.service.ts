@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
@@ -8,6 +8,9 @@ import { Apollo } from 'apollo-angular';
   providedIn: 'root'
 })
 export class SiimeiService {
+  usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
   public siimei = new Array<mwI.Siimei>();; //読込時にfrmsiire⇒smeitblコンポーネントへ渡すときのみ使用
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
@@ -47,9 +50,6 @@ export class SiimeiService {
         }
       }
     }`;
-
-  constructor(public usrsrv: UserService,
-    private apollo: Apollo) { }
   qrySiiden(denno: number): Observable<mwI.Trsiiden> {
     let observable: Observable<mwI.Trsiiden> = new Observable<mwI.Trsiiden>(observer => {
       this.apollo.watchQuery<any>({

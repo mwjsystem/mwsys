@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef } from "@angular/material/dialog";
@@ -39,16 +39,18 @@ interface Vendor {
     standalone: false
 })
 export class VcdhelpComponent implements OnInit {
+  usrsrv = inject(UserService);
+  private vensrv = inject(VendsService);
+  private apollo = inject(Apollo);
+  private dialogRef = inject<MatDialogRef<VcdhelpComponent>>(MatDialogRef);
+
   // public vcds: Vendor[]=[];
   readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<mwI.Vendor>;
   displayedColumns = ['code', 'adrname', 'kana', 'tanto', 'tel', 'tel2', 'tel3', 'fax', 'mail1', 'mail2', 'mail3', 'mail4', 'mail5', 'zip', 'region', 'local', 'url'];
   filter: string = "";
 
-  constructor(public usrsrv: UserService,
-    private vensrv: VendsService,
-    private apollo: Apollo,
-    private dialogRef: MatDialogRef<VcdhelpComponent>) {
+  constructor() {
     this.dataSource = new MatTableDataSource<mwI.Vendor>();
   }
 

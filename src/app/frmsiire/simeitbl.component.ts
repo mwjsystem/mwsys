@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input, viewChild, viewChildren } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input, viewChild, viewChildren, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -21,6 +21,16 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class SimeitblComponent implements OnInit {
+  private cdRef = inject(ChangeDetectorRef);
+  private elementRef = inject(ElementRef);
+  private dialog = inject(MatDialog);
+  private fb = inject(FormBuilder);
+  private apollo = inject(Apollo);
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  smisrv = inject(SiimeiService);
+  strsrv = inject(StoreService);
+
   readonly parentForm = input.required<FormGroup>();
   readonly paginator = viewChild(MatPaginator);
   readonly gcdInps = viewChildren<ElementRef>('gcdInputs');
@@ -45,16 +55,6 @@ export class SimeitblComponent implements OnInit {
     'taxrate',
     // 'currency'
   ];
-  constructor(private cdRef: ChangeDetectorRef,
-    private elementRef: ElementRef,
-    private dialog: MatDialog,
-    private fb: FormBuilder,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    public smisrv: SiimeiService,
-    public strsrv: StoreService) { }
 
   ngOnInit(): void {
     this.addRows(1);

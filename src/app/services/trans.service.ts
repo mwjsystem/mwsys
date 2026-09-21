@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { UserService } from './user.service';
 import { MembsService } from './../mstmember/membs.service';
 import { BunruiService } from './bunrui.service';
@@ -32,18 +32,17 @@ export class Trans {
   providedIn: 'root'
 })
 export class TransService {
+  usrsrv = inject(UserService);
+  memsrv = inject(MembsService);
+  bunsrv = inject(BunruiService);
+  stcsrv = inject(StockService);
+  private apollo = inject(Apollo);
+
   public tbldata: Trans[] = [];
   public flg: number = 1;
   //コンポーネント間通信用
   subject = new Subject<boolean>();
   observe = this.subject.asObservable();
-
-  constructor(public usrsrv: UserService,
-    public memsrv: MembsService,
-    public bunsrv: BunruiService,
-    public stcsrv: StockService,
-    private apollo: Apollo) {
-  }
 
   async getTrans(gcd: string, scd: string, day: Date): Promise<Trans[]> {
 	const lcday:Date = new Date(day.getTime());

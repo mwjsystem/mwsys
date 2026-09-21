@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Apollo } from 'apollo-angular';
@@ -16,6 +16,14 @@ import { AddressComponent } from './../address/address.component';
     standalone: false
 })
 export class AdredaComponent implements OnInit, AfterViewInit {
+  private fb = inject(FormBuilder);
+  memsrv = inject(MembsService);
+  private dialogRef = inject<MatDialogRef<AdredaComponent>>(MatDialogRef);
+  private dialog = inject(MatDialog);
+  private cdRef = inject(ChangeDetectorRef);
+  private usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
   private readonly child = viewChild(AddressComponent);
   mode: number = 3;
   form!: FormGroup;
@@ -23,14 +31,9 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   edaOld!: number;
   flg: boolean; //true⇒枝番をセットボタン表示
 
-  constructor(private fb: FormBuilder,
-    public memsrv: MembsService,
-    private dialogRef: MatDialogRef<AdredaComponent>,
-    @Inject(MAT_DIALOG_DATA) data: any,
-    private dialog: MatDialog,
-    private cdRef: ChangeDetectorRef,
-    private usrsrv: UserService,
-    private apollo: Apollo) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.memsrv.mcode = data.mcode;
     this.eda = data.eda;
     this.flg = data.flg;

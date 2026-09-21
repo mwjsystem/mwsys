@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
@@ -20,20 +20,22 @@ import gql from 'graphql-tag';
     }
 })
 export class GzaiComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private dialogRef = inject<MatDialogRef<GzaiComponent>>(MatDialogRef);
+  private dialog = inject(MatDialog);
+  private apollo = inject(Apollo);
+  usrsrv = inject(UserService);
+  gdssrv = inject(GoodsService);
+  cdRef = inject(ChangeDetectorRef);
+
   form: FormGroup;
   mode: number = 3;
   gcode: string;
   dataSource = new MatTableDataSource();
   displayedColumns = ['line', 'zcode', 'gtext', 'irisu', 'unit'];
-  constructor(private fb: FormBuilder,
-    private dialogRef: MatDialogRef<GzaiComponent>,
-    private dialog: MatDialog,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    public usrsrv: UserService,
-    public gdssrv: GoodsService,
-    public cdRef: ChangeDetectorRef,
-    @Inject(MAT_DIALOG_DATA) data: any) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.form = this.fb.group({ mtbl: this.fb.array([]) });
     this.gcode = data.gcode;
     const i: number = this.gdssrv.goods.findIndex(obj => obj.gcode == this.gcode);

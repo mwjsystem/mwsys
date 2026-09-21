@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
@@ -7,13 +7,12 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class StaffService {
+  private usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
 
   public tcds: mwI.Sval[] = [];
   private stfs: mwI.Staff[] = [];
-  constructor(private usrsrv: UserService,
-    private apollo: Apollo) {
-    // this.get_staff();
-  }
 
   getStaff(): void {
     const GetMast = gql`

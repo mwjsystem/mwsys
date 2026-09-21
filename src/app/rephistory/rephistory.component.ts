@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -14,13 +14,17 @@ import { DownloadService } from './../services/download.service';
     standalone: false
 })
 export class RephistoryComponent {
+  usrsrv = inject(UserService);
+  private fb = inject(FormBuilder);
+  private title = inject(Title);
+  private elementRef = inject(ElementRef);
+  private dwlsrv = inject(DownloadService);
+  private dialog = inject(MatDialog);
+
   form!: FormGroup;
-  constructor(public usrsrv: UserService,
-			  private fb: FormBuilder,
-              private title: Title,
-              private elementRef: ElementRef,
-              private dwlsrv: DownloadService,
-	          private dialog: MatDialog) {
+  constructor() {
+    const title = this.title;
+
     title.setTitle('受注履歴(MWSystem)');
   }
 

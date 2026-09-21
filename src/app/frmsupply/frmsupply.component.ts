@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, viewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -29,6 +29,22 @@ import { filter } from 'rxjs/operators';
     }
 })
 export class FrmsupplyComponent implements OnInit, AfterViewInit {
+  usrsrv = inject(UserService);
+  private fb = inject(FormBuilder);
+  private title = inject(Title);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private elementRef = inject(ElementRef);
+  private dialog = inject(MatDialog);
+  dwlsrv = inject(DownloadService);
+  bunsrv = inject(BunruiService);
+  strsrv = inject(StoreService);
+  stfsrv = inject(StaffService);
+  hmisrv = inject(HatmeiService);
+  private vensrv = inject(VendsService);
+  private overlay = inject(Overlay);
+  private cdRef = inject(ChangeDetectorRef);
+
   readonly hmeitbl = viewChild(HmeitblComponent);
   form!: FormGroup;
   denno: number = 0;
@@ -39,21 +55,9 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  constructor(public usrsrv: UserService,
-    private fb: FormBuilder,
-    private title: Title,
-    private route: ActivatedRoute,
-    private router: Router,
-    private elementRef: ElementRef,
-    private dialog: MatDialog,
-    public dwlsrv: DownloadService,
-    public bunsrv: BunruiService,
-    public strsrv: StoreService,
-    public stfsrv: StaffService,
-    public hmisrv: HatmeiService,
-    private vensrv: VendsService,
-    private overlay: Overlay,
-    private cdRef: ChangeDetectorRef) {
+  constructor() {
+    const title = this.title;
+
     title.setTitle('発注伝票(MWSystem)');
   }
 

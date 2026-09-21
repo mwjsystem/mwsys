@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 // import { Apollo } from 'apollo-angular';
 // import gql from 'graphql-tag';
@@ -25,6 +25,10 @@ interface Jyuden {
     standalone: false
 })
 export class JdentblComponent implements OnInit {
+  invsrv = inject(InvoiceService);
+  private cdRef = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
+
   // @Input() parentForm: FormGroup;
   jdno: number = 0;
   dataSource: MatTableDataSource<Jyuden>;
@@ -38,11 +42,7 @@ export class JdentblComponent implements OnInit {
     'stotal',
     'ttotal'
   ]
-  constructor(public invsrv: InvoiceService,
-    // public usrsrv: UserService,
-    private cdRef: ChangeDetectorRef,
-    // private apollo: Apollo,
-    private dialog: MatDialog) {
+  constructor() {
     this.dataSource = new MatTableDataSource<Jyuden>();
   }
 

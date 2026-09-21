@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,14 +14,14 @@ import { UserService } from './../services/user.service';
     standalone: false
 })
 export class TrantblComponent implements OnInit {
+  trnsrv = inject(TransService);
+  usrsrv = inject(UserService);
+  cdRef = inject(ChangeDetectorRef);
+
   readonly paginator = viewChild(MatPaginator);
   public dataSource!: MatTableDataSource<Trans>;
   public displayedColumns = ['ttype', 'sday', 'yday', 'aitec', 'aiten', 'denno', 'mline', 'tcode', 'biko', 'insuu',
     'ousuu', 'zaisu', 'yotei', 'wait'];
-
-  constructor(public trnsrv: TransService,
-    public usrsrv: UserService,
-    public cdRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.trnsrv.observe.subscribe(() => {

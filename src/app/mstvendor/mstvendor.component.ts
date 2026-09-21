@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -25,22 +25,22 @@ import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
     }
 })
 export class MstvendorComponent implements OnInit, AfterViewInit {
+  private fb = inject(FormBuilder);
+  private title = inject(Title);
+  private route = inject(ActivatedRoute);
+  private elementRef = inject(ElementRef);
+  private dialog = inject(MatDialog);
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  private dwlsrv = inject(DownloadService);
+  private vensrv = inject(VendsService);
+  private apollo = inject(Apollo);
+
   vcd!: string;
   form!: FormGroup;
   mode: number = 3;
 
-  constructor(private fb: FormBuilder,
-    private title: Title,
-    private route: ActivatedRoute,
-    private elementRef: ElementRef,
-    private dialog: MatDialog,
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    private dwlsrv: DownloadService,
-    private vensrv: VendsService,
-    private apollo: Apollo
-    // private toastr: ToastrService
-  ) {
+  constructor() {
     this.title.setTitle('仕入先マスタ(MWSystem)')
   }
 

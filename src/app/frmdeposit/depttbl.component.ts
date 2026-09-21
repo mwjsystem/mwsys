@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, input, inject } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
@@ -13,6 +13,12 @@ import { DepositService, Nyuden } from './deposit.service';
     standalone: false
 })
 export class DepttblComponent implements OnInit {
+  private cdRef = inject(ChangeDetectorRef);
+  private fb = inject(UntypedFormBuilder);
+  depsrv = inject(DepositService);
+  bunsrv = inject(BunruiService);
+  usrsrv = inject(UserService);
+
   readonly parentForm = input.required<UntypedFormGroup>();
   dataSource = new MatTableDataSource();
   displayedColumns: string[] = ['line',
@@ -22,11 +28,6 @@ export class DepttblComponent implements OnInit {
     'tmoney',
     'total',
     'mmemo'];
-  constructor(private cdRef: ChangeDetectorRef,
-    private fb: UntypedFormBuilder,
-    public depsrv: DepositService,
-    public bunsrv: BunruiService,
-    public usrsrv: UserService) { }
 
   ngOnInit(): void {
     this.insRow(0);

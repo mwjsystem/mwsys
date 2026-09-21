@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ViewEncapsulation, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, output, input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ViewEncapsulation, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, output, input, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -22,6 +22,16 @@ import { GzaiComponent } from './../share/gzai/gzai.component';
     standalone: false
 })
 export class GdstblComponent {
+  private cdRef = inject(ChangeDetectorRef);
+  private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
+  private apollo = inject(Apollo);
+  usrsrv = inject(UserService);
+  strsrv = inject(StoreService);
+  stcsrv = inject(StockService);
+  gdssrv = inject(GoodsService);
+  bunsrv = inject(BunruiService);
+
   readonly parentForm = input.required<FormGroup>();
   private paginator!: MatPaginator;
   @ViewChild(MatPaginator, { static: false }) set matPaginator(mp: MatPaginator) {
@@ -34,18 +44,6 @@ export class GdstblComponent {
   hidx = 6; //tabindex用ヘッダ項目数
   mcols = 11; //tabindex用明細列数 
   scode!: string;
-  constructor(private cdRef: ChangeDetectorRef,
-    private fb: FormBuilder,
-    private dialog: MatDialog,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    public usrsrv: UserService,
-    public strsrv: StoreService,
-    public stcsrv: StockService,
-    public gdssrv: GoodsService,
-    public bunsrv: BunruiService) {
-    // this.dataSource.paginator = this.paginator;
-  }
 
   ngOnInit(): void {
     this.addRows(1);

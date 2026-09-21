@@ -1,4 +1,4 @@
-import { Injectable, ElementRef } from '@angular/core';
+import { Injectable, ElementRef, inject } from '@angular/core';
 import * as FileSaver from 'file-saver';
 import * as json2csv from 'json2csv';
 import { HttpClient } from '@angular/common/http';
@@ -31,9 +31,9 @@ class ZipAdr {
   providedIn: 'root'
 })
 export class DownloadService {
+  usrsrv = inject(UserService);
+  private http = inject(HttpClient);
 
-  constructor(public usrsrv: UserService,
-    private http: HttpClient) { }
 
   pickObj(obj: { [x: string]: any; }, flds: string[]) {
     let pickobj: { [key: string]: any } = {};

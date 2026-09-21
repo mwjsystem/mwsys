@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { UserService } from './../../services/user.service';
 
 @Component({
@@ -9,9 +9,9 @@ import { UserService } from './../../services/user.service';
     standalone: false
 })
 export class TmstmpComponent implements OnInit {
-  constructor(
-    public cdRef: ChangeDetectorRef,
-    public usrsrv: UserService) { }
+  cdRef = inject(ChangeDetectorRef);
+  usrsrv = inject(UserService);
+
 
   ngOnInit(): void {
     this.usrsrv.observe.subscribe(flg=>{

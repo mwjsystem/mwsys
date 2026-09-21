@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 // import { Apollo } from 'apollo-angular';
@@ -28,16 +28,16 @@ interface Nymat {
     standalone: false
 })
 export class SpdethelpComponent implements OnInit {
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  private dialogRef = inject<MatDialogRef<SpdethelpComponent>>(MatDialogRef);
+
   dataSource: MatTableDataSource<Nymat>;
   jyusuu: number;
   public displayedColumns = ['denno', 'line', 'yday', 'ydaykbn', 'suu', 'hatzn', 'nymat', 'matzn', 'mbiko'];
-  constructor(
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    // private toastr: ToastrService,
-    // private apollo: Apollo,
-    private dialogRef: MatDialogRef<SpdethelpComponent>,
-    @Inject(MAT_DIALOG_DATA) data: any) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     let lcTbl: Nymat[] = [];
     // console.log(data);
     this.jyusuu = data.suu;

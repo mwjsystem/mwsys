@@ -1,4 +1,4 @@
-import { Directive, ElementRef, OnInit  } from '@angular/core';
+import { Directive, ElementRef, OnInit, inject } from '@angular/core';
 
 @Directive({
     selector: '[numInput]',
@@ -8,11 +8,13 @@ import { Directive, ElementRef, OnInit  } from '@angular/core';
     }
 })
 export class NuminputDirective {
+  private elementRef = inject(ElementRef);
+
   
   private el: HTMLInputElement;
   private value: any;
   
-  constructor(private elementRef: ElementRef) {
+  constructor() {
     this.el = this.elementRef.nativeElement;
   }
   

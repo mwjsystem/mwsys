@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
@@ -79,6 +79,9 @@ export class Jyuden {
   providedIn: 'root'
 })
 export class DepositService {
+  usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
   total: number = 0;
   mode: number = 3;
   nyusub: Nyusub[] = [];
@@ -156,9 +159,6 @@ export class DepositService {
         }
       }
     }`;
-
-  constructor(public usrsrv: UserService,
-    private apollo: Apollo) { }
 
   qryJyuden(denno: number): Observable<Jyuden> {
     let observable: Observable<Jyuden> = new Observable<Jyuden>(observer => {

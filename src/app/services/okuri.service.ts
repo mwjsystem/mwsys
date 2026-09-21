@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
@@ -7,14 +7,13 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class OkuriService {
+  private usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
 
   hokuri: mwI.Hokuri[] = [];
   haisou: mwI.Haisou[] = [];
   hktime: mwI.Hktime[] = [];
-
-  constructor(private usrsrv: UserService,
-    private apollo: Apollo) {
-  }
 
   getHokuri(): void {
     const GetMast = gql`

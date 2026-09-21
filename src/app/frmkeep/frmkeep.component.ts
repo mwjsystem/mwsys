@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -26,6 +26,15 @@ interface GetOpe {
     standalone: false
 })
 export class FrmkeepComponent implements OnInit {
+  usrsrv = inject(UserService);
+  cdRef = inject(ChangeDetectorRef);
+  stfsrv = inject(StaffService);
+  bunsrv = inject(BunruiService);
+  private apollo = inject(Apollo);
+  private dwlsrv = inject(DownloadService);
+  private overlay = inject(Overlay);
+  private route = inject(ActivatedRoute);
+
   denno!: number;
   // temp:mwI.Tropelog[]=[];
   overlayRef = this.overlay.create({
@@ -51,15 +60,6 @@ export class FrmkeepComponent implements OnInit {
     }`;
   private keycode: string[] | null = null;
   private status: string[] | null = null;
-  constructor(public usrsrv: UserService,
-    public cdRef: ChangeDetectorRef,
-    public stfsrv: StaffService,
-    public bunsrv: BunruiService,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    private dwlsrv: DownloadService,
-    private overlay: Overlay,
-    private route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));

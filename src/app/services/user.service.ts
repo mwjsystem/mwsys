@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { FormArray, ValidationErrors, FormGroup } from "@angular/forms";
 import { AuthService } from "@auth0/auth0-angular";
@@ -45,6 +45,11 @@ export class System {
   providedIn: "root",
 })
 export class UserService {
+  auth = inject(AuthService);
+  private apollo = inject(Apollo);
+  private toastr = inject(ToastrService);
+  private router = inject(Router);
+
   userInfo: { [key: string]: any } = {};
   compid!: number;
   staff!: mwI.Staff;
@@ -63,12 +68,7 @@ export class UserService {
     return day !== 0 && day !== 6 && ret;
   };
 
-  constructor(
-    public auth: AuthService,
-    private apollo: Apollo,
-    private toastr: ToastrService,
-    private router: Router
-  ) {
+  constructor() {
     const GetMast = gql`
       query get_system($id: smallint!) {
         mssystem(where: { id: { _eq: $id } }) {

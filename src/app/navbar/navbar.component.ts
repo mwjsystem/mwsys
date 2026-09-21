@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { UserService } from './../services/user.service';
 import { NavmenuService } from './../services/navmenu.service';
 import { DownloadService } from './../services/download.service';
@@ -11,12 +11,12 @@ import { DownloadService } from './../services/download.service';
     standalone: false
 })
 export class NavbarComponent implements OnInit {
+  usrsrv = inject(UserService);
+  navsrv = inject(NavmenuService);
+  dwlsrv = inject(DownloadService);
+  elementRef = inject(ElementRef);
+
   public db!: string;
-  constructor(
-	public usrsrv: UserService,
-    public navsrv: NavmenuService,
-	public dwlsrv: DownloadService,
-    public elementRef: ElementRef) { }
 
   ngOnInit(): void {
     this.db = localStorage.getItem('MWSYS_DB')!;

@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -36,6 +36,16 @@ interface Siiden {
     standalone: false
 })
 export class SdnohelpComponent implements OnInit {
+  usrsrv = inject(UserService);
+  stfsrv = inject(StaffService);
+  vensrv = inject(VendsService);
+  bunsrv = inject(BunruiService);
+  cdRef = inject(ChangeDetectorRef);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+  private dialog = inject(MatDialog);
+  private dialogRef = inject<MatDialogRef<SdnohelpComponent>>(MatDialogRef);
+
   readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -63,15 +73,7 @@ export class SdnohelpComponent implements OnInit {
   fsdno!: number;
   fhdno!: number;
 
-  constructor(public usrsrv: UserService,
-    public stfsrv: StaffService,
-    public vensrv: VendsService,
-    public bunsrv: BunruiService,
-    public cdRef: ChangeDetectorRef,
-    private apollo: Apollo,
-    private overlay: Overlay,
-    private dialog: MatDialog,
-    private dialogRef: MatDialogRef<SdnohelpComponent>) {
+  constructor() {
     this.dataSource = new MatTableDataSource<Siiden>();
   }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef, Inject, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -44,6 +44,13 @@ interface Hatmei {
     standalone: false
 })
 export class HmeihelpComponent implements OnInit {
+  usrsrv = inject(UserService);
+  cdRef = inject(ChangeDetectorRef);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+  private dialog = inject(MatDialog);
+  private dialogRef = inject<MatDialogRef<HmeihelpComponent>>(MatDialogRef);
+
   readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -80,16 +87,9 @@ export class HmeihelpComponent implements OnInit {
   fgcd: string = "";
   fday: Date = new Date();
 
-  constructor(public usrsrv: UserService,
-    // public stfsrv: StaffService,
-    // public vensrv: VendsService,
-    // public bunsrv: BunruiService,
-    public cdRef: ChangeDetectorRef,
-    private apollo: Apollo,
-    private overlay: Overlay,
-    private dialog: MatDialog,
-    private dialogRef: MatDialogRef<HmeihelpComponent>,
-    @Inject(MAT_DIALOG_DATA) data: any) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.fvcd = (data?.vcode ?? '');
     this.fgcd = (data?.gcode ?? '');
   }

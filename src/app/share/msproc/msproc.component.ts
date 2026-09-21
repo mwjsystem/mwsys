@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -21,19 +21,22 @@ import gql from 'graphql-tag';
     }
 })
 export class MsprocComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  cdRef = inject(ChangeDetectorRef);
+  private dialogRef = inject<MatDialogRef<MsprocComponent>>(MatDialogRef);
+
   mcode: number;
   mode: number = 2;
   form!: FormGroup;
   dataSource = new MatTableDataSource();
   displayedColumns = ['prcno', 'prcname', 'prcbody', 'vcode', 'code', 'memo', 'tanka', 'genka', 'posi01', 'posi02'];
 
-  constructor(private fb: FormBuilder,
-    private dialog: MatDialog,
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    public cdRef: ChangeDetectorRef,
-    @Inject(MAT_DIALOG_DATA) data: any,
-    private dialogRef: MatDialogRef<MsprocComponent>) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.mcode = data.mcode;
   }
 

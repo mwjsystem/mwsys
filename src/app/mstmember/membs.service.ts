@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
@@ -7,12 +7,13 @@ import { UserService } from './../services/user.service';
   providedIn: 'root'
 })
 export class MembsService {
+  private usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
   public mcode: string = "";
   public membs: mwI.Mcode[] = [];
   public edas: mwI.Edahlp[] = [];
   public adrs: mwI.Adrs[] = [];
-  constructor(private usrsrv: UserService,
-    private apollo: Apollo) { }
 
   getMembers(): Promise<Boolean> {
     const GetMast = gql`

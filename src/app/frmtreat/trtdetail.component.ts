@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
@@ -19,22 +19,24 @@ import { HttpClient } from '@angular/common/http';
     standalone: false
 })
 export class TrtdetailComponent implements OnInit {
+  trtsrv = inject(TreatService);
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  stfsrv = inject(StaffService);
+  cdRef = inject(ChangeDetectorRef);
+  private fb = inject(UntypedFormBuilder);
+  private dialog = inject(MatDialog);
+  private apollo = inject(Apollo);
+  private http = inject(HttpClient);
+  private dialogRef = inject<MatDialogRef<TrtdetailComponent>>(MatDialogRef);
+
 
   public idx: number = 0;
   public form!: UntypedFormGroup;
   readonly inputs = viewChildren('upfile', { read: ElementRef });
-  constructor(public trtsrv: TreatService,
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    public stfsrv: StaffService,
-    public cdRef: ChangeDetectorRef,
-    private fb: UntypedFormBuilder,
-    private dialog: MatDialog,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    private http: HttpClient,
-    private dialogRef: MatDialogRef<TrtdetailComponent>,
-    @Inject(MAT_DIALOG_DATA) data: any) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.idx = data.idx;
   }
 

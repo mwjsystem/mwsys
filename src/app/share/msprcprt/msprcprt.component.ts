@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { UntypedFormGroup, UntypedFormBuilder, FormControl, UntypedFormArray, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -19,6 +19,12 @@ import { HttpClient } from '@angular/common/http';
     }
 })
 export class MsprcprtComponent implements OnInit {
+  private fb = inject(UntypedFormBuilder);
+  private http = inject(HttpClient);
+  usrsrv = inject(UserService);
+  cdRef = inject(ChangeDetectorRef);
+  private dialogRef = inject<MatDialogRef<MsprcprtComponent>>(MatDialogRef);
+
   mcode: number;
   mode: number = 2;
   form!: UntypedFormGroup;
@@ -26,12 +32,9 @@ export class MsprcprtComponent implements OnInit {
   dataSource = new MatTableDataSource();
   readonly inputs = viewChildren('upfile', { read: ElementRef });
   displayedColumns = ['line', 'partno', 'seq', 'pic'];
-  constructor(private fb: UntypedFormBuilder,
-    private http: HttpClient,
-    public usrsrv: UserService,
-    public cdRef: ChangeDetectorRef,
-    @Inject(MAT_DIALOG_DATA) data: any,
-    private dialogRef: MatDialogRef<MsprcprtComponent>) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.mcode = data.mcode;
   }
 

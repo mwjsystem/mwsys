@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform, inject } from '@angular/core';
 import { StaffService } from './../../services/staff.service';
 
 @Pipe({
@@ -6,7 +6,8 @@ import { StaffService } from './../../services/staff.service';
     standalone: false
 })
 export class StaffPipe implements PipeTransform {
-  constructor(private stfsrv: StaffService) { }
+  private stfsrv = inject(StaffService);
+
 
   transform(value: string): string {
     return this.stfsrv.getName(value);

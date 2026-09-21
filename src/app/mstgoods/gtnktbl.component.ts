@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, input, inject } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,6 +14,12 @@ import { BunruiService } from './../services/bunrui.service';
     standalone: false
 })
 export class GtnktblComponent implements OnInit, AfterViewInit {
+  bunsrv = inject(BunruiService);
+  private cdRef = inject(ChangeDetectorRef);
+  private fb = inject(FormBuilder);
+  usrsrv = inject(UserService);
+  gdssrv = inject(GoodsService);
+
   readonly parentForm = input.required<FormGroup>();
   private paginator!: MatPaginator;
   @ViewChild(MatPaginator, { static: false }) set matPaginator(mp: MatPaginator) {
@@ -33,12 +39,7 @@ export class GtnktblComponent implements OnInit, AfterViewInit {
     'cost', 'genka', 'taxrate', 'currency'];
   hidx = 10000; //tabindex用ヘッダ項目数
   mcols = 14; //tabindex用明細列数  
-  constructor(public bunsrv: BunruiService,
-    private cdRef: ChangeDetectorRef,
-    private fb: FormBuilder,
-    public usrsrv: UserService,
-    public gdssrv: GoodsService
-  ) {
+  constructor() {
     this.dataSource.paginator = this.paginator;
 
   }

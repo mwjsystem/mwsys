@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatDialogRef } from "@angular/material/dialog";
 
 @Component({
@@ -9,9 +9,8 @@ import { MatDialogRef } from "@angular/material/dialog";
     standalone: false
 })
 export class StcscdsComponent implements OnInit {
+  private dialogRef = inject<MatDialogRef<StcscdsComponent>>(MatDialogRef);
 
-  constructor(
-    private dialogRef: MatDialogRef<StcscdsComponent>) { }
 
   ngOnInit(): void {
   }

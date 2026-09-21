@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef, MatDialog } from "@angular/material/dialog";
@@ -31,6 +31,15 @@ interface Movsub {
     standalone: false
 })
 export class MdnohelpComponent implements OnInit {
+  usrsrv = inject(UserService);
+  stfsrv = inject(StaffService);
+  strsrv = inject(StoreService);
+  cdRef = inject(ChangeDetectorRef);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+  private dialog = inject(MatDialog);
+  private dialogRef = inject<MatDialogRef<MdnohelpComponent>>(MatDialogRef);
+
   readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -54,14 +63,6 @@ export class MdnohelpComponent implements OnInit {
   foutcd: string = "";
   fday: Date = new Date();
   ftcd: string = "";
-  constructor(public usrsrv: UserService,
-    public stfsrv: StaffService,
-    public strsrv: StoreService,
-    public cdRef: ChangeDetectorRef,
-    private apollo: Apollo,
-    private overlay: Overlay,
-    private dialog: MatDialog,
-    private dialogRef: MatDialogRef<MdnohelpComponent>) { }
 
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;

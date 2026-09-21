@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
@@ -7,12 +7,11 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class StoreService {
+  private usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
 
   public scds: mwI.Sval[] = [];
-  constructor(private usrsrv: UserService,
-    private apollo: Apollo) {
-    // this.get_souko();
-  }
 
   getStore(): void {
     if (this.scds.length == 0) {

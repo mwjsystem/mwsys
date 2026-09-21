@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Overlay } from '@angular/cdk/overlay';
@@ -26,6 +26,16 @@ import { filter } from 'rxjs/operators';
     standalone: false
 })
 export class FrmtreatComponent implements OnInit {
+  trtsrv = inject(TreatService);
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  stfsrv = inject(StaffService);
+  private title = inject(Title);
+  private route = inject(ActivatedRoute);
+  private dialog = inject(MatDialog);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+
   readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<mwI.Trtreat>;
   displayedColumns = ['created_at', 'created_by', 'genre', 'trttype', 'mcode', 'grpcode', 'gcode', 'tel', 'email', 'question', 'answer', 'kaizen', 'result'];
@@ -39,16 +49,9 @@ export class FrmtreatComponent implements OnInit {
       .position().global().centerHorizontally().centerVertically()
   });
 
-  constructor(public trtsrv: TreatService,
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    public stfsrv: StaffService,
-    private title: Title,
-    private route: ActivatedRoute,
-    private dialog: MatDialog,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    private overlay: Overlay) {
+  constructor() {
+    const title = this.title;
+
     this.dataSource = new MatTableDataSource<mwI.Trtreat>(this.trtsrv.trts);
     this.dataSource.paginator = this.paginator() ?? null;
     title.setTitle('問合せ一覧(MWSystem)');

@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { SpdethelpComponent } from './../share/spdethelp/spdethelp.component';
@@ -26,17 +26,18 @@ export class Jmzai {
     standalone: false
 })
 export class JmzaitblComponent implements OnInit {
+  private dialogRef = inject<MatDialogRef<JmzaitblComponent>>(MatDialogRef);
+  private dialog = inject(MatDialog);
+  private apollo = inject(Apollo);
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+
   dataSource: MatTableDataSource<Jmzai> = new MatTableDataSource();
   scode: string;
   displayedColumns = ['eda', 'gcode', 'suu', 'genka', 'pable', 'spec', 'spdet'];
-  constructor(private dialogRef: MatDialogRef<JmzaitblComponent>,
-    private dialog: MatDialog,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    // public stcsrv: StockService,
-    @Inject(MAT_DIALOG_DATA) data: any) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.dataSource.data = data.tbldata;
     this.scode = data.scode;
   }

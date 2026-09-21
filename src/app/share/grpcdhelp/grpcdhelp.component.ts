@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, Inject, viewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, viewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
@@ -26,6 +26,12 @@ interface Ggrp {
     standalone: false
 })
 export class GrpcdhelpComponent implements OnInit {
+  private dialogRef = inject<MatDialogRef<GrpcdhelpComponent>>(MatDialogRef);
+  usrsrv = inject(UserService);
+  cdRef = inject(ChangeDetectorRef);
+  bunsrv = inject(BunruiService);
+  private apollo = inject(Apollo);
+
   readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<Ggrp>;
   displayedColumns = ['code', 'name', 'kana', 'gkbn', 'sozai', 'vcode', 'tcode'];
@@ -37,13 +43,9 @@ export class GrpcdhelpComponent implements OnInit {
   public subject = new Subject<Boolean>();
   public observe = this.subject.asObservable();
 
-  constructor(private dialogRef: MatDialogRef<GrpcdhelpComponent>,
-    public usrsrv: UserService,
-    public cdRef: ChangeDetectorRef,
-    // public gdssrv: GoodsService,
-    public bunsrv: BunruiService,
-    private apollo: Apollo,
-    @Inject(MAT_DIALOG_DATA) data: any) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     // console.log(data);
     this.dataSource = new MatTableDataSource<Ggrp>(this.ggrps);
     if (typeof data != 'undefined') {

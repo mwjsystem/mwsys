@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../services/user.service';
@@ -18,15 +18,15 @@ export interface Ggrp {
 })
 
 export class GoodsService {
+  private usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
   // public salgds: mwI.SalGds[]=[];
 
   public grpcd!: string;
   public goods: mwI.Goods[] = [];
   public ggrps: Ggrp[] = [];
   public gtnks: mwI.Gtanka[] = [];
-
-  constructor(private usrsrv: UserService,
-    private apollo: Apollo) { }
 
   getGgroups(): Promise<Boolean> {
     const GetMast = gql`

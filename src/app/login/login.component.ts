@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 
 @Component({
@@ -9,8 +9,8 @@ import { AuthService } from '@auth0/auth0-angular';
     standalone: false
 })
 export class LoginComponent implements OnInit {
+  auth = inject(AuthService);
 
-  constructor(public auth: AuthService) { }
 
   ngOnInit(): void {
   }

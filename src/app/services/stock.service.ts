@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
@@ -78,6 +78,9 @@ export class StGds {
   providedIn: 'root'
 })
 export class StockService {
+  usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
   public goods: Goods[] = [];
   public stc: Stock = new Stock();
   public stcs: Stock[] = [];
@@ -94,9 +97,7 @@ export class StockService {
   // public isLoading:boolean=false;
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
-  constructor(public usrsrv: UserService,
-    // public strsrv: StoreService,
-    private apollo: Apollo) {
+  constructor() {
     // this.getGoods();
     this.makeYyyymm();
   }

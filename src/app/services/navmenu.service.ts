@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
@@ -7,11 +7,11 @@ import { UserService } from './user.service';
   providedIn: 'root'
 })
 export class NavmenuService {
+  private usrsrv = inject(UserService);
+  private apollo = inject(Apollo);
+
   
-  public menu: { [key: string]: mwI.Navmenu[]; } = {};  
-  
-  constructor(private usrsrv: UserService,
-    private apollo: Apollo) { }
+  public menu: { [key: string]: mwI.Navmenu[]; } = {};
 
   getNavmenu(): void {
     this.qryNavmenu();

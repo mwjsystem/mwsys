@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef, OnInit, Inject, ElementRef, ChangeDetectionStrategy, viewChildren } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, OnInit, ElementRef, ChangeDetectionStrategy, viewChildren, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { UserService } from './../../services/user.service';
 import gql from 'graphql-tag';
@@ -14,18 +14,20 @@ import { HttpClient } from '@angular/common/http';
     standalone: false
 })
 export class GdsimageComponent implements OnInit, AfterViewInit {
+  usrsrv = inject(UserService);
+  cdRef = inject(ChangeDetectorRef);
+  private apollo = inject(Apollo);
+  private http = inject(HttpClient);
+  private dialogRef = inject<MatDialogRef<GdsimageComponent>>(MatDialogRef);
+
   public noimgs: Boolean[] = [];
   public url: string = "";
   public cat: string = "";
   public grpcd: string = "";
   readonly inputs = viewChildren('upfile', { read: ElementRef });
-  constructor(public usrsrv: UserService,
-    public cdRef: ChangeDetectorRef,
-    private apollo: Apollo,
-    // private toastr: ToastrService,
-    private http: HttpClient,
-    private dialogRef: MatDialogRef<GdsimageComponent>,
-    @Inject(MAT_DIALOG_DATA) data: any) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.grpcd = data.grpcd;
     this.url = data.url;
   }

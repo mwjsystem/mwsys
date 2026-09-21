@@ -1,4 +1,4 @@
-import { Directive, Input, ElementRef, AfterViewInit } from '@angular/core';
+import { Directive, Input, ElementRef, AfterViewInit, inject } from '@angular/core';
 import { TabService } from './tab.service';
 type IKNOWISNUMBER = any;
 type IKNOWISSTRING = any;
@@ -11,6 +11,9 @@ type IKNOWISSTRING = any;
     }
 })
 export class TabDirective implements AfterViewInit  {
+  private el = inject(ElementRef);
+  private tabService = inject(TabService);
+
 
   private _index!: number;
   get index(): IKNOWISNUMBER{
@@ -28,8 +31,6 @@ export class TabDirective implements AfterViewInit  {
       e.preventDefault();
       // console.log(e,this.index);
     }
-  }
-  constructor(private el: ElementRef, private tabService: TabService) { 
   }
 
   ngAfterViewInit(){

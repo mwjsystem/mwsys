@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef, Inject, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -30,6 +30,13 @@ export interface Gcd {
     standalone: false
 })
 export class GcdhelpComponent implements OnInit {
+  private dialogRef = inject<MatDialogRef<GcdhelpComponent>>(MatDialogRef);
+  private dialog = inject(MatDialog);
+  usrsrv = inject(UserService);
+  bunsrv = inject(BunruiService);
+  cdRef = inject(ChangeDetectorRef);
+  private apollo = inject(Apollo);
+
   readonly paginator = viewChild(MatPaginator);
   dataSource: MatTableDataSource<Gcd>;
   displayedColumns = ['code', 'gcode', 'gtext', 'size', 'color', 'jan', 'unit', 'gskbn', 'tkbn'];
@@ -41,13 +48,9 @@ export class GcdhelpComponent implements OnInit {
   public tkbn: string[] = [];
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
-  constructor(private dialogRef: MatDialogRef<GcdhelpComponent>,
-    private dialog: MatDialog,
-    public usrsrv: UserService,
-    public bunsrv: BunruiService,
-    public cdRef: ChangeDetectorRef,
-    private apollo: Apollo,
-    @Inject(MAT_DIALOG_DATA) data: any) {
+  constructor() {
+    const data = inject(MAT_DIALOG_DATA);
+
     this.dataSource = new MatTableDataSource<Gcd>(this.gcds);
     if (typeof data != 'undefined') {
       this.gcode = (data?.gcode ?? '');

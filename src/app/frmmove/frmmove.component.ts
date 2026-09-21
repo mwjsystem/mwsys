@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -28,6 +28,19 @@ import { filter } from 'rxjs/operators';
     }
 })
 export class FrmmoveComponent implements OnInit {
+  usrsrv = inject(UserService);
+  stfsrv = inject(StaffService);
+  okrsrv = inject(OkuriService);
+  strsrv = inject(StoreService);
+  movsrv = inject(MovingService);
+  private fb = inject(FormBuilder);
+  private dialog = inject(MatDialog);
+  private overlay = inject(Overlay);
+  private cdRef = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private title = inject(Title);
+
   readonly movtbl = viewChild(MovtblComponent);
   form!: FormGroup;
   denno: number = 0;
@@ -39,18 +52,9 @@ export class FrmmoveComponent implements OnInit {
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  constructor(public usrsrv: UserService,
-    public stfsrv: StaffService,
-    public okrsrv: OkuriService,
-    public strsrv: StoreService,
-    public movsrv: MovingService,
-    private fb: FormBuilder,
-    private dialog: MatDialog,
-    private overlay: Overlay,
-    private cdRef: ChangeDetectorRef,
-    private route: ActivatedRoute,
-    private router: Router,
-    private title: Title) {
+  constructor() {
+    const title = this.title;
+
     title.setTitle('移動伝票(MWSystem)');
   }
 

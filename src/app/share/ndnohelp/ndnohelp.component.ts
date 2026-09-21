@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -38,6 +38,15 @@ interface Nyusub {
     standalone: false
 })
 export class NdnohelpComponent implements OnInit {
+  usrsrv = inject(UserService);
+  stfsrv = inject(StaffService);
+  bunsrv = inject(BunruiService);
+  cdRef = inject(ChangeDetectorRef);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+  private dialog = inject(MatDialog);
+  private dialogRef = inject<MatDialogRef<NdnohelpComponent>>(MatDialogRef);
+
   readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -69,16 +78,6 @@ export class NdnohelpComponent implements OnInit {
   fday: Date = new Date();
   ftcd: string = "";
   fjdno: number = 0;
-
-  constructor(public usrsrv: UserService,
-    public stfsrv: StaffService,
-    public bunsrv: BunruiService,
-    public cdRef: ChangeDetectorRef,
-    private apollo: Apollo,
-    private overlay: Overlay,
-    private dialog: MatDialog,
-    private dialogRef: MatDialogRef<NdnohelpComponent>,
-    @Inject(MAT_DIALOG_DATA) data: any) { }
 
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;

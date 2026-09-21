@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -35,6 +35,15 @@ interface Hatden {
     standalone: false
 })
 export class HdnohelpComponent implements OnInit {
+  usrsrv = inject(UserService);
+  stfsrv = inject(StaffService);
+  vensrv = inject(VendsService);
+  cdRef = inject(ChangeDetectorRef);
+  private apollo = inject(Apollo);
+  private overlay = inject(Overlay);
+  private dialog = inject(MatDialog);
+  private dialogRef = inject<MatDialogRef<HdnohelpComponent>>(MatDialogRef);
+
   readonly paginator = viewChild(MatPaginator);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -62,15 +71,7 @@ export class HdnohelpComponent implements OnInit {
   ftcd: string = "";
   // fhdst = ["1", "2", "3", "4"];
 
-  constructor(public usrsrv: UserService,
-    public stfsrv: StaffService,
-    public vensrv: VendsService,
-    // public bunsrv: BunruiService,
-    public cdRef: ChangeDetectorRef,
-    private apollo: Apollo,
-    private overlay: Overlay,
-    private dialog: MatDialog,
-    private dialogRef: MatDialogRef<HdnohelpComponent>) {
+  constructor() {
     this.dataSource = new MatTableDataSource<Hatden>();
   }
 
