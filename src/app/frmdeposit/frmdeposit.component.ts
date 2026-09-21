@@ -4,7 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { DepttblComponent } from './depttbl.component';
-import { Jyuden, Nyuden, Nyuhis, DepositService } from './deposit.service';
+import { Jyuden, Nyuden, Nyuhis, NyusubSet, DepositService } from './deposit.service';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
@@ -278,7 +278,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     }
   }
   async save() {
-    let head: any = {
+    let head: NyusubSet = {
       day: this.usrsrv.editFrmval(this.form, 'day'),
       mcode: this.usrsrv.editFrmval(this.form, 'scde'),
       code: this.usrsrv.editFrmval(this.form, 'code'),

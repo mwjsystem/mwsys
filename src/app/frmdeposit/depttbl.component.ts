@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedF
 import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
-import { DepositService, Nyuden } from './deposit.service';
+import { DepositService, Nyuden, DeptInput } from './deposit.service';
 
 @Component({
     selector: 'app-depttbl',
@@ -100,7 +100,7 @@ export class DepttblComponent implements OnInit {
     this.depsrv.subDep.next(true);
   }
   getMtbl(dno: number) {
-    let dept: { id: number; kubun: number; denno: any; day: any; line: any; ptype: any; nmoney: any; smoney: any; tmoney: any; mmemo: any; }[] = [];
+    let dept: DeptInput[] = [];
     this.frmArr.controls
       .forEach(control => {
         dept.push({
