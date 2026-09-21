@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren, inject } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, UntypedFormControl, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from "@angular/material/dialog";
@@ -10,6 +10,24 @@ import { StaffService } from './../services/staff.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 // import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
+
+/** 問合せ詳細フォーム。seq / created_at / created_by は、新規登録時に表示用の値が入るため型を広げている */
+type TrtForm = {
+  seq: FormControl<string | number>;
+  created_at: FormControl<Date | string>;
+  created_by: FormControl<number | string>;
+  trttype: FormControl<string>;
+  genre: FormControl<string>;
+  mcode: FormControl<string | number>;
+  grpcode: FormControl<string>;
+  gcode: FormControl<string>;
+  tel: FormControl<string>;
+  email: FormControl<string>;
+  question: FormControl<string>;
+  answer: FormControl<string>;
+  kaizen: FormControl<string>;
+  result: FormControl<string>;
+};
 
 @Component({
     selector: 'app-trtdetail',
@@ -24,7 +42,6 @@ export class TrtdetailComponent implements OnInit {
   bunsrv = inject(BunruiService);
   stfsrv = inject(StaffService);
   cdRef = inject(ChangeDetectorRef);
-  private fb = inject(UntypedFormBuilder);
   private dialog = inject(MatDialog);
   private apollo = inject(Apollo);
   private http = inject(HttpClient);
@@ -32,7 +49,7 @@ export class TrtdetailComponent implements OnInit {
 
 
   public idx: number = 0;
-  public form!: UntypedFormGroup;
+  public form!: FormGroup<TrtForm>;
   readonly inputs = viewChildren('upfile', { read: ElementRef });
   constructor() {
     const data = inject(MAT_DIALOG_DATA);
@@ -41,26 +58,26 @@ export class TrtdetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.form = this.fb.group({
-      seq: new UntypedFormControl(''),
-      created_at: new UntypedFormControl(''),
-      created_by: new UntypedFormControl(''),
-      trttype: new UntypedFormControl(''),
-      genre: new UntypedFormControl(''),
-      mcode: new UntypedFormControl(''),
-      grpcode: new UntypedFormControl(''),
-      gcode: new UntypedFormControl(''),
-      tel: new UntypedFormControl(''),
-      email: new UntypedFormControl(''),
-      question: new UntypedFormControl(''),
-      answer: new UntypedFormControl(''),
-      kaizen: new UntypedFormControl(''),
-      result: new UntypedFormControl(''),
+    this.form = new FormGroup<TrtForm>({
+      seq: new FormControl<string | number>('', { nonNullable: true }),
+      created_at: new FormControl<Date | string>('', { nonNullable: true }),
+      created_by: new FormControl<number | string>('', { nonNullable: true }),
+      trttype: new FormControl<string>('', { nonNullable: true }),
+      genre: new FormControl<string>('', { nonNullable: true }),
+      mcode: new FormControl<string | number>('', { nonNullable: true }),
+      grpcode: new FormControl<string>('', { nonNullable: true }),
+      gcode: new FormControl<string>('', { nonNullable: true }),
+      tel: new FormControl<string>('', { nonNullable: true }),
+      email: new FormControl<string>('', { nonNullable: true }),
+      question: new FormControl<string>('', { nonNullable: true }),
+      answer: new FormControl<string>('', { nonNullable: true }),
+      kaizen: new FormControl<string>('', { nonNullable: true }),
+      result: new FormControl<string>('', { nonNullable: true }),
     });
     if (this.idx == -1) {
-      this.form.get('seq')!.setValue("新規登録");
-      this.form.get('created_at')!.setValue(new Date());
-      this.form.get('created_by')!.setValue(this.usrsrv.staff.code);
+      this.form.controls.seq.setValue("新規登録");
+      this.form.controls.created_at.setValue(new Date());
+      this.form.controls.created_by.setValue(this.usrsrv.staff.code);
     } else {
       this.form.patchValue(this.trtsrv.trts[this.idx]);
     }
@@ -128,7 +145,7 @@ export class TrtdetailComponent implements OnInit {
       data => {
         this.cdRef.reattach();
         if (typeof data != 'undefined') {
-          this.form.get('mcode')!.setValue(+data.mcode);
+          this.form.controls.mcode.setValue(+data.mcode);
         }
       }
     );
@@ -169,7 +186,7 @@ export class TrtdetailComponent implements OnInit {
       // this.usrsrv.getNumber('treat',1)
       //   .subscribe(value => {
       let value = await this.usrsrv.getNumber('treat', 1);
-      this.form.get('seq')!.setValue(value);
+      this.form.controls.seq.setValue(value);
       this.idx = 0;
       this.apollo.mutate<any>({
         mutation: InsertTran,

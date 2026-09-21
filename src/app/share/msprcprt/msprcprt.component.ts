@@ -1,12 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { UntypedFormGroup, UntypedFormBuilder, FormControl, UntypedFormArray, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { UserService } from './../../services/user.service';
 import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { HttpClient } from '@angular/common/http';
+
+type PartRowControls = {
+  line: FormControl<number | null>;
+  partno: FormControl<number | null>;
+  seq: FormControl<number | null>;
+};
 
 @Component({
     selector: 'app-msprcprt',
@@ -19,7 +25,6 @@ import { HttpClient } from '@angular/common/http';
     }
 })
 export class MsprcprtComponent implements OnInit {
-  private fb = inject(UntypedFormBuilder);
   private http = inject(HttpClient);
   usrsrv = inject(UserService);
   cdRef = inject(ChangeDetectorRef);
@@ -27,7 +32,7 @@ export class MsprcprtComponent implements OnInit {
 
   mcode: number;
   mode: number = 2;
-  form!: UntypedFormGroup;
+  form!: FormGroup<{ mtbl: FormArray<FormGroup<PartRowControls>> }>;
   selrow: any;
   dataSource = new MatTableDataSource();
   readonly inputs = viewChildren('upfile', { read: ElementRef });
@@ -39,7 +44,7 @@ export class MsprcprtComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.form = this.fb.group({ mtbl: this.fb.array([]) });
+    this.form = new FormGroup({ mtbl: new FormArray<FormGroup<PartRowControls>>([]) });
     this.ins_row(1);
   }
   // async newPno(i: number) {
@@ -58,15 +63,15 @@ export class MsprcprtComponent implements OnInit {
   //   this.refresh();
   // }
   ins_row(row: number) {
-    this.frmArr.insert(row, this.fb.group({
-      line: [{ value: 0, disabled: true }],
-      partno: [{ value: null, disabled: true }],
-      seq: [{ value: null, disabled: true }]
+    this.frmArr.insert(row, new FormGroup<PartRowControls>({
+      line: new FormControl<number | null>({ value: 0, disabled: true }),
+      partno: new FormControl<number | null>({ value: null, disabled: true }),
+      seq: new FormControl<number | null>({ value: null, disabled: true })
     }));
     this.refresh();
   }
-  get frmArr(): UntypedFormArray {
-    return this.form.get('mtbl') as UntypedFormArray;
+  get frmArr(): FormArray<FormGroup<PartRowControls>> {
+    return this.form.controls.mtbl;
   }
   // modeToUpd(): void {
   //   this.mode = 2;
