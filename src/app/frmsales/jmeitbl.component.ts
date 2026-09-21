@@ -9,7 +9,7 @@ import { JmzaitblComponent } from './jmzaitbl.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
-import { StockService } from './../services/stock.service';
+import { StockService, Stcbs } from './../services/stock.service';
 // import { GoodsService } from './../services/goods.service';
 import { MembsService } from './../mstmember/membs.service';
 import { JyumeiService, TrjyumeiRow } from './jyumei.service';
@@ -18,6 +18,28 @@ import * as Query from './queries.frms';
 // import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
 
+/** 商品の単価キー（tanka1〜tanka9） */
+type TankaKey = 'tanka1' | 'tanka2' | 'tanka3' | 'tanka4' | 'tanka5' | 'tanka6' | 'tanka7' | 'tanka8' | 'tanka9';
+/** get_nymat クエリの結果（入荷予定） */
+interface NymatRow { denno: number; line: number; yday: string; ydaykbn: string; suu: number; hatzn: number; nymat: number; matzn: number; mbiko: string | null }
+interface NymatResult { vnymat: NymatRow[] }
+/** 商品の構成品（在庫内訳）。gskbn は構成品の数量区分 */
+interface GzaiRef { zcode: string; irisu: number; msgoods: { gskbn: string } }
+type GoodTanka = { cost: number; currency: string; day: string; genka: number; taxrate: number } & Record<TankaKey, number>;
+interface GoodRow {
+  gcode: string; gtext: string; unit: string; koguchi: number | null; max: number | null; ordering: boolean;
+  send: string | null; gskbn: string; hgcode: string | null;
+  msggroup: { code: string; gkbn: string; vcode: string; msprocesses: { prcno: number; prcname: string }[] };
+  msgtankas: GoodTanka[];
+  msgsptnks: { sptnkbn: string; sptanka: number }[];
+  msgzais: GzaiRef[];
+}
+/** get_good クエリの結果 */
+interface GoodResult { msgoods_by_pk: GoodRow | null }
+/** 在庫内訳の編集ダイアログ（JmzaitblComponent）へ渡す行、および編集後に返される行 */
+interface JmzaiRow { eda: number; gcode: string; suu: number; spec: string | null; spdet: string | null; pable: number }
+/** get_jyuden の明細行（サーバーの形）。商品・グループの情報が msgood として入れ子で付いてくる */
+interface JyumeiRaw extends mwI.Jyumei { msgood: { msggroup: Record<string, unknown> } & Record<string, unknown> }
 @Component({
     selector: 'app-jmeitbl',
     templateUrl: './jmeitbl.component.html',
@@ -48,14 +70,14 @@ export class JmeitblComponent implements OnInit {
   navCli = navigator.clipboard;
   jmeikbn!: string;
   // jyumei: mwI.Jyumei[] = [];
-  hatden: any[] = [];
-  movden: any[] = [];
+  hatden: string[] = [];
+  movden: string[] = [];
   mall: boolean = false;
   hidx = 20; //tabindex用ヘッダ項目数
   mcols = 4; //tabindex用明細列数
   displayedColumns!: string[];
   flgCol: boolean = false;
-  setZai: any[] = [];
+  setZai: Stcbs[][] = [];
   defCol = ['chk',
     'line',
     // 'line2',
@@ -490,7 +512,7 @@ export class JmeitblComponent implements OnInit {
       return void (0);
     }
     // dialogConfig.panelClass= 'full-screen-modal';
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<NymatResult>({
       query: Query.GetTran,
       variables: {
         id: this.usrsrv.compid,
@@ -500,11 +522,11 @@ export class JmeitblComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         console.log(data);
-        if (data.vnymat.length == 0) {
+        if ((data as NymatResult).vnymat.length == 0) {
           this.usrsrv.toastWar("入荷予定が見つかりません");
         } else {
           dialogConfig.data = {
-            nymat: data.vnymat,
+            nymat: (data as NymatResult).vnymat,
             suu: this.frmArr.controls[i].value.suu
           };
           let dialogRef = this.dialog.open(SpdethelpComponent, dialogConfig);
@@ -523,10 +545,10 @@ export class JmeitblComponent implements OnInit {
   }
   jyumZai(i: number): void {
     let dialogConfig = new MatDialogConfig();
-    let lcdata: { eda: any; gcode: any; suu: any; spec: any; spdet: any; pable: number; }[] = [];
+    let lcdata: JmzaiRow[] = [];
     // console.log('jyumZai',this.getMtbl(i,'trjyumzais'),this.frmArr.controls[i].get('trjyumzais'));
     this.getMtbl(i, 'trjyumzais').controls.forEach(e => {
-      let j: number = this.setZai[i].findIndex((obj: { gcode: any; }) => obj.gcode == e.value.gcode);
+      let j: number = this.setZai[i].findIndex(obj => obj.gcode == e.value.gcode);
       if (j > -1) {
         lcdata.push({ eda: e.value.eda, gcode: e.value.gcode, suu: e.value.suu, spec: e.value.spec, spdet: e.value.spdet, pable: (this.setZai[i][j]?.stock - this.setZai[i][j]?.hikat - this.setZai[i][j]?.keepd) });
       }
@@ -544,7 +566,7 @@ export class JmeitblComponent implements OnInit {
         if (typeof data != 'undefined') {
           // console.log(data);
           this.getMtbl(i, 'trjyumzais').clear();
-          data.forEach((e: any) => this.getMtbl(i, 'trjyumzais').push(this.fb.group(e)));
+          data.forEach((e: JmzaiRow) => this.getMtbl(i, 'trjyumzais').push(this.fb.group(e)));
 
         }
       }
@@ -553,7 +575,7 @@ export class JmeitblComponent implements OnInit {
   updGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
     this.frmArr.controls[i].get('gcode')!.setValue(val);
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<GoodResult>({
       query: Query.GetGood,
       variables: {
         id: this.usrsrv.compid,
@@ -566,7 +588,7 @@ export class JmeitblComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
 		// console.log(data);  
-        let msgds = data.msgoods_by_pk;
+        let msgds = (data as GoodResult).msgoods_by_pk;
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
           this.frmArr.controls[i].get('gcode')!.setErrors({ 'incorrect': true });
@@ -590,13 +612,13 @@ export class JmeitblComponent implements OnInit {
 		  if ( msgds.msgtankas.length === 0) {
 
 		  }	else {
-		    j = msgds.msgsptnks.findIndex((obj: { sptnkbn: string; }) => obj.sptnkbn == this.jmisrv.sptnkbn)
+		    j = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn)
 		  }		
 		  // console.log(msgds.msgsptnks,this.jmisrv.sptnkbn,j);
           if (j > -1) {
             lctanka = msgds.msgsptnks[j].sptanka;
           } else {
-            lctanka = msgds.msgtankas[0]['tanka' + this.jmisrv.tankakbn];
+            lctanka = msgds.msgtankas[0][('tanka' + this.jmisrv.tankakbn) as TankaKey];
           }
           // console.log(i, lctanka);
           this.frmArr.controls[i].patchValue({
@@ -617,7 +639,7 @@ export class JmeitblComponent implements OnInit {
             // });
 
           }
-          msgds.msgzais.forEach((e: { msgoods: { gskbn: string; }; zcode: any; irisu: any; }) => {
+          msgds.msgzais.forEach(e => {
             let k: number = 0;
             let arr = []
             if (e.msgoods.gskbn == "0") {
@@ -646,7 +668,7 @@ export class JmeitblComponent implements OnInit {
       });
   }
 
-  setPable(i: number, gcd: string, msgzais: any) {
+  setPable(i: number, gcd: string, msgzais: GzaiRef[]) {
     // console.log(gcd, this.frmArr.controls[i].value.gskbn);
     this.frmArr.controls[i].patchValue({ pable: null });
     this.jmisrv.subject.next(true);
@@ -735,7 +757,7 @@ export class JmeitblComponent implements OnInit {
       });
     // }
   }
-  insRows(rowData: any[], flg: boolean) { //true:洗い替え、false：追加
+  insRows(rowData: string[], flg: boolean) { //true:洗い替え、false：追加
     let i: number = 0;
     if (flg) {
       this.frmArr.clear();
@@ -752,7 +774,7 @@ export class JmeitblComponent implements OnInit {
           gtext: '',
           suu: +col[1],
           unit: null,
-          tanka: (col[2] ?? +col[2]),
+          tanka: (col[2] ?? +col[2]) as unknown as number, // 貼り付けた文字列のまま（従来どおり。数値には変換されない）
           toutmoney: 0,
           tinmoney: 0,
           mmemo: null,
@@ -799,9 +821,9 @@ export class JmeitblComponent implements OnInit {
     this.usrsrv.toastInf('明細をクリップボードにコピーしました');
   }
 
-  objectToArray(obj: any): string {
+  objectToArray(obj: object): string {
     var result = Object.keys(obj).map((key: string) => {
-      let value = obj[key];
+      let value = (obj as Record<string, unknown>)[key];
       // console.log(value)
       return value;
     });
@@ -821,7 +843,7 @@ export class JmeitblComponent implements OnInit {
     this.jmisrv.trzaiko = [];
     let i: number = 0;
 
-    data.trjyumeis.forEach((element: any) => {
+    (data.trjyumeis as JyumeiRaw[]).forEach(element => {
       // console.log(element);
       let { msgood, ...rest } = element;
       let { msggroup, ...rest2 } = msgood;
@@ -832,18 +854,19 @@ export class JmeitblComponent implements OnInit {
       // // console.log(this.jmisrv.jyumei);
       // this.jyumei.forEach(e => {
       //   console.log(e);
-      let e = { ...msggroup, ...rest, ...rest2 };
+      let e = { ...msggroup, ...rest, ...rest2 } as mwI.Jyumei;
       this.frmArr.push(this.createRow(i + 1, e));
       this.setPable(i, e.gcode, e.msgzais);
       i += 1;
       //trzaikoテーブル取り消し用データ作成
       if (data.skbn != "1") {
         if (e.sday != null) {
-          e.trjyumzais.forEach((zai: { gcode: any; suu: number; }) => {
+          const sday = e.sday;
+          e.trjyumzais.forEach(zai => {
             const lczai: mwI.Zaiko = {
               scode: e.scode,
               gcode: zai.gcode,
-              day: e.sday,
+              day: sday,
               suu: zai.suu * -1
             }
             this.jmisrv.trzaiko.push(lczai);
@@ -924,7 +947,7 @@ export class JmeitblComponent implements OnInit {
         };
         this.jmisrv.trjyumei.push(row);
 		let lceda:number = 0;
-        control.value.msgzais.forEach((e: { irisu: number; zcode: any; }) => {
+        control.value.msgzais.forEach((e: Pick<mwI.Gzai, 'zcode' | 'irisu'>) => {
    	      let lcsuu:number =  control.value.suu * e.irisu; 
           lceda++;
 		  this.jmisrv.trjmzai.push({
