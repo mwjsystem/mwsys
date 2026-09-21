@@ -32,7 +32,7 @@ export interface Mcd {
 
 
 /** 顧客検索の条件。where2 は住所（msmadrs）側の条件 */
-type McdWhere = HasuraWhere & { where2?: { _and?: HasuraCond[] } & HasuraCond };
+type McdWhere = HasuraWhere & { where2?: { _and: HasuraCond[] } };
 /** get_members クエリの住所 */
 interface McdAdr { eda: number; zip: string; region: string; local: string; street: string; extend: string; extend2: string; adrname: string; tel: string; tel2: string; tel3: string; fax: string }
 /** get_members クエリの顧客 */
@@ -114,23 +114,18 @@ export class McdhelpComponent implements OnInit {
         ]
       });
     }
+    // 住所（msmadrs）側の条件。1 件でも複数でも _and の配列にまとめて渡す
+    const adrConds: HasuraCond[] = [];
     if (this.fadrnm) {
-      varWh['where2'] = {
-        "_and": [{
-          "_or": [{ "extend": { "_like": "%" + this.fadrnm + "%" } },
-          { "extend2": { "_like": "%" + this.fadrnm + "%" } },
-          { "adrname": { "_like": "%" + this.fadrnm + "%" } }
-          ]
-        }]
-      };
+      adrConds.push({
+        "_or": [{ "extend": { "_like": "%" + this.fadrnm + "%" } },
+        { "extend2": { "_like": "%" + this.fadrnm + "%" } },
+        { "adrname": { "_like": "%" + this.fadrnm + "%" } }
+        ]
+      });
     }
     if (this.ftel) {
-      if (varWh['where2'] != null) {
-        varWh['where2']._and!.push({ "ftel": { "_like": "%" + this.ftel + "%" } }); // ※ 住所名の条件が無いと _and が未設定で例外になる（既知の不具合。従来のまま）
-      } else {
-        varWh['where2'] = { "ftel": { "_like": "%" + this.ftel + "%" } };
-      }
-
+      adrConds.push({ "ftel": { "_like": "%" + this.ftel + "%" } });
     }
     if (this.ftcd) {
       varWh['where']._and.push({ "tcode": { "_eq": this.ftcd } });
@@ -139,11 +134,10 @@ export class McdhelpComponent implements OnInit {
       varWh['where']._and.push({ "tcode1": { "_eq": this.ftcd1 } });
     }
     if (this.feda0) {
-      if (varWh['where2'] != null) {
-        varWh['where2']._and!.push({ "eda": { "_eq": 0 } }); // ※ 電話番号のみの条件だと _and が未設定で例外になる（既知の不具合。従来のまま）
-      } else {
-        varWh['where2'] = { "eda": { "_eq": 0 } };
-      }
+      adrConds.push({ "eda": { "_eq": 0 } });
+    }
+    if (adrConds.length > 0) {
+      varWh['where2'] = { "_and": adrConds };
     }
 	if (this.fnorm) {
       varWh['where']._and.push({ "daibunrui": { "_iregex": "^(?!2).*$" } });
