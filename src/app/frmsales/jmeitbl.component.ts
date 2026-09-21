@@ -641,12 +641,12 @@ export class JmeitblComponent implements OnInit {
           }
           this.getMtbl(i, 'msgzais').clear(); // 商品コードを変えたとき、前の商品の構成品を残さない
           this.getMtbl(i, 'trjyumzais').clear();
+          let k: number = 0; // 構成品の枝番
           msgds.msgzais.forEach(e => {
-            let k: number = 0;
             let arr = []
             if (e.msgoods.gskbn == "0") {
               this.getMtbl(i, 'msgzais').push(this.fb.group({ zcode: e.zcode, irisu: e.irisu }));
-              k = +1;
+              k += 1;
               this.getMtbl(i, 'trjyumzais').push(this.fb.group({ eda: k, gcode: e.zcode, suu: e.irisu, spec: null, spdet: null }));
             }
           });
