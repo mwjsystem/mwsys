@@ -96,7 +96,7 @@ export class GzaiComponent implements OnInit {
     this.form.markAsPristine();
     this.refresh();
   }
-  updGds(i: number, event: KeyboardEvent): void {
+  updGds(i: number, event: Event): void {
     this.getGds(i, (event.target as HTMLInputElement)?.value);
   }
   /** 商品コードを行に反映し、商品名・単位を取得する（直接入力と商品ヘルプの両方から呼ぶ） */

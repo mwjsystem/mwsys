@@ -61,13 +61,13 @@ export class AddressComponent implements OnInit {
       htitle: new FormControl('')
     }));
   }
-  updTel(fldnm: string, event: KeyboardEvent) {
+  updTel(fldnm: string, event: Event) {
     let val: string = this.usrsrv.convTel((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
     this.parent.form.get(this.formName())!.get(fldnm)!.setValue(val);
   }
 
-  async getAdr(event: KeyboardEvent) {
+  async getAdr(event: Event) {
     this.dwlsrv.getAdr((event.target as HTMLInputElement)?.value).then(result => {
       // console.log(result, result.results)
       this.parent.form.get(this.formName())!.patchValue({

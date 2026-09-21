@@ -6,7 +6,7 @@
       <div class="flex flex-wrap space-x-4">
         <mat-form-field>
           <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
-          <input matInput [(ngModel)]="code" (change)="code=convUpper($any($event))"
+          <input matInput [(ngModel)]="code" (change)="code=convUpper($event)"
             (keydown.f4)="grpcdHelp()" [ngModelOptions]="{standalone: true}">
           <button mat-icon-button matSuffix (click)=" grpcdHelp()">
             <mat-icon>find_replace</mat-icon>
@@ -14,7 +14,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>商品コード</mat-label>
-          <input matInput [(ngModel)]="gcode" (change)="gcode=convUpper($any($event))"
+          <input matInput [(ngModel)]="gcode" (change)="gcode=convUpper($event)"
             [ngModelOptions]="{standalone: true}">
         </mat-form-field>
         <mat-form-field>

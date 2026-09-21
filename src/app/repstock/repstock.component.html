@@ -3,7 +3,7 @@
   <!-- <mat-label>商品ｺｰﾄﾞ</mat-label> -->
   <div class="icon-area" class="flex flex-row">
     <mat-form-field appearance="fill" subscriptSizing="dynamic" class="mwj-field w-40">
-      <input matInput [ngModel]="gcode" (change)="convUpper($any($event))" gcdInput (keyup.enter)="onEnter()"
+      <input matInput [ngModel]="gcode" (change)="convUpper($event)" gcdInput (keyup.enter)="onEnter()"
         (keydown.f4)="gcdHelp()" (blur)="onEnter()" [ngModelOptions]="{standalone: true}" placeholder="商品ｺｰﾄﾞ">
     </mat-form-field>
     <button mat-icon-button matSuffix (click)="gcdHelp()">

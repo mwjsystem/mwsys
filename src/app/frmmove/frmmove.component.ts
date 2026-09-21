@@ -201,7 +201,7 @@ export class FrmmoveComponent implements OnInit {
     );
 
   }
-  canEnter(e: KeyboardEvent): void {
+  canEnter(e: Event): void {
     let element = e.target as HTMLElement;
     // console.log(element,element.tagName);
     if (element.tagName !== 'TEXTAREA') {

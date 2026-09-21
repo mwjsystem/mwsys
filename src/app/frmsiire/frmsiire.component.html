@@ -43,7 +43,7 @@
   </a></button>
 </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($any($event))">
+<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($event)">
   <mat-card>
     <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between" style="margin-bottom: 10px;">
       <mat-card-title>

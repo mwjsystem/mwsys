@@ -141,7 +141,7 @@ export class GdstblComponent {
 
 
 
-  updGds(i: number, event: KeyboardEvent) {
+  updGds(i: number, event: Event) {
     let val: string = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);  //小文字全角→大文字半角変換
     this.frmArr.controls[i].get('gcode')!.setErrors(null);
     this.frmArr.controls[i].get('gcode')!.setValue(val);

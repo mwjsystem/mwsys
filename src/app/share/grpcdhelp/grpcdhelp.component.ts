@@ -65,11 +65,11 @@ export class GrpcdhelpComponent implements OnInit {
 
   }
 
-  convUpper(event: KeyboardEvent): string {
+  convUpper(event: Event): string {
     return this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
   }
 
-  convKana(event: KeyboardEvent): string {
+  convKana(event: Event): string {
     return this.usrsrv.convKana((event.target as HTMLInputElement)?.value);
   }
 

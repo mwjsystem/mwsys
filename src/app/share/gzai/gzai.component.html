@@ -54,7 +54,7 @@
           <th mat-header-cell *matHeaderCellDef>内訳商品コード</th>
           <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">
             <mat-form-field>
-              <input matInput formControlName="zcode" maxlength="20" (change)="updGds(i,$any($event))"
+              <input matInput formControlName="zcode" maxlength="20" (change)="updGds(i,$event)"
                 (keydown.f4)="gcdHelp(i)">
               @if (frmArr.enabled) {
                 <button mat-icon-button matSuffix (click)="gcdHelp(i)">

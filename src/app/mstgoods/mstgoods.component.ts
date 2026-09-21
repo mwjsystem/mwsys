@@ -186,7 +186,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     );
   }
 
-  canEnter(e: KeyboardEvent): void {
+  canEnter(e: Event): void {
     let element = e.target as HTMLElement;
     // console.log(element,element.tagName);
     if (element.tagName !== 'TEXTAREA') {
@@ -213,7 +213,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     this.form.get('kana')!.setValue(val);
   }
 
-  convUpper(event: KeyboardEvent) {
+  convUpper(event: Event) {
     console.log((event.target as HTMLInputElement));
     this.gdssrv.grpcd = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
   }

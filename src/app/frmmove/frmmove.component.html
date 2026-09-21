@@ -44,7 +44,7 @@
     </a></button>
   </div>
 </mat-toolbar>
-<form [formGroup]="form" class="flex flex-wrap space-x-4" (keydown.enter)="canEnter($any($event))">
+<form [formGroup]="form" class="flex flex-wrap space-x-4" (keydown.enter)="canEnter($event)">
   <mat-card>
     <mat-card-header class="flex justify-between">
       <mat-card-title>

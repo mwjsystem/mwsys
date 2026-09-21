@@ -208,7 +208,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     );
   }
 
-  canEnter(e: KeyboardEvent): void {
+  canEnter(e: Event): void {
     let element = e.target as HTMLElement;
     if (element.tagName !== 'TEXTAREA') {
       e.preventDefault();
@@ -343,13 +343,13 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   }
 
 
-  updKana(event: KeyboardEvent) {
+  updKana(event: Event) {
     let val: string = this.usrsrv.convKana((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
     this.form.get('base')!.get('kana')!.setValue(val);
   }
 
-  updMail(fldnm: string, event: KeyboardEvent) {
+  updMail(fldnm: string, event: Event) {
     let val: string = this.usrsrv.convHan((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
     this.form.get('base')!.get(fldnm)!.setValue(val);

@@ -91,7 +91,7 @@
   </a></button>
 </div>
 </mat-toolbar>
-<form [formGroup]="form" (keydown.enter)="canEnter($any($event))">
+<form [formGroup]="form" (keydown.enter)="canEnter($event)">
   <!-- <mat-card> -->
   <div class="flex justify-between items-center space-x-4 p-3">
     <span class="inline-block align-middle">

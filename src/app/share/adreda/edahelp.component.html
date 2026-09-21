@@ -4,19 +4,19 @@
   <mat-toolbar class="toolbar" style="width:45%;">
     <mat-form-field>
       <mat-label>宛名</mat-label>
-      <input matInput (keyup)="updateFilter('adrname',$any($event))">
+      <input matInput (keyup)="updateFilter('adrname',$event)">
     </mat-form-field>
     <mat-form-field>
       <mat-label>都道府県</mat-label>
-      <input matInput (keyup)="updateFilter('region',$any($event))">
+      <input matInput (keyup)="updateFilter('region',$event)">
     </mat-form-field>
     <mat-form-field>
       <mat-label>市区町村</mat-label>
-      <input matInput type="url" (keyup)="updateFilter('local',$any($event))">
+      <input matInput type="url" (keyup)="updateFilter('local',$event)">
     </mat-form-field>
     <mat-form-field>
       <mat-label>電話番号</mat-label>
-      <input matInput type="url" (keyup)="updateFilter('tel',$any($event))">
+      <input matInput type="url" (keyup)="updateFilter('tel',$event)">
     </mat-form-field>
   </mat-toolbar>
   <table mat-table [dataSource]="dataSource" aria-label="Elements" class="mat-elevation-z8">

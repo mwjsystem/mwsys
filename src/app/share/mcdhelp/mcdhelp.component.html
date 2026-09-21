@@ -11,7 +11,7 @@
         </mat-form-field>
         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
           <mat-label>ﾌﾘｶﾞﾅ</mat-label>
-          <input matInput [(ngModel)]="fkana" (input)="fkana=convKana($any($event))" [ngModelOptions]="{standalone: true}">
+          <input matInput [(ngModel)]="fkana" (input)="fkana=convKana($event)" [ngModelOptions]="{standalone: true}">
         </mat-form-field>
         <!-- <mat-form-field>
         <mat-label>メール1～5</mat-label>

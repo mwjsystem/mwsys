@@ -22,7 +22,7 @@
     }
     <mat-form-field>
       <!-- <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label> -->
-      <input [ngModel]="gdssrv.grpcd" matInput (change)="convUpper($any($event))" (keydown.f4)="grpcdHelp()"
+      <input [ngModel]="gdssrv.grpcd" matInput (change)="convUpper($event)" (keydown.f4)="grpcdHelp()"
         [disabled]="mode==2 && form.dirty" (keyup.enter)="getGgroup(gdssrv.grpcd)" (blur)="refresh()"
         [ngModelOptions]="{standalone: true}" placeholder="商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ">
       <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" [style.display]="mode==3 ? 'inline-block' : 'none'">
@@ -64,7 +64,7 @@
 </a></button>
 </div>
 </mat-toolbar>
-<form [formGroup]="form" class="flex flex-wrap" (keydown.enter)="canEnter($any($event))">
+<form [formGroup]="form" class="flex flex-wrap" (keydown.enter)="canEnter($event)">
   <!-- <div > -->
   <mat-card class="flex flex-wrap">
     <mat-card-header class="flex flex-wrap">

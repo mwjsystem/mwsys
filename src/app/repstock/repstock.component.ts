@@ -87,7 +87,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     });
   }
 
-  convUpper(event: KeyboardEvent) {
+  convUpper(event: Event) {
     // console.log((event.target as HTMLInputElement));
     this.gcode = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
   }

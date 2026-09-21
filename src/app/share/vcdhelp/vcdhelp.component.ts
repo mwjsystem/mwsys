@@ -61,7 +61,7 @@ export class VcdhelpComponent implements OnInit {
     // });
   }
 
-  applyFilter(event: { target: HTMLInputElement; }) {
+  applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }

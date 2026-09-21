@@ -84,7 +84,7 @@ export class McdhelpComponent implements OnInit {
     this.dataSource.paginator = this.paginator() ?? null;
   }
 
-  convKana(event: KeyboardEvent): string {
+  convKana(event: Event): string {
     return this.usrsrv.convKana((event.target as HTMLInputElement)?.value);
   }
 

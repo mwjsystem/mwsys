@@ -143,7 +143,7 @@ export class GcdhelpComponent implements OnInit {
     );
   }
 
-  convUpper(event: KeyboardEvent): string {
+  convUpper(event: Event): string {
     return this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
 
   }

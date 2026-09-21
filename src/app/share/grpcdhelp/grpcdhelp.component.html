@@ -6,12 +6,12 @@
       <div class="flex flex-wrap space-x-4">
         <mat-form-field>
           <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
-          <input matInput [(ngModel)]="code" (change)="code=convUpper($any($event))"
+          <input matInput [(ngModel)]="code" (change)="code=convUpper($event)"
             [ngModelOptions]="{standalone: true}">
         </mat-form-field>
         <mat-form-field>
           <mat-label>ﾌﾘｶﾞﾅ</mat-label>
-          <input matInput [(ngModel)]="kana" (change)="kana=convKana($any($event))"
+          <input matInput [(ngModel)]="kana" (change)="kana=convKana($event)"
             [ngModelOptions]="{standalone: true}">
         </mat-form-field>
         <mat-form-field>

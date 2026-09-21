@@ -37,7 +37,7 @@
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:10em;">
             <input [tabIndex]="hidx + i * mcols + 1" matInput formControlName="gcode"
-              (change)="updGds(getIdx(i),$any($event))" [readonly]="frmArr.getRawValue()[getIdx(i)]['ins']"
+              (change)="updGds(getIdx(i),$event)" [readonly]="frmArr.getRawValue()[getIdx(i)]['ins']"
               [disabled]="frmArr.getRawValue()[getIdx(i)]['ins']">
           </mat-form-field>
         </td>

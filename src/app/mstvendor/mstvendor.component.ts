@@ -202,7 +202,7 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
 
   }
 
-  async getAdr(event: KeyboardEvent) {
+  async getAdr(event: Event) {
     this.dwlsrv.getAdr((event.target as HTMLInputElement)?.value).then(result => {
       // console.log(result, result.results)
       this.form.patchValue({
