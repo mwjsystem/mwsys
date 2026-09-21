@@ -18,6 +18,11 @@ interface GetOpe {
   status?: string;
 }
 
+/** get_opelog クエリの結果 */
+interface OpelogResult { tropelog: mwI.Tropelog[] }
+/** iupdLog ミューテーションの結果 */
+interface UpdOpelogResult { update_tropelog: { returning: Pick<mwI.Tropelog, 'status' | 'updated_by' | 'updated_at'>[] } }
+
 @Component({
     selector: 'app-frmkeep',
     templateUrl: './frmkeep.component.html',
@@ -99,7 +104,7 @@ export class FrmkeepComponent implements OnInit {
     console.log(this.keycode, this.status);
     // return new Promise( resolve => {
     let observable: Observable<mwI.Tropelog[]> = new Observable<mwI.Tropelog[]>(observer => {
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<OpelogResult>({
         query: this.GetLog,
         variables: {
           id: this.usrsrv.compid,
@@ -111,7 +116,7 @@ export class FrmkeepComponent implements OnInit {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log(data.tropelog);
-          observer.next(data.tropelog);
+          observer.next((data as OpelogResult).tropelog);
           // return resolve(data.tropelog);
           // observer.complete();
           // console.log(data.tropelog);
@@ -135,7 +140,7 @@ export class FrmkeepComponent implements OnInit {
     });
   }
 
-  toDenno(pdenno: any) {
+  toDenno(pdenno: string) {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.getOpelog({ denno: pdenno }).subscribe(value => {
       this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
@@ -157,7 +162,7 @@ export class FrmkeepComponent implements OnInit {
         }
       }
     }`;
-    this.apollo.mutate<any>({
+    this.apollo.mutate<UpdOpelogResult>({
       mutation: UpdateOpelog,
       variables: {
         "seq": this.dataSource.data[i].sequ,
@@ -181,9 +186,10 @@ export class FrmkeepComponent implements OnInit {
       this.usrsrv.toastInf("処理しました");
       let temp: mwI.Tropelog[] = this.dwlsrv.pickObjArr(this.dataSource.data, ['sequ', 'keycode', 'extype', 'created_by', 'created_at', 'status', 'updated_by', 'updated_at', 'memo']) as mwI.Tropelog[];
       // console.log(temp);
-      temp[i].status = data.update_tropelog.returning[0].status;
-      temp[i].updated_by = data.update_tropelog.returning[0].updated_by;
-      temp[i].updated_at = data.update_tropelog.returning[0].updated_at;
+      const upd = (data as UpdOpelogResult).update_tropelog.returning[0];
+      temp[i].status = upd.status;
+      temp[i].updated_by = upd.updated_by;
+      temp[i].updated_at = upd.updated_at;
       this.dataSource = new MatTableDataSource<mwI.Tropelog>(temp);
       this.cdRef.detectChanges();
       // this.get_opelog(this.denno.toString()).subscribe(value => {

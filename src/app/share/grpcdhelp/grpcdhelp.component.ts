@@ -7,6 +7,7 @@ import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { Subject } from 'rxjs';
+import { HasuraWhere } from './../help-where';
 
 interface Ggrp {
   code: string;
@@ -17,6 +18,9 @@ interface Ggrp {
   vcode: string;
   tcode: string;
 }
+
+/** get_ggroup クエリの結果 */
+interface GgroupResult { msggroup: Ggrp[] }
 
 @Component({
     selector: 'app-grpcdhelp',
@@ -70,7 +74,7 @@ export class GrpcdhelpComponent implements OnInit {
   }
 
   filterGcd() {
-    let varWh: { [k: string]: any } = {
+    let varWh: HasuraWhere = {
       "where": {
         "_and": [
           { "id": { "_eq": this.usrsrv.compid } }
@@ -98,17 +102,17 @@ export class GrpcdhelpComponent implements OnInit {
         tcode
       }
     }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<GgroupResult>({
       query: GetMast,
       variables: varWh
     })
       .valueChanges
       .subscribe(({ data }) => {
         // if(data.msggroup.length===0){
-        if (data.msggroup.length == 0) {
+        if ((data as GgroupResult).msggroup.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          this.ggrps = data.msggroup;
+          this.ggrps = (data as GgroupResult).msggroup;
           this.subject.next(true);
         }
         // }
@@ -119,7 +123,7 @@ export class GrpcdhelpComponent implements OnInit {
       });
   }
 
-  setGrpcd(selected: any) {
+  setGrpcd(selected: Ggrp) {
     // console.log("select",selected);
     // this.mcdsrv.mcds=[];
     this.dialogRef.close(selected);

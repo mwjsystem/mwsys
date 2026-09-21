@@ -6,6 +6,11 @@ import { Apollo } from 'apollo-angular';
 // import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 
+/** get_specurl クエリの結果 */
+interface SpecurlResult { msggroup_by_pk: { catalog: string; specurl: string } }
+/** set_specurl ミューテーションの結果 */
+interface SetUrlResult { update_msggroup: { affected_rows: number } }
+
 @Component({
     selector: 'app-gdsimage',
     templateUrl: './gdsimage.component.html',
@@ -52,7 +57,7 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
         specurl
       }
     }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<SpecurlResult>({
       query: GetUrl,
       variables: {
         id: this.usrsrv.compid,
@@ -61,8 +66,8 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.url = data.msggroup_by_pk.specurl;
-        this.cat = data.msggroup_by_pk.catalog;
+        this.url = (data as SpecurlResult).msggroup_by_pk.specurl;
+        this.cat = (data as SpecurlResult).msggroup_by_pk.catalog;
       }, (error) => {
         console.log('error query get_url', error);
       });
@@ -75,7 +80,7 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
         affected_rows
       }
     }`;
-    this.apollo.mutate<any>({
+    this.apollo.mutate<SetUrlResult>({
       mutation: SetUrl,
       variables: {
         id: this.usrsrv.compid,
@@ -97,9 +102,9 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
     this.inputs()[num].nativeElement.click();
   }
   //アップロードの実行
-  onchange(list: any, num: string) {
+  onchange(list: FileList | null, num: string) {
     // ファイルが指定されていなければ
-    if (list.length <= 0) { return; }
+    if (list == null || list.length <= 0) { return; }
 
     // ファイルを取得
     let f = list[0];

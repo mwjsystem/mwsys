@@ -33,7 +33,7 @@ export class MsprcprtComponent implements OnInit {
   mcode: number;
   mode: number = 2;
   form!: FormGroup<{ mtbl: FormArray<FormGroup<PartRowControls>> }>;
-  selrow: any;
+  selrow: FormGroup<PartRowControls> | undefined;
   dataSource = new MatTableDataSource();
   readonly inputs = viewChildren('upfile', { read: ElementRef });
   displayedColumns = ['line', 'partno', 'seq', 'pic'];
@@ -102,7 +102,7 @@ export class MsprcprtComponent implements OnInit {
   closeSet() {
     this.dialogRef.close(this.selrow);
   }
-  selected(selected: any) {
+  selected(selected: FormGroup<PartRowControls>) {
     this.selrow = selected;
   }
   // onClickFileInputButton(num: number) {

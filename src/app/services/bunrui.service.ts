@@ -3,6 +3,9 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
 
+/** get_bunrui クエリの結果（区分ごとの分類値） */
+interface BunruiResult { msbkbn: { kubun: string; msbunruis: mwI.Sval[] }[] }
+
 @Injectable({
   providedIn: 'root'
 })
@@ -18,7 +21,7 @@ export class BunruiService {
     this.qryBunrui();
   }
 
-  async qryBunrui(): Promise<any> {
+  async qryBunrui(): Promise<{ [key: string]: mwI.Sval[]; }> {
     const GetMast = gql`
       query get_bunrui($id: smallint!){
         msbkbn {
@@ -34,7 +37,7 @@ export class BunruiService {
       if (Object.keys(this.kbn).length > 0) {
         return resolve(this.kbn);
       } else {
-        this.apollo.watchQuery<any>({
+        this.apollo.watchQuery<BunruiResult>({
           query: GetMast,
           variables: {
             id: this.usrsrv.compid
@@ -43,8 +46,9 @@ export class BunruiService {
           .valueChanges
           .subscribe(({ data }) => {
 
-            for (let i = 0; i < data.msbkbn.length; i++) {
-              this.kbn[data.msbkbn[i].kubun] = data.msbkbn[i].msbunruis;
+            const msbkbn = (data as BunruiResult).msbkbn;
+            for (let i = 0; i < msbkbn.length; i++) {
+              this.kbn[msbkbn[i].kubun] = msbkbn[i].msbunruis;
             }
             return resolve(this.kbn);
           }, (error) => {

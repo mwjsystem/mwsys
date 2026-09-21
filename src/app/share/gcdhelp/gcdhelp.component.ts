@@ -8,6 +8,7 @@ import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { GrpcdhelpComponent } from './../grpcdhelp/grpcdhelp.component';
 import { Subject } from 'rxjs';
+import { HasuraWhere } from './../help-where';
 
 export interface Gcd {
   code: string;
@@ -21,6 +22,9 @@ export interface Gcd {
   tkbn: number;
   zkbn: number;
 }
+
+/** get_goods クエリの結果 */
+interface GoodsResult { msgoods: Gcd[] }
 
 @Component({
     selector: 'app-gcdhelp',
@@ -67,7 +71,7 @@ export class GcdhelpComponent implements OnInit {
 
   filterGcd() {
     // console.log(this.tkbn);
-    let varWh: { [k: string]: any } = {
+    let varWh: HasuraWhere = {
       "where": {
         "_and": [
           { "id": { "_eq": this.usrsrv.compid } }
@@ -104,17 +108,17 @@ export class GcdhelpComponent implements OnInit {
       }
     }`;
     // console.log(varWh);
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<GoodsResult>({
       query: GetMast,
       variables: varWh
     })
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        if (data.msgoods.length == 0) {
+        if ((data as GoodsResult).msgoods.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          this.gcds = data.msgoods;
+          this.gcds = (data as GoodsResult).msgoods;
           this.subject.next(true);
         }
         // this.subject.complete();
@@ -144,7 +148,7 @@ export class GcdhelpComponent implements OnInit {
 
   }
 
-  setGcd(selected: any) {
+  setGcd(selected: Gcd) {
     this.dialogRef.close(selected);
   }
 

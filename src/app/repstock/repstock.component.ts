@@ -18,6 +18,9 @@ import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { StcscdsComponent } from './../share/stcscds/stcscds.component';
 // import * as Query from './queries.frms';
 
+/** get_goods クエリの結果 */
+interface GoodResult { msgoods_by_pk: Pick<StGds, 'gtext' | 'gskbn' | 'unit' | 'msgzais'> }
+
 @Component({
     selector: 'app-repstock',
     templateUrl: './repstock.component.html',
@@ -180,7 +183,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
     // let dialogRef = this.dialog.open(ShcntChartComponent, dialogConfig);
 
   }
-  public outputCsv(event: any) {
+  public outputCsv(event: MouseEvent) {
 
   }
   selScd() {
@@ -317,7 +320,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
             }
           }
         }`;
-        this.apollo.watchQuery<any>({
+        this.apollo.watchQuery<GoodResult>({
           query: GetMast,
           variables: {
             id: this.usrsrv.compid,
@@ -326,10 +329,11 @@ export class RepstockComponent implements OnInit, AfterViewInit {
         })
           .valueChanges
           .subscribe(({ data }) => {
-            this.stgds.gtext = data.msgoods_by_pk.gtext;
-            this.stgds.gskbn = data.msgoods_by_pk.gskbn;
-            this.stgds.unit = data.msgoods_by_pk.unit;
-            this.stgds.msgzais = data.msgoods_by_pk.msgzais;
+            const msgood = (data as GoodResult).msgoods_by_pk;
+            this.stgds.gtext = msgood.gtext;
+            this.stgds.gskbn = msgood.gskbn;
+            this.stgds.unit = msgood.unit;
+            this.stgds.msgzais = msgood.msgzais;
             console.log(this.stgds.msgzais,this.stcsrv.goods);
             this.selScd();
           }, (error) => {
