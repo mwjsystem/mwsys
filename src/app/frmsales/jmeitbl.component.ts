@@ -12,7 +12,7 @@ import { StoreService } from './../services/store.service';
 import { StockService } from './../services/stock.service';
 // import { GoodsService } from './../services/goods.service';
 import { MembsService } from './../mstmember/membs.service';
-import { JyumeiService } from './jyumei.service';
+import { JyumeiService, TrjyumeiRow } from './jyumei.service';
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
 // import { ToastrService } from 'ngx-toastr';
@@ -894,9 +894,10 @@ export class JmeitblComponent implements OnInit {
   editJyumei(dno: number) {
     this.jmisrv.trjyumei = [];
     this.jmisrv.trjmzai = [];
+    this.jmisrv.zaikoNew = [];
     this.frmArr.controls
       .forEach(control => {
-        this.jmisrv.trjyumei.push({
+        const row: TrjyumeiRow = {
           id: this.usrsrv.compid,
           denno: dno,
           line: this.usrsrv.editFrmval(control, 'line'),
@@ -920,7 +921,8 @@ export class JmeitblComponent implements OnInit {
           taxrate: this.usrsrv.editFrmval(control, 'taxrate'),
           gskbn: this.usrsrv.editFrmval(control, 'gskbn'),
           currency: this.usrsrv.editFrmval(control, 'currency')
-        });
+        };
+        this.jmisrv.trjyumei.push(row);
 		let lceda:number = 0;
         control.value.msgzais.forEach((e: { irisu: number; zcode: any; }) => {
    	      let lcsuu:number =  control.value.suu * e.irisu; 
@@ -934,7 +936,11 @@ export class JmeitblComponent implements OnInit {
             suu: lcsuu,
             spec: this.usrsrv.editFrmval(control, 'spec'),
             spdet: this.usrsrv.editFrmval(control, 'spdet')
-          });			
+          });
+          //保存後の在庫更新用（読込時の trzaiko と対。出荷日が入っている明細のみ）
+          if (row.sday != null) {
+            this.jmisrv.zaikoNew.push({ scode: row.scode, gcode: e.zcode, day: row.sday, suu: lcsuu });
+          }			
         })
         // (control.get('trjyumzais') as FormArray).controls.forEach(e => {
 	      // console.log('editJyumei trjyumei', control,control.value.msgzais);

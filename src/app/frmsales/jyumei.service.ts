@@ -11,11 +11,6 @@ interface AffectedRows { affected_rows: number }
 export type TrjyumeiRow = Pick<mwI.Jyumei, 'line' | 'gcode' | 'gtext' | 'suu' | 'tanka' | 'toutmoney' | 'tinmoney' | 'mmemo' | 'spec' | 'spdet' | 'genka' | 'scode' | 'sday' | 'tanka1' | 'money' | 'mtax' | 'tgenka' | 'taxmoney' | 'taxrate' | 'gskbn' | 'currency'> & {
   id: number;
   denno: number;
-  /**
-   * editJyumei は明細行に msgzais を設定しない（trjyumei_insert_input に渡せないため）。
-   * frmsales の保存後の在庫更新はこの値を参照するが、実際には未設定（undefined）になる。
-   */
-  msgzais?: mwI.Gzai[];
 };
 /** 受注明細の在庫内訳（trjyumzai_insert_input） */
 export interface TrjmzaiRow { id: number; denno: number; line: number; eda: number; gcode: string; suu: number; spec: string | null; spdet: string | null }
@@ -37,6 +32,8 @@ export class JyumeiService {
   // public jyumei: mwI.Jyumei[] = []; //frmsales⇒jmeitblコンポーネントへ渡すときのみ使用
   public trjyumei: TrjyumeiRow[] = [];
   public trjmzai: TrjmzaiRow[] = [];
+  /** 保存後に加算する在庫データ（editJyumei が作成。読込時に作る取り消し用 trzaiko と対になる） */
+  public zaikoNew: mwI.Zaiko[] = [];
   public denno: number = 0;
   public mtax!: string;             //顧客マスタ「税区分」
   public tankakbn!: string;         //顧客マスタ「単価区分」

@@ -733,23 +733,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               this.jmisrv.updZaiko(e);
             });
             //  zaiko更新処理 (通常分プラス)
-            jyumei.forEach(e => {
-              // console.log(e, jyuden);
-              if (jyuden.skbn != "1") {
-                if (e.sday != null) {
-                  const sday = e.sday;
-                  e.msgzais!.forEach(zai => {
-                    const lczai: mwI.Zaiko = {
-                      scode: e.scode,
-                      gcode: zai.zcode,
-                      day: sday,
-                      suu: e.suu * zai.irisu
-                    }
-                    this.jmisrv.updZaiko(lczai);
-                  });
-                }
-              }
-            });
+            if (jyuden.skbn != "1") {
+              this.jmisrv.zaikoNew.forEach(z => this.jmisrv.updZaiko(z));
+            }
             this.form.markAsPristine();
             this.cancel();
             return resolve(true);
@@ -786,22 +772,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
             this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'を新規登録しました');
             //  zaiko更新処理 　新規
             let cnt_keep: number = 0;
+            if (jyuden.skbn != "1") {
+              this.jmisrv.zaikoNew.forEach(z => this.jmisrv.updZaiko(z));
+            }
             jyumei.forEach(e => {
-              // console.log(e, this.form);
-              if (jyuden.skbn != "1") {
-                if (e.sday != null) {
-                  const sday = e.sday;
-                  e.msgzais!.forEach(zai => {
-                    const lczai: mwI.Zaiko = {
-                      scode: e.scode,
-                      gcode: zai.zcode,
-                      day: sday,
-                      suu: e.suu * zai.irisu
-                    }
-                    this.jmisrv.updZaiko(lczai);
-                  });
-                }
-              }
               if (e.spec == '2') {
                 cnt_keep += 1;
               }
