@@ -13,6 +13,9 @@ import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
 import { GzaiComponent } from './../share/gzai/gzai.component';
 
+/** 単価行の追加(flg=true)・削除(flg=false)を、親の mstgoods へ伝えるイベントの値 */
+export type TnkAction = { flg: boolean; row: number; flgCP?: boolean };
+
 @Component({
     selector: 'app-gdstbl',
     templateUrl: './gdstbl.component.html',
@@ -38,7 +41,7 @@ export class GdstblComponent {
     this.paginator = mp;
     this.dataSource.paginator = this.paginator;
   }
-  readonly action = output<{ flg: boolean; row: number; flgCP?: boolean }>();
+  readonly action = output<TnkAction>();
   dataSource = new MatTableDataSource();
   displayedColumns = ['action', 'gcode', 'gtext', 'size', 'color', 'unit', 'gskbn', 'jan', 'weight', 'tkbn', 'max', 'send', 'ordering', 'koguchi', 'lot', 'vgcode', 'hgcode'];
   hidx = 6; //tabindex用ヘッダ項目数

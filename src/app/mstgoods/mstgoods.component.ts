@@ -9,7 +9,7 @@ import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.mstg';
 import * as AutoKana from 'vanilla-autokana';
-import { GdstblComponent } from './gdstbl.component';
+import { GdstblComponent, TnkAction } from './gdstbl.component';
 import { GtnktblComponent } from './gtnktbl.component';
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { GrpcdhelpComponent } from './../share/grpcdhelp/grpcdhelp.component';
@@ -20,6 +20,37 @@ import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
 import { VendsService } from './../mstvendor/vends.service';
 
+interface AffectedRows { affected_rows: number }
+/** get_grpcode クエリの結果 */
+interface GgroupCodeResult { msggroup: { code: string }[] }
+/** get_ggroup クエリの結果 */
+interface GgroupResult { msggroup_by_pk: mwI.Ggroup }
+/** upd_ggroup / ins_group ミューテーションの結果 */
+interface GgroupUpdateResult { update_msggroup: AffectedRows; insert_msgoods: AffectedRows; insert_msgtanka: AffectedRows }
+interface GgroupInsertResult { insert_msggroup: AffectedRows; insert_msgoods: AffectedRows; insert_msgtanka: AffectedRows }
+/** 保存時に msggroup へ渡す値（登録時のみ created_at / created_by を追加する） */
+type GgroupInput = Pick<mwI.Ggroup, 'code' | 'kana' | 'name' | 'gkbn' | 'memo' | 'sozai' | 'vcode' | 'specurl' | 'category' | 'subcat' | 'updated_at' | 'updated_by'> & {
+  id: number;
+  created_at?: Date;
+  created_by?: string;
+};
+/** 保存時に msgoods へ渡す値 */
+type GoodsInput = Pick<mwI.Goods, 'gcode' | 'size' | 'color' | 'gskbn' | 'jan' | 'weight' | 'unit' | 'tkbn' | 'gtext' | 'max' | 'send' | 'ordering' | 'koguchi' | 'lot' | 'vgcode' | 'hgcode'> & {
+  id: number;
+  code: string;
+};
+/** 保存時に msgtanka へ渡す値（単価・原価は、カンマを除いた文字列で送る） */
+interface TankaInput {
+  id: number;
+  gcode: string;
+  day: string;
+  tanka1: string | null; tanka2: string | null; tanka3: string | null; tanka4: string | null; tanka5: string | null;
+  tanka6: string | null; tanka7: string | null; tanka8: string | null; tanka9: string | null;
+  cost: string | null;
+  genka: string | null;
+  taxrate: number;
+  currency: string;
+}
 @Component({
     selector: 'app-mstgoods',
     templateUrl: './mstgoods.component.html',
@@ -193,7 +224,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     // }
     if (grpcd) {
       grpcd = this.usrsrv.convUpper(grpcd);
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<GgroupCodeResult>({
         query: Query.GetMast0,
         variables: {
           id: this.usrsrv.compid,
@@ -201,7 +232,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
         },
       }).valueChanges
         .subscribe(({ data }) => {
-          if (data.msggroup.length == 0) {
+          if ((data as GgroupCodeResult).msggroup.length == 0) {
             this.form.reset();
             history.replaceState('', '', './mstgoods');
             this.overlayRef.detach();
@@ -211,12 +242,12 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
               this.el.nativeElement.querySelector('#first-fld').focus();
             }
           } else {
-            let lcgrpcd = data.msggroup[0].code;
+            let lcgrpcd = (data as GgroupCodeResult).msggroup[0].code;
             if (this.mode == 1) {
               this.usrsrv.toastWar("商品グループコード" + lcgrpcd + "は登録済です。新規登録ボタンからやり直してください");
               this.mode = 3;
             }
-            this.apollo.watchQuery<any>({
+            this.apollo.watchQuery<GgroupResult>({
               query: Query.GetMast1,
               variables: {
                 id: this.usrsrv.compid,
@@ -225,7 +256,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
             }).valueChanges
               .subscribe(({ data }) => {
                 this.form.reset();
-                let ggroup: mwI.Ggroup = data.msggroup_by_pk;
+                let ggroup: mwI.Ggroup = (data as GgroupResult).msggroup_by_pk;
                 this.form.patchValue(ggroup);
                 this.usrsrv.setTmstmp(ggroup);
                 this.gdssrv.goods = [];
@@ -310,7 +341,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   }
 
   save(): void {
-    let ggroup: any = {
+    let ggroup: GgroupInput = {
       id: this.usrsrv.compid,
       code: this.gdssrv.grpcd,
       kana: this.usrsrv.editFrmval(this.form, 'kana'),
@@ -326,11 +357,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       updated_at: new Date(),
       updated_by: this.usrsrv.staff.code
     };
-    let gds: {
-        id: number; code: string; gcode: any; size: any; color: any; gskbn: any; jan: any; weight: any; unit: any; tkbn: any;
-        // zkbn: this.usrsrv.editFrmval(control,'zkbn'),
-        gtext: any; max: any; send: any; ordering: any; koguchi: any; lot: any; vgcode: any; hgcode: any;
-    }[] = [];
+    let gds: GoodsInput[] = [];
     this.frmArr.controls
       .forEach(control => {
         gds.push({
@@ -355,7 +382,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
           hgcode: this.usrsrv.editFrmval(control, 'hgcode')
         });
       });
-    let tnk: { id: number; gcode: any; day: any; tanka1: any; tanka2: any; tanka3: any; tanka4: any; tanka5: any; tanka6: any; tanka7: any; tanka8: any; tanka9: any; cost: any; genka: any; taxrate: any; currency: any; }[] = [];
+    let tnk: TankaInput[] = [];
     this.frmArr2.controls
       .forEach(control => {
         tnk.push({
@@ -379,7 +406,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       });
 
     if (this.mode == 2) {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<GgroupUpdateResult>({
         mutation: Query.UpdateMast1,
         variables: {
           id: this.usrsrv.compid,
@@ -410,7 +437,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     } else {//新規登録
       ggroup.created_at = ggroup.updated_at;
       ggroup.created_by = this.usrsrv.staff.code;
-      this.apollo.mutate<any>({
+      this.apollo.mutate<GgroupInsertResult>({
         mutation: Query.InsertMast1,
         variables: {
           object: [ggroup],
@@ -491,7 +518,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       e.returnValue = true;
     }
   }
-  insTnkrow(emitParam: any) {
+  insTnkrow(emitParam: TnkAction) {
     // console.log(emitParam);
     if (emitParam.flg) {
       this.gtnktbl()!.insRow(emitParam.row, emitParam.flgCP);
