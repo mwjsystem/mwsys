@@ -10,9 +10,9 @@ import { ToastrService } from "@damjantonkli/ngx-toastr";
 import { environment } from './../../environments/environment';
 
 export class TmStmp {
-  created_at!: Date;
+  created_at!: Date | string;
   created_by!: string;
-  updated_at!: Date;
+  updated_at!: Date | string;
   updated_by!: string;
   constructor(init?: Partial<TmStmp>) {
     Object.assign(this, init);
@@ -263,6 +263,7 @@ export class UserService {
     return okrno.toString() + chkNum.toString();
   }
 
+  /** フォームの値をそのまま返す（空文字は null）。コントロールの値は未型付け（any）のため戻り値も any */
   editFrmval(frm: AbstractControl, fld: string): any {
     let val: any;
     // console.log(fld, frm.get(fld).value);
@@ -273,9 +274,9 @@ export class UserService {
     }
     return val;
   }
-  editFrmday(frm: AbstractControl, fld: string): any {
+  editFrmday(frm: AbstractControl, fld: string): string | null {
     // console.log(fld, frm.get(fld).value);
-    let val: any;
+    let val: string | null;
     if (frm.get(fld)!.value == null) {
       val = null;
     } else {
@@ -283,8 +284,8 @@ export class UserService {
     }
     return val;
   }
-  editDay(frm: AbstractControl, fld: string): any {
-    let val: any;
+  editDay(frm: AbstractControl, fld: string): string {
+    let val: string;
     if (frm.get(fld)!.value == null) {
       val = "2000-01-01";
     } else {
@@ -294,8 +295,8 @@ export class UserService {
     return val;
   }
 
-  editInt(frm: AbstractControl, fld: string): any {
-    let val: any;
+  editInt(frm: AbstractControl, fld: string): string | null {
+    let val: string | null;
     if (frm.get(fld)!.value == null) {
       val = null;
     } else if (frm.get(fld)!.value == "") {
@@ -312,8 +313,8 @@ export class UserService {
     fld2?: string,
     fld3?: string,
     fld4?: string
-  ): any {
-    let val: any = "";
+  ): string {
+    let val: string = "";
     if (frm.get(fld1)!.value) {
       val += frm.get(fld1)!.value.replace(/[^0-9]/g, "");
     }
@@ -365,7 +366,7 @@ export class UserService {
     }
     return (tel || "").slice(0, -1);
   }
-  setTmstmp(obj: any): void {
+  setTmstmp(obj: Pick<TmStmp, 'created_at' | 'created_by' | 'updated_at' | 'updated_by'>): void {
     this.tmstmp.created_at = obj.created_at;
     this.tmstmp.created_by = obj.created_by;
     this.tmstmp.updated_at = obj.updated_at;

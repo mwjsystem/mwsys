@@ -176,9 +176,9 @@ declare namespace mwI {
     tax: number;
     total: number;
     created_at: string;
-    created_by: Date;
+    created_by: string;
     updated_at: string;
-    updated_by: Date;
+    updated_by: string;
     // jdenno: number;
     currency: string;
     msvendor: {
@@ -226,9 +226,9 @@ declare namespace mwI {
     tax: number;
     total: number;
     created_at: string;
-    created_by: Date;
+    created_by: string;
     updated_at: string;
-    updated_by: Date;
+    updated_by: string;
     currency: string;
   }
   interface Siimei {
