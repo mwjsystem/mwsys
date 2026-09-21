@@ -28,6 +28,23 @@ export class Trans {
   }
 }
 
+/**
+ * get_trans クエリ（GetTran）の結果行。
+ * 各フィールドの型は、Trans への代入内容（従来 any だった行データの使われ方）から読み取ったもの。
+ */
+interface TransStaff { tcode: string }
+interface TransMember { sei: string; mei: string | null }
+interface ShukkaRow { sday: string | null; yday: string; denno: number; line: number; mbikou: string | null; suu: number; trjyuden: TransStaff & { mcode: number; msmember: TransMember } }
+interface SiireRow { inday: string; denno: number; line: number; mbiko: string | null; suu: number; trsiiden: TransStaff & { vcode: number; msvendor: { adrname: string } } }
+interface MovinRow { denno: number; line: number; mbiko: string | null; suu: number; trmovsub: TransStaff & { day: string; outcode: number; msstoreout: { name: string } } }
+interface MovoutRow { denno: number; line: number; mbiko: string | null; suu: number; trmovsub: TransStaff & { day: string; incode: number; msstorein: { name: string } } }
+interface TenkaiRow extends TransStaff { day: string; denno: number; line: number; memo: string | null; suu: number }
+interface HikatRow { sday: string | null; spec: string; spdet: string | null; mbikou: string | null; denno: number; line: number; suu: number; trjyuden: TransStaff & { yday: string; mcode: number; msmember: TransMember } }
+interface HatznRow extends TransStaff { denno: number; line: number; mbikou: string | null; yday: string; vcode: number; adrname: string; hatzn: number; nymat: number }
+interface TransQueryResult {
+  shukka: ShukkaRow[]; siire: SiireRow[]; movin: MovinRow[]; movout: MovoutRow[];
+  tenmoto: TenkaiRow[]; tensaki: TenkaiRow[]; hikat: HikatRow[]; hatzn: HatznRow[];
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -207,8 +224,9 @@ export class TransService {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log('出荷',data);
+          const rows: TransQueryResult = data;
           let trans: Trans[] = [];
-          data.shukka.forEach((e: { sday: any; yday: any; denno: any; line: any; mbikou: any; trjyuden: { tcode: any; mcode: any; msmember: { sei: any; mei: any; }; }; suu: any; }) => {
+          rows.shukka.forEach(e => {
             let lcsrtdy = e.sday ?? e.yday;
             const tran: Trans = {
               sday: e.sday,
@@ -229,7 +247,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.siire.forEach((e: { inday: any; denno: any; line: any; mbiko: any; trsiiden: { tcode: any; vcode: any; msvendor: { adrname: any; }; }; suu: any; }) => {
+          rows.siire.forEach(e => {
             const tran: Trans = {
               sday: e.inday,
               ttype: '仕入',
@@ -249,7 +267,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.movin.forEach((e: { trmovsub: { day: any; tcode: any; outcode: any; msstoreout: { name: any; }; }; denno: any; line: any; mbiko: any; suu: any; }) => {
+          rows.movin.forEach(e => {
             const tran: Trans = {
               sday: e.trmovsub.day,
               ttype: '移動入庫',
@@ -269,7 +287,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.movout.forEach((e: { trmovsub: { day: any; tcode: any; incode: any; msstorein: { name: any; }; }; denno: any; line: any; mbiko: any; suu: any; }) => {
+          rows.movout.forEach(e => {
             const tran: Trans = {
               sday: e.trmovsub.day,
               ttype: '移動出庫',
@@ -289,7 +307,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.tenmoto.forEach((e: { day: any; denno: any; line: any; memo: any; tcode: any; suu: any; }) => {
+          rows.tenmoto.forEach(e => {
             const tran: Trans = {
               sday: e.day,
               ttype: '展開元',
@@ -309,7 +327,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.tensaki.forEach((e: { day: any; denno: any; line: any; memo: any; tcode: any; suu: any; }) => {
+          rows.tensaki.forEach(e => {
             const tran: Trans = {
               sday: e.day,
               ttype: '展開先',
@@ -330,7 +348,7 @@ export class TransService {
             trans.push(tran);
           });
           // console.log(data);
-          data.hikat.forEach((e: { sday: any; trjyuden: { yday: any; tcode: any; mcode: any; msmember: { sei: any; mei: any; }; }; spec: string; spdet: any; mbikou: any; denno: any; line: any; suu: any; }) => {
+          rows.hikat.forEach(e => {
             // console.log(e.sday);
             let lcsrtdy = e.sday ?? e.trjyuden.yday;
             let lcbiko;
@@ -358,7 +376,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.hatzn.forEach((e: { denno: any; line: any; mbikou: any; tcode: any; yday: any; vcode: any; adrname: any; hatzn: any; nymat: any; }) => {
+          rows.hatzn.forEach(e => {
             // console.log(e.sday);
             const tran: Trans = {
               sday: null,
@@ -397,9 +415,9 @@ export class TransService {
     })
   }
 
-  sortTblData(tbldata: any[]): Trans[] {
+  sortTblData(tbldata: Trans[]): Trans[] {
     // return new Promise( resolve => {
-    tbldata.sort(function (a: { srtdy: number; } | null, b: { srtdy: number; } | null) {
+    tbldata.sort(function (a: Trans | null, b: Trans | null) {
       if (a == null && b == null) return 0;
       if (a == null) return 1;
       if (b == null) return -1;
@@ -412,12 +430,12 @@ export class TransService {
     let wGenz: number = 0;
     for (let i = 0; i < tbldata.length; i++) {
       if (tbldata[i].sday != null) {
-        wGenz += tbldata[i].insuu - tbldata[i].ousuu;
+        wGenz += (tbldata[i].insuu ?? 0) - (tbldata[i].ousuu ?? 0);
         tbldata[i].zaisu = wGenz;
       }
     }
     if (this.flg == -1) {
-      tbldata.sort(function (a: { srtdy: number; } | null, b: { srtdy: number; } | null) {
+      tbldata.sort(function (a: Trans | null, b: Trans | null) {
         if (a == null && b == null) return 0;
         if (a == null) return 1;
         if (b == null) return -1;
