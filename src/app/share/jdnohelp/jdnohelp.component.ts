@@ -14,6 +14,7 @@ import { BunruiService } from './../../services/bunrui.service';
 import { MembsService } from './../../mstmember/membs.service';
 import { McdhelpComponent } from './../mcdhelp/mcdhelp.component';
 import { AdredaComponent } from './../adreda/adreda.component';
+import { HasuraCond, HasuraWhere } from './../help-where';
 
 
 interface Jyuden {
@@ -38,6 +39,10 @@ interface Jyuden {
   pcode: string;
 }
 
+/** get_jyuden クエリの行。受注明細（1 行目）の商品コードが入れ子で付く */
+interface JyudenRow extends Jyuden { trjyumeis: { gcode: string }[] }
+/** get_jyuden クエリの結果 */
+interface JyudenResult { trjyuden: JyudenRow[] }
 @Component({
     selector: 'app-jdnohelp',
     templateUrl: './jdnohelp.component.html',
@@ -168,7 +173,7 @@ export class JdnohelpComponent implements OnInit {
   //   this.mcdtxt=this.memsrv.get_mcdtxt(mcd);
   // }
   getJyuden(): void {
-    let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
+    let varWh: HasuraWhere = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     if (this.ftype == "0") {
       varWh.where._and.push({ "torikbn": { "_eq": false } });
     } else if (this.ftype == "1") {
@@ -176,7 +181,7 @@ export class JdnohelpComponent implements OnInit {
     }
 
     if (this.fmcd) {
-      let fldobj: { [k: string]: any } = {};
+      let fldobj: HasuraCond = {};
       fldobj[this.fmcdfld] = { "_eq": this.fmcd };
       varWh.where._and.push(fldobj);
     }
@@ -184,7 +189,7 @@ export class JdnohelpComponent implements OnInit {
       varWh.where._and.push({ "nadr": { "_eq": this.feda } });
     }
     if (this.fday) {
-      let fldobj: { [k: string]: any } = {};
+      let fldobj: HasuraCond = {};
       fldobj[this.fdayfld] = { "_gt": this.usrsrv.formatDate(this.fday) };
       varWh.where._and.push(fldobj);
     }
@@ -228,7 +233,7 @@ export class JdnohelpComponent implements OnInit {
       }
     }`;
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<JyudenResult>({
       query: GetTran,
       variables: varWh
     })
@@ -236,11 +241,11 @@ export class JdnohelpComponent implements OnInit {
       .subscribe(({ data }) => {
         // console.log(data);
         // this.subject.next(data.trjyuden);
-        let srcdata: any[] | undefined = [];
-        if (data.trjyuden.length == 0) {
+        let srcdata: Jyuden[] = [];
+        if ((data as JyudenResult).trjyuden.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          data.trjyuden.forEach((element: { [x: string]: any; trjyumeis: any; }) => {
+          (data as JyudenResult).trjyuden.forEach(element => {
             let { trjyumeis, ...rest } = element;
             // console.log(element.denno, trjyumeis);
             let gcd = { gcode: trjyumeis[0].gcode };

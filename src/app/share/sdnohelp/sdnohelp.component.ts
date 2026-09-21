@@ -14,12 +14,13 @@ import { BunruiService } from './../../services/bunrui.service';
 import { VendsService } from './../../mstvendor/vends.service';
 import { VcdhelpComponent } from './../vcdhelp/vcdhelp.component';
 import { HdnohelpComponent } from './../hdnohelp/hdnohelp.component';
+import { HasuraWhere } from './../help-where';
 
 interface Siiden {
   denno: number;
   inday: Date;
   vcode: string;
-  hdenno: number;
+  hdenno?: number; // get_siiden では取得しない
   scode: string;
   tcode: number;
   // del: boolean;
@@ -28,6 +29,10 @@ interface Siiden {
   gcode: string;
 }
 
+/** get_siiden クエリの行。仕入明細（1 行目）の商品コードが入れ子で付く */
+interface SiidenRow extends Omit<Siiden, 'gcode'> { trsiimeis: { gcode: string }[] }
+/** get_siiden クエリの結果 */
+interface SiidenResult { trsiiden: SiidenRow[] }
 @Component({
     selector: 'app-sdnohelp',
     templateUrl: './sdnohelp.component.html',
@@ -116,7 +121,7 @@ export class SdnohelpComponent implements OnInit {
     );
   }
   get_siiden(): void {
-    let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
+    let varWh: HasuraWhere = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     if (this.fvcd) {
       varWh.where._and.push({ "vcode": { "_eq": this.fvcd } });
     }
@@ -150,18 +155,18 @@ export class SdnohelpComponent implements OnInit {
       }
     }`;
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<SiidenResult>({
       query: GetTran,
       variables: varWh
     })
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        if (data.trsiiden.length == 0) {
+        if ((data as SiidenResult).trsiiden.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          let srcdata: any[] | undefined = [];
-          data.trsiiden.forEach((element: { [x: string]: any; trsiimeis: any; }) => {
+          let srcdata: Siiden[] = [];
+          (data as SiidenResult).trsiiden.forEach(element => {
             let { trsiimeis, ...rest } = element;
             let gcd = { gcode: trsiimeis[0].gcode };
             srcdata.push({ ...rest, ...gcd });

@@ -10,6 +10,7 @@ import { Subject } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
+import { HasuraWhere } from './../help-where';
 // import { StaffService } from './../../services/staff.service';
 // import { BunruiService } from './../../services/bunrui.service';
 
@@ -36,6 +37,8 @@ interface Hatmei {
   msgood: { unit: string; };
 }
 
+/** get_hatmei クエリの結果 */
+interface HatmeiResult { vhatzn: Hatmei[] }
 @Component({
     selector: 'app-hmeihelp',
     templateUrl: './hmeihelp.component.html',
@@ -100,7 +103,7 @@ export class HmeihelpComponent implements OnInit {
   }
 
   get_hatmei(): void {
-    let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
+    let varWh: HasuraWhere = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     if (this.fvcd) {
       varWh.where._and.push({ "vcode": { "_eq": this.fvcd } });
     }
@@ -139,18 +142,18 @@ export class HmeihelpComponent implements OnInit {
       }
     }`;
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<HatmeiResult>({
       query: GetTran,
       variables: varWh
     })
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        if (data.vhatzn.length == 0) {
+        if ((data as HatmeiResult).vhatzn.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          let srcdata: any[] | undefined = [];
-          data.vhatzn.forEach((element: any) => {
+          let srcdata: Hatmei[] = [];
+          (data as HatmeiResult).vhatzn.forEach(element => {
             srcdata.push(element);
           });
           this.dataSource = new MatTableDataSource<Hatmei>(srcdata);

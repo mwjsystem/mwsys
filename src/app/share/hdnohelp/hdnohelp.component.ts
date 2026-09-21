@@ -13,6 +13,7 @@ import { StaffService } from './../../services/staff.service';
 // import { BunruiService } from './../../services/bunrui.service';
 import { VendsService } from './../../mstvendor/vends.service';
 import { VcdhelpComponent } from './../vcdhelp/vcdhelp.component';
+import { HasuraWhere } from './../help-where';
 
 interface Hatden {
   denno: number;
@@ -21,12 +22,16 @@ interface Hatden {
   vcode: string;
   scode: string;
   tcode: number;
-  del: boolean;
+  del?: boolean; // get_hatden では取得しない
   updated_at: Date;
   updated_by: string;
   gcode: string;
 }
 
+/** get_hatden クエリの行。発注明細（1 行目）の商品コードが入れ子で付く */
+interface HatdenRow extends Omit<Hatden, 'gcode'> { trhatmeis: { gcode: string }[] }
+/** get_hatden クエリの結果 */
+interface HatdenResult { trhatden: HatdenRow[] }
 @Component({
     selector: 'app-hdnohelp',
     templateUrl: './hdnohelp.component.html',
@@ -97,7 +102,7 @@ export class HdnohelpComponent implements OnInit {
     );
   }
   get_hatden(): void {
-    let varWh: { [k: string]: any } = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
+    let varWh: HasuraWhere = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     if (this.fvcd) {
       varWh.where._and.push({ "vcode": { "_eq": this.fvcd } });
     }
@@ -129,18 +134,18 @@ export class HdnohelpComponent implements OnInit {
       }
     }`;
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<HatdenResult>({
       query: GetTran,
       variables: varWh
     })
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        if (data.trhatden.length == 0) {
+        if ((data as HatdenResult).trhatden.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          let srcdata: any[] | undefined = [];
-          data.trhatden.forEach((element: { [x: string]: any; trhatmeis: any; }) => {
+          let srcdata: Hatden[] = [];
+          (data as HatdenResult).trhatden.forEach(element => {
             let { trhatmeis, ...rest } = element;
             let gcd = { gcode: trhatmeis[0].gcode };
             srcdata.push({ ...rest, ...gcd });
