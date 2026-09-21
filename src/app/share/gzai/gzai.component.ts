@@ -90,7 +90,11 @@ export class GzaiComponent implements OnInit {
     this.refresh();
   }
   updGds(i: number, event: KeyboardEvent): void {
-    let val: string = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
+    this.getGds(i, (event.target as HTMLInputElement)?.value);
+  }
+  /** 商品コードを行に反映し、商品名・単位を取得する（直接入力と商品ヘルプの両方から呼ぶ） */
+  getGds(i: number, value: string): void {
+    let val: string = this.usrsrv.convUpper(value);
     this.frmArr.controls[i].get('zcode')!.setValue(val);
     const GetMast = gql`
     query get_goods($id: smallint!, $gcode: String!) {
@@ -126,7 +130,7 @@ export class GzaiComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.updGds(i, data.gcode);
+          this.getGds(i, data.gcode);
         }
       }
     );
