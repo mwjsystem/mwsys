@@ -1,7 +1,7 @@
 import { Injectable, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { FormArray, ValidationErrors, FormGroup } from "@angular/forms";
-import { AuthService } from "@auth0/auth0-angular";
+import { AuthService, User } from "@auth0/auth0-angular";
 import { Apollo } from "apollo-angular";
 import { AbstractControl } from "@angular/forms";
 import { Observable, Subject } from "rxjs";
@@ -41,6 +41,11 @@ export class System {
   }
 }
 
+interface SystemResult { mssystem: System[] }
+interface StaffResult { msstaff: mwI.Staff[] }
+interface CurnumResult { update_trnumber: { returning: { curnum: number }[] } }
+interface TbldefResult { vtbldef: mwI.Tbldef[] }
+interface HolidayResult { msholiday: { holiday: string | number | Date }[] }
 @Injectable({
   providedIn: "root",
 })
@@ -50,7 +55,7 @@ export class UserService {
   private toastr = inject(ToastrService);
   private router = inject(Router);
 
-  userInfo: { [key: string]: any } = {};
+  userInfo: User = {};
   compid!: number;
   staff!: mwI.Staff;
   tmstmp: TmStmp = new TmStmp();
@@ -99,7 +104,7 @@ export class UserService {
       this.compid = this.userInfo["https://userids"][0];
       console.log('usersrv2', this.userInfo, this.compid);
       this.apollo
-        .watchQuery<any>({
+        .watchQuery<SystemResult>({
           query: GetMast,
           variables: {
             id: this.compid,
@@ -107,7 +112,7 @@ export class UserService {
         })
         .valueChanges.subscribe(
           ({ data }) => {
-            this.system = data.mssystem[0];
+            this.system = (data as SystemResult).mssystem[0];
 			console.log('UserService constructor',data);
           },
           (error) => {
@@ -154,7 +159,7 @@ export class UserService {
     );
   }
 
-  async getStaff(mail: string): Promise<mwI.Staff> {
+  async getStaff(mail: string | undefined): Promise<mwI.Staff> {
     const GetMast = gql`
       query get_staff($id: smallint!, $mail: String!) {
         msstaff(where: { id: { _eq: $id }, mail: { _eq: $mail } }) {
@@ -167,7 +172,7 @@ export class UserService {
     `;
     return new Promise((resolve) => {
       this.apollo
-        .watchQuery<any>({
+        .watchQuery<StaffResult>({
           query: GetMast,
           variables: {
             id: this.compid,
@@ -176,7 +181,7 @@ export class UserService {
         })
         .valueChanges.subscribe(
           ({ data }) => {
-            return resolve(data.msstaff[0]);
+            return resolve((data as StaffResult).msstaff[0]);
           },
           (error) => {
             console.log("error query get_staff", error);
@@ -204,7 +209,7 @@ export class UserService {
         return resolve(dno!);
       } else {
         this.apollo
-          .mutate<any>({
+          .mutate<CurnumResult>({
             mutation: UpdateNumber,
             variables: {
               id: this.compid,
@@ -214,7 +219,7 @@ export class UserService {
           })
           .subscribe(
             ({ data }) => {
-              return resolve(data.update_trnumber.returning[0].curnum);
+              return resolve((data as CurnumResult).update_trnumber.returning[0].curnum);
               // observer.next(data.update_trnumber.returning[0].curnum);
               // observer.complete();
             },
@@ -447,7 +452,7 @@ export class UserService {
     return val;
   }
   convKana(value: string): string {
-    const kanaMap: { [key: string]: any } = {
+    const kanaMap: { [key: string]: string } = {
       ガ: "ｶﾞ",
       ギ: "ｷﾞ",
       グ: "ｸﾞ",
@@ -569,13 +574,13 @@ export class UserService {
     }
     return ret;
   }
-  disableMtbl(form: FormGroup<any>) {
+  disableMtbl(form: AbstractControl) {
     (<FormArray>form.get("mtbl")).controls.forEach((control) => {
       control.disable();
       control.clearValidators();
     });
   }
-  enableMtbl(form: FormGroup<any>) {
+  enableMtbl(form: AbstractControl) {
     (<FormArray>form.get("mtbl")).controls.forEach((control) => {
       control.enable();
       control.clearValidators();
@@ -586,7 +591,7 @@ export class UserService {
     // window.open(url.toString(),null,'top=100,left=100');
     window.open(url.toString());
   }
-  openFrm(typ: string, dno: any) {
+  openFrm(typ: string, dno: string | number) {
     let func: string | undefined;
     switch (true) {
       case typ == "出荷":
@@ -640,7 +645,7 @@ export class UserService {
     // window.open(url.toString() + '?stkey=' + jdkey ,null,'top=100,left=100');
     window.open(url.toString() + "?stkey=" + jdkey);
   }
-  openRepstc(gcd: any, scd: any) {
+  openRepstc(gcd: string, scd: string) {
     const url = this.router.createUrlTree(["/repstock"], {
       queryParams: { gcode: gcd, scode: scd },
     });
@@ -677,12 +682,12 @@ export class UserService {
       }
     `;
     this.apollo
-      .watchQuery<any>({
+      .watchQuery<TbldefResult>({
         query: GetMast,
       })
       .valueChanges.subscribe(
         ({ data }) => {
-          this.tbldef = data.vtbldef;
+          this.tbldef = (data as TbldefResult).vtbldef;
         },
         (error) => {
           console.log("error query getVtbldef", error);
@@ -729,7 +734,7 @@ export class UserService {
       }
     `;
     this.apollo
-      .watchQuery<any>({
+      .watchQuery<HolidayResult>({
         query: GetMast,
         variables: {
           id: this.compid,
@@ -737,7 +742,7 @@ export class UserService {
       })
       .valueChanges.subscribe(
         ({ data }) => {
-          data.msholiday.forEach((element: { holiday: string | number | Date; }) => {
+          (data as HolidayResult).msholiday.forEach(element => {
             this.holidays.push(this.formatDate(new Date(element.holiday)));
           });
         },
