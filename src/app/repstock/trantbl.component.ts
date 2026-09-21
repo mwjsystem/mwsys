@@ -14,8 +14,9 @@ import { UserService } from './../services/user.service';
     standalone: false
 })
 export class TrantblComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-  public dataSource: MatTableDataSource<Trans>;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
+  public dataSource!: MatTableDataSource<Trans>;
   public displayedColumns = ['ttype', 'sday', 'yday', 'aitec', 'aiten', 'denno', 'mline', 'tcode', 'biko', 'insuu',
     'ousuu', 'zaisu', 'yotei', 'wait'];
 

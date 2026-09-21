@@ -36,7 +36,8 @@ interface Siiden {
     standalone: false
 })
 export class SdnohelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -60,8 +61,8 @@ export class SdnohelpComponent implements OnInit {
   fvcd: string = "";
   fday: Date = new Date();
   ftcd: string = "";
-  fsdno: number;
-  fhdno: number;
+  fsdno!: number;
+  fhdno!: number;
 
   constructor(public usrsrv: UserService,
     public stfsrv: StaffService,
@@ -158,8 +159,8 @@ export class SdnohelpComponent implements OnInit {
         if (data.trsiiden.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          let srcdata = [];
-          data.trsiiden.forEach(element => {
+          let srcdata: any[] | undefined = [];
+          data.trsiiden.forEach((element: { [x: string]: any; trsiimeis: any; }) => {
             let { trsiimeis, ...rest } = element;
             let gcd = { gcode: trsiimeis[0].gcode };
             srcdata.push({ ...rest, ...gcd });

@@ -68,7 +68,7 @@ export class VendsService {
     return vcdtxt;
   }
   getVendor(vcd: string): any {
-    let vendor = {};
+    let vendor: { [key: string]: any } = {};
     const i: number = this.vends.findIndex(obj => obj.code == vcd);
     if (i > -1) {
       vendor['name'] = this.vends[i].adrname;

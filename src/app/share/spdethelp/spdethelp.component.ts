@@ -37,11 +37,11 @@ export class SpdethelpComponent implements OnInit {
     // private toastr: ToastrService,
     // private apollo: Apollo,
     private dialogRef: MatDialogRef<SpdethelpComponent>,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data: any) {
     let lcTbl: Nymat[] = [];
     // console.log(data);
     this.jyusuu = data.suu;
-    data.nymat.forEach(e => {
+    data.nymat.forEach((e: { denno: any; line: any; yday: any; ydaykbn: any; suu: any; hatzn: any; nymat: any; matzn: any; mbiko: any; }) => {
       lcTbl.push({
         denno: e.denno,
         line: e.line,
@@ -60,7 +60,7 @@ export class SpdethelpComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  sel_vcd(selected) {
+  sel_vcd(selected: { matzn: number; }) {
     // console.log(this.jyusuu<selected.matzn);
     if (this.jyusuu > selected.matzn) {
       this.usrsrv.toastWar("受注数量" + this.jyusuu + "に足りません。一旦、閉じて受注明細を分割してください。");

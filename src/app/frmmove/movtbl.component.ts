@@ -19,14 +19,17 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class MovtblComponent implements OnInit {
-  @Input() parentForm: FormGroup;
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-  @ViewChildren('gcdInputs') gcdInps: QueryList<ElementRef>;
-  private el: HTMLInputElement;
+  @Input()
+    parentForm!: FormGroup;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
+  @ViewChildren('gcdInputs')
+    gcdInps!: QueryList<ElementRef>;
+  private el!: HTMLInputElement;
   dataSource = new MatTableDataSource();
-  copyToClipboard: string;
+  copyToClipboard!: string;
   navCli = navigator.clipboard;
-  setZai = [];
+  setZai: any[] = [];
   hidx = 5; //tabindex用ヘッダ項目数
   mcols = 3; //tabindex用明細列数  
   public trzaiko: Zaiko[] = [];
@@ -87,7 +90,7 @@ export class MovtblComponent implements OnInit {
 
   updGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
-    this.frmArr.controls[i].get('gcode').setValue(val);
+    this.frmArr.controls[i].get('gcode')!.setValue(val);
     const GetGood = gql`
     query get_good($id: smallint!,$gds:String!) {
       msgoods_by_pk(gcode: $gds, id: $id){
@@ -117,12 +120,12 @@ export class MovtblComponent implements OnInit {
 
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-          this.frmArr.controls[i].get('gcode').setErrors({ 'incorrect': true });
+          this.frmArr.controls[i].get('gcode')!.setErrors({ 'incorrect': true });
         } else {
           console.log(msgds);
-          this.frmArr.controls[i].get('gcode').setErrors(null);
+          this.frmArr.controls[i].get('gcode')!.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
-          msgds.msgzais.forEach(e => {
+          msgds.msgzais.forEach((e: { msgoods: { gskbn: string; }; zcode: any; irisu: any; }) => {
             let arr = []
             if (e.msgoods.gskbn == "0") {
               this.getMtbl(i, 'msgzais').push(this.fb.group({ zcode: e.zcode, irisu: e.irisu }));
@@ -168,25 +171,25 @@ export class MovtblComponent implements OnInit {
   setPable(i: number, gcd: string, msgzais: any) {
     // console.log(gcd, this.parentForm.get('incode').value);
     if (this.frmArr.controls[i].value.gskbn == "0") {
-      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('outcode').value).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('outcode')!.value).then(result => {
         // console.log(result);
         this.frmArr.controls[i].patchValue({ pable: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
         // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
-      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('incode').value).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm.get('incode')!.value).then(result => {
         // console.log(result);
         this.frmArr.controls[i].patchValue({ stock: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
         // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
     } else if (this.frmArr.controls[i].value.gskbn == "1") {
-      this.stcsrv.getSetZai(this.parentForm.get('outcode').value, msgzais).then(result => {
+      this.stcsrv.getSetZai(this.parentForm.get('outcode')!.value, msgzais).then(result => {
         this.setZai[i] = result;
         this.frmArr.controls[i].patchValue({ pable: this.stcsrv.getPaabl(result) });
         this.movsrv.subject.next(true);
       });
-      this.stcsrv.getSetZai(this.parentForm.get('incode').value, msgzais).then(result => {
+      this.stcsrv.getSetZai(this.parentForm.get('incode')!.value, msgzais).then(result => {
         this.setZai[i] = result;
         this.frmArr.controls[i].patchValue({ stock: this.stcsrv.getPaabl(result) });
         this.movsrv.subject.next(true);
@@ -235,14 +238,14 @@ export class MovtblComponent implements OnInit {
       });
     // }
   }
-  insRows(rowData, flg: boolean) {
+  insRows(rowData: any[], flg: boolean) {
     let i: number = 0;
     if (flg) {
       this.frmArr.clear();
     } else {
       i = this.frmArr.length;
     }
-    rowData.forEach(row => {
+    rowData.forEach((row) => {
       let col = row.split("\t");
       if (col[0] != "") {
         let movden: Movden = {
@@ -280,8 +283,8 @@ export class MovtblComponent implements OnInit {
     this.usrsrv.toastInf('クリップボードにコピーしました');
   }
 
-  getMovmei(dno) {
-    let movmei = [];
+  getMovmei(dno: number) {
+    let movmei: any[] = [];
     this.frmArr.controls
       .forEach(control => {
         movmei.push({
@@ -296,8 +299,8 @@ export class MovtblComponent implements OnInit {
       });
     return movmei;
   }
-  objectToArray(obj: object): string {
-    var result = Object.keys(obj).map((key: keyof typeof obj) => {
+  objectToArray(obj: any): string {
+    var result = Object.keys(obj).map((key: string) => {
       let value = obj[key];
       // console.log(value)
       return value;
@@ -321,16 +324,16 @@ export class MovtblComponent implements OnInit {
 
       e.msgood.msgzais.forEach(zai => {
         this.trzaiko.push({
-          scode: this.parentForm.get('incode').value,
+          scode: this.parentForm.get('incode')!.value,
           gcode: zai.zcode,
-          day: this.parentForm.get('day').value,
+          day: this.parentForm.get('day')!.value,
           movi: e.suu * zai.irisu * -1,
           movo: 0
         });
         this.trzaiko.push({
-          scode: this.parentForm.get('outcode').value,
+          scode: this.parentForm.get('outcode')!.value,
           gcode: zai.zcode,
-          day: this.parentForm.get('day').value,
+          day: this.parentForm.get('day')!.value,
           movi: 0,
           movo: e.suu * zai.irisu * -1,
         });

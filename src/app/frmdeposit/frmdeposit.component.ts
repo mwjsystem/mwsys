@@ -21,8 +21,9 @@ import { NdnohelpComponent } from './../share/ndnohelp/ndnohelp.component';
     standalone: false
 })
 export class FrmdepositComponent implements OnInit, AfterViewInit {
-  @ViewChild(DepttblComponent) depttbl: DepttblComponent;
-  form: FormGroup;
+  @ViewChild(DepttblComponent)
+    depttbl!: DepttblComponent;
+  form!: FormGroup;
   denno: number = 0;
   rows: FormArray = this.fb.array([]);
   jyuden: Jyuden = new Jyuden();
@@ -65,11 +66,11 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
         if (params.get('mode') === null) {
           this.cancel();
         } else {
-          this.depsrv.mode = +params.get('mode');
+          this.depsrv.mode = +params.get('mode')!;
           this.refresh();
         }
         if (params.get('denno') !== null) {
-          this.denno = +params.get('denno');
+          this.denno = +params.get('denno')!;
           this.getNyuden(this.denno);
         }
       });
@@ -93,7 +94,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
           if (result.kubun == 1) {
             this.usrsrv.toastInf('請求入金伝票です');
           } else {
-            this.form.get('jdenno').setValue(+result.jdenno);
+            this.form.get('jdenno')!.setValue(+result.jdenno);
             this.getJyuden(result.jdenno);
             this.depsrv.nyuden = [];
             for (let i = 0; i < result.trnyudens.length; i++) {
@@ -110,9 +111,9 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
               );
             }
             this.depttbl.setTbl();
-            this.form.get('day').setValue(result.day);
-            this.form.get('code').setValue(result.code);
-            this.form.get('tcode').setValue(result.tcode);
+            this.form.get('day')!.setValue(result.day);
+            this.form.get('code')!.setValue(result.code);
+            this.form.get('tcode')!.setValue(result.tcode);
             this.refresh();
 
           }
@@ -134,10 +135,10 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
         } else if (result.nyuzan <= 0 && (this.depsrv.mode == 1 || (this.depsrv.mode == 2 && i < 0))) {
           this.usrsrv.toastInf('この受注伝票は入金済です');
         } else {
-          this.form.get('jdenno').setValue(denno);
+          this.form.get('jdenno')!.setValue(denno);
           this.jyuden = result;
-          this.form.get('scde').setValue(this.jyuden.scde);
-          this.form.get('code').setValue(this.jyuden.scde);
+          this.form.get('scde')!.setValue(this.jyuden.scde);
+          this.form.get('code')!.setValue(this.jyuden.scde);
           let nyuhis: Nyuhis[] = [];
           for (let i = 0; i < result.trnyusubs.length; i++) {
             if (this.denno !== result.trnyusubs[i].denno) {
@@ -220,7 +221,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get('jdenno').setValue(data.denno);
+          this.form.get('jdenno')!.setValue(data.denno);
           this.getJyuden(data.denno);
         }
       }
@@ -237,7 +238,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get(fldnm).setValue(data.mcode);
+          this.form.get(fldnm)!.setValue(data.mcode);
         }
       }
     );

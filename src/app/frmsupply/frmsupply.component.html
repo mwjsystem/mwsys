@@ -25,7 +25,7 @@
     <input [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10" (blur)="onEnter()"
       [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)">
     @if (mode==3) {
-      <button mat-flat-button mat-icon-button matSuffix (click)="dennoHelp()">
+      <button mat-icon-button matSuffix (click)="dennoHelp()">
         <mat-icon>find_replace</mat-icon>
       </button>
     }

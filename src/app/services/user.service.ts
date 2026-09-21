@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
-import { FormArray } from "@angular/forms";
+import { FormArray, ValidationErrors, FormGroup } from "@angular/forms";
 import { AuthService } from "@auth0/auth0-angular";
 import { Apollo } from "apollo-angular";
 import { AbstractControl } from "@angular/forms";
@@ -10,32 +10,32 @@ import { ToastrService } from "@damjantonkli/ngx-toastr";
 import { environment } from './../../environments/environment';
 
 export class TmStmp {
-  created_at: Date;
-  created_by: string;
-  updated_at: Date;
-  updated_by: string;
+  created_at!: Date;
+  created_by!: string;
+  updated_at!: Date;
+  updated_by!: string;
   constructor(init?: Partial<TmStmp>) {
     Object.assign(this, init);
   }
 }
 export class System {
-  name: string;
-  subname: string;
-  maxmcd: string;
-  maxdno: number;
-  urischema: string;
-  imgurl: string;
-  currate: number;
-  mtax: string;
-  tnk1txt: number;
-  tnk2txt: number;
-  tnk3txt: number;
-  tnk4txt: number;
-  tnk5txt: number;
-  tnk6txt: number;
-  tnk7txt: number;
-  tnk8txt: number;
-  tnk9txt: number;
+  name!: string;
+  subname!: string;
+  maxmcd!: string;
+  maxdno!: number;
+  urischema!: string;
+  imgurl!: string;
+  currate!: number;
+  mtax!: string;
+  tnk1txt!: number;
+  tnk2txt!: number;
+  tnk3txt!: number;
+  tnk4txt!: number;
+  tnk5txt!: number;
+  tnk6txt!: number;
+  tnk7txt!: number;
+  tnk8txt!: number;
+  tnk9txt!: number;
   constructor(init?: Partial<System>) {
     Object.assign(this, init);
   }
@@ -46,8 +46,8 @@ export class System {
 })
 export class UserService {
   userInfo: { [key: string]: any } = {};
-  compid: number;
-  staff: mwI.Staff;
+  compid!: number;
+  staff!: mwI.Staff;
   tmstmp: TmStmp = new TmStmp();
   system: System = new System();
   tbldef: mwI.Tbldef[] = [];
@@ -94,7 +94,7 @@ export class UserService {
     `;
 
     this.auth.user$.subscribe((user) => {
-      this.userInfo = user;
+      this.userInfo = user!;
       // console.log('usersrv1', this.userInfo, this.compid);
       this.compid = this.userInfo["https://userids"][0];
       console.log('usersrv2', this.userInfo, this.compid);
@@ -200,8 +200,8 @@ export class UserService {
     `;
     // let observable:Observable<number> = new Observable<number>(observer => {
     return new Promise((resolve) => {
-      if (dno > 0) {
-        return resolve(dno);
+      if (dno! > 0) {
+        return resolve(dno!);
       } else {
         this.apollo
           .mutate<any>({
@@ -261,29 +261,29 @@ export class UserService {
   editFrmval(frm: AbstractControl, fld: string): any {
     let val: any;
     // console.log(fld, frm.get(fld).value);
-    if (frm.get(fld).value == "") {
+    if (frm.get(fld)!.value == "") {
       val = null;
     } else {
-      val = frm.get(fld).value;
+      val = frm.get(fld)!.value;
     }
     return val;
   }
   editFrmday(frm: AbstractControl, fld: string): any {
     // console.log(fld, frm.get(fld).value);
     let val: any;
-    if (frm.get(fld).value == null) {
+    if (frm.get(fld)!.value == null) {
       val = null;
     } else {
-      val = this.formatDate(frm.get(fld).value);
+      val = this.formatDate(frm.get(fld)!.value);
     }
     return val;
   }
   editDay(frm: AbstractControl, fld: string): any {
     let val: any;
-    if (frm.get(fld).value == null) {
+    if (frm.get(fld)!.value == null) {
       val = "2000-01-01";
     } else {
-      val = this.formatDate(frm.get(fld).value);
+      val = this.formatDate(frm.get(fld)!.value);
     }
     // console.log(frm.get(fld).value,val);
     return val;
@@ -291,12 +291,12 @@ export class UserService {
 
   editInt(frm: AbstractControl, fld: string): any {
     let val: any;
-    if (frm.get(fld).value == null) {
+    if (frm.get(fld)!.value == null) {
       val = null;
-    } else if (frm.get(fld).value == "") {
+    } else if (frm.get(fld)!.value == "") {
       val = null;
     } else {
-      val = frm.get(fld).value.toString().replace(/,/g, "");
+      val = frm.get(fld)!.value.toString().replace(/,/g, "");
     }
     return val;
   }
@@ -309,17 +309,17 @@ export class UserService {
     fld4?: string
   ): any {
     let val: any = "";
-    if (frm.get(fld1).value) {
-      val += frm.get(fld1).value.replace(/[^0-9]/g, "");
+    if (frm.get(fld1)!.value) {
+      val += frm.get(fld1)!.value.replace(/[^0-9]/g, "");
     }
-    if (frm.get(fld2).value) {
-      val += frm.get(fld2).value.replace(/[^0-9]/g, "");
+    if (frm.get(fld2!)!.value) {
+      val += frm.get(fld2!)!.value.replace(/[^0-9]/g, "");
     }
-    if (frm.get(fld3).value) {
-      val += frm.get(fld3).value.replace(/[^0-9]/g, "");
+    if (frm.get(fld3!)!.value) {
+      val += frm.get(fld3!)!.value.replace(/[^0-9]/g, "");
     }
-    if (frm.get(fld4).value) {
-      val += frm.get(fld4).value.replace(/[^0-9]/g, "");
+    if (frm.get(fld4!)!.value) {
+      val += frm.get(fld4!)!.value.replace(/[^0-9]/g, "");
     }
     return val;
   }
@@ -370,7 +370,7 @@ export class UserService {
     // console.log(obj,this.tmstmp);
   }
 
-  formatDate(date?): string {
+  formatDate(date?: string | number | Date | null | undefined): string {
     let lcdate: Date;
     if (date != null) {
       lcdate = new Date(date);
@@ -383,13 +383,13 @@ export class UserService {
     return y + "-" + m + "-" + d;
   }
 
-  toYYYYMM(date) {
-    const y: string = date.getFullYear();
+  toYYYYMM(date: Date) {
+    const y: number = date.getFullYear();
     const m: string = ("00" + (date.getMonth() + 1)).slice(-2);
     return y + m;
   }
 
-  formatTime(date?): string {
+  formatTime(date?: string | number | Date | null): string {
     let lcdate: Date;
     if (date != null) {
       lcdate = new Date(date);
@@ -447,7 +447,7 @@ export class UserService {
     return val;
   }
   convKana(value: string): string {
-    const kanaMap = {
+    const kanaMap: { [key: string]: any } = {
       ガ: "ｶﾞ",
       ギ: "ｷﾞ",
       グ: "ｸﾞ",
@@ -569,25 +569,25 @@ export class UserService {
     }
     return ret;
   }
-  disableMtbl(form) {
+  disableMtbl(form: FormGroup<any>) {
     (<FormArray>form.get("mtbl")).controls.forEach((control) => {
       control.disable();
       control.clearValidators();
     });
   }
-  enableMtbl(form) {
+  enableMtbl(form: FormGroup<any>) {
     (<FormArray>form.get("mtbl")).controls.forEach((control) => {
       control.enable();
       control.clearValidators();
     });
   }
-  openMst(func, value: string) {
+  openMst(func: string, value: string) {
     const url = this.router.createUrlTree(["/" + func, "3", value]);
     // window.open(url.toString(),null,'top=100,left=100');
     window.open(url.toString());
   }
-  openFrm(typ: string, dno) {
-    let func: string;
+  openFrm(typ: string, dno: any) {
+    let func: string | undefined;
     switch (true) {
       case typ == "出荷":
         func = "/frmsales";
@@ -635,12 +635,12 @@ export class UserService {
     // window.open(url.toString(),null,'top=100,left=100');
     window.open(url.toString());
   }
-  openFrmCre(frm, dno, jdkey) {
+  openFrmCre(frm: string, dno: number, jdkey: string) {
     const url = this.router.createUrlTree([frm, "1", dno]);
     // window.open(url.toString() + '?stkey=' + jdkey ,null,'top=100,left=100');
     window.open(url.toString() + "?stkey=" + jdkey);
   }
-  openRepstc(gcd, scd) {
+  openRepstc(gcd: any, scd: any) {
     const url = this.router.createUrlTree(["/repstock"], {
       queryParams: { gcode: gcd, scode: scd },
     });
@@ -700,18 +700,18 @@ export class UserService {
     }
     return ret;
   }
-  getValiderr(obj, i?: number): string {
+  getValiderr(obj: ValidationErrors | null, i?: number): string {
     let ret: string = "";
-    if (obj.required) {
+    if (obj!.required) {
       ret += "未入力です！";
     }
-    if (obj.email) {
+    if (obj!.email) {
       ret += "メールの形式が不正です！";
     }
-    if (obj.incorrect) {
+    if (obj!.incorrect) {
       ret += "マスタ未登録です！";
     }
-    if (obj.existed) {
+    if (obj!.existed) {
       ret += "マスタ登録済です！";
     }
     // console.log(obj);
@@ -737,7 +737,7 @@ export class UserService {
       })
       .valueChanges.subscribe(
         ({ data }) => {
-          data.msholiday.forEach((element) => {
+          data.msholiday.forEach((element: { holiday: string | number | Date; }) => {
             this.holidays.push(this.formatDate(new Date(element.holiday)));
           });
         },
@@ -797,7 +797,7 @@ export class UserService {
     }
     return date;
   }  
-  toastErr(title, msg) {
+  toastErr(title: string | undefined, msg: string | undefined) {
     this.toastr.error(title, msg, {
       closeButton: true,
       disableTimeOut: true,
@@ -805,13 +805,13 @@ export class UserService {
       positionClass: "toast-top-center",
     });
   }
-  toastWar(msg) {
+  toastWar(msg: string | undefined) {
     this.toastr.warning(msg);
   }
-  toastSuc(msg) {
+  toastSuc(msg: string | undefined) {
     this.toastr.success(msg);
   }
-  toastInf(msg) {
+  toastInf(msg: string | undefined) {
     this.toastr.info(msg);
   }
 }

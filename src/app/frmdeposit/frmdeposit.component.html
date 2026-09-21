@@ -26,7 +26,7 @@
         (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
         [disabled]="depsrv.mode==1 || (depsrv.mode==2 && form.dirty)">
       @if (depsrv.mode==3) {
-        <button mat-button mat-icon-button matSuffix (click)="dennoHelp()">
+        <button mat-icon-button matSuffix (click)="dennoHelp()">
           <mat-icon>find_replace</mat-icon>
         </button>
       }
@@ -46,7 +46,7 @@
     </a></button>
   </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="usrsrv.canEnter($event)">
+<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="usrsrv.canEnter($any($event))">
   <mat-card>
     <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
       <mat-card-title>
@@ -62,7 +62,7 @@
             <div fxLayout="row wrap">
               <mat-form-field>
                 <mat-label>受注伝票</mat-label>
-                <input matInput formControlName="jdenno" (change)="getJyuden($event.target.value)">
+                <input matInput formControlName="jdenno" (change)="getJyuden($any($event.target).value)">
                 @if (frmArr.enabled) {
                   <button type="button" mat-icon-button matSuffix (click)="jdennoHelp()"
                     >
@@ -70,7 +70,7 @@
                   </button>
                 }
                 @if (form.value.jdenno) {
-                  <button mat-button mat-icon-button matSuffix
+                  <button mat-icon-button matSuffix
                     (click)="usrsrv.openFrm('出荷',form.value.jdenno)">
                     <mat-icon>open_in_new</mat-icon>
                   </button>
@@ -82,7 +82,7 @@
                 <mat-label>請求先</mat-label>
                 <input matInput [value]="form.value.scde" disabled>
                 @if (form.value.scde) {
-                  <button mat-button mat-icon-button matSuffix
+                  <button mat-icon-button matSuffix
                     (click)="usrsrv.openMst('mstmember',form.value.scde)">
                     <mat-icon>open_in_new</mat-icon>
                   </button>
@@ -100,7 +100,7 @@
                   </button>
                 }
                 @if (form.value.code) {
-                  <button mat-button mat-icon-button matSuffix
+                  <button mat-icon-button matSuffix
                     (click)="usrsrv.openMst('mstmember',form.value.code)">
                     <mat-icon>open_in_new</mat-icon>
                   </button>

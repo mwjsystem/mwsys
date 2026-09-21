@@ -31,13 +31,14 @@ interface Movsub {
     standalone: false
 })
 export class MdnohelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  dataSource: MatTableDataSource<Movsub>;
+  dataSource!: MatTableDataSource<Movsub>;
   // subject = new Subject<Movsub[]>();
   // observe = this.subject.asObservable();
   displayedColumns = [

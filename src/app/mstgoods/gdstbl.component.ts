@@ -22,8 +22,9 @@ import { GzaiComponent } from './../share/gzai/gzai.component';
     standalone: false
 })
 export class GdstblComponent {
-  @Input() parentForm: FormGroup;
-  private paginator: MatPaginator;
+  @Input()
+    parentForm!: FormGroup;
+  private paginator!: MatPaginator;
   @ViewChild(MatPaginator, { static: false }) set matPaginator(mp: MatPaginator) {
     this.paginator = mp;
     this.dataSource.paginator = this.paginator;
@@ -33,7 +34,7 @@ export class GdstblComponent {
   displayedColumns = ['action', 'gcode', 'gtext', 'size', 'color', 'unit', 'gskbn', 'jan', 'weight', 'tkbn', 'max', 'send', 'ordering', 'koguchi', 'lot', 'vgcode', 'hgcode'];
   hidx = 6; //tabindex用ヘッダ項目数
   mcols = 11; //tabindex用明細列数 
-  scode: string;
+  scode!: string;
   constructor(private cdRef: ChangeDetectorRef,
     private fb: FormBuilder,
     private dialog: MatDialog,
@@ -97,7 +98,7 @@ export class GdstblComponent {
     return tooltip;
   }
   async setJan(i: number) {
-    this.frmArr.controls[i].get('jan').setValue(this.usrsrv.addCheckDigit(await this.usrsrv.getNumber('jan', 1)));
+    this.frmArr.controls[i].get('jan')!.setValue(this.usrsrv.addCheckDigit(await this.usrsrv.getNumber('jan', 1)));
   }
   diaGzai(i: number) {
     let dialogConfig = new MatDialogConfig();
@@ -129,7 +130,7 @@ export class GdstblComponent {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.frmArr.controls[i].get('hgcode').setValue(data.gcode);
+          this.frmArr.controls[i].get('hgcode')!.setValue(data.gcode);
         }
       }
     );
@@ -139,8 +140,8 @@ export class GdstblComponent {
 
   updGds(i: number, event: KeyboardEvent) {
     let val: string = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);  //小文字全角→大文字半角変換
-    this.frmArr.controls[i].get('gcode').setErrors(null);
-    this.frmArr.controls[i].get('gcode').setValue(val);
+    this.frmArr.controls[i].get('gcode')!.setErrors(null);
+    this.frmArr.controls[i].get('gcode')!.setValue(val);
     this.apollo.watchQuery<any>({
       query: Query.GetMast2,
       variables: {
@@ -155,19 +156,19 @@ export class GdstblComponent {
           let j: number = 0;
           this.frmArr.controls
             .forEach(control => {
-              if (control.get('gcode').value == val && j != i) {
+              if (control.get('gcode')!.value == val && j != i) {
 
                 this.usrsrv.toastErr(val + 'は重複しています(' + (j + 1) + '行目)', '商品コード入力エラー');
-                this.frmArr.controls[i].get('gcode').setErrors({ 'exist': true });
+                this.frmArr.controls[i].get('gcode')!.setErrors({ 'exist': true });
               }
               j += 1;
             });
         } else {
           this.usrsrv.toastErr(val + 'は商品ｸﾞﾙｰﾌﾟ' + data.msgoods[0].msggroup.code + 'で登録済です', '商品コード入力エラー');
-          this.frmArr.controls[i].get('gcode').setErrors({ 'exist': true });
+          this.frmArr.controls[i].get('gcode')!.setErrors({ 'exist': true });
         }
       });
-    (this.parentForm.get('mtbl2') as FormArray).controls[i].get('gcode').setValue(val);
+    (this.parentForm.get('mtbl2') as FormArray).controls[i].get('gcode')!.setValue(val);
   }
   createRow(flg: boolean, goods?: mwI.Goods) {
     return this.fb.group({

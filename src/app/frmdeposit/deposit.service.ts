@@ -5,69 +5,69 @@ import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
 export class Nyuden {
-  line: number;
-  ptype: string;
-  nmoney: number;
-  smoney: number;
-  tmoney: number;
-  total: number;
-  mmemo: string;
+  line!: number;
+  ptype!: string;
+  nmoney!: number;
+  smoney!: number;
+  tmoney!: number;
+  total!: number;
+  mmemo!: string;
 }
 
 export class Nyusub {
-  denno: number;
-  kubun: number;
-  day: Date;
-  mcode: string;
-  code: string;
-  tcode: string;
-  created_at: Date;
-  created_by: string;
-  updated_at: Date;
-  updated_by: string;
-  memo: string;
-  jdenno: number;
-  idenno: number;
-  nmoney: number;
-  smoney: number;
-  tmoney: number;
-  trnyudens: Nyuden[];
+  denno!: number;
+  kubun!: number;
+  day!: Date;
+  mcode!: string;
+  code!: string;
+  tcode!: string;
+  created_at!: Date;
+  created_by!: string;
+  updated_at!: Date;
+  updated_by!: string;
+  memo!: string;
+  jdenno!: number;
+  idenno!: number;
+  nmoney!: number;
+  smoney!: number;
+  tmoney!: number;
+  trnyudens!: Nyuden[];
 }
 
 export class Nyuhis {
-  denno: number;
-  day: Date;
-  nmoney: number;
-  smoney: number;
-  tmoney: number;
-  total: number;
-  memo: string;
+  denno!: number;
+  day!: Date;
+  nmoney!: number;
+  smoney!: number;
+  tmoney!: number;
+  total!: number;
+  memo!: string;
 }
 
 
 
 export class Jyuden {
-  day: Date;
-  uday: Date;
-  nday: Date;
-  scde: string;
-  hcode: string;
-  okurino: String;
+  day!: Date;
+  uday!: Date;
+  nday!: Date;
+  scde!: string;
+  hcode!: string;
+  okurino!: String;
   total: number;
-  torikbn: boolean;
-  idenno: number;
-  daibiki: number;
-  tcode: String;
-  tcode1: String;
-  nyukin: number;
-  shukin: number;
-  chosei: number;
+  torikbn!: boolean;
+  idenno!: number;
+  daibiki!: number;
+  tcode!: String;
+  tcode1!: String;
+  nyukin!: number;
+  shukin!: number;
+  chosei!: number;
   nyuzan: number;
-  created_at: Date;
-  created_by: string;
-  updated_at: Date;
-  updated_by: string;
-  trnyusubs: Nyusub[];
+  created_at!: Date;
+  created_by!: string;
+  updated_at!: Date;
+  updated_by!: string;
+  trnyusubs!: Nyusub[];
   constructor(init?: Partial<Jyuden>) {
     Object.assign(this, init);
     this.total = 0;
@@ -205,7 +205,7 @@ export class DepositService {
     });
     return observable;
   }
-  updNyuden(denno, nyusub, dept): Promise<string> {
+  updNyuden(denno: number, nyusub: any, dept: any[]): Promise<string> {
     const UpdateTran = gql`
       mutation upd_nyusub($id: smallint!, $dno: Int!,$_set: trnyusub_set_input!,$obj:[trnyuden_insert_input!]!) {
         update_trnyusub(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: $_set)  {
@@ -242,7 +242,7 @@ export class DepositService {
       });
     });
   }
-  insNyuden(nyusub, dept): Promise<string> {
+  insNyuden(nyusub: any[], dept: any[]): Promise<string> {
     const InsertTran = gql`
       mutation ins_nyuden($obj:[trnyusub_insert_input!]!,$objm:[trnyuden_insert_input!]!) {
         insert_trnyusub(objects: $obj)  {

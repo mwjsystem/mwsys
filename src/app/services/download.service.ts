@@ -5,23 +5,23 @@ import { HttpClient } from '@angular/common/http';
 import { UserService } from './user.service';
 
 export class Result {
-  zipcode: string;
-  prefcode: string;
-  address1: string;
-  address2: string;
-  address3: string;
-  kana1: string;
-  kana2: string;
-  kana3: string;
+  zipcode!: string;
+  prefcode!: string;
+  address1!: string;
+  address2!: string;
+  address3!: string;
+  kana1!: string;
+  kana2!: string;
+  kana3!: string;
   constructor(init?: Partial<Result>) {
     Object.assign(this, init);
   }
 }
 
 class ZipAdr {
-  status: string;
-  message: string;
-  result: Result[];
+  status!: string;
+  message!: string;
+  result!: Result[];
   constructor(init?: Partial<ZipAdr>) {
     Object.assign(this, init);
   }
@@ -35,16 +35,16 @@ export class DownloadService {
   constructor(public usrsrv: UserService,
     private http: HttpClient) { }
 
-  pickObj(obj, flds: string[]) {
-    let pickobj = {};
+  pickObj(obj: { [x: string]: any; }, flds: string[]) {
+    let pickobj: { [key: string]: any } = {};
     flds.forEach(e => pickobj[e] = obj[e]);
     return pickobj;
   }
 
-  pickObjArr(objarr, flds: string[]) {
-    let pickarr = [];
-    objarr.forEach(obj => {
-      let pickobj = {};
+  pickObjArr(objarr: any[], flds: string[]) {
+    let pickarr: { [key: string]: any }[] = [];
+    objarr.forEach((obj) => {
+      let pickobj: { [key: string]: any } = {};
       flds.forEach(e => pickobj[e] = obj[e]);
       pickarr.push(pickobj);
     });
@@ -57,7 +57,7 @@ export class DownloadService {
     link.href = pformat;
     link.click();
   }
-  dlCsv(data, pcsv: string) {
+  dlCsv(data: any, pcsv: string) {
     const blob = new Blob([json2csv.parse(data)], { type: 'text/csv' });
     FileSaver.saveAs(blob, pcsv);
   }
@@ -80,7 +80,7 @@ export class DownloadService {
     });
   }
 
-  async base64DecodeAsBlob(text) {
+  async base64DecodeAsBlob(text: URL | RequestInfo) {
     // console.log(text);
     return fetch(text).then(response => response.blob());
   }

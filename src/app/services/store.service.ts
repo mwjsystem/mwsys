@@ -32,7 +32,7 @@ export class StoreService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          data.msstore.forEach(e => {
+          data.msstore.forEach((e: { code: any; subname: any; }) => {
             this.scds.push({ value: e.code, viewval: e.subname });
           });
         }, (error) => {
@@ -41,7 +41,7 @@ export class StoreService {
     }
   }
 
-  async getStradr(scd): Promise<any> {
+  async getStradr(scd: any): Promise<any> {
     const GetMast = gql`
     query get_souko($id: smallint!,$scd: String!) {
       msstore_by_pk(id:$id,code:$scd) {

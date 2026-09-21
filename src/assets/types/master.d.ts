@@ -7,7 +7,7 @@ declare namespace mwI {
 
 
   interface Sval {
-    value: string;
+    value: string | null;
     viewval: string;
     // dis:boolean;
   }

@@ -31,7 +31,7 @@
       (blur)="onEnter()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)"
       placeholder="移動伝票番号">
     @if (mode==3) {
-      <button mat-flat-button mat-icon-button matSuffix (click)="dennoHelp()">
+      <button mat-icon-button matSuffix (click)="dennoHelp()">
         <mat-icon>find_replace</mat-icon>
       </button>
     }
@@ -137,14 +137,14 @@
           <mat-label>送り状番号</mat-label>
           <input tabIndex="20" matInput formControlName="okurino">
           @if (form.value.okurino && form.value.hcode) {
-            <button mat-flat-button mat-icon-button matSuffix
+            <button mat-icon-button matSuffix
               (click)="openOkuri(form.value.hcode,form.value.okurino)"
               >
               <mat-icon>web_asset</mat-icon>
             </button>
           }
           @if (okrsrv.getHinfo(form.value.hcode).numbering && mode!=3 && !form.value.okurino) {
-            <button mat-flat-button mat-icon-button matSuffix (click)="setOkrno()"
+            <button mat-icon-button matSuffix (click)="setOkrno()"
               >
               <mat-icon>calculate</mat-icon>
             </button>

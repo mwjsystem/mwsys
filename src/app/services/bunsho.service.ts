@@ -36,7 +36,7 @@ export class BunshoService {
         .valueChanges
         .subscribe(({ data }) => {
           // this.buntype = data.msbuntype
-		  data.msbuntype.forEach(element => {
+		  data.msbuntype.forEach((element: { code: any; name: string; first: any; saki: any; second: any; sksec: any; }) => {
             this.buntype.push({ code: element.code, 
 			                    name: String(Number(element.code)) + ' ' + element.name,
 								first: element.first,
@@ -67,7 +67,7 @@ export class BunshoService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          data.msbunsho.forEach(element => {
+          data.msbunsho.forEach((element: any) => {
             this.bunsho.push({ group: element.code.slice(0, 1), code: element.code, name: element.name });
           });
         }, (error) => {

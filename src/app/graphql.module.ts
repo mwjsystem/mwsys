@@ -10,7 +10,7 @@ const authHeader = new HttpHeaders()
     .set('X-Hasura-admin-secret', 'something_secret')
     .set('Content-Type', 'application/json');
 export function createApollo(httpLink: HttpLink): ApolloClientOptions {
-  let appname:string = localStorage.getItem('MWSYS_DB');
+  let appname:string = localStorage.getItem('MWSYS_DB')!;
   if ( appname==null ){appname = 'mwjtables';}
   const uri = 'https://' + appname +'.herokuapp.com/v1/graphql';
   return {

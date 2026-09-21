@@ -59,7 +59,7 @@ export class BunruiService {
   getSubcat(cat: string) {
     this.qryBunrui();
     return this.kbn['subcat']?.filter(obj => {
-      if (obj.value.slice(0, 2) == cat) {
+      if (obj.value!.slice(0, 2) == cat) {
         return true;
       }
     })

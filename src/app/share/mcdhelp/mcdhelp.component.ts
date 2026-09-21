@@ -39,7 +39,7 @@ export interface Mcd {
 })
 export class McdhelpComponent implements OnInit {
 
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
   dataSource: MatTableDataSource<Mcd>;
   displayedColumns = ['mcode', 'sei', 'kana', 'tcode1', 'tcode2', 'eda', 'zip', 'region', 'local', 'street', 'extend', 'extend2', 'adrname', 'tel', 'mail', 'webid'];
   fname: string = "";

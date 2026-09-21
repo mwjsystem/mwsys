@@ -35,7 +35,7 @@ interface Hatden {
     standalone: false
 })
 export class HdnohelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -138,8 +138,8 @@ export class HdnohelpComponent implements OnInit {
         if (data.trhatden.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          let srcdata = [];
-          data.trhatden.forEach(element => {
+          let srcdata: any[] | undefined = [];
+          data.trhatden.forEach((element: { [x: string]: any; trhatmeis: any; }) => {
             let { trhatmeis, ...rest } = element;
             let gcd = { gcode: trhatmeis[0].gcode };
             srcdata.push({ ...rest, ...gcd });

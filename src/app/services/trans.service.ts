@@ -8,21 +8,21 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
 export class Trans {
-  sday: String;
-  ttype: String;
-  denno: number;
-  line: number;
-  biko: String;
-  tcode: String;
-  yday: String;
-  aitec: number;
-  aiten: String;
-  insuu: number;
-  ousuu: number;
-  zaisu: number;
-  yotei: number;
-  wait: number;
-  srtdy: String;
+  sday!: String | null;
+  ttype!: String;
+  denno!: number | null;
+  line!: number | null;
+  biko!: String | null;
+  tcode!: String | null;
+  yday!: String | null;
+  aitec!: number | null;
+  aiten!: String | null;
+  insuu!: number | null;
+  ousuu!: number | null;
+  zaisu!: number | null;
+  yotei!: number | null;
+  wait!: number | null;
+  srtdy!: String;
   constructor(init?: Partial<Trans>) {
     Object.assign(this, init);
   }
@@ -209,7 +209,7 @@ export class TransService {
         .subscribe(({ data }) => {
           // console.log('出荷',data);
           let trans: Trans[] = [];
-          data.shukka.forEach(e => {
+          data.shukka.forEach((e: { sday: any; yday: any; denno: any; line: any; mbikou: any; trjyuden: { tcode: any; mcode: any; msmember: { sei: any; mei: any; }; }; suu: any; }) => {
             let lcsrtdy = e.sday ?? e.yday;
             const tran: Trans = {
               sday: e.sday,
@@ -230,7 +230,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.siire.forEach(e => {
+          data.siire.forEach((e: { inday: any; denno: any; line: any; mbiko: any; trsiiden: { tcode: any; vcode: any; msvendor: { adrname: any; }; }; suu: any; }) => {
             const tran: Trans = {
               sday: e.inday,
               ttype: '仕入',
@@ -250,7 +250,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.movin.forEach(e => {
+          data.movin.forEach((e: { trmovsub: { day: any; tcode: any; outcode: any; msstoreout: { name: any; }; }; denno: any; line: any; mbiko: any; suu: any; }) => {
             const tran: Trans = {
               sday: e.trmovsub.day,
               ttype: '移動入庫',
@@ -270,7 +270,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.movout.forEach(e => {
+          data.movout.forEach((e: { trmovsub: { day: any; tcode: any; incode: any; msstorein: { name: any; }; }; denno: any; line: any; mbiko: any; suu: any; }) => {
             const tran: Trans = {
               sday: e.trmovsub.day,
               ttype: '移動出庫',
@@ -290,7 +290,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.tenmoto.forEach(e => {
+          data.tenmoto.forEach((e: { day: any; denno: any; line: any; memo: any; tcode: any; suu: any; }) => {
             const tran: Trans = {
               sday: e.day,
               ttype: '展開元',
@@ -310,7 +310,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.tensaki.forEach(e => {
+          data.tensaki.forEach((e: { day: any; denno: any; line: any; memo: any; tcode: any; suu: any; }) => {
             const tran: Trans = {
               sday: e.day,
               ttype: '展開先',
@@ -331,7 +331,7 @@ export class TransService {
             trans.push(tran);
           });
           // console.log(data);
-          data.hikat.forEach(e => {
+          data.hikat.forEach((e: { sday: any; trjyuden: { yday: any; tcode: any; mcode: any; msmember: { sei: any; mei: any; }; }; spec: string; spdet: any; mbikou: any; denno: any; line: any; suu: any; }) => {
             // console.log(e.sday);
             let lcsrtdy = e.sday ?? e.trjyuden.yday;
             let lcbiko;
@@ -359,7 +359,7 @@ export class TransService {
             };
             trans.push(tran);
           });
-          data.hatzn.forEach(e => {
+          data.hatzn.forEach((e: { denno: any; line: any; mbikou: any; tcode: any; yday: any; vcode: any; adrname: any; hatzn: any; nymat: any; }) => {
             // console.log(e.sday);
             const tran: Trans = {
               sday: null,
@@ -398,9 +398,9 @@ export class TransService {
     })
   }
 
-  sortTblData(tbldata): Trans[] {
+  sortTblData(tbldata: any[]): Trans[] {
     // return new Promise( resolve => {
-    tbldata.sort(function (a, b) {
+    tbldata.sort(function (a: { srtdy: number; } | null, b: { srtdy: number; } | null) {
       if (a == null && b == null) return 0;
       if (a == null) return 1;
       if (b == null) return -1;
@@ -418,7 +418,7 @@ export class TransService {
       }
     }
     if (this.flg == -1) {
-      tbldata.sort(function (a, b) {
+      tbldata.sort(function (a: { srtdy: number; } | null, b: { srtdy: number; } | null) {
         if (a == null && b == null) return 0;
         if (a == null) return 1;
         if (b == null) return -1;

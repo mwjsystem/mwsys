@@ -26,7 +26,7 @@ import { filter } from 'rxjs/operators';
     standalone: false
 })
 export class FrmtreatComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
   dataSource: MatTableDataSource<mwI.Trtreat>;
   displayedColumns = ['created_at', 'created_by', 'genre', 'trttype', 'mcode', 'grpcode', 'gcode', 'tel', 'email', 'question', 'answer', 'kaizen', 'result'];
   fmcode: string = "";
@@ -69,11 +69,11 @@ export class FrmtreatComponent implements OnInit {
     //   } 
     // }); 
     this.route.queryParamMap.pipe(
-      filter(n => Object.keys(n["params"]).length !== 0)
+      filter(n => Object.keys((n as any)["params"]).length !== 0)
     ).subscribe(
       n => {
-        let vars = { "id": this.usrsrv.compid };
-        let params = n["params"];
+        let vars: { [key: string]: any } = { "id": this.usrsrv.compid };
+        let params = (n as any)["params"];
         // console.log(params);
         Object.keys(params).map(k => {
           if (k == "mcode") {
@@ -110,7 +110,7 @@ export class FrmtreatComponent implements OnInit {
 
 
 
-  getTreat(params) {
+  getTreat(params: { [key: string]: any }) {
     const GetTrt = gql`
     query get_treat($id: smallint!, $mcode: Int, $grpcd: String) {
       trtreat(where: {id: {_eq: $id}, mcode: {_eq: $mcode}, grpcode: {_ilike: $grpcd}}, order_by: {seq: asc}) {

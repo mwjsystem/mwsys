@@ -46,7 +46,7 @@ interface Jyuden {
     standalone: false
 })
 export class JdnohelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
@@ -102,7 +102,7 @@ export class JdnohelpComponent implements OnInit {
     private overlay: Overlay,
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<JdnohelpComponent>,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data: any) {
     this.dataSource = new MatTableDataSource<Jyuden>();
     if (data?.ftype) {
       this.ftype = data.ftype;
@@ -233,11 +233,11 @@ export class JdnohelpComponent implements OnInit {
       .subscribe(({ data }) => {
         // console.log(data);
         // this.subject.next(data.trjyuden);
-        let srcdata = [];
+        let srcdata: any[] | undefined = [];
         if (data.trjyuden.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          data.trjyuden.forEach(element => {
+          data.trjyuden.forEach((element: { [x: string]: any; trjyumeis: any; }) => {
             let { trjyumeis, ...rest } = element;
             // console.log(element.denno, trjyumeis);
             let gcd = { gcode: trjyumeis[0].gcode };

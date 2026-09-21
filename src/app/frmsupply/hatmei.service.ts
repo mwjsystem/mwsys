@@ -85,7 +85,7 @@ export class HatmeiService {
     });
     return observable;
   }
-  updHatden(denno, hatden, hatmei): Promise<string> {
+  updHatden(denno: number, hatden: any, hatmei: any[]): Promise<string> {
     const UpdateTran = gql`
       mutation upd_hatden($id: smallint!, $hdno: Int!,$_set: trhatden_set_input!,$obj:[trhatmei_insert_input!]!) {
         update_trhatden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -122,7 +122,7 @@ export class HatmeiService {
       });
     });
   }
-  insHatden(hatden, hatmei): Promise<string> {
+  insHatden(hatden: mwI.Trhatden[] | mwI.Trsiiden[], hatmei: any[]): Promise<string> {
     const InsertTran = gql`
       mutation ins_hatden($obj:[trhatden_insert_input!]!,$objm:[trhatmei_insert_input!]!) {
         insert_trhatden(objects: $obj)  {
@@ -146,14 +146,14 @@ export class HatmeiService {
       });
     });
   }
-  getHdsta(hmei): string {
+  getHdsta(hmei: any[]): string {
     let flg0: boolean = false;//発注済
     let flg1: boolean = false;//入荷予定あり
     let flg2: boolean = false;//入荷確定あり
     let flg3: boolean = false;//仕入済あり
     let ret: string = "";
 
-    hmei.forEach(e => {
+    hmei.forEach((e) => {
       if (e.inday) {
         flg3 = true;
       } else if (e.yday && e.ydaykbn == '0') {

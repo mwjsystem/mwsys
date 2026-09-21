@@ -21,12 +21,15 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class SimeitblComponent implements OnInit {
-  @Input() parentForm: FormGroup;
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-  @ViewChildren('gcdInputs') gcdInps: QueryList<ElementRef>;
-  private el: HTMLInputElement;
+  @Input()
+    parentForm!: FormGroup;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
+  @ViewChildren('gcdInputs')
+    gcdInps!: QueryList<ElementRef>;
+  private el!: HTMLInputElement;
   dataSource = new MatTableDataSource();
-  copyToClipboard: string;
+  copyToClipboard!: string;
   navCli = navigator.clipboard;
   displayedColumns = [
     'line',
@@ -139,14 +142,14 @@ export class SimeitblComponent implements OnInit {
       });
     // }
   }
-  insRows(rowData, flg: boolean) {
+  insRows(rowData: any[], flg: boolean) {
     let i: number = 0;
     if (flg) {
       this.frmArr.clear();
     } else {
       i = this.frmArr.length;
     }
-    rowData.forEach(row => {
+    rowData.forEach((row) => {
       let col = row.split("\t");
       if (col[0] != "") {
         let smei: mwI.Siimei = {
@@ -189,8 +192,8 @@ export class SimeitblComponent implements OnInit {
       return index;
     }
   }
-  getSiimei(dno) {
-    let siimei = [];
+  getSiimei(dno: number) {
+    let siimei: { id: number; denno: any; line: any; inday: any; gcode: any; suu: any; genka: any; money: any; taxrate: any; mmemo: any; spec: any; hdenno: any; hline: any; mtax: any; }[] = [];
     this.frmArr.controls
       .forEach(control => {
         siimei.push({
@@ -212,7 +215,7 @@ export class SimeitblComponent implements OnInit {
       });
     return siimei;
   }
-  hmeihelp(i) {
+  hmeihelp(i: number) {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width = '100vw';
     dialogConfig.height = '98%';
@@ -232,8 +235,8 @@ export class SimeitblComponent implements OnInit {
       }
     );
   }
-  objectToArray(obj: object): string {
-    var result = Object.keys(obj).map((key: keyof typeof obj) => {
+  objectToArray(obj: any): string {
+    var result = Object.keys(obj).map((key: string) => {
       let value = obj[key];
       // console.log(value)
       return value;

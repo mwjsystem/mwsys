@@ -43,7 +43,7 @@
   </a></button>
 </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($event)">
+<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($any($event))">
   <mat-card>
     <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between" style="margin-bottom: 10px;">
       <mat-card-title>
@@ -54,7 +54,7 @@
           <mat-label>参照発注伝票番号</mat-label>
           <input matInput [(ngModel)]="hdenno" (keydown.f4)="hdennoHelp()" maxlength="10" (blur)="onEnter()"
             [ngModelOptions]="{standalone: true}">
-          <button mat-flat-button mat-icon-button matSuffix (click)="hdennoHelp()">
+          <button mat-icon-button matSuffix (click)="hdennoHelp()">
             <mat-icon>find_replace</mat-icon>
           </button>
         </mat-form-field>

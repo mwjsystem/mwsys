@@ -28,10 +28,12 @@ import { VendsService } from './../mstvendor/vends.service';
     standalone: false
 })
 export class MstgoodsComponent implements OnInit, AfterViewInit {
-  @ViewChild(GdstblComponent) gdstbl: GdstblComponent;
-  @ViewChild(GtnktblComponent) gtnktbl: GtnktblComponent;
+  @ViewChild(GdstblComponent)
+    gdstbl!: GdstblComponent;
+  @ViewChild(GtnktblComponent)
+    gtnktbl!: GtnktblComponent;
 
-  form: FormGroup;
+  form!: FormGroup;
   mode: number = 3;
   rows: FormArray = this.fb.array([]);
   rows2: FormArray = this.fb.array([]);
@@ -77,7 +79,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     });
 
     if (this.gdssrv.ggrps.length == 0) {
-      if (!this.overlayRef) {
+      if (!this.overlayRef.hasAttached()) {
         this.overlayRef.attach(new ComponentPortal(MatSpinner));
       }
       this.gdssrv.getGgroups().then(result => {
@@ -89,13 +91,13 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     this.route.paramMap.subscribe((params: ParamMap) => {
       if (params.get('grpcd') != null) {
         //１件分だけ先に読込
-        this.gdssrv.grpcd = params.get('grpcd');
+        this.gdssrv.grpcd = params.get('grpcd')!;
         this.getGgroup(this.gdssrv.grpcd);
       }
       if (params.get('mode') === null) {
         this.mode = 3;
       } else {
-        this.mode = +params.get('mode');
+        this.mode = +params.get('mode')!;
       }
     });
     this.refresh();
@@ -166,7 +168,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get('vcode').setValue(data.code);
+          this.form.get('vcode')!.setValue(data.code);
           this.cdRef.detectChanges();
         }
       }
@@ -176,7 +178,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   updKana(value: string) {
     let val: string = this.usrsrv.convKana(value);
     // console.log(value,val);
-    this.form.get('kana').setValue(val);
+    this.form.get('kana')!.setValue(val);
   }
 
   convUpper(event: KeyboardEvent) {
@@ -323,7 +325,11 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       updated_at: new Date(),
       updated_by: this.usrsrv.staff.code
     };
-    let gds = [];
+    let gds: {
+        id: number; code: string; gcode: any; size: any; color: any; gskbn: any; jan: any; weight: any; unit: any; tkbn: any;
+        // zkbn: this.usrsrv.editFrmval(control,'zkbn'),
+        gtext: any; max: any; send: any; ordering: any; koguchi: any; lot: any; vgcode: any; hgcode: any;
+    }[] = [];
     this.frmArr.controls
       .forEach(control => {
         gds.push({
@@ -348,7 +354,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
           hgcode: this.usrsrv.editFrmval(control, 'hgcode')
         });
       });
-    let tnk = [];
+    let tnk: { id: number; gcode: any; day: any; tanka1: any; tanka2: any; tanka3: any; tanka4: any; tanka5: any; tanka6: any; tanka7: any; tanka8: any; tanka9: any; cost: any; genka: any; taxrate: any; currency: any; }[] = [];
     this.frmArr2.controls
       .forEach(control => {
         tnk.push({

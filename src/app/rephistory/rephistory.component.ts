@@ -14,7 +14,7 @@ import { DownloadService } from './../services/download.service';
     standalone: false
 })
 export class RephistoryComponent {
-  form: FormGroup;
+  form!: FormGroup;
   constructor(public usrsrv: UserService,
 			  private fb: FormBuilder,
               private title: Title,
@@ -40,7 +40,7 @@ export class RephistoryComponent {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get('mcode').setValue(data.mcode);
+          this.form.get('mcode')!.setValue(data.mcode);
         }
       }
     );

@@ -18,16 +18,17 @@ import { HttpClient } from '@angular/common/http';
 export class MsprcprtComponent implements OnInit {
   mcode: number;
   mode: number = 2;
-  form: UntypedFormGroup;
-  selrow;
+  form!: UntypedFormGroup;
+  selrow: any;
   dataSource = new MatTableDataSource();
-  @ViewChildren('upfile', { read: ElementRef }) inputs: QueryList<ElementRef>;
+  @ViewChildren('upfile', { read: ElementRef })
+    inputs!: QueryList<ElementRef>;
   displayedColumns = ['line', 'partno', 'seq', 'pic'];
   constructor(private fb: UntypedFormBuilder,
     private http: HttpClient,
     public usrsrv: UserService,
     public cdRef: ChangeDetectorRef,
-    @Inject(MAT_DIALOG_DATA) data,
+    @Inject(MAT_DIALOG_DATA) data: any,
     private dialogRef: MatDialogRef<MsprcprtComponent>) {
     this.mcode = data.mcode;
   }
@@ -91,7 +92,7 @@ export class MsprcprtComponent implements OnInit {
   closeSet() {
     this.dialogRef.close(this.selrow);
   }
-  selected(selected) {
+  selected(selected: any) {
     this.selrow = selected;
   }
   // onClickFileInputButton(num: number) {

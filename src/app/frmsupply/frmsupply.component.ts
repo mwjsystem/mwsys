@@ -26,8 +26,9 @@ import { filter } from 'rxjs/operators';
     standalone: false
 })
 export class FrmsupplyComponent implements OnInit, AfterViewInit {
-  @ViewChild(HmeitblComponent) hmeitbl: HmeitblComponent;
-  form: FormGroup;
+  @ViewChild(HmeitblComponent)
+    hmeitbl!: HmeitblComponent;
+  form!: FormGroup;
   denno: number = 0;
   mode: number = 3;
   rows: FormArray = this.fb.array([]);
@@ -82,18 +83,18 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       this.route.paramMap.subscribe((params: ParamMap) => {
         if (params.get('mode') === null) {
           this.cancel();
-        } else if (+params.get('mode') == 1) {
+        } else if (+params.get('mode')! == 1) {
           this.modeToCre();
           // console.log(params);
           // JSON.parse(localstrage.getItem()); 
           this.route.queryParamMap.pipe(
-            filter(n => Object.keys(n["params"]).length !== 0)
+            filter(n => Object.keys((n as any)["params"]).length !== 0)
           ).subscribe(
             n => {
-              let params = n["params"];
+              let params = (n as any)["params"];
               Object.keys(params).map(k => {
                 if (k == "stkey") {
-                  const stra = JSON.parse(localStorage.getItem(params[k]));
+                  const stra = JSON.parse(localStorage.getItem(params[k])!);
                   this.form.patchValue({ vcode: stra.vcd });
                   this.updVcd(stra.vcd);
                   this.hmeitbl.insRows(stra.mei, true);
@@ -103,13 +104,13 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
               })
             }
           )
-          this.denno = +params.get('denno');
-          this.form.get('tcode').setValue(this.usrsrv.staff?.code);
-          this.form.get('autoproc').setValue(true);
+          this.denno = +params.get('denno')!;
+          this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
+          this.form.get('autoproc')!.setValue(true);
         } else {
-          this.mode = +params.get('mode');
+          this.mode = +params.get('mode')!;
           if (params.get('denno') !== null) {
-            this.denno = +params.get('denno');
+            this.denno = +params.get('denno')!;
             // console.log(this.denno);
             this.getHatden(this.denno);
           }
@@ -123,10 +124,10 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   }
 
   getHatden(denno: number): void {
-    if (!this.overlayRef) {
-      this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    }
     if (denno > 0) {
+      if (!this.overlayRef.hasAttached()) {
+        this.overlayRef.attach(new ComponentPortal(MatSpinner));
+      }
       this.hmisrv.qryHatden(denno).subscribe(
         result => {
           this.form.reset();
@@ -161,7 +162,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     let vend = this.vensrv.getVendor(value);
     this.form.patchValue({ mtax: vend?.mtax, currency: vend?.currency });
   }
-  test(value) {
+  test(value: any) {
     this.usrsrv.toastInf(this.form.value.yday);
     // this.usrsrv.getNumber('denno',2).subscribe(value => {
     //   console.log(value);
@@ -207,7 +208,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get(fldnm).setValue(data.code);
+          this.form.get(fldnm)!.setValue(data.code);
           // this.vcdtxt = data.adrname;
         }
       }
@@ -258,9 +259,9 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.mode = 1;
     this.form.reset();
     this.denno = 0;
-    this.form.get('tcode').setValue(this.usrsrv.staff?.code);
-    this.form.get('day').setValue(new Date());
-    this.form.get('scode').setValue(this.usrsrv.staff.scode);
+    this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
+    this.form.get('day')!.setValue(new Date());
+    this.form.get('scode')!.setValue(this.usrsrv.staff.scode);
     // this.form.get('hdstatus').setValue("0"); 
     this.hmeitbl.frmArr.clear();
     console.log(this.hmeitbl.frmArr);

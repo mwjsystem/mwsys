@@ -3,54 +3,47 @@
   <!-- <mat-dialog-content style="height: calc(100% - 90px);">     -->
   <div class="mat-elevation-z8">
     <mat-toolbar class="flex flex-row">
-      <!-- <mat-toolbar class="flex" style="font-size: 10px;height:80px;padding-top:0px"></mat-toolbar> -->
       <button mat-raised-button (click)="filterMcd()">検索</button>
-      <div class="flex flex-row space-x-1">
-        <!-- <mat-form-field> -->
-        <!-- <mat-label>顧客名(姓、名)</mat-label> -->
-        <input [(ngModel)]="fname" [ngModelOptions]="{standalone: true}" placeholder="顧客名(姓、名)"
-          class="inline w-40 p-3 text-black border rounded-lg">
-      <!-- </mat-form-field> -->
-      <!-- <mat-form-field> -->
-      <!-- <mat-label>ﾌﾘｶﾞﾅ</mat-label> -->
-      <input [(ngModel)]="fkana" (input)="fkana=convKana($any($event))" [ngModelOptions]="{standalone: true}"
-        placeholder="ﾌﾘｶﾞﾅ" class="inline w-40 p-3 text-black border rounded-lg">
-    <!-- </mat-form-field> -->
-    <!-- <mat-form-field>
-    <mat-label>メール1～5</mat-label>
-    <input matInput type="url" [(ngModel)]="fmail" [ngModelOptions]="{standalone: true}">
-  </mat-form-field> -->
-  <!-- <mat-form-field> -->
-  <!-- <mat-label>建物、道場名、宛名</mat-label> -->
-  <input [(ngModel)]="fadrnm" [ngModelOptions]="{standalone: true}" placeholder="建物、道場名、宛名"
-    class="inline w-40 p-3 text-black border  rounded-lg">
-<!-- </mat-form-field> -->
-<!-- <mat-form-field> -->
-<!-- <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label> -->
-<input type="number" [(ngModel)]="ftel" [ngModelOptions]="{standalone: true}"
-  placeholder="電話番号 or FAX ハイフン(-)なし" class="inline w-40 p-3 text-black border rounded-lg">
-<!-- </mat-form-field> -->
-<!-- <mat-form-field> -->
-<!-- <mat-label>内勤担当</mat-label> -->
-<!-- <input matInput (input)="ftcd=$event.target.value"> -->
-<select [(ngModel)]="ftcd" placeholder="内勤担当" class="inline w-24 p-3 text-black border rounded-lg">
-  @for (sval of stfsrv.tcds; track sval) {
-    <option [value]="sval.value" class="w-20 text-black">
-      {{sval.viewval}}
-    </option>
-  }
-</select>
-<mat-checkbox [(ngModel)]="fnorm" ><span class="text-black">通販顧客除く</span></mat-checkbox>
-<!-- </mat-form-field> -->
-<!-- <mat-form-field>
-<mat-label>Web会員ID</mat-label>
-<input matInput [(ngModel)]="fwebid" [ngModelOptions]="{standalone: true}">
-</mat-form-field> -->
-<!-- <mat-form-field> -->
-<!-- <mat-checkbox [(ngModel)]="feda0" class="inline">基本住所のみ表示</mat-checkbox> -->
-<!-- </mat-form-field> -->
-</div>
-</mat-toolbar>
+      <div class="flex flex-row items-center space-x-1">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+          <mat-label>顧客名(姓、名)</mat-label>
+          <input matInput [(ngModel)]="fname" [ngModelOptions]="{standalone: true}">
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+          <mat-label>ﾌﾘｶﾞﾅ</mat-label>
+          <input matInput [(ngModel)]="fkana" (input)="fkana=convKana($any($event))" [ngModelOptions]="{standalone: true}">
+        </mat-form-field>
+        <!-- <mat-form-field>
+        <mat-label>メール1～5</mat-label>
+        <input matInput type="url" [(ngModel)]="fmail" [ngModelOptions]="{standalone: true}">
+      </mat-form-field> -->
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
+          <mat-label>建物、道場名、宛名</mat-label>
+          <input matInput [(ngModel)]="fadrnm" [ngModelOptions]="{standalone: true}">
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
+          <mat-label>電話番号 or FAX</mat-label>
+          <input matInput type="number" [(ngModel)]="ftel" [ngModelOptions]="{standalone: true}"
+            placeholder="ハイフン(-)なし">
+        </mat-form-field>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+          <mat-label>内勤担当</mat-label>
+          <mat-select [(ngModel)]="ftcd">
+            @for (sval of stfsrv.tcds; track sval) {
+              <mat-option [value]="sval.value">
+                {{sval.viewval}}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-checkbox [(ngModel)]="fnorm"><span class="text-black">通販顧客除く</span></mat-checkbox>
+        <!-- <mat-form-field>
+        <mat-label>Web会員ID</mat-label>
+        <input matInput [(ngModel)]="fwebid" [ngModelOptions]="{standalone: true}">
+        </mat-form-field> -->
+        <!-- <mat-checkbox [(ngModel)]="feda0" class="inline">基本住所のみ表示</mat-checkbox> -->
+      </div>
+    </mat-toolbar>
 <table mat-table [dataSource]="dataSource" aria-label="Elements">
   <ng-container matColumnDef="mcode">
     <th mat-header-cell *matHeaderCellDef class="w-16">顧客ｺｰﾄﾞ</th>

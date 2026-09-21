@@ -11,7 +11,7 @@ import { DownloadService } from './../services/download.service';
     standalone: false
 })
 export class NavbarComponent implements OnInit {
-  public db: string;
+  public db!: string;
   constructor(
 	public usrsrv: UserService,
     public navsrv: NavmenuService,
@@ -19,7 +19,7 @@ export class NavbarComponent implements OnInit {
     public elementRef: ElementRef) { }
 
   ngOnInit(): void {
-    this.db = localStorage.getItem('MWSYS_DB');
+    this.db = localStorage.getItem('MWSYS_DB')!;
     if (this.db == null) {
       this.db = '本番環境';
     } else {
@@ -50,7 +50,7 @@ export class NavbarComponent implements OnInit {
       window.location.reload();
     }
   }
-  dlKick(form) {
+  dlKick(form: string) {
     // console.log(this.elementRef.nativeElement); 
     this.dwlsrv.dlKick(this.usrsrv.system.urischema + form + this.usrsrv.compid, this.elementRef);
   }

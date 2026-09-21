@@ -44,13 +44,14 @@ interface Hatmei {
     standalone: false
 })
 export class HmeihelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  dataSource: MatTableDataSource<Hatmei>;
+  dataSource!: MatTableDataSource<Hatmei>;
   subject = new Subject<Hatmei[]>();
   observe = this.subject.asObservable();
   displayedColumns = [
@@ -89,7 +90,7 @@ export class HmeihelpComponent implements OnInit {
     private overlay: Overlay,
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<HmeihelpComponent>,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data: any) {
     this.fvcd = (data?.vcode ?? '');
     this.fgcd = (data?.gcode ?? '');
   }
@@ -149,8 +150,8 @@ export class HmeihelpComponent implements OnInit {
         if (data.vhatzn.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          let srcdata = [];
-          data.vhatzn.forEach(element => {
+          let srcdata: any[] | undefined = [];
+          data.vhatzn.forEach((element: any) => {
             srcdata.push(element);
           });
           this.dataSource = new MatTableDataSource<Hatmei>(srcdata);

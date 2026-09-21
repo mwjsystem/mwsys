@@ -1,10 +1,9 @@
 import { Component, OnInit, Input, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray } from '@angular/forms';
-// import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/table';
 import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
-import { DepositService } from './deposit.service';
+import { DepositService, Nyuden } from './deposit.service';
 
 @Component({
     selector: 'app-depttbl',
@@ -14,7 +13,7 @@ import { DepositService } from './deposit.service';
     standalone: false
 })
 export class DepttblComponent implements OnInit {
-  @Input() parentForm: UntypedFormGroup;
+  @Input() parentForm!: UntypedFormGroup;
   dataSource = new MatTableDataSource();
   displayedColumns: string[] = ['line',
     'ptype',
@@ -71,7 +70,7 @@ export class DepttblComponent implements OnInit {
 
   calcMei(row: number) {
     let rowData = this.frmArr.controls[row];
-    rowData.get('total').setValue(rowData.value.nmoney - rowData.value.smoney + rowData.value.tmoney);
+    rowData.get('total')!.setValue(rowData.value.nmoney - rowData.value.smoney + rowData.value.tmoney);
     this.calcTot();
   }
 
@@ -84,14 +83,14 @@ export class DepttblComponent implements OnInit {
       })
     this.refresh();
   }
-  createRow(i: number, deposit?) {
+  createRow(i: number, deposit?: Nyuden | undefined) {
     return this.fb.group({
       line: [i],
       ptype: [deposit?.ptype, Validators.required],
       nmoney: [deposit?.nmoney],
       smoney: [deposit?.smoney],
       tmoney: [deposit?.tmoney],
-      total: [deposit?.nmoney - deposit?.smoney + deposit?.tmoney],
+      total: [deposit?.nmoney! - deposit?.smoney! + deposit?.tmoney!],
       mmemo: [deposit?.mmemo]
     })
   }
@@ -99,8 +98,8 @@ export class DepttblComponent implements OnInit {
     this.dataSource.data = this.frmArr.controls;
     this.depsrv.subDep.next(true);
   }
-  getMtbl(dno) {
-    let dept = [];
+  getMtbl(dno: number) {
+    let dept: { id: number; kubun: number; denno: any; day: any; line: any; ptype: any; nmoney: any; smoney: any; tmoney: any; mmemo: any; }[] = [];
     this.frmArr.controls
       .forEach(control => {
         dept.push({

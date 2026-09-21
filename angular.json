@@ -39,10 +39,7 @@
             ],
             "styles": [
               "src/styles.scss",
-              "@angular/material/prebuilt-themes/deeppurple-amber.css",
-              "node_modules/tailwindcss/base.css",
-              "node_modules/tailwindcss/components.css",
-              "node_modules/tailwindcss/utilities.css",
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "node_modules/@damjantonkli/ngx-toastr/toastr.css"
             ],
             "scripts": [],
@@ -106,7 +103,7 @@
               "src/assets"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "./node_modules/@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.scss"
             ],
             "scripts": []

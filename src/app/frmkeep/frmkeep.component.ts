@@ -26,14 +26,14 @@ interface GetOpe {
     standalone: false
 })
 export class FrmkeepComponent implements OnInit {
-  denno: number;
+  denno!: number;
   // temp:mwI.Tropelog[]=[];
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  dataSource: MatTableDataSource<mwI.Tropelog>;
+  dataSource!: MatTableDataSource<mwI.Tropelog>;
   displayedColumns = ['actionsColumn', 'sequ', 'keycode', 'extype', 'created_by', 'created_at', 'status', 'updated_by', 'updated_at', 'memo'];
   private GetLog = gql`
     query get_opelog($id:smallint!,$typ:String!,$kcd:[String!],$sts:[String!]) {
@@ -49,8 +49,8 @@ export class FrmkeepComponent implements OnInit {
         updated_at
       }
     }`;
-  private keycode: string[] = null;
-  private status: string[] = null;
+  private keycode: string[] | null = null;
+  private status: string[] | null = null;
   constructor(public usrsrv: UserService,
     public cdRef: ChangeDetectorRef,
     public stfsrv: StaffService,
@@ -68,8 +68,8 @@ export class FrmkeepComponent implements OnInit {
     this.route.paramMap.subscribe((params: ParamMap) => {
       // console.log('param',params);
       if (params.get('denno') !== null) {
-        this.denno = +params.get('denno');
-        this.getOpelog({ denno: params.get('denno') }).subscribe(value => {
+        this.denno = +params.get('denno')!;
+        this.getOpelog({ denno: params.get('denno')! }).subscribe(value => {
           console.log(value);
           this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
           this.overlayRef.detach();
@@ -135,7 +135,7 @@ export class FrmkeepComponent implements OnInit {
     });
   }
 
-  toDenno(pdenno) {
+  toDenno(pdenno: any) {
     this.overlayRef.attach(new ComponentPortal(MatSpinner));
     this.getOpelog({ denno: pdenno }).subscribe(value => {
       this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
@@ -179,7 +179,7 @@ export class FrmkeepComponent implements OnInit {
         }],
     }).subscribe(({ data }) => {
       this.usrsrv.toastInf("処理しました");
-      let temp: mwI.Tropelog[] = this.dwlsrv.pickObjArr(this.dataSource.data, ['sequ', 'keycode', 'extype', 'created_by', 'created_at', 'status', 'updated_by', 'updated_at', 'memo']);
+      let temp: mwI.Tropelog[] = this.dwlsrv.pickObjArr(this.dataSource.data, ['sequ', 'keycode', 'extype', 'created_by', 'created_at', 'status', 'updated_by', 'updated_at', 'memo']) as mwI.Tropelog[];
       // console.log(temp);
       temp[i].status = data.update_tropelog.returning[0].status;
       temp[i].updated_by = data.update_tropelog.returning[0].updated_by;

@@ -20,7 +20,7 @@ import gql from 'graphql-tag';
 export class MsprocComponent implements OnInit {
   mcode: number;
   mode: number = 2;
-  form: FormGroup;
+  form!: FormGroup;
   dataSource = new MatTableDataSource();
   displayedColumns = ['prcno', 'prcname', 'prcbody', 'vcode', 'code', 'memo', 'tanka', 'genka', 'posi01', 'posi02'];
 
@@ -29,7 +29,7 @@ export class MsprocComponent implements OnInit {
     public usrsrv: UserService,
     public bunsrv: BunruiService,
     public cdRef: ChangeDetectorRef,
-    @Inject(MAT_DIALOG_DATA) data,
+    @Inject(MAT_DIALOG_DATA) data: any,
     private dialogRef: MatDialogRef<MsprocComponent>) {
     this.mcode = data.mcode;
   }
@@ -46,7 +46,7 @@ export class MsprocComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.frmArr.controls[i].get('vcode').setValue(data.code);
+          this.frmArr.controls[i].get('vcode')!.setValue(data.code);
           // this.vcdtxt = data.adrname;
         }
       }
@@ -64,7 +64,7 @@ export class MsprocComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.frmArr.controls[i].get('code').setValue(data.code);
+          this.frmArr.controls[i].get('code')!.setValue(data.code);
         }
       }
     );
@@ -81,7 +81,7 @@ export class MsprocComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.frmArr.controls[i].get(fld).setValue(data.patno);
+          this.frmArr.controls[i].get(fld)!.setValue(data.patno);
         }
       }
     );
@@ -102,7 +102,7 @@ export class MsprocComponent implements OnInit {
     this.refresh();
   }
 
-  createRow(row: number, proc?) {
+  createRow(row: number, proc?: { prcname: any; prcbody: any; vcode: any; code: any; memo: any; tanka: any; genka: any; posi01: any; posi02: any; } | undefined) {
     return this.fb.group({
       prcno: [{ value: row, disabled: true }],
       prcname: [proc?.prcname],

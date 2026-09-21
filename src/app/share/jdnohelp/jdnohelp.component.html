@@ -1,72 +1,69 @@
 <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">受注伝票検索</h1>
 
-<nav class="flex flex-wrap items-center items-stretch gap-2">
-  <button class="flex items-end m-1" mat-raised-button (click)="getJyuden()">検索</button>
-  <!-- <div class="flex flex-wrap items-center m-1 p-1"> -->
-  <!-- <mat-form-field style="width:7em;">
-  <mat-label>締請求</mat-label> -->
-  <select [(ngModel)]="ftype" class="inline w-40 p-1 text-black border rounded-lg">
-    <option value="2">すべて</option>
-    <option value="0">都度伝票のみ</option>
-    <option value="1">締請求のみ</option>
-  </select>
-<!-- </mat-form-field> -->
-<!-- <mat-form-field style="width:7em;"> -->
-<!-- <mat-label>日付</mat-label> -->
-<select [(ngModel)]="fdayfld">
-  <option value="day">受付日</option>
-  <option value="yday">出荷予定日</option>
-  <option value="sday">出荷日</option>
-  <option value="uday">売上日</option>
-  <option value="nday">入金予定日</option>
-</select>
-<!-- </mat-form-field> -->
-<!-- <mat-form-field style="width:8em;"> -->
-<input [(ngModel)]="fday" [matDatepicker]="picker1" [ngModelOptions]="{standalone: true}"
-  class="inline w-16 p-1 text-black border rounded-lg">
-<mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-<mat-datepicker #picker1></mat-datepicker>
-<!-- </mat-form-field> -->
-<span>以降</span>
-<!-- <mat-form-field style="width:5em;">
-<mat-label>顧客コード</mat-label> -->
-<select [(ngModel)]="fmcdfld" placeholder="顧客コード" class="inline w-24 p-1 text-black border rounded-lg">
-  <option value="mcode">受注先</option>
-  <option value="scde">請求先</option>
-  <option value="ncode">納入先</option>
-</select>
-<!-- </mat-form-field> -->
-<!-- <mat-form-field style="width:7em;"> -->
-<input [(ngModel)]="fmcd" [ngModelOptions]="{standalone: true}">
-<button mat-icon-button matSuffix (click)="mcdHelp()">
-  <mat-icon>find_replace</mat-icon>
-</button>
-<!-- </mat-form-field> -->
-<span class="nmtxt">{{fmcd | mcdtxt}}</span>
-@if (fmcdfld=='ncode') {
-  <div style="width:5em;">
-    <!-- <mat-label>納品先枝番</mat-label> -->
-    <input [(ngModel)]="feda" [ngModelOptions]="{standalone: true}">
-    <button mat-icon-button matSuffix (click)="diaBetsu()">
+<nav class="flex flex-wrap items-center gap-2">
+  <button class="m-1" mat-raised-button (click)="getJyuden()">検索</button>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+    <mat-label>締請求</mat-label>
+    <mat-select [(ngModel)]="ftype">
+      <mat-option value="2">すべて</mat-option>
+      <mat-option value="0">都度伝票のみ</mat-option>
+      <mat-option value="1">締請求のみ</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+    <mat-label>日付</mat-label>
+    <mat-select [(ngModel)]="fdayfld">
+      <mat-option value="day">受付日</mat-option>
+      <mat-option value="yday">出荷予定日</mat-option>
+      <mat-option value="sday">出荷日</mat-option>
+      <mat-option value="uday">売上日</mat-option>
+      <mat-option value="nday">入金予定日</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+    <input matInput [(ngModel)]="fday" [matDatepicker]="picker1" [ngModelOptions]="{standalone: true}">
+    <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+    <mat-datepicker #picker1></mat-datepicker>
+  </mat-form-field>
+  <span>以降</span>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+    <mat-label>顧客コード</mat-label>
+    <mat-select [(ngModel)]="fmcdfld">
+      <mat-option value="mcode">受注先</mat-option>
+      <mat-option value="scde">請求先</mat-option>
+      <mat-option value="ncode">納入先</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+    <input matInput [(ngModel)]="fmcd" [ngModelOptions]="{standalone: true}">
+    <button mat-icon-button matSuffix (click)="mcdHelp()">
       <mat-icon>find_replace</mat-icon>
     </button>
-  </div>
-}
-<!-- <mat-form-field style="width:7em;">
-<mat-label>担当者</mat-label> -->
-<select [(ngModel)]="ftcd" class="inline w-24 p-3 text-black border rounded-lg">
-  @for (sval of stfsrv.tcds; track sval) {
-    <option [value]="sval.value" class="w-20 text-black">
-      {{sval.viewval}}
-    </option>
+  </mat-form-field>
+  <span class="nmtxt">{{fmcd | mcdtxt}}</span>
+  @if (fmcdfld=='ncode') {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+      <mat-label>納品先枝番</mat-label>
+      <input matInput [(ngModel)]="feda" [ngModelOptions]="{standalone: true}">
+      <button mat-icon-button matSuffix (click)="diaBetsu()">
+        <mat-icon>find_replace</mat-icon>
+      </button>
+    </mat-form-field>
   }
-</select>
-<!-- </mat-form-field> -->
-<!-- <mat-form-field>
-<mat-label>受注先伝票番号</mat-label> -->
-<input (input)="fcusden=$event.target.value" placeholder="受注先伝票番号"
-  class="inline w-40 p-3 text-black border rounded-lg">
-<!-- </mat-form-field> -->
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+    <mat-label>担当者</mat-label>
+    <mat-select [(ngModel)]="ftcd">
+      @for (sval of stfsrv.tcds; track sval) {
+        <mat-option [value]="sval.value">
+          {{sval.viewval}}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
+    <mat-label>受注先伝票番号</mat-label>
+    <input matInput (input)="fcusden=$event.target.value">
+  </mat-form-field>
 <!-- <mat-form-field style="width:7em;">
 <mat-label>ｽﾃｰﾀｽ(受注伝票)</mat-label>
 <mat-select [value]="fjdst">

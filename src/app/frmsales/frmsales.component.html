@@ -37,9 +37,11 @@
         <mat-icon>cancel</mat-icon>中止
       </button>
     }
-    <input [(ngModel)]="jmisrv.denno" tabIndex="1" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
-      (blur)="onEnter()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)"
-      class="inline w-40 h-full p-3 text-black text-xl border-2 border-black rounded-lg">
+    <mat-form-field appearance="fill" subscriptSizing="dynamic" class="mwj-field w-40">
+      <input matInput [(ngModel)]="jmisrv.denno" tabIndex="1" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()"
+        maxlength="10" (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
+        [disabled]="mode==1 || (mode==2 && form.dirty)">
+    </mat-form-field>
     @if (mode==3) {
       <button mat-icon-button matSuffix (click)="dennoHelp()">
         <mat-icon>find_replace</mat-icon>
@@ -89,7 +91,7 @@
   </a></button>
 </div>
 </mat-toolbar>
-<form [formGroup]="form" (keydown.enter)="canEnter($event)">
+<form [formGroup]="form" (keydown.enter)="canEnter($any($event))">
   <!-- <mat-card> -->
   <div class="flex justify-between items-center space-x-4 p-3">
     <span class="inline-block align-middle">
@@ -186,7 +188,7 @@
       </mat-form-field>
       <mat-form-field style="width: 3em;">
         <mat-label>枝番</mat-label>
-        <input matInput formControlName="nadr" required (change)="changeEda($event.target.value)">
+        <input matInput formControlName="nadr" required (change)="changeEda($any($event.target).value)">
       </mat-form-field>
       @if (form.value.nsaki=='2') {
         <button mat-flat-button (click)="diaBetsu('nadr')">
@@ -359,7 +361,7 @@
           </button>
         }
         @if (mode!=3) {
-          <button mat-flat-button mat-icon-button matSuffix (click)="dennoHelp(true)">
+          <button mat-icon-button matSuffix (click)="dennoHelp(true)">
             <mat-icon>find_replace</mat-icon>
           </button>
         }
@@ -371,51 +373,40 @@
         <input tabIndex="20" matInput formControlName="okurino">
       </mat-form-field>
       @if (form.value.okurino && form.value.hcode) {
-        <button mat-flat-button mat-icon-button matSuffix (click)="openOkuri(form.value.hcode,form.value.okurino)"
+        <button mat-icon-button matSuffix (click)="openOkuri(form.value.hcode,form.value.okurino)"
           >
           <mat-icon>web_asset</mat-icon>
         </button>
       }
       @if (okrsrv.getHinfo(form.value.hcode).numbering && mode!=3 && !form.value.okurino) {
-        <button mat-flat-button mat-icon-button matSuffix (click)="setOkrno()"
+        <button mat-icon-button matSuffix (click)="setOkrno()"
           >
           <mat-icon>calculate</mat-icon>
         </button>
       }
     </div>
   </div>
-  <div class="flex flex-wrap">
-    <label for="txt0" class="block mx-2">納品先住所</label>
-    <textarea id="txt0" matInput [value]="jmisrv.address" matTextareaAutosize disabled
-    class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-    <label for="txt1" class="block mx-2">伝票備考</label>
-    <textarea id="txt1" [rows]="getRows('dmemo')" formControlName="dmemo"
-    class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-    <label for="txt2" class="block mx-2">納品書備考</label>
-    <textarea id="txt2" [rows]="getRows('nmemo')" formControlName="nmemo"
-    class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-    <label for="txt3" class="block mx-2">送り状備考</label>
-    <textarea id="txt3" [rows]="getRows('omemo')" formControlName="omemo"
-    class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-    <label for="txt4" class="block mx-2">出荷指示書備考</label>
-    <textarea id="txt4" [rows]="getRows('smemo')" formControlName="smemo"
-    class="block mx-2 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-    <!-- <mat-form-field class="txtar">
-    <mat-label>伝票備考</mat-label>
-    <textarea matInput formControlName="dmemo" matTextareaAutosize></textarea>
-  </mat-form-field>
-  <mat-form-field class="txtar">
-    <mat-label>納品書備考</mat-label>
-    <textarea matInput formControlName="nmemo" matTextareaAutosize></textarea>
-  </mat-form-field>
-  <mat-form-field class="txtar">
-    <mat-label>送り状備考</mat-label>
-    <textarea matInput formControlName="omemo" matTextareaAutosize></textarea>
-  </mat-form-field>
-  <mat-form-field class="txtar">
-    <mat-label>出荷指示書備考</mat-label>
-    <textarea matInput formControlName="smemo" matTextareaAutosize></textarea>
-  </mat-form-field> -->
+  <div class="flex flex-wrap gap-2">
+    <mat-form-field appearance="outline" class="mwj-field w-full">
+      <mat-label>納品先住所</mat-label>
+      <textarea matInput id="txt0" [value]="jmisrv.address" matTextareaAutosize disabled></textarea>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="mwj-field w-full">
+      <mat-label>伝票備考</mat-label>
+      <textarea matInput id="txt1" [rows]="getRows('dmemo')" formControlName="dmemo"></textarea>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="mwj-field w-full">
+      <mat-label>納品書備考</mat-label>
+      <textarea matInput id="txt2" [rows]="getRows('nmemo')" formControlName="nmemo"></textarea>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="mwj-field w-full">
+      <mat-label>送り状備考</mat-label>
+      <textarea matInput id="txt3" [rows]="getRows('omemo')" formControlName="omemo"></textarea>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="mwj-field w-full">
+      <mat-label>出荷指示書備考</mat-label>
+      <textarea matInput id="txt4" [rows]="getRows('smemo')" formControlName="smemo"></textarea>
+    </mat-form-field>
 </div>
 </div>
 

@@ -14,8 +14,9 @@ import { BunruiService } from './../services/bunrui.service';
     standalone: false
 })
 export class GtnktblComponent implements OnInit, AfterViewInit {
-  @Input() parentForm: FormGroup;
-  private paginator: MatPaginator;
+  @Input()
+    parentForm!: FormGroup;
+  private paginator!: MatPaginator;
   @ViewChild(MatPaginator, { static: false }) set matPaginator(mp: MatPaginator) {
     this.paginator = mp;
     this.dataSource.paginator = this.paginator;
@@ -56,7 +57,7 @@ export class GtnktblComponent implements OnInit, AfterViewInit {
     this.frmArr.removeAt(row);
     this.refresh();
   }
-  insRow(row: number, flgCp) {
+  insRow(row: number, flgCp: any) {
     // console.log(row,value);
     if (flgCp) {
       this.frmArr.insert(row, this.createRow(this.frmArr.controls[row - 1].value));

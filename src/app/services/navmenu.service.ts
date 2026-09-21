@@ -39,7 +39,7 @@ export class NavmenuService {
 		  .valueChanges
 		  .subscribe(({ data }) => {
 
-			data.msnavmenu.forEach(element => {
+			data.msnavmenu.forEach((element: { mmenu: string | number; smenu: any; tag: any; link: any; sort: any; }) => {
 			  this.menu[element.mmenu].push({ 
 			                    smenu: element.smenu,
 								tag: element.tag,

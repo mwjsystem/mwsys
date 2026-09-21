@@ -38,14 +38,15 @@ interface Nyusub {
     standalone: false
 })
 export class NdnohelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
   overlayRef = this.overlay.create({
     hasBackdrop: true,
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
 
-  dataSource: MatTableDataSource<Nyusub>;
+  dataSource!: MatTableDataSource<Nyusub>;
   subject = new Subject<Nyusub[]>();
   observe = this.subject.asObservable();
   displayedColumns = [
@@ -78,7 +79,7 @@ export class NdnohelpComponent implements OnInit {
     private overlay: Overlay,
     private dialog: MatDialog,
     private dialogRef: MatDialogRef<NdnohelpComponent>,
-    @Inject(MAT_DIALOG_DATA) data) { }
+    @Inject(MAT_DIALOG_DATA) data: any) { }
 
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;

@@ -20,8 +20,8 @@ export class NuminputDirective {
 
   // }
 
-  @HostListener("blur", ["$event.target.value"])
-  onBlur(value) {
+  @HostListener("blur", ["$any($event.target).value"])
+  onBlur(value: any) {
     this.transform(value)
   }
 
@@ -29,9 +29,9 @@ export class NuminputDirective {
     this.transform(this.el.value)
   }
   
-  transform(value) {
+  transform(value: string) {
 
-    const conv = value.replace(/[^0-9０-９.．]/g, '').replace(/[０-９．]/g, function(s) {
+    const conv = value.replace(/[^0-9０-９.．]/g, '').replace(/[０-９．]/g, function(s: string) {
         return String.fromCharCode(s.charCodeAt(0) - 65248);
     });   //数字のみ抽出して半角に変換
 
@@ -61,7 +61,7 @@ export class NuminputDirective {
   //   return val;
   // }
 
-  format_number(number, prefix) {
+  format_number(number: { toString: () => string; }, prefix: string | undefined) {
     let thousand_separator = ',',
       decimal_separator = '.',
       regex = new RegExp('[^' + decimal_separator + '\\d]', 'g'),

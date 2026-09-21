@@ -21,14 +21,17 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class HmeitblComponent implements OnInit {
-  @Input() parentForm: FormGroup;
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-  @ViewChildren('gcdInputs') gcdInps: QueryList<ElementRef>;
-  private el: HTMLInputElement;
+  @Input()
+    parentForm!: FormGroup;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
+  @ViewChildren('gcdInputs')
+    gcdInps!: QueryList<ElementRef>;
+  private el!: HTMLInputElement;
   dataSource = new MatTableDataSource();
-  copyToClipboard: string;
+  copyToClipboard!: string;
   navCli = navigator.clipboard;
-  yday: Date;
+  yday!: Date;
   displayedColumns = ['chk',
     'line',
     // 'soko',
@@ -143,7 +146,7 @@ export class HmeitblComponent implements OnInit {
   updGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
     // console.log(this.frmArr.controls[i]);
-    this.frmArr.controls[i].get('gcode').setValue(val);
+    this.frmArr.controls[i].get('gcode')!.setValue(val);
     const GetGood = gql`
     query get_good($id: smallint!,$gds:String!,$day: date!) {
       msgoods_by_pk(gcode: $gds, id: $id){
@@ -170,7 +173,7 @@ export class HmeitblComponent implements OnInit {
       variables: {
         id: this.usrsrv.compid,
         gds: val,
-        day: this.parentForm.get('day').value
+        day: this.parentForm.get('day')!.value
       },
     })
       .valueChanges
@@ -179,13 +182,13 @@ export class HmeitblComponent implements OnInit {
 
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-          this.frmArr.controls[i].get('gcode').setErrors({ 'incorrect': true });
+          this.frmArr.controls[i].get('gcode')!.setErrors({ 'incorrect': true });
         } else {
           // console.log(msgds);
-          this.frmArr.controls[i].get('gcode').setErrors(null);
+          this.frmArr.controls[i].get('gcode')!.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
-          this.frmArr.controls[i].patchValue({ day: this.parentForm.get('day').value, mtax: this.parentForm.get('mtax').value });
+          this.frmArr.controls[i].patchValue({ day: this.parentForm.get('day')!.value, mtax: this.parentForm.get('mtax')!.value });
           this.calcTot();
         }
         this.hmisrv.subject.next(true);
@@ -269,14 +272,14 @@ export class HmeitblComponent implements OnInit {
   //   this.parentForm.markAsDirty();
   //   // console.log(rowData);
   // }
-  insRows(rowData, flg: boolean) {
+  insRows(rowData: any[], flg: boolean) {
     let i: number = 0;
     if (flg) {
       this.frmArr.clear();
     } else {
       i = this.frmArr.length;
     }
-    rowData.forEach(row => {
+    rowData.forEach((row) => {
       let col = row.split("\t");
       if (col[0] != "") {
         let hmei: mwI.Hatmei = {
@@ -317,8 +320,12 @@ export class HmeitblComponent implements OnInit {
     })
     this.usrsrv.toastInf('クリップボードにコピーしました');
   }
-  getHatmei(dno) {
-    let hatmei = [];
+  getHatmei(dno: number) {
+    let hatmei: {
+        id: number; denno: any; line: any; day: any; inday: any; gcode: any; gtext: any; suu: any; genka: any; money: any; taxrate: any;
+        // unit:this.usrsrv.editFrmval(control,'unit'),
+        mmemo: any; spec: any; jdenno: any; jline: any; yday: any; ydaykbn: any; mtax: any;
+    }[] = [];
     this.frmArr.controls
       .forEach(control => {
         hatmei.push({
@@ -345,8 +352,8 @@ export class HmeitblComponent implements OnInit {
       });
     return hatmei;
   }
-  objectToArray(obj: object): string {
-    var result = Object.keys(obj).map((key: keyof typeof obj) => {
+  objectToArray(obj: any): string {
+    var result = Object.keys(obj).map((key: string) => {
       let value = obj[key];
       // console.log(value)
       return value;

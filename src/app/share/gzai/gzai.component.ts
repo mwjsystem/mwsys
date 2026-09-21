@@ -30,7 +30,7 @@ export class GzaiComponent implements OnInit {
     public usrsrv: UserService,
     public gdssrv: GoodsService,
     public cdRef: ChangeDetectorRef,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data: any) {
     this.form = this.fb.group({ mtbl: this.fb.array([]) });
     this.gcode = data.gcode;
     const i: number = this.gdssrv.goods.findIndex(obj => obj.gcode == this.gcode);
@@ -86,7 +86,7 @@ export class GzaiComponent implements OnInit {
   }
   updGds(i: number, event: KeyboardEvent): void {
     let val: string = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);
-    this.frmArr.controls[i].get('zcode').setValue(val);
+    this.frmArr.controls[i].get('zcode')!.setValue(val);
     const GetMast = gql`
     query get_goods($id: smallint!, $gcode: String!) {
       msgoods_by_pk(id:$id, gcode:$gcode) {
@@ -107,7 +107,7 @@ export class GzaiComponent implements OnInit {
         this.frmArr.controls[i].patchValue(data.msgoods_by_pk);
       }, (error) => {
         this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-        this.frmArr.controls[i].get('zcode').setErrors({ 'incorrect': true });
+        this.frmArr.controls[i].get('zcode')!.setErrors({ 'incorrect': true });
         console.log('error query get_goods', error);
       });
   }
@@ -136,8 +136,8 @@ export class GzaiComponent implements OnInit {
           affected_rows
         }
       }`;
-    let objGzai = [];
-    let gzai = []
+    let objGzai: { id: number; gcode: string; zcode: any; irisu: any; }[] = [];
+    let gzai: any[] = []
     this.frmArr.controls
       .forEach(control => {
         objGzai.push({

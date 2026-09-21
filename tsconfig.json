@@ -31,18 +31,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     
-    /* 🌟 引き続き既存コードの型エラーチェックを一括オフ */
-    "strict": false,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictFunctionTypes": false,
-    "strictBindCallApply": false,
-    "strictPropertyInitialization": false,
-    "noImplicitThis": false,
-    "alwaysStrict": false
+    "strict": true
   },
   "angularCompilerOptions": {
-    /* 🌟 テンプレートチェックと診断エラーを完全無効化 */
-    "strictTemplates": false
+    
+    "strictTemplates": true
   }
 }

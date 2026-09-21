@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-// import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
 import { Nyuhis, DepositService } from './deposit.service';
 
@@ -13,7 +12,7 @@ import { Nyuhis, DepositService } from './deposit.service';
 })
 export class HisttblComponent implements OnInit {
   // @Input() parentForm: FormGroup;
-  dataSource = new MatTableDataSource();
+  dataSource = new MatTableDataSource<Nyuhis>();
   displayedColumns: string[] = [
     'denno',
     'nmoney',

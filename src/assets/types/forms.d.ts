@@ -88,31 +88,31 @@ declare namespace mwI {
     tanka: number;
     toutmoney: number;
     tinmoney: number;
-    mmemo: string;
-    spec: string;
-    spdet: string;
+    mmemo: string | null;
+    spec: string | null;
+    spdet: string | null;
     pable: number;
     genka: number;
     scode: string;
-    sday: string;
+    sday: string | null;
     tanka1: number;
     money: number;
-    mtax: number;
+    mtax: number | null;
     tgenka: number;
     taxmoney: number;
-    taxrate: number;
-    currency: string;
-    gskbn: string;
-    unit: string;
-    max: number;
-    koguchi: number;
-    ordering: boolean;
-    send: string;
-    vcode: string;
-    gkbn: string;
-    code: string;
-    hgcode: string;
-    tanano: string;
+    taxrate: number | null;
+    currency: string | null;
+    gskbn: string | null;
+    unit: string | null;
+    max: number | null;
+    koguchi: number | null;
+    ordering: boolean | null;
+    send: string | null;
+    vcode: string | null;
+    gkbn: string | null;
+    code: string | null;
+    hgcode: string | null;
+    tanano: string | null;
     msgzais: Gzai[];
     trjyumzais: Jmzai[];
   }
@@ -184,12 +184,12 @@ declare namespace mwI {
     msvendor: {
       mtax: string;
       currency: string;
-    }
+    }[]
   }
   interface Hatmei {
     line: number;
     day: string;
-    inday: string;
+    inday: string | null;
     // soko:string;
     gcode: string;
     gtext: string;
@@ -202,7 +202,7 @@ declare namespace mwI {
     spec: string;
     jdenno: number;
     jline: number;
-    yday: string;
+    yday: string | null;
     ydaykbn: string;
     mtax: string;
     msgood: {
@@ -233,7 +233,7 @@ declare namespace mwI {
   }
   interface Siimei {
     line: number;
-    inday: string;
+    inday: string | null;
     gcode: string;
     suu: number;
     genka: number;

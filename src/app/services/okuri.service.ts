@@ -43,7 +43,7 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-		 data.mshokuri.forEach(element => {
+		 data.mshokuri.forEach((element: { code: string; name: string; htype: any; binshu: any; mtchaku: any; daibiki: any; scode: any; csvimp: any; cuscode: any; order: any; hscode: any; onmin: any; donmax: any; }) => {
             this.hokuri.push({ code: element.code, 
 			                   name: element.code + ' ' + element.name,
 							   htype: element.htype,
@@ -112,7 +112,7 @@ export class OkuriService {
       });
   }
 
-  getUrl(hcode): string {
+  getUrl(hcode: string): string {
     let ret: string = "";
     let i: number = this.hokuri.findIndex(obj => obj.code == hcode);
     if (i > -1) {
@@ -124,7 +124,7 @@ export class OkuriService {
     return ret;
   }
 
-  getHinfo(hcode) {
+  getHinfo(hcode: string) {
     let ret = { code: 0, numbering: false };
     let i: number = this.hokuri.findIndex(obj => obj.code == hcode);
     if (i > -1) {
@@ -137,7 +137,7 @@ export class OkuriService {
     return ret;
   }
 
-  async setOkurino(hcode): Promise<string> {
+  async setOkurino(hcode: any): Promise<string> {
     const type: string = 'sagawa_' + this.getHinfo(hcode).code;
     let okrno: number[] = await this.getNumber(type, 1);
     // console.log(type,okrno);

@@ -17,17 +17,17 @@ import { AddressComponent } from './../address/address.component';
 })
 export class AdredaComponent implements OnInit, AfterViewInit {
   @ViewChild(AddressComponent, { static: false })
-  private child: AddressComponent;
+    private child!: AddressComponent;
   mode: number = 3;
-  form: FormGroup;
+  form!: FormGroup;
   eda: number | string;
-  edaOld: number;
+  edaOld!: number;
   flg: boolean; //true⇒枝番をセットボタン表示
 
   constructor(private fb: FormBuilder,
     public memsrv: MembsService,
     private dialogRef: MatDialogRef<AdredaComponent>,
-    @Inject(MAT_DIALOG_DATA) data,
+    @Inject(MAT_DIALOG_DATA) data: any,
     private dialog: MatDialog,
     private cdRef: ChangeDetectorRef,
     private usrsrv: UserService,
@@ -87,7 +87,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
       omemo: this.memsrv.adrs[0].omemo,
       htitle: '0'
     };
-    this.form.get('addr').patchValue(memos);
+    this.form.get('addr')!.patchValue(memos);
   }
 
   modeToUpd(): void {
@@ -111,7 +111,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     this.mode = 3;
     this.form.disable();
   }
-  updateAdrs(padrs) {
+  updateAdrs(padrs: mwI.Adrs) {
     if (this.mode == 1) {
       this.memsrv.adrs.push(padrs);
     } else if (this.mode == 2) {
@@ -143,7 +143,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     if (i > -1) {
       let lcadrs: mwI.Adrs = this.memsrv.adrs[i];
       // console.log(adrs,this.form.get('addr'));
-      this.form.get('addr').patchValue(lcadrs);
+      this.form.get('addr')!.patchValue(lcadrs);
     }
     if (this.mode == 3) {
       this.form.disable();

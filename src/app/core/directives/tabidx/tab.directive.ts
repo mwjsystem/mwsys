@@ -9,7 +9,7 @@ type IKNOWISSTRING = any;
 })
 export class TabDirective implements AfterViewInit  {
 
-  private _index: number;
+  private _index!: number;
   get index(): IKNOWISNUMBER{
     return this._index;
   }

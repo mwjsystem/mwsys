@@ -30,10 +30,11 @@ export interface Gcd {
     standalone: false
 })
 export class GcdhelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
   dataSource: MatTableDataSource<Gcd>;
   displayedColumns = ['code', 'gcode', 'gtext', 'size', 'color', 'jan', 'unit', 'gskbn', 'tkbn'];
-  public gcds: Gcd[];
+  public gcds!: Gcd[];
   public code: string = "";
   public jan: string = "";
   public gcode: string = "";
@@ -47,7 +48,7 @@ export class GcdhelpComponent implements OnInit {
     public bunsrv: BunruiService,
     public cdRef: ChangeDetectorRef,
     private apollo: Apollo,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data: any) {
     this.dataSource = new MatTableDataSource<Gcd>(this.gcds);
     if (typeof data != 'undefined') {
       this.gcode = (data?.gcode ?? '');
@@ -141,7 +142,7 @@ export class GcdhelpComponent implements OnInit {
 
   }
 
-  setGcd(selected) {
+  setGcd(selected: any) {
     this.dialogRef.close(selected);
   }
 

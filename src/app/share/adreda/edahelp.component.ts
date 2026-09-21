@@ -12,7 +12,7 @@ import { MatDialogRef } from "@angular/material/dialog";
     standalone: false
 })
 export class EdahelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
   public filters: any = [{ id: 'adrname', value: '' },
   { id: 'region', value: '' },
   { id: 'local', value: '' },
@@ -30,10 +30,10 @@ export class EdahelpComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     // this.edasrv.observe.subscribe();
     this.dataSource.filterPredicate = (data: mwI.Edahlp, filtersJson: string) => {
-      const matchFilter = [];
+      const matchFilter: any[] = [];
       const filters = JSON.parse(filtersJson);
-      filters.forEach(filter => {
-        const val = data[filter.id] === null ? '' : data[filter.id];
+      filters.forEach((filter: { id: string | number; value: string; }) => {
+        const val = (data as any)[filter.id] === null ? '' : (data as any)[filter.id];
         matchFilter.push(val.toLowerCase().includes(filter.value.toLowerCase()));
       });
       return matchFilter.every(Boolean);
@@ -46,7 +46,7 @@ export class EdahelpComponent implements OnInit {
     }
   }
   updateFilter(fldid: string, event: KeyboardEvent): void {
-    let i: number = this.filters.findIndex(obj => obj.id == fldid);
+    let i: number = this.filters.findIndex((obj: { id: string; }) => obj.id == fldid);
     if (i > -1) {
       this.filters[i].value = (event.target as HTMLInputElement)?.value;
       this.applyFilter();
@@ -58,7 +58,7 @@ export class EdahelpComponent implements OnInit {
     this.dataSource = new MatTableDataSource<mwI.Edahlp>(this.memsrv.edas);
     this.dataSource.paginator = this.paginator;
   }
-  selEda(selected) {
+  selEda(selected: any) {
     // console.log("select",selected);
     this.dialogRef.close(selected);
   }

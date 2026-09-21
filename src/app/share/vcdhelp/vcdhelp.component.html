@@ -4,7 +4,7 @@
         <mat-toolbar style="font-size: 12px;">
             <mat-form-field>
                 <mat-label>絞込条件(全項目共通)</mat-label>
-                <input matInput (keyup)="applyFilter($event)">
+                <input matInput (keyup)="applyFilter($any($event))">
             </mat-form-field>
         </mat-toolbar>
         <table mat-table [dataSource]="dataSource" aria-label="Elements">

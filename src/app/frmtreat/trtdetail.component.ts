@@ -21,8 +21,9 @@ import { HttpClient } from '@angular/common/http';
 export class TrtdetailComponent implements OnInit {
 
   public idx: number = 0;
-  public form: UntypedFormGroup;
-  @ViewChildren('upfile', { read: ElementRef }) inputs: QueryList<ElementRef>;
+  public form!: UntypedFormGroup;
+  @ViewChildren('upfile', { read: ElementRef })
+    inputs!: QueryList<ElementRef>;
   constructor(public trtsrv: TreatService,
     public usrsrv: UserService,
     public bunsrv: BunruiService,
@@ -34,7 +35,7 @@ export class TrtdetailComponent implements OnInit {
     // private toastr: ToastrService,
     private http: HttpClient,
     private dialogRef: MatDialogRef<TrtdetailComponent>,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data: any) {
     this.idx = data.idx;
   }
 
@@ -56,9 +57,9 @@ export class TrtdetailComponent implements OnInit {
       result: new UntypedFormControl(''),
     });
     if (this.idx == -1) {
-      this.form.get('seq').setValue("新規登録");
-      this.form.get('created_at').setValue(new Date());
-      this.form.get('created_by').setValue(this.usrsrv.staff.code);
+      this.form.get('seq')!.setValue("新規登録");
+      this.form.get('created_at')!.setValue(new Date());
+      this.form.get('created_by')!.setValue(this.usrsrv.staff.code);
     } else {
       this.form.patchValue(this.trtsrv.trts[this.idx]);
     }
@@ -126,7 +127,7 @@ export class TrtdetailComponent implements OnInit {
       data => {
         this.cdRef.reattach();
         if (typeof data != 'undefined') {
-          this.form.get('mcode').setValue(+data.mcode);
+          this.form.get('mcode')!.setValue(+data.mcode);
         }
       }
     );
@@ -167,7 +168,7 @@ export class TrtdetailComponent implements OnInit {
       // this.usrsrv.getNumber('treat',1)
       //   .subscribe(value => {
       let value = await this.usrsrv.getNumber('treat', 1);
-      this.form.get('seq').setValue(value);
+      this.form.get('seq')!.setValue(value);
       this.idx = 0;
       this.apollo.mutate<any>({
         mutation: InsertTran,

@@ -26,7 +26,7 @@
         (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
         [disabled]="invsrv.mode==1 || (invsrv.mode==2 && form.dirty)">
       @if (invsrv.mode==3) {
-        <button mat-button mat-icon-button matSuffix (click)="dennoHelp()">
+        <button mat-icon-button matSuffix (click)="dennoHelp()">
           <mat-icon>find_replace</mat-icon>
         </button>
       }

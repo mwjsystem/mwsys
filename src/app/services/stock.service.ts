@@ -5,31 +5,31 @@ import { UserService } from './user.service';
 import { Subject, Observable } from 'rxjs';
 
 export class Goods {
-  gcode: string;
-  gtext: string;
-  gskbn: string;
-  unit: string;
-  msgzais: {
-    zcode: string;
-    irisu: string;
-    msgoods: {
-      gskbn: string;
-    }
-  };
+  gcode!: string;
+  gtext!: string;
+  gskbn!: string;
+  unit!: string;
+  msgzais!: {
+        zcode: string;
+        irisu: string;
+        msgoods: {
+            gskbn: string;
+        };
+    }[];
   constructor(init?: Partial<Goods>) {
     Object.assign(this, init);
   }
 }
 
 export class Stcbs {
-  gcode: string;
-  scode: string;
-  stock: number;
-  hikat: number;
-  keepd: number;
-  yday: Date;
-  suu: number;
-  htzan: number;
+  gcode!: string;
+  scode!: string;
+  stock!: number;
+  hikat!: number;
+  keepd!: number;
+  yday!: Date;
+  suu!: number;
+  htzan!: number;
   constructor(init?: Partial<Stcbs>) {
     Object.assign(this, init);
   }
@@ -37,37 +37,37 @@ export class Stcbs {
 
 
 export class Stock {
-  gcode: string;
-  scode: string;
-  stock: number;
-  hikat: number;
-  juzan: number;
-  today: number;
-  keepd: number;
-  tommo: number;
+  gcode!: string;
+  scode!: string;
+  stock!: number;
+  hikat!: number;
+  juzan!: number;
+  today!: number;
+  keepd!: number;
+  tommo!: number;
   constructor(init?: Partial<Stock>) {
     Object.assign(this, init);
   }
 }
 
 export class StGds {
-  gcode: string;
-  gtext: string;
-  gskbn: string;
-  yday: Date;
-  suu: number;
-  htzan: number;
-  moavg: number;
-  unit: string;
-  motai: string;
+  gcode!: string;
+  gtext!: string;
+  gskbn!: string;
+  yday!: Date | null;
+  suu!: number;
+  htzan!: number;
+  moavg!: number;
+  unit!: string;
+  motai!: string;
   ydtxt: string;
-  msgzais: {
-    zcode: string;
-    irisu: string;
-    msgoods: {
-      gskbn: string;
-    }
-  };
+  msgzais!: {
+        zcode: string;
+        irisu: string;
+        msgoods: {
+            gskbn: string;
+        };
+    }[];
   constructor(init?: Partial<StGds>) {
     Object.assign(this, init);
     this.ydtxt = '入荷予定日';
@@ -89,8 +89,8 @@ export class StockService {
   private shlym: string[] = [];
   public paabl: number = 0;
   public stcbs: Stcbs[] = [];
-  public shGcd: string;
-  public stcGcd: string;
+  public shGcd!: string;
+  public stcGcd!: string;
   // public isLoading:boolean=false;
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
@@ -183,13 +183,13 @@ export class StockService {
         .subscribe(({ data }) => {
           // console.log(data);
           for (let i = 0; i < 12; i++) {
-            const j: number = data.vshukka.findIndex(obj => obj.to_char == this.shcym[i]);
+            const j: number = data.vshukka.findIndex((obj: { to_char: string; }) => obj.to_char == this.shcym[i]);
             if (j > -1) {
               this.shcnt[i] = data.vshukka[j].sum;
             } else {
               this.shcnt[i] = 0;
             }
-            const k: number = data.vshukka.findIndex(obj => obj.to_char == this.shlym[i]);
+            const k: number = data.vshukka.findIndex((obj: { to_char: string; }) => obj.to_char == this.shlym[i]);
             if (k > -1) {
               this.shlas[i] = data.vshukka[k].sum;
             } else {
@@ -257,13 +257,13 @@ export class StockService {
         .subscribe(({ data }) => {
           // console.log(data);
           for (let i = 0; i < 12; i++) {
-            const j: number = data.vshukka.findIndex(obj => obj.to_char == this.shcym[i]);
+            const j: number = data.vshukka.findIndex((obj: { to_char: string; }) => obj.to_char == this.shcym[i]);
             if (j > -1) {
               this.shcnt[i] = data.vshukka[j].sum;
             } else {
               this.shcnt[i] = 0;
             }
-            const k: number = data.vshukka.findIndex(obj => obj.to_char == this.shlym[i]);
+            const k: number = data.vshukka.findIndex((obj: { to_char: string; }) => obj.to_char == this.shlym[i]);
             if (k > -1) {
               this.shlas[i] = data.vshukka[k].sum;
             } else {
@@ -308,7 +308,7 @@ export class StockService {
       lcdate = new Date();
     }
     // console.log(date,lcdate);
-    let lcstcs = [];
+    let lcstcs: any[] = [];
     return new Promise(resolve => {
       // console.log(lcdate);
       this.apollo.watchQuery<any>({
@@ -327,7 +327,7 @@ export class StockService {
           // this.stgds.gskbn=data.vgstana[0]?.gskbn;
           // this.stgds.unit=data.vgstana[0]?.unit;
 
-          Promise.all(data.vgstana.map(async item => {
+          Promise.all(data.vgstana.map(async (item: { day: Date; tana: number; code: string; }) => {
             // console.log(item);
             let lcday: Date = item.day ?? new Date('2000-01-01');
             let lctana: number = item.tana ?? 0;
@@ -426,11 +426,11 @@ export class StockService {
     });
 
   }
-  getSetZai(scd: string, gzais): Promise<Stcbs[]> {
+  getSetZai(scd: string, gzais: any[]): Promise<Stcbs[]> {
     return new Promise(resolve => {
-      let lcstcs = [];
+      let lcstcs: any[] = [];
 	  // console.log('getSetZai1',gzais);
-      Promise.all(gzais.map(async item => {
+      Promise.all(gzais.map(async (item) => {
 		// console.log('getSetZai2',item,item.msgoods.gskbn);
         if (item.msgoods.gskbn == '0') {
           let lcstc = await this.getStock(item.zcode, '1', scd);
@@ -590,7 +590,7 @@ export class StockService {
     });
   }
 
-  getPaabl(stcbs): number {
+  getPaabl(stcbs: string | any[]): number {
     let paabl: number = 9999;
     for (let i = 0; i < stcbs.length; i++) {
       const wAble = Math.floor((stcbs[i].stock - stcbs[i].hikat - stcbs[i].keepd) / stcbs[i].irisu);

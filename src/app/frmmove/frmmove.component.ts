@@ -25,8 +25,9 @@ import { filter } from 'rxjs/operators';
     standalone: false
 })
 export class FrmmoveComponent implements OnInit {
-  @ViewChild(MovtblComponent) movtbl: MovtblComponent;
-  form: FormGroup;
+  @ViewChild(MovtblComponent)
+    movtbl!: MovtblComponent;
+  form!: FormGroup;
   denno: number = 0;
   mode: number = 3;
   hktval: mwI.Sval[] = [];
@@ -76,16 +77,16 @@ export class FrmmoveComponent implements OnInit {
     this.route.paramMap.subscribe((params: ParamMap) => {
       if (params.get('mode') === null) {
         this.cancel();
-      } else if (+params.get('mode') == 1) {
+      } else if (+params.get('mode')! == 1) {
         this.modeToCre();
         this.route.queryParamMap.pipe(
-          filter(n => Object.keys(n["params"]).length !== 0)
+          filter(n => Object.keys((n as any)["params"]).length !== 0)
         ).subscribe(
           n => {
-            let params = n["params"];
+            let params = (n as any)["params"];
             Object.keys(params).map(k => {
               if (k == "stkey") {
-                const stra = JSON.parse(localStorage.getItem(params[k]));
+                const stra = JSON.parse(localStorage.getItem(params[k])!);
                 this.form.patchValue({ incode: stra.incode, outcode: stra.outcode });
                 this.movtbl.insRows(stra.mei, true);
                 localStorage.removeItem(params[k]);
@@ -93,12 +94,12 @@ export class FrmmoveComponent implements OnInit {
             })
           }
         )
-        this.denno = +params.get('denno');
-        this.form.get('tcode').setValue(this.usrsrv.staff?.code);
+        this.denno = +params.get('denno')!;
+        this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
       } else {
-        this.mode = +params.get('mode');
+        this.mode = +params.get('mode')!;
         if (params.get('denno') !== null) {
-          this.denno = +params.get('denno');
+          this.denno = +params.get('denno')!;
           // console.log(this.denno);
           this.getMovden(this.denno);
         }
@@ -112,10 +113,10 @@ export class FrmmoveComponent implements OnInit {
   }
 
   getMovden(denno: number): void {
-    if (!this.overlayRef) {
-      this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    };
     if (denno > 0) {
+      if (!this.overlayRef.hasAttached()) {
+        this.overlayRef.attach(new ComponentPortal(MatSpinner));
+      }
       this.movsrv.qryMovden(denno).subscribe(
         result => {
           this.form.reset();
@@ -154,13 +155,13 @@ export class FrmmoveComponent implements OnInit {
     this.getMovden(this.denno);
   }
 
-  openOkuri(hcode, value) {
+  openOkuri(hcode: any, value: string) {
     window.open(this.okrsrv.getUrl(hcode) + value, '_blank');
   }
 
   async setOkrno() {
     let okrno: string = await this.okrsrv.setOkurino(this.form.value.hcode);
-    this.form.get('okurino').setValue(okrno);
+    this.form.get('okurino')!.setValue(okrno);
   }
 
   selHcd(event: KeyboardEvent) {
@@ -264,7 +265,7 @@ export class FrmmoveComponent implements OnInit {
                 movo: e.suu
               });
             } else if (e.msgood.gskbn == "1") {
-              e.msgood.msgzais.forEach(zai => {
+              e.msgood.msgzais.forEach((zai: { zcode: any; irisu: number; }) => {
                 this.movsrv.updZaiko({
                   scode: movsub.incode,
                   gcode: zai.zcode,
@@ -322,8 +323,8 @@ export class FrmmoveComponent implements OnInit {
     this.mode = 1;
     this.form.reset();
     this.denno = 0;
-    this.form.get('tcode').setValue(this.usrsrv.staff?.code);
-    this.form.get('day').setValue(new Date());
+    this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
+    this.form.get('day')!.setValue(new Date());
     this.movtbl.frmArr.clear();
     this.movtbl.addRows(1);
     this.refresh();

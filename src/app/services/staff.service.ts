@@ -36,7 +36,7 @@ export class StaffService {
         // console.log(this.stfs,data.msstaff);
         this.tcds = [{ value: null, viewval: "" }];
         this.stfs = data.msstaff;
-        data.msstaff.forEach(e => {
+        data.msstaff.forEach((e: { code: any; sei: any; mei: any; }) => {
           this.tcds.push({ value: e.code, viewval: e.sei + (e.mei ?? "") }); //e.meiがnull等の時は、''を結合
         });
       }, (error) => {

@@ -40,7 +40,7 @@ interface Vendor {
 })
 export class VcdhelpComponent implements OnInit {
   // public vcds: Vendor[]=[];
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
   dataSource: MatTableDataSource<mwI.Vendor>;
   displayedColumns = ['code', 'adrname', 'kana', 'tanto', 'tel', 'tel2', 'tel3', 'fax', 'mail1', 'mail2', 'mail3', 'mail4', 'mail5', 'zip', 'region', 'local', 'url'];
   filter: string = "";
@@ -59,7 +59,7 @@ export class VcdhelpComponent implements OnInit {
     // });
   }
 
-  applyFilter(event) {
+  applyFilter(event: { target: HTMLInputElement; }) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }

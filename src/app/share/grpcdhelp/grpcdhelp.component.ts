@@ -26,10 +26,11 @@ interface Ggrp {
     standalone: false
 })
 export class GrpcdhelpComponent implements OnInit {
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
   dataSource: MatTableDataSource<Ggrp>;
   displayedColumns = ['code', 'name', 'kana', 'gkbn', 'sozai', 'vcode', 'tcode'];
-  public ggrps: Ggrp[];
+  public ggrps!: Ggrp[];
   public code: string = "";
   public kana: string = "";
   public name: string = "";
@@ -43,7 +44,7 @@ export class GrpcdhelpComponent implements OnInit {
     // public gdssrv: GoodsService,
     public bunsrv: BunruiService,
     private apollo: Apollo,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data: any) {
     // console.log(data);
     this.dataSource = new MatTableDataSource<Ggrp>(this.ggrps);
     if (typeof data != 'undefined') {
@@ -117,7 +118,7 @@ export class GrpcdhelpComponent implements OnInit {
       });
   }
 
-  setGrpcd(selected) {
+  setGrpcd(selected: any) {
     // console.log("select",selected);
     // this.mcdsrv.mcds=[];
     this.dialogRef.close(selected);

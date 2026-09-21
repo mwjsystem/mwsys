@@ -10,7 +10,7 @@ import { Stcbs, StockService } from './../services/stock.service';
     standalone: false
 })
 export class GzaitblComponent implements OnInit {
-  public dataSource: MatTableDataSource<Stcbs>;
+  public dataSource!: MatTableDataSource<Stcbs>;
   public displayedColumns = ['gcode', 'irisu', 'pable', 'stock', 'hikat', 'yday', 'suu', 'htzan'];
 
 

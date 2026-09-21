@@ -6,39 +6,39 @@ import { Apollo } from 'apollo-angular';
 
 
 export class Zaiko {
-  scode: string;
-  gcode: string;
-  day: string;
-  movi: number;
-  movo: number;
+  scode!: string;
+  gcode!: string;
+  day!: string;
+  movi!: number;
+  movo!: number;
 }
 export class Gzai {
-  zcode: string;
-  irisu: number;
-  msgoods: {
-    gskbn: string;
-  };
+  zcode!: string;
+  irisu!: number;
+  msgoods!: {
+        gskbn: string;
+    };
   constructor(init?: Partial<Movden>) {
     Object.assign(this, init);
   }
 }
 
 export class Movden {
-  line: number;
-  gcode: string;
-  suu: number;
-  pable: number;
-  stock: number;
-  memo: string;
-  jdenno: number;
-  jline: number;
-  kako: string;
-  msgood: {
-    gtext: string;
-    unit: string;
-    gskbn: string;
-    msgzais: Gzai[];
-  }
+  line!: number;
+  gcode!: string;
+  suu!: number;
+  pable!: number;
+  stock!: number;
+  memo!: string;
+  jdenno!: number;
+  jline!: number;
+  kako!: string;
+  msgood!: {
+        gtext: string;
+        unit: string;
+        gskbn: string;
+        msgzais: Gzai[];
+    };
   constructor(init?: Partial<Movden>) {
     Object.assign(this, init);
   }
@@ -47,21 +47,21 @@ export class Movden {
 
 
 export class Movsub {
-  day: Date;
-  incode: string;
-  outcode: string;
-  tcode: string;
-  omemo: string;
-  hday: Date;
-  htime: string;
-  hcode: string;
-  okurino: number;
-  okurisuu: number;
-  created_at: Date;
-  created_by: string;
-  updated_at: Date;
-  updated_by: string;
-  trmovdens: Movden[];
+  day!: Date;
+  incode!: string;
+  outcode!: string;
+  tcode!: string;
+  omemo!: string;
+  hday!: Date;
+  htime!: string;
+  hcode!: string;
+  okurino!: number;
+  okurisuu!: number;
+  created_at!: Date;
+  created_by!: string;
+  updated_at!: Date;
+  updated_by!: string;
+  trmovdens!: Movden[];
   constructor(init?: Partial<Movsub>) {
     Object.assign(this, init);
   }
@@ -182,7 +182,7 @@ export class MovingService {
     });
   }
 
-  updMovden(denno, movsub, movmei): Promise<string> {
+  updMovden(denno: number, movsub: any, movmei: any[]): Promise<string> {
     const UpdateTran = gql`
       mutation upd_movsub($id: smallint!, $dno: Int!,$_set: trmovsub_set_input!,$obj:[trmovden_insert_input!]!) {
         update_trmovsub(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: $_set)  {
@@ -219,7 +219,7 @@ export class MovingService {
       });
     });
   }
-  insMovden(movsub, movmei): Promise<string> {
+  insMovden(movsub: Movsub[], movmei: any[]): Promise<string> {
     const InsertTran = gql`
       mutation ins_movsub($obj:[trmovsub_insert_input!]!,$objm:[trmovden_insert_input!]!) {
         insert_trmovsub(objects: $obj)  {

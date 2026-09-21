@@ -21,9 +21,9 @@ import { AddressComponent } from './../share/address/address.component';
 import { MsprocComponent } from './../share/msproc/msproc.component';
 
 class Sval {
-  value: string;
-  viewval: string;
-  dis: boolean;
+  value!: string;
+  viewval!: string;
+  dis!: boolean;
 }
 
 @Component({
@@ -35,8 +35,8 @@ class Sval {
 })
 export class MstmemberComponent implements OnInit, AfterViewInit {
   @ViewChildren(AddressComponent)
-  private children: QueryList<AddressComponent>;
-  form: FormGroup;
+    private children!: QueryList<AddressComponent>;
+  form!: FormGroup;
   mcd: string = "";
   mode: number = 3;
 
@@ -129,7 +129,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       if (params.get('mode') === null) {
         this.mode = 3;
       } else {
-        this.mode = +params.get('mode');
+        this.mode = +params.get('mode')!;
       }
       this.refresh();
       if (params.get('mcd') === null) {
@@ -137,7 +137,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         // this.refresh();
       } else {
         //１件分だけ先に読込
-        this.mcd = params.get('mcd');
+        this.mcd = params.get('mcd')!;
         this.getMember(this.mcd);
       }
     });
@@ -240,10 +240,10 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   }
 
   getMember(mcode: string) {
-    if (!this.overlayRef) {
-      this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    }
     if (this.checkMcode(mcode)) {
+      if (!this.overlayRef.hasAttached()) {
+        this.overlayRef.attach(new ComponentPortal(MatSpinner));
+      }
       this.apollo.watchQuery<any>({
         query: Query.GetMast1,
         variables: {
@@ -257,9 +257,10 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
           if (data.msmember_by_pk == null) {
             this.usrsrv.toastWar("顧客コード" + mcode + "は登録されていません");
             history.replaceState('', '', './mstmember');
+            this.overlayRef.detach();
           } else {
             let member: mwI.Member = data.msmember_by_pk;
-            this.form.get('base').patchValue(member);
+            this.form.get('base')!.patchValue(member);
             this.usrsrv.setTmstmp(member);
             this.memsrv.mcode = mcode;
             this.memsrv.edas = [];
@@ -280,15 +281,15 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
                 });
               }
             }
-            this.form.get('addr0').patchValue(member.msmadrs[0]);
+            this.form.get('addr0')!.patchValue(member.msmadrs[0]);
             //その他住所があれば、
             let j: number = member.msmadrs.findIndex(obj => obj.eda == 1);
             if (j > -1) {
-              this.form.get('addr1').patchValue(member.msmadrs[j]);
+              this.form.get('addr1')!.patchValue(member.msmadrs[j]);
               this.flgadr1 = 2;
               this.gadrVal[1].dis = false;
             } else {
-              this.form.get('addr1').reset();
+              this.form.get('addr1')!.reset();
               this.flgadr1 = 1;
               this.gadrVal[1].dis = true;
             }
@@ -315,7 +316,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   }
 
   getRows(fldnm: string): number {
-    const lines: number = (this.form.get('base').get(fldnm).value + '\n').match(/\n/g).length;
+    const lines: number = (this.form.get('base')!.get(fldnm)!.value + '\n').match(/\n/g)!.length;
     return lines;
   }
 
@@ -323,15 +324,15 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   updKana(event: KeyboardEvent) {
     let val: string = this.usrsrv.convKana((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
-    this.form.get('base').get('kana').setValue(val);
+    this.form.get('base')!.get('kana')!.setValue(val);
   }
 
   updMail(fldnm: string, event: KeyboardEvent) {
     let val: string = this.usrsrv.convHan((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
-    this.form.get('base').get(fldnm).setValue(val);
+    this.form.get('base')!.get(fldnm)!.setValue(val);
   }
-  test(value) {
+  test(value: any) {
     this.usrsrv.toastInf('機能作成中');
     const invalid = [];
     const ctrls = this.form.controls;
@@ -382,7 +383,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     }
   }
 
-  modeToDel(flg, mode): void {
+  modeToDel(flg: any, mode: number): void {
     let lctxt: string = (flg ? '削除' : '削除取消');
     if (window.confirm(lctxt + 'してもよろしいですか？')) {
 
@@ -439,46 +440,46 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     let member: any = {
       id: this.usrsrv.compid,
       mcode: this.mcd,
-      sei: this.usrsrv.editFrmval(this.form.get('base'), 'sei'),
-      mei: this.usrsrv.editFrmval(this.form.get('base'), 'mei'),
-      kana: this.usrsrv.editFrmval(this.form.get('base'), 'kana'),
-      tankakbn: this.usrsrv.editFrmval(this.form.get('base'), 'tankakbn'),
-      mail: this.usrsrv.editFrmval(this.form.get('base'), 'mail'),
-      mail2: this.usrsrv.editFrmval(this.form.get('base'), 'mail2'),
-      mail3: this.usrsrv.editFrmval(this.form.get('base'), 'mail3'),
-      mail4: this.usrsrv.editFrmval(this.form.get('base'), 'mail4'),
-      mail5: this.usrsrv.editFrmval(this.form.get('base'), 'mail5'),
-      torikbn: Boolean(this.form.get('base').value.torikbn),
-      sime: this.usrsrv.editFrmval(this.form.get('base'), 'sime'),
-      site: this.usrsrv.editFrmval(this.form.get('base'), 'site'),
-      inday: this.usrsrv.editFrmval(this.form.get('base'), 'inday'),
-      scde: this.usrsrv.editFrmval(this.form.get('base'), 'scde'),
-      memo: this.usrsrv.editFrmval(this.form.get('base'), 'memo'),
-      dmemo: this.usrsrv.editFrmval(this.form.get('base'), 'dmemo'),
-      pcode: this.usrsrv.editFrmval(this.form.get('base'), 'pcode'),
-      hcode: this.usrsrv.editFrmval(this.form.get('base'), 'hcode'),
-      htime: this.usrsrv.editFrmval(this.form.get('base'), 'htime'),
-      jcode: this.usrsrv.editFrmval(this.form.get('base'), 'jcode'),
-      mtax: this.usrsrv.editFrmval(this.form.get('base'), 'mtax'),
-      sscode: this.usrsrv.editFrmval(this.form.get('base'), 'sscode'),
-      daibunrui: this.usrsrv.editFrmval(this.form.get('base'), 'daibunrui'),
-      chubunrui: this.usrsrv.editFrmval(this.form.get('base'), 'chubunrui'),
-      shobunrui: this.usrsrv.editFrmval(this.form.get('base'), 'shobunrui'),
-      tcode1: this.usrsrv.editFrmval(this.form.get('base'), 'tcode1'),
-      tcode: this.usrsrv.editFrmval(this.form.get('base'), 'tcode'),
-      del: Boolean(this.form.get('base').value.del),
-      sptnkbn: this.usrsrv.editFrmval(this.form.get('base'), 'sptnkbn'),
-      ntype: this.usrsrv.editFrmval(this.form.get('base'), 'ntype'),
-      tntype: this.usrsrv.editFrmval(this.form.get('base'), 'tntype'),
-      webid: this.usrsrv.editFrmval(this.form.get('base'), 'webid'),
-      ryoate: this.usrsrv.editFrmval(this.form.get('base'), 'ryoate'),
-      mtgt1: this.form.get('base').value.mtgt1,
-      mtgt2: this.form.get('base').value.mtgt2,
-      mtgt3: this.form.get('base').value.mtgt3,
-      mtgt4: this.form.get('base').value.mtgt4,
-      mtgt5: this.form.get('base').value.mtgt5,
-      jan: this.usrsrv.editFrmval(this.form.get('base'), 'jan'),
-      gadr: this.usrsrv.editFrmval(this.form.get('base'), 'gadr'),
+      sei: this.usrsrv.editFrmval(this.form.get('base')!, 'sei'),
+      mei: this.usrsrv.editFrmval(this.form.get('base')!, 'mei'),
+      kana: this.usrsrv.editFrmval(this.form.get('base')!, 'kana'),
+      tankakbn: this.usrsrv.editFrmval(this.form.get('base')!, 'tankakbn'),
+      mail: this.usrsrv.editFrmval(this.form.get('base')!, 'mail'),
+      mail2: this.usrsrv.editFrmval(this.form.get('base')!, 'mail2'),
+      mail3: this.usrsrv.editFrmval(this.form.get('base')!, 'mail3'),
+      mail4: this.usrsrv.editFrmval(this.form.get('base')!, 'mail4'),
+      mail5: this.usrsrv.editFrmval(this.form.get('base')!, 'mail5'),
+      torikbn: Boolean(this.form.get('base')!.value.torikbn),
+      sime: this.usrsrv.editFrmval(this.form.get('base')!, 'sime'),
+      site: this.usrsrv.editFrmval(this.form.get('base')!, 'site'),
+      inday: this.usrsrv.editFrmval(this.form.get('base')!, 'inday'),
+      scde: this.usrsrv.editFrmval(this.form.get('base')!, 'scde'),
+      memo: this.usrsrv.editFrmval(this.form.get('base')!, 'memo'),
+      dmemo: this.usrsrv.editFrmval(this.form.get('base')!, 'dmemo'),
+      pcode: this.usrsrv.editFrmval(this.form.get('base')!, 'pcode'),
+      hcode: this.usrsrv.editFrmval(this.form.get('base')!, 'hcode'),
+      htime: this.usrsrv.editFrmval(this.form.get('base')!, 'htime'),
+      jcode: this.usrsrv.editFrmval(this.form.get('base')!, 'jcode'),
+      mtax: this.usrsrv.editFrmval(this.form.get('base')!, 'mtax'),
+      sscode: this.usrsrv.editFrmval(this.form.get('base')!, 'sscode'),
+      daibunrui: this.usrsrv.editFrmval(this.form.get('base')!, 'daibunrui'),
+      chubunrui: this.usrsrv.editFrmval(this.form.get('base')!, 'chubunrui'),
+      shobunrui: this.usrsrv.editFrmval(this.form.get('base')!, 'shobunrui'),
+      tcode1: this.usrsrv.editFrmval(this.form.get('base')!, 'tcode1'),
+      tcode: this.usrsrv.editFrmval(this.form.get('base')!, 'tcode'),
+      del: Boolean(this.form.get('base')!.value.del),
+      sptnkbn: this.usrsrv.editFrmval(this.form.get('base')!, 'sptnkbn'),
+      ntype: this.usrsrv.editFrmval(this.form.get('base')!, 'ntype'),
+      tntype: this.usrsrv.editFrmval(this.form.get('base')!, 'tntype'),
+      webid: this.usrsrv.editFrmval(this.form.get('base')!, 'webid'),
+      ryoate: this.usrsrv.editFrmval(this.form.get('base')!, 'ryoate'),
+      mtgt1: this.form.get('base')!.value.mtgt1,
+      mtgt2: this.form.get('base')!.value.mtgt2,
+      mtgt3: this.form.get('base')!.value.mtgt3,
+      mtgt4: this.form.get('base')!.value.mtgt4,
+      mtgt5: this.form.get('base')!.value.mtgt5,
+      jan: this.usrsrv.editFrmval(this.form.get('base')!, 'jan'),
+      gadr: this.usrsrv.editFrmval(this.form.get('base')!, 'gadr'),
       updated_at: new Date(),
       updated_by: this.usrsrv.staff.code
     }
@@ -493,10 +494,10 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         },
       }).subscribe(({ data }) => {
         // console.log('update_msmember', data);
-        this.form.get('addr0').patchValue({ dmemo: member.dmemo, memo: member.memo });
+        this.form.get('addr0')!.patchValue({ dmemo: member.dmemo, memo: member.memo });
         this.children.toArray()[0].saveMadr(this.mcd, 0, this.mode);
         // console.log(this.form.get('addr1').value);
-        if (this.form.get('addr1').value.zip != null) {
+        if (this.form.get('addr1')!.value.zip != null) {
           this.children.toArray()[1].saveMadr(this.mcd, 1, this.flgadr1);
         }
         this.usrsrv.toastSuc('顧客コード' + this.mcd + 'の変更を保存しました');
@@ -531,7 +532,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         console.log('Insert_msmember', data);
         this.children.toArray()[0].saveMadr(this.mcd, 0, this.mode);
         // console.log(this.form.get('addr1').get('zip'),);
-        if (this.form.get('addr1').value.zip != null) {
+        if (this.form.get('addr1')!.value.zip != null) {
           this.children.toArray()[1].saveMadr(this.mcd, 1, this.flgadr1);
         }
 

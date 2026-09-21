@@ -10,12 +10,12 @@ import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
 
 export class Jmzai {
-  eda: number;
-  gcode: string;
-  suu: number;
-  genka: number;
-  spec: string;
-  spdet: string;
+  eda!: number;
+  gcode!: string;
+  suu!: number;
+  genka!: number;
+  spec!: string;
+  spdet!: string;
 }
 
 @Component({
@@ -36,7 +36,7 @@ export class JmzaitblComponent implements OnInit {
     public usrsrv: UserService,
     public bunsrv: BunruiService,
     // public stcsrv: StockService,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data: any) {
     this.dataSource.data = data.tbldata;
     this.scode = data.scode;
   }
@@ -83,7 +83,7 @@ export class JmzaitblComponent implements OnInit {
 
   }
 
-  edited(selected) {
+  edited(selected: any) {
     this.dialogRef.close(selected);
   }
 

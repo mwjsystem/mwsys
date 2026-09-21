@@ -18,7 +18,7 @@ import { StaffService } from './../services/staff.service';
 })
 export class FrminvoiceComponent implements OnInit, AfterViewInit {
     // @ViewChild(DepttblComponent) depttbl: DepttblComponent;
-    form: FormGroup;
+    form!: FormGroup;
     denno: number = 0;
 	rows: FormArray = this.fb.array([]);
     constructor(public usrsrv: UserService,

@@ -26,23 +26,26 @@ import { take } from 'rxjs/operators';
     standalone: false
 })
 export class JmeitblComponent implements OnInit {
-  @Input() parentForm: FormGroup;
-  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-  @ViewChildren('gcdInputs') gcdInps: QueryList<ElementRef>;
-  private el: HTMLInputElement;
+  @Input()
+    parentForm!: FormGroup;
+  @ViewChild(MatPaginator, { static: false })
+    paginator!: MatPaginator;
+  @ViewChildren('gcdInputs')
+    gcdInps!: QueryList<ElementRef>;
+  private el!: HTMLInputElement;
   dataSource = new MatTableDataSource();
-  copyToClipboard: string;
+  copyToClipboard!: string;
   navCli = navigator.clipboard;
-  jmeikbn: string;
+  jmeikbn!: string;
   // jyumei: mwI.Jyumei[] = [];
-  hatden = [];
-  movden = [];
+  hatden: any[] = [];
+  movden: any[] = [];
   mall: boolean = false;
   hidx = 20; //tabindex用ヘッダ項目数
   mcols = 4; //tabindex用明細列数
-  displayedColumns: string[];
+  displayedColumns!: string[];
   flgCol: boolean = false;
-  setZai = [];
+  setZai: any[] = [];
   defCol = ['chk',
     'line',
     // 'line2',
@@ -293,7 +296,7 @@ export class JmeitblComponent implements OnInit {
     }  
 
     this.autoFil();
-    this.parentForm.get('okurisuu').setValue(kogu);
+    this.parentForm.get('okurisuu')!.setValue(kogu);
   }
 
   async setJmeikbn(kbn: string) {
@@ -323,14 +326,14 @@ export class JmeitblComponent implements OnInit {
     //仕入先１件分の処理
     this.jmisrv.denno = await this.jmisrv.getDenno();
     let hdno = await this.usrsrv.getNumber('hdenno', 1);
-    let jmei = [];
+    let jmei: string[] = [];
     this.frmArr.controls
       .forEach(control => {
         // console.log(control,this.hatden[0]);
         // console.log(control.get('spec').value=="3",control);
-        if (control.get('spec').value == "3" && control.get('vcode').value == this.hatden[0]) {
+        if (control.get('spec')!.value == "3" && control.get('vcode')!.value == this.hatden[0]) {
           jmei.push(control.value.gcode + "\t" + control.value.suu + "\t"
-            + this.jmisrv.denno + "\t" + control.get('line').value);
+            + this.jmisrv.denno + "\t" + control.get('line')!.value);
           control.patchValue({ spdet: hdno });
         }
       })
@@ -346,14 +349,14 @@ export class JmeitblComponent implements OnInit {
   async toFrmmov() {
     this.jmisrv.denno = await this.jmisrv.getDenno();
     let mdno = await this.usrsrv.getNumber('mdenno', 1);
-    let jmei = [];
+    let jmei: string[] = [];
     this.frmArr.controls
       .forEach(control => {
         // console.log(control,this.hatden[0]);
         // console.log(control.get('spec').value=="3",control);
-        if (control.get('spec').value == "6" && control.value.scode == this.movden[0]) {
+        if (control.get('spec')!.value == "6" && control.value.scode == this.movden[0]) {
           jmei.push(control.value.gcode + "\t" + control.value.suu + "\t"
-            + this.jmisrv.denno + "\t" + control.get('line').value);
+            + this.jmisrv.denno + "\t" + control.get('line')!.value);
           control.patchValue({ spdet: mdno });
         }
       })
@@ -514,7 +517,7 @@ export class JmeitblComponent implements OnInit {
               if (typeof data != 'undefined') {
                 // console.log(data,data.denno || '_' || data.line);
                 // this.frmArr.controls[i].get('spec').setValue('8');
-                this.frmArr.controls[i].get('spdet').setValue(data.denno + '_' + data.line);
+                this.frmArr.controls[i].get('spdet')!.setValue(data.denno + '_' + data.line);
               }
             }
           );
@@ -523,10 +526,10 @@ export class JmeitblComponent implements OnInit {
   }
   jyumZai(i: number): void {
     let dialogConfig = new MatDialogConfig();
-    let lcdata = [];
+    let lcdata: { eda: any; gcode: any; suu: any; spec: any; spdet: any; pable: number; }[] = [];
     // console.log('jyumZai',this.getMtbl(i,'trjyumzais'),this.frmArr.controls[i].get('trjyumzais'));
     this.getMtbl(i, 'trjyumzais').controls.forEach(e => {
-      let j: number = this.setZai[i].findIndex(obj => obj.gcode == e.value.gcode);
+      let j: number = this.setZai[i].findIndex((obj: { gcode: any; }) => obj.gcode == e.value.gcode);
       if (j > -1) {
         lcdata.push({ eda: e.value.eda, gcode: e.value.gcode, suu: e.value.suu, spec: e.value.spec, spdet: e.value.spdet, pable: (this.setZai[i][j]?.stock - this.setZai[i][j]?.hikat - this.setZai[i][j]?.keepd) });
       }
@@ -544,7 +547,7 @@ export class JmeitblComponent implements OnInit {
         if (typeof data != 'undefined') {
           // console.log(data);
           this.getMtbl(i, 'trjyumzais').clear();
-          data.forEach(e => this.getMtbl(i, 'trjyumzais').push(this.fb.group(e)));
+          data.forEach((e: any) => this.getMtbl(i, 'trjyumzais').push(this.fb.group(e)));
 
         }
       }
@@ -552,7 +555,7 @@ export class JmeitblComponent implements OnInit {
   }
   updGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
-    this.frmArr.controls[i].get('gcode').setValue(val);
+    this.frmArr.controls[i].get('gcode')!.setValue(val);
     this.apollo.watchQuery<any>({
       query: Query.GetGood,
       variables: {
@@ -569,9 +572,9 @@ export class JmeitblComponent implements OnInit {
         let msgds = data.msgoods_by_pk;
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-          this.frmArr.controls[i].get('gcode').setErrors({ 'incorrect': true });
+          this.frmArr.controls[i].get('gcode')!.setErrors({ 'incorrect': true });
         } else {
-          this.frmArr.controls[i].get('gcode').setErrors(null);
+          this.frmArr.controls[i].get('gcode')!.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msggroup);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
@@ -590,7 +593,7 @@ export class JmeitblComponent implements OnInit {
 		  if ( msgds.msgtankas.length === 0) {
 
 		  }	else {
-		    j = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn)
+		    j = msgds.msgsptnks.findIndex((obj: { sptnkbn: string; }) => obj.sptnkbn == this.jmisrv.sptnkbn)
 		  }		
 		  // console.log(msgds.msgsptnks,this.jmisrv.sptnkbn,j);
           if (j > -1) {
@@ -617,7 +620,7 @@ export class JmeitblComponent implements OnInit {
             // });
 
           }
-          msgds.msgzais.forEach(e => {
+          msgds.msgzais.forEach((e: { msgoods: { gskbn: string; }; zcode: any; irisu: any; }) => {
             let k: number = 0;
             let arr = []
             if (e.msgoods.gskbn == "0") {
@@ -662,7 +665,7 @@ export class JmeitblComponent implements OnInit {
         }
         this.calcMei(i);
         if (this.frmArr.getRawValue()[i]['spec'] == null) {
-          this.frmArr.controls[i].get('spec').setErrors({ 'required': true });
+          this.frmArr.controls[i].get('spec')!.setErrors({ 'required': true });
         }
         this.jmisrv.subject.next(true);
       });
@@ -678,7 +681,7 @@ export class JmeitblComponent implements OnInit {
         }
         this.calcMei(i);
         if (this.frmArr.getRawValue()[i]['spec'] == null) {
-          this.frmArr.controls[i].get('spec').setErrors({ 'required': true });
+          this.frmArr.controls[i].get('spec')!.setErrors({ 'required': true });
         }
         this.jmisrv.subject.next(true);
       });
@@ -687,9 +690,9 @@ export class JmeitblComponent implements OnInit {
 
   changeSpec(i: number) {
     if (this.frmArr.getRawValue()[i]['spec'] == null) {
-      this.frmArr.controls[i].get('spec').setErrors({ 'required': true });
+      this.frmArr.controls[i].get('spec')!.setErrors({ 'required': true });
     } else {
-      this.frmArr.controls[i].get('spec').setErrors(null);
+      this.frmArr.controls[i].get('spec')!.setErrors(null);
     }
   }
   changeTax(i: number, value: number) {
@@ -735,14 +738,14 @@ export class JmeitblComponent implements OnInit {
       });
     // }
   }
-  insRows(rowData, flg: boolean) { //true:洗い替え、false：追加
+  insRows(rowData: any[], flg: boolean) { //true:洗い替え、false：追加
     let i: number = 0;
     if (flg) {
       this.frmArr.clear();
     } else {
       i = this.frmArr.length;
     }
-    rowData.forEach(row => {
+    rowData.forEach((row) => {
       let col = row.split("\t");
       // console.log(col,row);
       if (col[0] != "") {
@@ -760,7 +763,7 @@ export class JmeitblComponent implements OnInit {
           spdet: null,
           pable: 0,
           genka: 0,
-          scode: this.parentForm.get('scode').value,
+          scode: this.parentForm.get('scode')!.value,
           sday: null,
           tanka1: 0,
           money: 0,
@@ -799,8 +802,8 @@ export class JmeitblComponent implements OnInit {
     this.usrsrv.toastInf('明細をクリップボードにコピーしました');
   }
 
-  objectToArray(obj: object): string {
-    var result = Object.keys(obj).map((key: keyof typeof obj) => {
+  objectToArray(obj: any): string {
+    var result = Object.keys(obj).map((key: string) => {
       let value = obj[key];
       // console.log(value)
       return value;
@@ -815,13 +818,13 @@ export class JmeitblComponent implements OnInit {
     // console.log(this.frmArr.controls);
   }
 
-  setJyumei(data) { //skbn:受注伝票出荷区分
+  setJyumei(data: mwI.Trjyuden) { //skbn:受注伝票出荷区分
     this.frmArr.clear();
     // this.jyumei = [];
     this.jmisrv.trzaiko = [];
     let i: number = 0;
 
-    data.trjyumeis.forEach(element => {
+    data.trjyumeis.forEach((element: any) => {
       // console.log(element);
       let { msgood, ...rest } = element;
       let { msggroup, ...rest2 } = msgood;
@@ -839,7 +842,7 @@ export class JmeitblComponent implements OnInit {
       //trzaikoテーブル取り消し用データ作成
       if (data.skbn != "1") {
         if (e.sday != null) {
-          e.trjyumzais.forEach(zai => {
+          e.trjyumzais.forEach((zai: { gcode: any; suu: number; }) => {
             const lczai: mwI.Zaiko = {
               scode: e.scode,
               gcode: zai.gcode,
@@ -873,7 +876,7 @@ export class JmeitblComponent implements OnInit {
     }
     // console.log(index);
   }
-  getKkrt(i: number): number {
+  getKkrt(i: number): number | undefined {
     const lcteika: number = +this.frmArr.getRawValue()[i]['tanka1'];
     const lctanka: number = +this.frmArr.getRawValue()[i]['tanka'];
     const lctaxrate: number = +this.frmArr.getRawValue()[i]['taxrate'] / 100;
@@ -890,7 +893,7 @@ export class JmeitblComponent implements OnInit {
     }
 
   }
-  editJyumei(dno) {
+  editJyumei(dno: number) {
     this.jmisrv.trjyumei = [];
     this.jmisrv.trjmzai = [];
     this.frmArr.controls
@@ -921,7 +924,7 @@ export class JmeitblComponent implements OnInit {
           currency: this.usrsrv.editFrmval(control, 'currency')
         });
 		let lceda:number = 0;
-        control.value.msgzais.forEach(e => {
+        control.value.msgzais.forEach((e: { irisu: number; zcode: any; }) => {
    	      let lcsuu:number =  control.value.suu * e.irisu; 
           lceda++;
 		  this.jmisrv.trjmzai.push({

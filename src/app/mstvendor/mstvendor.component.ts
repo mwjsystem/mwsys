@@ -22,8 +22,8 @@ import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
     standalone: false
 })
 export class MstvendorComponent implements OnInit, AfterViewInit {
-  vcd: string;
-  form: FormGroup;
+  vcd!: string;
+  form!: FormGroup;
   mode: number = 3;
 
   constructor(private fb: FormBuilder,
@@ -75,11 +75,11 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
       if (params.get('mode') === null) {
         this.mode = 3;
       } else {
-        this.mode = +params.get('mode');
+        this.mode = +params.get('mode')!;
       }
       this.refresh();
       if (params.get('vcd') !== null) {
-        this.vcd = params.get('vcd');
+        this.vcd = params.get('vcd')!;
         this.get_vendor();
       }
     });
@@ -90,7 +90,7 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
 
     script.charset = "UTF-8";
     const div = document.getElementById('script');
-    div.insertAdjacentElement('afterend', script);
+    div!.insertAdjacentElement('afterend', script);
   }
 
   onEnter(): void {

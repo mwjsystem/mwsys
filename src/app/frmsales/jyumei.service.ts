@@ -11,15 +11,15 @@ import { Apollo } from 'apollo-angular';
 })
 export class JyumeiService {
   // public jyumei: mwI.Jyumei[] = []; //frmsales⇒jmeitblコンポーネントへ渡すときのみ使用
-  public trjyumei = [];
-  public trjmzai = [];
+  public trjyumei: any[] = [];
+  public trjmzai: any[] = [];
   public denno: number = 0;
-  public mtax: string;             //顧客マスタ「税区分」
-  public tankakbn: string;         //顧客マスタ「単価区分」
-  public sptnkbn: string;          //顧客マスタ「特別単価区分」
+  public mtax!: string;             //顧客マスタ「税区分」
+  public tankakbn!: string;         //顧客マスタ「単価区分」
+  public sptnkbn!: string;          //顧客マスタ「特別単価区分」
   // public souko:string;
-  public ntype: string;            //顧客マスタ「納品書タイプ」
-  public tntype: string;           //顧客マスタ「直送納品書タイプ」
+  public ntype!: string;            //顧客マスタ「納品書タイプ」
+  public tntype!: string;           //顧客マスタ「直送納品書タイプ」
   public address: string = "";
   public dmemo: string = "";
   public obisu: number = 0;
@@ -27,7 +27,7 @@ export class JyumeiService {
   public trzaiko: mwI.Zaiko[] = [];
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
-  public isSaving: boolean;
+  public isSaving!: boolean;
 
   private GetTran = gql`
     query get_jyuden($id: smallint!,$dno: Int!) {
@@ -222,7 +222,7 @@ export class JyumeiService {
     });
   }
 
-  updJyuden(denno, jyuden, jyumei, jyumzai): Promise<string> {
+  updJyuden(denno: number, jyuden: any, jyumei: any[], jyumzai: any[]): Promise<string> {
     const UpdateTran = gql`
       mutation upd_jyuden($id: smallint!, $hdno: Int!,$_set: trjyuden_set_input!,$obj:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
         update_trjyuden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -267,7 +267,7 @@ export class JyumeiService {
     });
   }
 
-  insJyuden(jyuden, jyumei, jyumzai): Promise<string> {
+  insJyuden(jyuden: mwI.Trjyuden[], jyumei: any[], jyumzai: any[]): Promise<string> {
     const InsertTran = gql`
       mutation ins_jyuden($obj:[trjyuden_insert_input!]!,$objm:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
         insert_trjyuden(objects: $obj)  {
@@ -296,7 +296,7 @@ export class JyumeiService {
     });
   }
 
-  delJyuden(denno, flg): void {
+  delJyuden(denno: string | number, flg: boolean): void {
     const DeleteTran = gql`
       mutation del_jyuden($id: smallint!, $dno: Int!, $flg: Boolean, $uat: timestamptz!, $uby: String!) {
         update_trjyuden(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: {del: $flg, updated_at: $uat, updated_by: $uby})  {
@@ -335,14 +335,14 @@ export class JyumeiService {
     });
   }
 
-  getJdsta(hmei): string {
+  getJdsta(hmei: any): string {
 
     let ret: string = "";
 
     return ret;
   }
 
-  async checkAmazon(hcode, pOkrno: string): Promise<string> {
+  async checkAmazon(hcode: any, pOkrno: string): Promise<string> {
     const CheckOkrno = gql`
       query get_jyuden($okrno: String!) {
         trjyuden(where: {id: {_eq: 1}, mcode: {_eq: "408223"}, okurino: {_eq: $okrno}}) {

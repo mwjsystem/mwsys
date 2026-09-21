@@ -71,9 +71,9 @@ export class SiimeiService {
     });
     return observable;
   }
-  convHatmei(hdenno, hatmei) {
+  convHatmei(hdenno: number, hatmei: any[]) {
     this.siimei = new Array<mwI.Siimei>();
-    hatmei.forEach(e => {
+    hatmei.forEach((e) => {
       // console.log(e);
       if (e.hatzn > 0) {
         this.siimei.push({
@@ -99,7 +99,7 @@ export class SiimeiService {
     });
   }
 
-  updSiiden(denno, siiden, siimei): Promise<string> {
+  updSiiden(denno: number, siiden: any, siimei: any[]): Promise<string> {
     const UpdateTran = gql`
       mutation upd_siiden($id: smallint!, $hdno: Int!,$_set: trsiiden_set_input!,$obj:[trsiimei_insert_input!]!) {
         update_trsiiden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -136,7 +136,7 @@ export class SiimeiService {
       });
     });
   }
-  insSiiden(siiden, siimei): Promise<string> {
+  insSiiden(siiden: any, siimei: any): Promise<string> {
     const InsertTran = gql`
       mutation ins_siiden($obj:[trsiiden_insert_input!]!,$objm:[trsiimei_insert_input!]!) {
         insert_trsiiden(objects: $obj)  {

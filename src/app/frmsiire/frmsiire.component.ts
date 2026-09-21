@@ -29,8 +29,9 @@ import { Apollo } from 'apollo-angular';
     standalone: false
 })
 export class FrmsiireComponent implements OnInit, AfterViewInit {
-  @ViewChild(SimeitblComponent) simeitbl: SimeitblComponent;
-  form: FormGroup;
+  @ViewChild(SimeitblComponent)
+    simeitbl!: SimeitblComponent;
+  form!: FormGroup;
   denno: number = 0;
   hdenno: number = 0;
   mode: number = 3;
@@ -78,7 +79,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
       this.route.paramMap.subscribe((params: ParamMap) => {
         if (params.get('mode') === null) {
           this.cancel();
-        } else if (+params.get('mode') == 1) {
+        } else if (+params.get('mode')! == 1) {
           this.modeToCre();
           // this.route.queryParamMap.pipe(
           //   filter(n => Object.keys(n["params"]).length !== 0)
@@ -94,12 +95,12 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
           //     })
           //   }
           // )
-          this.denno = +params.get('denno');
-          this.form.get('tcode').setValue(this.usrsrv.staff?.code);
+          this.denno = +params.get('denno')!;
+          this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
         } else {
-          this.mode = +params.get('mode');
+          this.mode = +params.get('mode')!;
           if (params.get('denno') !== null) {
-            this.denno = +params.get('denno');
+            this.denno = +params.get('denno')!;
             this.getSiiden(this.denno);
           }
           this.refresh();
@@ -111,10 +112,10 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     });
   }
   getSiiden(denno: number): void {
-    if (!this.overlayRef) {
-      this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    }
     if (denno > 0) {
+      if (!this.overlayRef.hasAttached()) {
+        this.overlayRef.attach(new ComponentPortal(MatSpinner));
+      }
       this.smisrv.qrySiiden(denno).subscribe(
         result => {
           this.form.reset();
@@ -147,10 +148,10 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
   }
 
   getHatden(denno: number): void {
-    if (!this.overlayRef) {
-      this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    }
     if (denno > 0) {
+      if (!this.overlayRef.hasAttached()) {
+        this.overlayRef.attach(new ComponentPortal(MatSpinner));
+      }
       this.hmisrv.qryHatden(denno).subscribe(
         result => {
           this.form.reset();
@@ -181,7 +182,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
   }
 
 
-  test(value) {
+  test(value: any) {
     // this.toastr.info(this.form.value.yday);
     console.log(this.simeitbl.getSiimei(this.denno));
     this.refresh();
@@ -247,9 +248,9 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     this.mode = 1;
     this.form.reset();
     this.denno = 0;
-    this.form.get('tcode').setValue(this.usrsrv.staff?.code);
-    this.form.get('inday').setValue(new Date());
-    this.form.get('scode').setValue(this.usrsrv.staff.scode);
+    this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
+    this.form.get('inday')!.setValue(new Date());
+    this.form.get('scode')!.setValue(this.usrsrv.staff.scode);
     this.simeitbl.frmArr.clear();
     this.simeitbl.addRows(1);
     this.refresh();

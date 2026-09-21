@@ -18,14 +18,14 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
   public url: string = "";
   public cat: string = "";
   public grpcd: string = "";
-  @ViewChildren('upfile', { read: ElementRef }) inputs: QueryList<ElementRef>;
+  @ViewChildren('upfile', { read: ElementRef }) inputs!: QueryList<ElementRef>;
   constructor(public usrsrv: UserService,
     public cdRef: ChangeDetectorRef,
     private apollo: Apollo,
     // private toastr: ToastrService,
     private http: HttpClient,
     private dialogRef: MatDialogRef<GdsimageComponent>,
-    @Inject(MAT_DIALOG_DATA) data) {
+    @Inject(MAT_DIALOG_DATA) data: any) {
     this.grpcd = data.grpcd;
     this.url = data.url;
   }
