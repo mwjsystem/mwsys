@@ -341,11 +341,10 @@ export class JyumeiService {
         }],
     }).subscribe(({ data }) => {
       this.usrsrv.toastSuc('受注伝票' + denno + 'を変更しました');
+      // trzaiko は読込時の在庫内訳を「符号反転」したもの。取消(flg=true)ではそのまま適用し、
+      // 取消解除(flg=false)では符号を戻して加算する。元データは書き換えない（後続の保存で再利用されるため）
       this.trzaiko.forEach(e => {
-        if (flg = false) {
-          e.suu = e.suu * -1;
-        }
-        this.updZaiko(e);
+        this.updZaiko(flg ? e : { ...e, suu: e.suu * -1 });
       });
     }, (error) => {
       this.usrsrv.toastErr('データベースエラー', '受注伝票' + denno + 'の取消(解除)ができませんでした');
