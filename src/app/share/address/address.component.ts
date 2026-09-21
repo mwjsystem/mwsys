@@ -7,6 +7,15 @@ import { BunruiService } from './../../services/bunrui.service';
 import { DownloadService } from './../../services/download.service';
 import { Observable, Subject } from 'rxjs';
 
+interface AffectedRows { affected_rows: number }
+/** 顧客住所（msmadr）へ渡す値。eda は住所の枝番、ftel は電話番号をまとめた表示用の値 */
+type MadrInput = mwI.Adrs & { id: number; mcode: string; ftel: string };
+/** get_eda クエリの結果（顧客の住所枝番の最大値） */
+interface MaxEdaResult { msmadr_aggregate: { aggregate: { max: { eda: number } } } }
+/** upd_madr ミューテーションの結果 */
+interface UpdMadrResult { update_msmadr: AffectedRows }
+/** ins_madr ミューテーションの結果 */
+interface InsMadrResult { insert_msmadr: AffectedRows }
 @Component({
     selector: 'app-address',
     templateUrl: './address.component.html',
@@ -68,14 +77,14 @@ export class AddressComponent implements OnInit {
       });
     })
   }
-  saveMadr(mcode: string, eda: string | number, mode: number): Subject<any> {
+  saveMadr(mcode: string, eda: string | number, mode: number): Subject<mwI.Adrs> {
     // console.log(this.formName,eda);
     const form = this.parent.form;
-    let neweda: Subject<any> = new Subject();
-    let madr: any = {
+    let neweda: Subject<mwI.Adrs> = new Subject();
+    let madr: MadrInput = {
       id: this.usrsrv.compid,
       mcode: mcode,
-      eda: eda,
+      eda: eda as number, // 新規登録のときは、通知の前に採番した数値へ置き換える
       zip: this.usrsrv.editFrmval(form.get(this.formName())!, 'zip'),
       region: this.usrsrv.editFrmval(form.get(this.formName())!, 'region'),
       local: this.usrsrv.editFrmval(form.get(this.formName())!, 'local'),
@@ -96,7 +105,7 @@ export class AddressComponent implements OnInit {
       htitle: this.usrsrv.editFrmval(form.get(this.formName())!, 'htitle')
     }
     if (mode == 2) {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<UpdMadrResult>({
         mutation: Query.UpdateMast2,
         variables: {
           id: this.usrsrv.compid,
@@ -112,8 +121,8 @@ export class AddressComponent implements OnInit {
         console.log('error update_msmember', error);
       });
     } else {
-      let madrs: any[] = [];
-      this.apollo.watchQuery<any>({
+      let madrs: MadrInput[] = [];
+      this.apollo.watchQuery<MaxEdaResult>({
         query: Query.GetMast6,
         variables: {
           id: this.usrsrv.compid,
@@ -123,7 +132,7 @@ export class AddressComponent implements OnInit {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log(data, data.msmadr_aggregate.aggregate.max.eda);
-          let lceda = data.msmadr_aggregate.aggregate.max.eda + 1;
+          let lceda = (data as MaxEdaResult).msmadr_aggregate.aggregate.max.eda + 1;
           if (lceda > 10) {
             madr.eda = lceda;
           } else {
@@ -133,7 +142,7 @@ export class AddressComponent implements OnInit {
           // neweda.complete();
           // console.log(madr);
           madrs.push(madr);
-          this.apollo.mutate<any>({
+          this.apollo.mutate<InsMadrResult>({
             mutation: Query.InsertMast2,
             variables: {
               "object": madrs

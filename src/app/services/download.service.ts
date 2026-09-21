@@ -27,6 +27,12 @@ class ZipAdr {
   }
 }
 
+/** 郵便番号検索 API（zipcloud）の応答。該当なしのとき results は null（呼び出し側は従来どおり確認していない） */
+export interface ZipcloudResponse {
+  status: number;
+  message: string | null;
+  results: { zipcode: string; address1: string; address2: string; address3: string }[];
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -35,18 +41,16 @@ export class DownloadService {
   private http = inject(HttpClient);
 
 
-  pickObj(obj: { [x: string]: any; }, flds: string[]) {
-    let pickobj: { [key: string]: any } = {};
-    flds.forEach(e => pickobj[e] = obj[e]);
-    return pickobj;
+  pickObj<T extends object>(obj: T, flds: string[]): Partial<T> {
+    let pickobj: Record<string, unknown> = {};
+    flds.forEach(e => pickobj[e] = (obj as Record<string, unknown>)[e]);
+    return pickobj as unknown as Partial<T>; // 指定した項目だけを取り出した部分オブジェクト
   }
 
-  pickObjArr(objarr: any[], flds: string[]) {
-    let pickarr: { [key: string]: any }[] = [];
+  pickObjArr<T extends object>(objarr: T[], flds: string[]): Partial<T>[] {
+    let pickarr: Partial<T>[] = [];
     objarr.forEach((obj) => {
-      let pickobj: { [key: string]: any } = {};
-      flds.forEach(e => pickobj[e] = obj[e]);
-      pickarr.push(pickobj);
+      pickarr.push(this.pickObj(obj, flds));
     });
     return pickarr;
   }
@@ -57,7 +61,7 @@ export class DownloadService {
     link.href = pformat;
     link.click();
   }
-  dlCsv(data: any, pcsv: string) {
+  dlCsv(data: object | object[], pcsv: string) {
     const blob = new Blob([json2csv.parse(data)], { type: 'text/csv' });
     FileSaver.saveAs(blob, pcsv);
   }
@@ -85,8 +89,8 @@ export class DownloadService {
     return fetch(text).then(response => response.blob());
   }
 
-  private async getImg(path: string, file: string): Promise<any> {
-    return new Promise((resolve, reject) => {
+  private async getImg(path: string, file: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
       this.http.get(this.usrsrv.system.imgurl + 'index.php?topath=./' + path + '/&func=img&file=' + file, { responseType: 'text' })
         .subscribe(
           data => { return resolve(data) },
@@ -95,9 +99,9 @@ export class DownloadService {
     });
   }
 
-  async getAdr(zipcode: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.http.get('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zipcode)
+  async getAdr(zipcode: string): Promise<ZipcloudResponse> {
+    return new Promise<ZipcloudResponse>((resolve, reject) => {
+      this.http.get<ZipcloudResponse>('https://zipcloud.ibsnet.co.jp/api/search?zipcode=' + zipcode)
         .subscribe(
           data => {
             // return resolve(JSON.stringify(data))
