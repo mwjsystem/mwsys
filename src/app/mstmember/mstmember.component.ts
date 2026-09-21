@@ -451,7 +451,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
 
   async getMcode() {
     if (!this.mcd) {
-      return await this.usrsrv.getNumber('mcode', 1).toString();
+      return (await this.usrsrv.getNumber('mcode', 1)).toString();
     } else {
       return this.mcd;
     }
