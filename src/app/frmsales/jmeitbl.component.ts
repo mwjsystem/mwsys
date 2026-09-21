@@ -639,6 +639,8 @@ export class JmeitblComponent implements OnInit {
             // });
 
           }
+          this.getMtbl(i, 'msgzais').clear(); // 商品コードを変えたとき、前の商品の構成品を残さない
+          this.getMtbl(i, 'trjyumzais').clear();
           msgds.msgzais.forEach(e => {
             let k: number = 0;
             let arr = []
