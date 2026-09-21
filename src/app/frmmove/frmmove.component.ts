@@ -285,6 +285,14 @@ export class FrmmoveComponent implements OnInit {
       this.movsrv.insMovden(trmovsub, movmei)
         .then(result => {
           this.usrsrv.toastSuc('移動伝票' + this.denno + 'を新規登録しました');
+
+          //  zaiko更新処理 (新規分プラス)。各明細の構成品ごとに、入庫先へ加算・出庫元から減算
+          const zaikoNew = this.movtbl()!.getZaikoNew(movsub.day, movsub.incode, movsub.outcode);
+          zaikoNew.forEach(z => {
+            this.movsrv.updZaiko(z);
+          });
+          //  登録直後に変更保存しても在庫が狂わないよう、取り消し用データを今回の内容にしておく
+          this.movtbl()!.setTrzaikoFrom(zaikoNew);
           this.form.markAsPristine();
           this.cancel();
         }).catch(error => {
