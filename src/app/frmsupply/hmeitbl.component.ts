@@ -13,6 +13,20 @@ import gql from 'graphql-tag';
 // import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
 
+/** get_good クエリの結果 */
+interface GoodResult {
+  msgoods_by_pk: {
+    gcode: string; gtext: string; unit: string; ordering: boolean; gskbn: string; zkbn: string | null;
+    msggroup: { code: string; gkbn: string; vcode: string };
+    msgtankas: { genka: number; taxrate: number; currency: string }[];
+  } | null;
+}
+/** 保存時に発注明細（trhatmei）へ渡す値。day / yday は日付文字列（未入力は null） */
+type HatmeiInput = Pick<mwI.Hatmei, 'line' | 'inday' | 'gcode' | 'gtext' | 'suu' | 'genka' | 'money' | 'taxrate' | 'mmemo' | 'spec' | 'jdenno' | 'jline' | 'yday' | 'ydaykbn' | 'mtax'> & {
+  id: number;
+  denno: number;
+  day: string | null;
+};
 @Component({
     selector: 'app-hmeitbl',
     templateUrl: './hmeitbl.component.html',
@@ -166,7 +180,7 @@ export class HmeitblComponent implements OnInit {
         }
       }
     }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<GoodResult>({
       query: GetGood,
       variables: {
         id: this.usrsrv.compid,
@@ -176,7 +190,7 @@ export class HmeitblComponent implements OnInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        let msgds = data.msgoods_by_pk;
+        let msgds = (data as GoodResult).msgoods_by_pk;
 
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
@@ -270,7 +284,7 @@ export class HmeitblComponent implements OnInit {
   //   this.parentForm.markAsDirty();
   //   // console.log(rowData);
   // }
-  insRows(rowData: any[], flg: boolean) {
+  insRows(rowData: string[], flg: boolean) {
     let i: number = 0;
     if (flg) {
       this.frmArr.clear();
@@ -319,11 +333,7 @@ export class HmeitblComponent implements OnInit {
     this.usrsrv.toastInf('クリップボードにコピーしました');
   }
   getHatmei(dno: number) {
-    let hatmei: {
-        id: number; denno: any; line: any; day: any; inday: any; gcode: any; gtext: any; suu: any; genka: any; money: any; taxrate: any;
-        // unit:this.usrsrv.editFrmval(control,'unit'),
-        mmemo: any; spec: any; jdenno: any; jline: any; yday: any; ydaykbn: any; mtax: any;
-    }[] = [];
+    let hatmei: HatmeiInput[] = [];
     this.frmArr.controls
       .forEach(control => {
         hatmei.push({
@@ -350,9 +360,9 @@ export class HmeitblComponent implements OnInit {
       });
     return hatmei;
   }
-  objectToArray(obj: any): string {
+  objectToArray(obj: object): string {
     var result = Object.keys(obj).map((key: string) => {
-      let value = obj[key];
+      let value = (obj as Record<string, unknown>)[key];
       // console.log(value)
       return value;
     });
