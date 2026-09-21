@@ -27,9 +27,9 @@
     <button mat-flat-button class="w-24" color="primary" (click)="setJmeikbn(jmeikbn)"
     >一括設定</button>
   }
-  @if (frmArr.enabled) {
+  @if (frmArr.enabled && usrsrv.compid == 1) {
     <button mat-flat-button class="w-48" color="accent" (click)="setKoguchi()" [disabled]="parentForm().invalid"
-    matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips"　*ngIf="usrsrv.compid == 1">個口送料等計算</button>
+    matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
   }
   <button mat-flat-button class="w-24 m-1" color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
   <mat-menu #cnp="matMenu">
