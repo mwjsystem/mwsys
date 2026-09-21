@@ -132,6 +132,7 @@ export class FrmmoveComponent implements OnInit {
             // console.log(result);
             let movsub: Movsub = result;
             this.form.patchValue(movsub);
+            this.selHcd(movsub.hcode); // 保存済みの配送方法に合わせて、配送時間の候補を出す
             this.usrsrv.setTmstmp(movsub);
             this.movtbl()!.setMovmei(movsub.trmovdens);
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
@@ -169,8 +170,7 @@ export class FrmmoveComponent implements OnInit {
     this.form.get('okurino')!.setValue(okrno);
   }
 
-  selHcd(event: KeyboardEvent) {
-    let value: string = (event.target as HTMLInputElement)?.value;
+  selHcd(value: string) {
     const i: number = this.okrsrv.hokuri.findIndex(obj => obj.code == value);
     if (i > -1) {
       this.hktval = [];

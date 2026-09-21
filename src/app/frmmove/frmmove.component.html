@@ -98,7 +98,7 @@
       <div fxLayout="row wrap">
         <mat-form-field style="width: 7em;">
           <mat-label>配送方法</mat-label>
-          <mat-select formControlName="hcode" (selectionChange)="selHcd($any($event))" [panelClass]="'my-panel-class'">
+          <mat-select formControlName="hcode" (selectionChange)="selHcd($event.value)" [panelClass]="'my-panel-class'">
             <mat-option>選択削除</mat-option>
             @for (sval of okrsrv.hokuri; track sval) {
               <mat-option [value]="sval.code">
