@@ -210,7 +210,7 @@ declare namespace mwI {
     }
   }
   interface Trhatden extends Hatden {
-    vhatzns: Hatmei[];
+    vhatzns: (Hatmei & { hatzn: number })[]; // 入荷予定ビュー(vhatzn)の行。未入荷数 hatzn が付く
   }
   interface Siiden {
     id: number;

@@ -7,17 +7,11 @@ import { HmeihelpComponent } from './../share/hmeihelp/hmeihelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
-import { SiimeiService } from './siimei.service';
+import { SiimeiService, SiimeiInput } from './siimei.service';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 // import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
-
-/** 保存時に仕入明細（trsiimei）へ渡す値。inday は日付文字列（未入力は null） */
-type SiimeiInput = Pick<mwI.Siimei, 'line' | 'inday' | 'gcode' | 'suu' | 'genka' | 'money' | 'taxrate' | 'mmemo' | 'spec' | 'hdenno' | 'hline' | 'mtax'> & {
-  id: number;
-  denno: number;
-};
 
 @Component({
     selector: 'app-simeitbl',

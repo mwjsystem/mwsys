@@ -3,7 +3,29 @@ import { Subject, Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
+import { SiimeiInput } from './../frmsiire/siimei.service';
 
+/** 保存時に発注明細（trhatmei）へ渡す値。day / yday は日付文字列（未入力は null） */
+export type HatmeiInput = Pick<mwI.Hatmei, 'line' | 'inday' | 'gcode' | 'gtext' | 'suu' | 'genka' | 'money' | 'taxrate' | 'mmemo' | 'spec' | 'jdenno' | 'jline' | 'yday' | 'ydaykbn' | 'mtax'> & {
+  id: number;
+  denno: number;
+  day: string | null;
+};
+/** 保存時に発注伝票（trhatden）の更新へ渡す値。day は日付文字列 */
+export type HatdenSet = Pick<mwI.Hatden, 'vcode' | 'scode' | 'tcode' | 'dmemo' | 'gtotal' | 'tax' | 'total' | 'updated_by' | 'currency'> & {
+  day: string | null;
+  autoproc: boolean | string;
+  inmemo: string;
+  updated_at: Date;
+};
+
+interface AffectedRows { affected_rows: number }
+/** get_hatden クエリの結果 */
+interface HatdenResult { trhatden_by_pk: mwI.Trhatden | null }
+/** upd_hatden ミューテーションの結果 */
+export interface UpdHatdenResult { update_trhatden: AffectedRows; delete_trhatmei: AffectedRows; insert_trhatmei: AffectedRows }
+/** ins_hatden ミューテーションの結果 */
+export interface InsHatdenResult { insert_trhatden: AffectedRows; insert_trhatmei: AffectedRows }
 @Injectable({
   providedIn: 'root'
 })
@@ -62,11 +84,11 @@ export class HatmeiService {
       }
     }`;
 
-  qryHatden(denno: number): Observable<mwI.Trhatden> {
+  qryHatden(denno: number): Observable<mwI.Trhatden | null> {
     // console.log(denno);
     // return new Promise( (resolve,reject) => {
-    let observable: Observable<mwI.Trhatden> = new Observable<mwI.Trhatden>(observer => {
-      this.apollo.watchQuery<any>({
+    let observable: Observable<mwI.Trhatden | null> = new Observable<mwI.Trhatden | null>(observer => {
+      this.apollo.watchQuery<HatdenResult>({
         query: this.GetTran,
         variables: {
           id: this.usrsrv.compid,
@@ -76,7 +98,7 @@ export class HatmeiService {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log(data);
-          observer.next(data.trhatden_by_pk);
+          observer.next((data as HatdenResult).trhatden_by_pk);
           // return resolve(data.trhatden_by_pk);
         }, (error) => {
           // return reject(error);
@@ -85,7 +107,7 @@ export class HatmeiService {
     });
     return observable;
   }
-  updHatden(denno: number, hatden: any, hatmei: any[]): Promise<string> {
+  updHatden(denno: number, hatden: HatdenSet, hatmei: HatmeiInput[]): Promise<UpdHatdenResult> {
     const UpdateTran = gql`
       mutation upd_hatden($id: smallint!, $hdno: Int!,$_set: trhatden_set_input!,$obj:[trhatmei_insert_input!]!) {
         update_trhatden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -99,7 +121,7 @@ export class HatmeiService {
         }
       }`;
     return new Promise((resolve, reject) => {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<UpdHatdenResult>({
         mutation: UpdateTran,
         variables: {
           id: this.usrsrv.compid,
@@ -116,13 +138,14 @@ export class HatmeiService {
             },
           }],
       }).subscribe(({ data }) => {
-        return resolve(data);
+        return resolve(data as UpdHatdenResult);
       }, (error) => {
         return reject(error);
       });
     });
   }
-  insHatden(hatden: mwI.Trhatden[] | mwI.Trsiiden[], hatmei: any[]): Promise<string> {
+  // ※ frmsiire（仕入入力）の新規登録からも呼ばれている（既知の不具合。従来の呼び出しのまま型だけ明示）
+  insHatden(hatden: mwI.Trhatden[] | mwI.Trsiiden[], hatmei: HatmeiInput[] | SiimeiInput[]): Promise<InsHatdenResult> {
     const InsertTran = gql`
       mutation ins_hatden($obj:[trhatden_insert_input!]!,$objm:[trhatmei_insert_input!]!) {
         insert_trhatden(objects: $obj)  {
@@ -133,20 +156,20 @@ export class HatmeiService {
         }
       }`;
     return new Promise((resolve, reject) => {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<InsHatdenResult>({
         mutation: InsertTran,
         variables: {
           obj: hatden,
           objm: hatmei
         },
       }).subscribe(({ data }) => {
-        return resolve(data);
+        return resolve(data as InsHatdenResult);
       }, (error) => {
         return reject(error);
       });
     });
   }
-  getHdsta(hmei: any[]): string {
+  getHdsta(hmei: Pick<mwI.Hatmei, 'inday' | 'yday' | 'ydaykbn'>[]): string {
     let flg0: boolean = false;//発注済
     let flg1: boolean = false;//入荷予定あり
     let flg2: boolean = false;//入荷確定あり

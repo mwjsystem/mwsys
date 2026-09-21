@@ -7,7 +7,7 @@ import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StoreService } from './../services/store.service';
-import { HatmeiService } from './hatmei.service';
+import { HatmeiService, HatmeiInput } from './hatmei.service';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 // import { ToastrService } from 'ngx-toastr';
@@ -21,12 +21,6 @@ interface GoodResult {
     msgtankas: { genka: number; taxrate: number; currency: string }[];
   } | null;
 }
-/** 保存時に発注明細（trhatmei）へ渡す値。day / yday は日付文字列（未入力は null） */
-type HatmeiInput = Pick<mwI.Hatmei, 'line' | 'inday' | 'gcode' | 'gtext' | 'suu' | 'genka' | 'money' | 'taxrate' | 'mmemo' | 'spec' | 'jdenno' | 'jline' | 'yday' | 'ydaykbn' | 'mtax'> & {
-  id: number;
-  denno: number;
-  day: string | null;
-};
 @Component({
     selector: 'app-hmeitbl',
     templateUrl: './hmeitbl.component.html',

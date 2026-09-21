@@ -4,6 +4,24 @@ import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
+/** 保存時に仕入明細（trsiimei）へ渡す値。inday は日付文字列（未入力は null） */
+export type SiimeiInput = Pick<mwI.Siimei, 'line' | 'inday' | 'gcode' | 'suu' | 'genka' | 'money' | 'taxrate' | 'mmemo' | 'spec' | 'hdenno' | 'hline' | 'mtax'> & {
+  id: number;
+  denno: number;
+};
+/** 保存時に仕入伝票（trsiiden）の更新へ渡す値。inday は日付文字列 */
+export type SiidenSet = Pick<mwI.Siiden, 'vcode' | 'scode' | 'tcode' | 'dmemo' | 'gtotal' | 'tax' | 'total' | 'updated_by' | 'currency'> & {
+  inday: string | null;
+  updated_at: Date;
+};
+
+interface AffectedRows { affected_rows: number }
+/** get_siiden クエリの結果 */
+interface SiidenResult { trsiiden_by_pk: mwI.Trsiiden | null }
+/** upd_siiden ミューテーションの結果 */
+export interface UpdSiidenResult { update_trsiiden: AffectedRows; delete_trsiimei: AffectedRows; insert_trsiimei: AffectedRows }
+/** ins_siiden ミューテーションの結果 */
+export interface InsSiidenResult { insert_trsiiden: AffectedRows; insert_trsiimei: AffectedRows }
 @Injectable({
   providedIn: 'root'
 })
@@ -50,9 +68,9 @@ export class SiimeiService {
         }
       }
     }`;
-  qrySiiden(denno: number): Observable<mwI.Trsiiden> {
-    let observable: Observable<mwI.Trsiiden> = new Observable<mwI.Trsiiden>(observer => {
-      this.apollo.watchQuery<any>({
+  qrySiiden(denno: number): Observable<mwI.Trsiiden | null> {
+    let observable: Observable<mwI.Trsiiden | null> = new Observable<mwI.Trsiiden | null>(observer => {
+      this.apollo.watchQuery<SiidenResult>({
         query: this.GetTran,
         variables: {
           id: this.usrsrv.compid,
@@ -62,7 +80,7 @@ export class SiimeiService {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log(data);
-          observer.next(data.trsiiden_by_pk);
+          observer.next((data as SiidenResult).trsiiden_by_pk);
           // return resolve(data.trhatden_by_pk);
         }, (error) => {
           // return reject(error);
@@ -71,7 +89,7 @@ export class SiimeiService {
     });
     return observable;
   }
-  convHatmei(hdenno: number, hatmei: any[]) {
+  convHatmei(hdenno: number, hatmei: mwI.Trhatden['vhatzns']) {
     this.siimei = new Array<mwI.Siimei>();
     hatmei.forEach((e) => {
       // console.log(e);
@@ -99,7 +117,7 @@ export class SiimeiService {
     });
   }
 
-  updSiiden(denno: number, siiden: any, siimei: any[]): Promise<string> {
+  updSiiden(denno: number, siiden: SiidenSet, siimei: SiimeiInput[]): Promise<UpdSiidenResult> {
     const UpdateTran = gql`
       mutation upd_siiden($id: smallint!, $hdno: Int!,$_set: trsiiden_set_input!,$obj:[trsiimei_insert_input!]!) {
         update_trsiiden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -113,7 +131,7 @@ export class SiimeiService {
         }
       }`;
     return new Promise((resolve, reject) => {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<UpdSiidenResult>({
         mutation: UpdateTran,
         variables: {
           id: this.usrsrv.compid,
@@ -130,13 +148,13 @@ export class SiimeiService {
             },
           }],
       }).subscribe(({ data }) => {
-        return resolve(data);
+        return resolve(data as UpdSiidenResult);
       }, (error) => {
         return reject(error);
       });
     });
   }
-  insSiiden(siiden: any, siimei: any): Promise<string> {
+  insSiiden(siiden: mwI.Trsiiden[], siimei: SiimeiInput[]): Promise<InsSiidenResult> {
     const InsertTran = gql`
       mutation ins_siiden($obj:[trsiiden_insert_input!]!,$objm:[trsiimei_insert_input!]!) {
         insert_trsiiden(objects: $obj)  {
@@ -147,14 +165,14 @@ export class SiimeiService {
         }
       }`;
     return new Promise((resolve, reject) => {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<InsSiidenResult>({
         mutation: InsertTran,
         variables: {
           obj: siiden,
           objm: siimei
         },
       }).subscribe(({ data }) => {
-        return resolve(data);
+        return resolve(data as InsSiidenResult);
       }, (error) => {
         return reject(error);
       });
