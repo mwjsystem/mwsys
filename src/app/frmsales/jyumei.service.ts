@@ -6,6 +6,26 @@ import { OkuriService } from './../services/okuri.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
+interface AffectedRows { affected_rows: number }
+/** 受注明細行（jmeitbl.editJyumei が組み立てて trjyumei_insert_input に渡す） */
+export type TrjyumeiRow = Pick<mwI.Jyumei, 'line' | 'gcode' | 'gtext' | 'suu' | 'tanka' | 'toutmoney' | 'tinmoney' | 'mmemo' | 'spec' | 'spdet' | 'genka' | 'scode' | 'sday' | 'tanka1' | 'money' | 'mtax' | 'tgenka' | 'taxmoney' | 'taxrate' | 'gskbn' | 'currency'> & {
+  id: number;
+  denno: number;
+  /**
+   * editJyumei は明細行に msgzais を設定しない（trjyumei_insert_input に渡せないため）。
+   * frmsales の保存後の在庫更新はこの値を参照するが、実際には未設定（undefined）になる。
+   */
+  msgzais?: mwI.Gzai[];
+};
+/** 受注明細の在庫内訳（trjyumzai_insert_input） */
+export interface TrjmzaiRow { id: number; denno: number; line: number; eda: number; gcode: string; suu: number; spec: string | null; spdet: string | null }
+interface JyudenResult { trjyuden_by_pk: mwI.Trjyuden }
+interface ZaikoUpdateResult { update_trzaiko: AffectedRows }
+interface ZaikoInsertResult { insert_trzaiko: AffectedRows }
+export interface JyudenUpdateResult { update_trjyuden: AffectedRows; delete_trjyumei: AffectedRows; insert_trjyumei: AffectedRows; delete_trjyumzai: AffectedRows; insert_trjyumzai: AffectedRows }
+export interface JyudenInsertResult { insert_trjyuden: AffectedRows; insert_trjyumei: AffectedRows; insert_trjyumzai: AffectedRows }
+interface JyudenDeleteResult { update_trjyuden: AffectedRows }
+interface CheckOkrnoResult { trjyuden: { denno: number }[] }
 @Injectable({
   providedIn: 'root'
 })
@@ -15,8 +35,8 @@ export class JyumeiService {
   private apollo = inject(Apollo);
 
   // public jyumei: mwI.Jyumei[] = []; //frmsales⇒jmeitblコンポーネントへ渡すときのみ使用
-  public trjyumei: any[] = [];
-  public trjmzai: any[] = [];
+  public trjyumei: TrjyumeiRow[] = [];
+  public trjmzai: TrjmzaiRow[] = [];
   public denno: number = 0;
   public mtax!: string;             //顧客マスタ「税区分」
   public tankakbn!: string;         //顧客マスタ「単価区分」
@@ -148,7 +168,7 @@ export class JyumeiService {
 
   qryJyuden(denno: number): Observable<mwI.Trjyuden> {
     let observable: Observable<mwI.Trjyuden> = new Observable<mwI.Trjyuden>(observer => {
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<JyudenResult>({
         query: this.GetTran,
         variables: {
           id: this.usrsrv.compid,
@@ -158,7 +178,7 @@ export class JyumeiService {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log(data);
-          observer.next(data.trjyuden_by_pk);
+          observer.next((data as JyudenResult).trjyuden_by_pk);
         }, (error) => {
           observer.error(error);
         });
@@ -173,7 +193,7 @@ export class JyumeiService {
     }
   }
 
-  updZaiko(zai: any) {
+  updZaiko(zai: mwI.Zaiko) {
     const UpdateTran = gql`
       mutation upd_zaiko($id:smallint!,$scd:String!,$gcd:String!,$day:date!,$inc: trzaiko_inc_input!) {
         update_trzaiko(where:{id:{_eq:$id},scode:{_eq:$scd},gcode:{_eq:$gcd},day:{_eq:$day}}, _inc: $inc)  {
@@ -186,7 +206,7 @@ export class JyumeiService {
           affected_rows
         }
       }`;
-    this.apollo.mutate<any>({
+    this.apollo.mutate<ZaikoUpdateResult>({
       mutation: UpdateTran,
       variables: {
         id: this.usrsrv.compid,
@@ -197,8 +217,8 @@ export class JyumeiService {
       },
     }).subscribe(({ data }) => {
       // console.log(zai, data);
-      if (data.update_trzaiko.affected_rows == 0) {
-        this.apollo.mutate<any>({
+      if ((data as ZaikoUpdateResult).update_trzaiko.affected_rows == 0) {
+        this.apollo.mutate<ZaikoInsertResult>({
           mutation: InsertTran,
           variables: {
             obj: [{
@@ -220,7 +240,7 @@ export class JyumeiService {
     });
   }
 
-  updJyuden(denno: number, jyuden: any, jyumei: any[], jyumzai: any[]): Promise<string> {
+  updJyuden(denno: number, jyuden: Partial<mwI.Jyuden>, jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[]): Promise<JyudenUpdateResult> {
     const UpdateTran = gql`
       mutation upd_jyuden($id: smallint!, $hdno: Int!,$_set: trjyuden_set_input!,$obj:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
         update_trjyuden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
@@ -240,7 +260,7 @@ export class JyumeiService {
         }      
       }`;
     return new Promise((resolve, reject) => {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<JyudenUpdateResult>({
         mutation: UpdateTran,
         variables: {
           id: this.usrsrv.compid,
@@ -258,14 +278,14 @@ export class JyumeiService {
             },
           }],
       }).subscribe(({ data }) => {
-        return resolve(data);
+        return resolve(data as JyudenUpdateResult);
       }, (error) => {
         return reject(error);
       });
     });
   }
 
-  insJyuden(jyuden: mwI.Trjyuden[], jyumei: any[], jyumzai: any[]): Promise<string> {
+  insJyuden(jyuden: mwI.Trjyuden[], jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[]): Promise<JyudenInsertResult> {
     const InsertTran = gql`
       mutation ins_jyuden($obj:[trjyuden_insert_input!]!,$objm:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
         insert_trjyuden(objects: $obj)  {
@@ -279,7 +299,7 @@ export class JyumeiService {
         }  
       }`;
     return new Promise((resolve, reject) => {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<JyudenInsertResult>({
         mutation: InsertTran,
         variables: {
           obj: jyuden,
@@ -287,7 +307,7 @@ export class JyumeiService {
           obj2: jyumzai
         },
       }).subscribe(({ data }) => {
-        return resolve(data);
+        return resolve(data as JyudenInsertResult);
       }, (error) => {
         return reject(error);
       });
@@ -302,7 +322,7 @@ export class JyumeiService {
         }
       }`;
 
-    this.apollo.mutate<any>({
+    this.apollo.mutate<JyudenDeleteResult>({
       mutation: DeleteTran,
       variables: {
         id: this.usrsrv.compid,
@@ -333,14 +353,14 @@ export class JyumeiService {
     });
   }
 
-  getJdsta(hmei: any): string {
+  getJdsta(hmei: unknown): string {
 
     let ret: string = "";
 
     return ret;
   }
 
-  async checkAmazon(hcode: any, pOkrno: string): Promise<string> {
+  async checkAmazon(hcode: string, pOkrno: string): Promise<string> {
     const CheckOkrno = gql`
       query get_jyuden($okrno: String!) {
         trjyuden(where: {id: {_eq: 1}, mcode: {_eq: "408223"}, okurino: {_eq: $okrno}}) {
@@ -348,7 +368,7 @@ export class JyumeiService {
         }
       }`;
     return new Promise(resolve => {
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<CheckOkrnoResult>({
         query: CheckOkrno,
         variables: {
           okrno: pOkrno
@@ -357,7 +377,7 @@ export class JyumeiService {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log(pOkrno,data); 
-          if (data.trjyuden.length == 0) {
+          if ((data as CheckOkrnoResult).trjyuden.length == 0) {
             return resolve(pOkrno);
           } else {
             this.okrsrv.setOkurino(hcode).then(value => this.checkAmazon(hcode, value));

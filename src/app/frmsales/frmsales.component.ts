@@ -737,11 +737,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               // console.log(e, jyuden);
               if (jyuden.skbn != "1") {
                 if (e.sday != null) {
-                  e.msgzais.forEach((zai: { zcode: any; irisu: number; }) => {
+                  const sday = e.sday;
+                  e.msgzais!.forEach(zai => {
                     const lczai: mwI.Zaiko = {
                       scode: e.scode,
                       gcode: zai.zcode,
-                      day: e.sday,
+                      day: sday,
                       suu: e.suu * zai.irisu
                     }
                     this.jmisrv.updZaiko(lczai);
@@ -789,11 +790,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               // console.log(e, this.form);
               if (jyuden.skbn != "1") {
                 if (e.sday != null) {
-                  e.msgzais.forEach((zai: { zcode: any; irisu: number; }) => {
+                  const sday = e.sday;
+                  e.msgzais!.forEach(zai => {
                     const lczai: mwI.Zaiko = {
                       scode: e.scode,
                       gcode: zai.zcode,
-                      day: e.sday,
+                      day: sday,
                       suu: e.suu * zai.irisu
                     }
                     this.jmisrv.updZaiko(lczai);

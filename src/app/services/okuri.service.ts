@@ -3,6 +3,13 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
 
+/** get_okuri クエリの結果行（Hokuri の ordering は、クエリ上のフィールド名が order） */
+interface HokuriRow extends Omit<mwI.Hokuri, 'ordering'> { order: string }
+interface HokuriResult { mshokuri: HokuriRow[] }
+interface HaisouResult { mshaisou: mwI.Haisou[] }
+interface HktimeResult { mshktime: mwI.Hktime[] }
+/** 採番（update_trnumber ミューテーション）の結果 */
+interface TrnumberResult { update_trnumber: { returning: { type?: string; curnum: number; minnum: number; maxnum: number }[] } }
 @Injectable({
   providedIn: 'root'
 })
@@ -34,7 +41,7 @@ export class OkuriService {
         onmax
       }
     }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<HokuriResult>({
       query: GetMast,
       variables: {
         id: this.usrsrv.compid
@@ -42,7 +49,7 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-		 data.mshokuri.forEach((element: { code: string; name: string; htype: any; binshu: any; mtchaku: any; daibiki: any; scode: any; csvimp: any; cuscode: any; order: any; hscode: any; onmin: any; donmax: any; }) => {
+		 (data as HokuriResult).mshokuri.forEach(element => {
             this.hokuri.push({ code: element.code, 
 			                   name: element.code + ' ' + element.name,
 							   htype: element.htype,
@@ -55,7 +62,7 @@ export class OkuriService {
 							   ordering: element.order,	
 							   hscode: element.hscode,	
 							   onmin: element.onmin,	
-							   onmax: element.donmax
+							   onmax: element.onmax
 							});	
             });							
       }, (error) => {
@@ -73,7 +80,7 @@ export class OkuriService {
           numbering
         }
       }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<HaisouResult>({
       query: GetMast,
       variables: {
         id: this.usrsrv.compid
@@ -81,7 +88,7 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.haisou = data.mshaisou;
+        this.haisou = (data as HaisouResult).mshaisou;
       }, (error) => {
         console.log('error query get_haisou', error);
       });
@@ -97,7 +104,7 @@ export class OkuriService {
         bunrui  
       }
     }`;
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<HktimeResult>({
       query: GetMast,
       variables: {
         id: this.usrsrv.compid
@@ -105,7 +112,7 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.hktime = data.mshktime;
+        this.hktime = (data as HktimeResult).mshktime;
       }, (error) => {
         console.log('error query get_hktime', error);
       });
@@ -136,7 +143,7 @@ export class OkuriService {
     return ret;
   }
 
-  async setOkurino(hcode: any): Promise<string> {
+  async setOkurino(hcode: string): Promise<string> {
     const type: string = 'sagawa_' + this.getHinfo(hcode).code;
     let okrno: number[] = await this.getNumber(type, 1);
     // console.log(type,okrno);
@@ -157,7 +164,7 @@ export class OkuriService {
               }
             }
           }`;
-        this.apollo.mutate<any>({
+        this.apollo.mutate<TrnumberResult>({
           mutation: UpdateCurnum,
           variables: {
             id: this.usrsrv.compid,
@@ -187,7 +194,7 @@ export class OkuriService {
       }`;
     // let observable:Observable<number> = new Observable<number>(observer => {
     return new Promise(resolve => {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<TrnumberResult>({
         mutation: UpdateNumber,
         variables: {
           id: this.usrsrv.compid,
@@ -195,7 +202,8 @@ export class OkuriService {
           inc: inc
         },
       }).subscribe(({ data }) => {
-        return resolve([data.update_trnumber.returning[0].curnum, data.update_trnumber.returning[0].minnum, data.update_trnumber.returning[0].maxnum]);
+        const row = (data as TrnumberResult).update_trnumber.returning[0];
+        return resolve([row.curnum, row.minnum, row.maxnum]);
         // observer.next(data.update_trnumber.returning[0].curnum);
         // observer.complete();
       }, (error) => {
