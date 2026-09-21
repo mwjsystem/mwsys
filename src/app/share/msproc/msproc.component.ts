@@ -10,6 +10,9 @@ import { BunruiService } from './../../services/bunrui.service';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
+/** 加工工程の 1 行（フォームの値）。項目の型は入力に応じて文字列・数値・未入力(null) */
+type MsprocValue = string | number | null;
+type MsprocRow = Record<'prcname' | 'prcbody' | 'vcode' | 'code' | 'memo' | 'tanka' | 'genka' | 'posi01' | 'posi02', MsprocValue>;
 @Component({
     selector: 'app-msproc',
     templateUrl: './msproc.component.html',
@@ -108,7 +111,7 @@ export class MsprocComponent implements OnInit {
     this.refresh();
   }
 
-  createRow(row: number, proc?: { prcname: any; prcbody: any; vcode: any; code: any; memo: any; tanka: any; genka: any; posi01: any; posi02: any; } | undefined) {
+  createRow(row: number, proc?: MsprocRow) {
     return this.fb.group({
       prcno: [{ value: row, disabled: true }],
       prcname: [proc?.prcname],

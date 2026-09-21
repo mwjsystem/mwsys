@@ -17,7 +17,7 @@ interface Nymat {
   hatzn: number;
   nymat: number;
   matzn: number;
-  mbiko: string;
+  mbiko: string | null;
 }
 
 @Component({
@@ -41,7 +41,7 @@ export class SpdethelpComponent implements OnInit {
     let lcTbl: Nymat[] = [];
     // console.log(data);
     this.jyusuu = data.suu;
-    data.nymat.forEach((e: { denno: any; line: any; yday: any; ydaykbn: any; suu: any; hatzn: any; nymat: any; matzn: any; mbiko: any; }) => {
+    data.nymat.forEach((e: Nymat) => {
       lcTbl.push({
         denno: e.denno,
         line: e.line,

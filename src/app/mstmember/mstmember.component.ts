@@ -20,6 +20,23 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
 import { AddressComponent } from './../share/address/address.component';
 import { MsprocComponent } from './../share/msproc/msproc.component';
 
+interface AffectedRows { affected_rows: number }
+/** get_member クエリの結果 */
+interface MemberResult { msmember_by_pk: mwI.Member | null }
+/** upd_member / del_jyuden ミューテーションの結果 */
+interface UpdMemberResult { update_msmember: AffectedRows }
+/** ins_member ミューテーションの結果 */
+interface InsMemberResult { insert_msmember: AffectedRows }
+/** 保存時に顧客（msmember）へ渡す値。新規登録では created_at / created_by が付く */
+type MemberInput = Pick<mwI.Member, 'mcode' | 'sei' | 'mei' | 'kana' | 'tankakbn' | 'mail' | 'mail2' | 'mail3' | 'mail4' | 'mail5' | 'torikbn' | 'sime' | 'site' | 'inday' | 'pcode' | 'hcode' | 'htime' | 'jcode' | 'mtax' | 'sscode' | 'tcode1' | 'tcode' | 'del' | 'dmemo' | 'sptnkbn' | 'chubunrui' | 'shobunrui' | 'ntype' | 'tntype' | 'webid' | 'ryoate' | 'mtgt1' | 'mtgt2' | 'mtgt3' | 'mtgt4' | 'mtgt5' | 'gadr' | 'updated_at' | 'updated_by'> & {
+  id: number;
+  scde: string;
+  memo: string;
+  daibunrui: string;
+  jan: string;
+  created_at?: Date;
+  created_by?: string;
+};
 class Sval {
   value!: string;
   viewval!: string;
@@ -248,7 +265,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       if (!this.overlayRef.hasAttached()) {
         this.overlayRef.attach(new ComponentPortal(MatSpinner));
       }
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<MemberResult>({
         query: Query.GetMast1,
         variables: {
           id: this.usrsrv.compid,
@@ -258,12 +275,13 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         .valueChanges
         .subscribe(({ data }) => {
           this.form.reset();
-          if (data.msmember_by_pk == null) {
+          const msmember = (data as MemberResult).msmember_by_pk;
+          if (msmember == null) {
             this.usrsrv.toastWar("顧客コード" + mcode + "は登録されていません");
             history.replaceState('', '', './mstmember');
             this.overlayRef.detach();
           } else {
-            let member: mwI.Member = data.msmember_by_pk;
+            let member: mwI.Member = msmember;
             this.form.get('base')!.patchValue(member);
             this.usrsrv.setTmstmp(member);
             this.memsrv.mcode = mcode;
@@ -336,7 +354,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     // console.log(value,val);
     this.form.get('base')!.get(fldnm)!.setValue(val);
   }
-  test(value: any) {
+  test(value: unknown) {
     this.usrsrv.toastInf('機能作成中');
     const invalid = [];
     const ctrls = this.form.controls;
@@ -387,11 +405,11 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     }
   }
 
-  modeToDel(flg: any, mode: number): void {
+  modeToDel(flg: boolean, mode: number): void {
     let lctxt: string = (flg ? '削除' : '削除取消');
     if (window.confirm(lctxt + 'してもよろしいですか？')) {
 
-      this.apollo.mutate<any>({
+      this.apollo.mutate<UpdMemberResult>({
         mutation: Query.DeleteMast,
         variables: {
           id: this.usrsrv.compid,
@@ -441,7 +459,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
 
   async save() {
     // console.log(this.form.get('base'), this.form.get('base').value);
-    let member: any = {
+    let member: MemberInput = {
       id: this.usrsrv.compid,
       mcode: this.mcd,
       sei: this.usrsrv.editFrmval(this.form.get('base')!, 'sei'),
@@ -489,7 +507,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     }
     console.log(member);
     if (this.mode == 2) {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<UpdMemberResult>({
         mutation: Query.UpdateMast1,
         variables: {
           id: this.usrsrv.compid,
@@ -513,7 +531,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         console.log('error update_msmember', error);
       });
     } else {//新規登録
-      let membs: any[] = [];
+      let membs: MemberInput[] = [];
       // this.usrsrv.getNumber('mcode',1)
       //   .subscribe(value => {
       this.mcd = await this.getMcode();
@@ -527,7 +545,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       member.created_at = new Date();
       member.created_by = this.usrsrv.staff.code;
       membs.push(member);
-      this.apollo.mutate<any>({
+      this.apollo.mutate<InsMemberResult>({
         mutation: Query.InsertMast1,
         variables: {
           "object": membs

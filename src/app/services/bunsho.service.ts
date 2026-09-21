@@ -3,6 +3,9 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
 
+/** get_bunsho クエリの結果 */
+interface BuntypeResult { msbuntype: mwI.Buntype[] }
+interface BunshoResult { msbunsho: { code: string; name: string }[] }
 @Injectable({
   providedIn: 'root'
 })
@@ -27,7 +30,7 @@ export class BunshoService {
           sksec
         }
       }`;
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<BuntypeResult>({
         query: GetMast,
         variables: {
           id: this.usrsrv.compid
@@ -36,7 +39,7 @@ export class BunshoService {
         .valueChanges
         .subscribe(({ data }) => {
           // this.buntype = data.msbuntype
-		  data.msbuntype.forEach((element: { code: any; name: string; first: any; saki: any; second: any; sksec: any; }) => {
+		  (data as BuntypeResult).msbuntype.forEach(element => {
             this.buntype.push({ code: element.code, 
 			                    name: String(Number(element.code)) + ' ' + element.name,
 								first: element.first,
@@ -59,7 +62,7 @@ export class BunshoService {
           name
         }
       }`;
-      this.apollo.watchQuery<any>({
+      this.apollo.watchQuery<BunshoResult>({
         query: GetMast,
         variables: {
           id: this.usrsrv.compid
@@ -67,7 +70,7 @@ export class BunshoService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          data.msbunsho.forEach((element: any) => {
+          (data as BunshoResult).msbunsho.forEach(element => {
             this.bunsho.push({ group: element.code.slice(0, 1), code: element.code, name: element.name });
           });
         }, (error) => {
