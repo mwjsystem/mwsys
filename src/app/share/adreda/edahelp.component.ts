@@ -32,10 +32,12 @@ export class EdahelpComponent implements OnInit {
     this.dataSource.paginator = this.paginator() ?? null;
     // this.edasrv.observe.subscribe();
     this.dataSource.filterPredicate = (data: mwI.Edahlp, filtersJson: string) => {
-      const matchFilter: any[] = [];
+      const matchFilter: boolean[] = [];
+      const record = data as unknown as Record<string, string | null>;
       const filters = JSON.parse(filtersJson);
       filters.forEach((filter: { id: string | number; value: string; }) => {
-        const val = (data as any)[filter.id] === null ? '' : (data as any)[filter.id];
+        const raw = record[filter.id];
+        const val = (raw === null ? '' : raw) as string;
         matchFilter.push(val.toLowerCase().includes(filter.value.toLowerCase()));
       });
       return matchFilter.every(Boolean);

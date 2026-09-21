@@ -85,11 +85,10 @@ export class FrmmoveComponent implements OnInit {
         this.cancel();
       } else if (+params.get('mode')! == 1) {
         this.modeToCre();
-        this.route.queryParamMap.pipe(
-          filter(n => Object.keys((n as any)["params"]).length !== 0)
+        this.route.queryParams.pipe(
+          filter(p => Object.keys(p).length !== 0)
         ).subscribe(
-          n => {
-            let params = (n as any)["params"];
+          params => {
             Object.keys(params).map(k => {
               if (k == "stkey") {
                 const stra = JSON.parse(localStorage.getItem(params[k])!);

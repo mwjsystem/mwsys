@@ -71,12 +71,11 @@ export class FrmtreatComponent implements OnInit {
     //     });         
     //   } 
     // }); 
-    this.route.queryParamMap.pipe(
-      filter(n => Object.keys((n as any)["params"]).length !== 0)
+    this.route.queryParams.pipe(
+      filter(p => Object.keys(p).length !== 0)
     ).subscribe(
-      n => {
+      params => {
         let vars: { [key: string]: any } = { "id": this.usrsrv.compid };
-        let params = (n as any)["params"];
         // console.log(params);
         Object.keys(params).map(k => {
           if (k == "mcode") {
