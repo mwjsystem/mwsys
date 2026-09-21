@@ -3,7 +3,6 @@ import { Subject, Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
-import { SiimeiInput } from './../frmsiire/siimei.service';
 
 /** 保存時に発注明細（trhatmei）へ渡す値。day / yday は日付文字列（未入力は null） */
 export type HatmeiInput = Pick<mwI.Hatmei, 'line' | 'inday' | 'gcode' | 'gtext' | 'suu' | 'genka' | 'money' | 'taxrate' | 'mmemo' | 'spec' | 'jdenno' | 'jline' | 'yday' | 'ydaykbn' | 'mtax'> & {
@@ -144,8 +143,7 @@ export class HatmeiService {
       });
     });
   }
-  // ※ frmsiire（仕入入力）の新規登録からも呼ばれている（既知の不具合。従来の呼び出しのまま型だけ明示）
-  insHatden(hatden: mwI.Trhatden[] | mwI.Trsiiden[], hatmei: HatmeiInput[] | SiimeiInput[]): Promise<InsHatdenResult> {
+  insHatden(hatden: mwI.Trhatden[], hatmei: HatmeiInput[]): Promise<InsHatdenResult> {
     const InsertTran = gql`
       mutation ins_hatden($obj:[trhatden_insert_input!]!,$objm:[trhatmei_insert_input!]!) {
         insert_trhatden(objects: $obj)  {

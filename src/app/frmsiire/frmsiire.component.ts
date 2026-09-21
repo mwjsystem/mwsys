@@ -320,15 +320,13 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
         }
         , ...siiden,
       }]
-      // console.log(trhatden);
-      this.hmisrv.insHatden(trsiiden, siimei)
+      this.smisrv.insSiiden(trsiiden, siimei)
         .then(result => {
-          // console.log('insert_trhat',result);
-          this.usrsrv.toastSuc('発注伝票' + this.denno + 'を新規登録しました');
+          this.usrsrv.toastSuc('仕入伝票' + this.denno + 'を新規登録しました');
           this.form.markAsPristine();
           this.cancel();
         }).catch(error => {
-          this.usrsrv.toastErr('データベースエラー', '発注伝票の新規登録ができませんでした');
+          this.usrsrv.toastErr('データベースエラー', '仕入伝票の新規登録ができませんでした');
           console.log('error insert_siiden', error);
         });
     }
