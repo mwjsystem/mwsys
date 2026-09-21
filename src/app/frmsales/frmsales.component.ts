@@ -24,6 +24,8 @@ import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 
+/** get_member クエリの結果 */
+interface MemberResult { msmember_by_pk: mwI.Member | null }
 @Component({
     selector: 'app-frmsales',
     templateUrl: './frmsales.component.html',
@@ -251,7 +253,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.dwlsrv.dlKick(this.usrsrv.system.urischema + 'FRM-KEEP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
   }
 
-  openOkuri(hcode: any, value: string) {
+  openOkuri(hcode: string, value: string) {
     window.open(this.okrsrv.getUrl(hcode) + value, '_blank');
   }
 
@@ -457,7 +459,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   getMember(mcode: string, flg: boolean) {//flg:true⇒画面変更時、false⇒受注伝票読込時
-    this.apollo.watchQuery<any>({
+    this.apollo.watchQuery<MemberResult>({
       query: Query.GetMember,
       variables: {
         id: this.usrsrv.compid,
@@ -466,10 +468,11 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        if (data.msmember_by_pk == null) {
+        const msmember = (data as MemberResult).msmember_by_pk;
+        if (msmember == null) {
           this.usrsrv.toastInf("顧客コード" + mcode + "は登録されていません");
         } else {
-          let member: mwI.Member = data.msmember_by_pk;
+          let member: mwI.Member = msmember;
           if (flg) {
             // console.log(member, member.gadr);
             this.form.patchValue(member);
@@ -610,7 +613,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     history.replaceState('', '', './frmsales/' + this.mode + '/' + this.jmisrv.denno);
   }
 
-  modeToDel(flg: any, mode: number): void {
+  modeToDel(flg: boolean, mode: number): void {
     let lctxt: string = (flg ? '取消' : '取消解除');
     if (window.confirm(lctxt + 'してもよろしいですか？')) {
       this.jmisrv.delJyuden(this.jmisrv.denno, flg);

@@ -29,6 +29,13 @@ type TrtForm = {
   result: FormControl<string>;
 };
 
+interface AffectedRows { affected_rows: number }
+/** 保存時に問合せ対応（trtreat）へ渡す値 */
+type TreatSet = Pick<mwI.Trtreat, 'genre' | 'mcode' | 'grpcode' | 'gcode' | 'tel' | 'email' | 'question' | 'answer' | 'kaizen' | 'result'> & { id: number };
+/** ins_treat ミューテーションの結果 */
+interface InsTreatResult { insert_trtreat: AffectedRows }
+/** upd_treat ミューテーションの結果 */
+interface UpdTreatResult { update_trtreat: AffectedRows }
 @Component({
     selector: 'app-trtdetail',
     templateUrl: './trtdetail.component.html',
@@ -99,9 +106,9 @@ export class TrtdetailComponent implements OnInit {
     }
   }
 
-  onchange(list: any, num: string) {
+  onchange(list: FileList | null, num: string) {
     // ファイルが指定されていなければ
-    if (list.length <= 0) { return; }
+    if (list == null || list.length <= 0) { return; }
 
     // ファイルを取得
     let f = list[0];
@@ -169,7 +176,7 @@ export class TrtdetailComponent implements OnInit {
         affected_rows
       }
     }`;
-    let treat: any = {
+    let treat: TreatSet = {
       id: this.usrsrv.compid,
       genre: this.usrsrv.editFrmval(this.form, 'genre'),
       mcode: this.usrsrv.editFrmval(this.form, 'mcode'),
@@ -188,10 +195,10 @@ export class TrtdetailComponent implements OnInit {
       let value = await this.usrsrv.getNumber('treat', 1);
       this.form.controls.seq.setValue(value);
       this.idx = 0;
-      this.apollo.mutate<any>({
+      this.apollo.mutate<InsTreatResult>({
         mutation: InsertTran,
         variables: {
-          "object": { id: this.usrsrv.compid, seq: value, created_at: new Date(), created_by: this.usrsrv.staff.code, ...treat }
+          "object": { seq: value, created_at: new Date(), created_by: this.usrsrv.staff.code, ...treat }
         },
       }).subscribe(({ data }) => {
         this.usrsrv.toastSuc('問合せ対応を新規登録しました');
@@ -201,7 +208,7 @@ export class TrtdetailComponent implements OnInit {
       });
       // });  
     } else {
-      this.apollo.mutate<any>({
+      this.apollo.mutate<UpdTreatResult>({
         mutation: UpdateTran,
         variables: {
           id: this.usrsrv.compid,
