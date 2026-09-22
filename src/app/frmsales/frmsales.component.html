@@ -188,7 +188,7 @@
       </mat-form-field>
       <mat-form-field style="width: 3em;">
         <mat-label>枝番</mat-label>
-        <input matInput formControlName="nadr" required (change)="changeEda($any($event.target).value)">
+        <input #nadrInp matInput formControlName="nadr" required (change)="changeEda(nadrInp.value)">
       </mat-form-field>
       @if (form.value.nsaki=='2') {
         <button mat-flat-button (click)="diaBetsu('nadr')">

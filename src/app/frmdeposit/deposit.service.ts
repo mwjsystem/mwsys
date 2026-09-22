@@ -181,7 +181,7 @@ export class DepositService {
       }
     }`;
 
-  qryJyuden(denno: number): Observable<Jyuden> {
+  qryJyuden(denno: number | string): Observable<Jyuden> {
     let observable: Observable<Jyuden> = new Observable<Jyuden>(observer => {
       this.apollo.watchQuery<NyuzanResult>({
         query: this.GetTran,

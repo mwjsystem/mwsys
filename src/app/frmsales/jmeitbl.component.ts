@@ -721,7 +721,7 @@ export class JmeitblComponent implements OnInit {
       this.rowCtl(this.frmArr.controls[i]).spec.setErrors(null);
     }
   }
-  changeTax(i: number, value: number) {
+  changeTax(i: number, value: string) { // 入力欄からは文字列が渡される
     const lcmoney: number = this.frmArr.controls[i].value.suu * this.frmArr.controls[i].value.tanka;
     if (this.frmArr.getRawValue()[i]['mtax'] == "0") {
       this.frmArr.controls[i].patchValue({ tinmoney: (lcmoney + value) });

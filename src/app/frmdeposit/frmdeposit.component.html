@@ -62,7 +62,7 @@
             <div fxLayout="row wrap">
               <mat-form-field>
                 <mat-label>受注伝票</mat-label>
-                <input matInput formControlName="jdenno" (change)="getJyuden($any($event.target).value)">
+                <input #jdennoInp matInput formControlName="jdenno" (change)="getJyuden(jdennoInp.value)">
                 @if (frmArr.enabled) {
                   <button type="button" mat-icon-button matSuffix (click)="jdennoHelp()"
                     >

@@ -412,7 +412,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 	// console.log(this.form.value);
   }
 
-  changeEda(eda: number) {
+  changeEda(eda: string | number | null) { // 入力欄からは文字列が渡される
     if (eda !== null) {
       let i: number = this.memsrv.adrs.findIndex(obj => obj.eda == eda);
       if (i > -1) {

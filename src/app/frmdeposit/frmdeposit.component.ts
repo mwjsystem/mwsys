@@ -138,7 +138,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     );
   }
 
-  getJyuden(denno: number) {
+  getJyuden(denno: number | string) { // 入力欄からは文字列が渡される
 
     this.depsrv.qryJyuden(denno).subscribe(
       result => {
