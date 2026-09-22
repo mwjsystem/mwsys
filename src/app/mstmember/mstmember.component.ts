@@ -169,12 +169,13 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         this.mode = Number(params.get('mode'));
       }
       this.refresh();
-      if (params.get('mcd') === null) {
+      const mcd = params.get('mcd');
+      if (mcd === null) {
         // this.mcd = '読込中です！';
         // this.refresh();
       } else {
         //１件分だけ先に読込
-        this.mcd = params.get('mcd')!;
+        this.mcd = mcd;
         this.getMember(this.mcd);
       }
     });
