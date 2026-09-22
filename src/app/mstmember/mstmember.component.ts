@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChildren, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, AbstractControl, Validators } from '@angular/forms';
 
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -37,6 +37,8 @@ type MemberInput = Pick<mwI.Member, 'mcode' | 'sei' | 'mei' | 'kana' | 'tankakbn
   created_at?: Date;
   created_by?: string;
 };
+/** 顧客の基本項目（base グループ）の項目名 */
+type BaseField = 'sei' | 'mei' | 'kana' | 'tankakbn' | 'pcode' | 'hcode' | 'jcode' | 'mtax' | 'daibunrui' | 'chubunrui' | 'shobunrui' | 'tcode1' | 'tcode' | 'sptnkbn' | 'htime' | 'ntype' | 'tntype' | 'webid' | 'ryoate' | 'del' | 'dmemo' | 'jan' | 'memo' | 'torikbn' | 'sime' | 'site' | 'inday' | 'scde' | 'sscode' | 'mail' | 'mail2' | 'mail3' | 'mail4' | 'mail5' | 'mtgt1' | 'mtgt2' | 'mtgt3' | 'mtgt4' | 'mtgt5' | 'gadr';
 class Sval {
   value!: string;
   viewval!: string;
@@ -71,6 +73,20 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
 
   private readonly children = viewChildren(AddressComponent);
   form!: FormGroup;
+  /** 顧客の基本項目（base）。項目を名前で取り出す baseCtl は、名前を型で限定し、存在しない名前はコンパイルで検出する */
+  private get baseForm(): FormGroup {
+    return this.form.controls['base'] as FormGroup;
+  }
+  private get baseCtl(): Record<BaseField, AbstractControl> {
+    return this.baseForm.controls as Record<BaseField, AbstractControl>;
+  }
+  /** 住所（基本・その他）。AddressComponent が初期化時にフォームへ追加する */
+  private get addr0Form(): FormGroup {
+    return this.form.controls['addr0'] as FormGroup;
+  }
+  private get addr1Form(): FormGroup {
+    return this.form.controls['addr1'] as FormGroup;
+  }
   mcd: string = "";
   mode: number = 3;
 
@@ -282,7 +298,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
             this.overlayRef.detach();
           } else {
             let member: mwI.Member = msmember;
-            this.form.get('base')!.patchValue(member);
+            this.baseForm.patchValue(member);
             this.usrsrv.setTmstmp(member);
             this.memsrv.mcode = mcode;
             this.memsrv.edas = [];
@@ -303,15 +319,15 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
                 });
               }
             }
-            this.form.get('addr0')!.patchValue(member.msmadrs[0]);
+            this.addr0Form.patchValue(member.msmadrs[0]);
             //その他住所があれば、
             let j: number = member.msmadrs.findIndex(obj => obj.eda == 1);
             if (j > -1) {
-              this.form.get('addr1')!.patchValue(member.msmadrs[j]);
+              this.addr1Form.patchValue(member.msmadrs[j]);
               this.flgadr1 = 2;
               this.gadrVal[1].dis = false;
             } else {
-              this.form.get('addr1')!.reset();
+              this.addr1Form.reset();
               this.flgadr1 = 1;
               this.gadrVal[1].dis = true;
             }
@@ -337,8 +353,8 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getRows(fldnm: string): number {
-    const lines: number = (this.form.get('base')!.get(fldnm)!.value + '\n').match(/\n/g)!.length;
+  getRows(fldnm: BaseField): number {
+    const lines: number = (this.baseCtl[fldnm].value + '\n').match(/\n/g)!.length;
     return lines;
   }
 
@@ -346,13 +362,13 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   updKana(event: Event) {
     let val: string = this.usrsrv.convKana((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
-    this.form.get('base')!.get('kana')!.setValue(val);
+    this.baseCtl.kana.setValue(val);
   }
 
-  updMail(fldnm: string, event: Event) {
+  updMail(fldnm: BaseField, event: Event) {
     let val: string = this.usrsrv.convHan((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
-    this.form.get('base')!.get(fldnm)!.setValue(val);
+    this.baseCtl[fldnm].setValue(val);
   }
   test(value: unknown) {
     this.usrsrv.toastInf('機能作成中');
@@ -462,46 +478,46 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     let member: MemberInput = {
       id: this.usrsrv.compid,
       mcode: this.mcd,
-      sei: this.usrsrv.editFrmval(this.form.get('base')!, 'sei'),
-      mei: this.usrsrv.editFrmval(this.form.get('base')!, 'mei'),
-      kana: this.usrsrv.editFrmval(this.form.get('base')!, 'kana'),
-      tankakbn: this.usrsrv.editFrmval(this.form.get('base')!, 'tankakbn'),
-      mail: this.usrsrv.editFrmval(this.form.get('base')!, 'mail'),
-      mail2: this.usrsrv.editFrmval(this.form.get('base')!, 'mail2'),
-      mail3: this.usrsrv.editFrmval(this.form.get('base')!, 'mail3'),
-      mail4: this.usrsrv.editFrmval(this.form.get('base')!, 'mail4'),
-      mail5: this.usrsrv.editFrmval(this.form.get('base')!, 'mail5'),
-      torikbn: Boolean(this.form.get('base')!.value.torikbn),
-      sime: this.usrsrv.editFrmval(this.form.get('base')!, 'sime'),
-      site: this.usrsrv.editFrmval(this.form.get('base')!, 'site'),
-      inday: this.usrsrv.editFrmval(this.form.get('base')!, 'inday'),
-      scde: this.usrsrv.editFrmval(this.form.get('base')!, 'scde'),
-      memo: this.usrsrv.editFrmval(this.form.get('base')!, 'memo'),
-      dmemo: this.usrsrv.editFrmval(this.form.get('base')!, 'dmemo'),
-      pcode: this.usrsrv.editFrmval(this.form.get('base')!, 'pcode'),
-      hcode: this.usrsrv.editFrmval(this.form.get('base')!, 'hcode'),
-      htime: this.usrsrv.editFrmval(this.form.get('base')!, 'htime'),
-      jcode: this.usrsrv.editFrmval(this.form.get('base')!, 'jcode'),
-      mtax: this.usrsrv.editFrmval(this.form.get('base')!, 'mtax'),
-      sscode: this.usrsrv.editFrmval(this.form.get('base')!, 'sscode'),
-      daibunrui: this.usrsrv.editFrmval(this.form.get('base')!, 'daibunrui'),
-      chubunrui: this.usrsrv.editFrmval(this.form.get('base')!, 'chubunrui'),
-      shobunrui: this.usrsrv.editFrmval(this.form.get('base')!, 'shobunrui'),
-      tcode1: this.usrsrv.editFrmval(this.form.get('base')!, 'tcode1'),
-      tcode: this.usrsrv.editFrmval(this.form.get('base')!, 'tcode'),
-      del: Boolean(this.form.get('base')!.value.del),
-      sptnkbn: this.usrsrv.editFrmval(this.form.get('base')!, 'sptnkbn'),
-      ntype: this.usrsrv.editFrmval(this.form.get('base')!, 'ntype'),
-      tntype: this.usrsrv.editFrmval(this.form.get('base')!, 'tntype'),
-      webid: this.usrsrv.editFrmval(this.form.get('base')!, 'webid'),
-      ryoate: this.usrsrv.editFrmval(this.form.get('base')!, 'ryoate'),
-      mtgt1: this.form.get('base')!.value.mtgt1,
-      mtgt2: this.form.get('base')!.value.mtgt2,
-      mtgt3: this.form.get('base')!.value.mtgt3,
-      mtgt4: this.form.get('base')!.value.mtgt4,
-      mtgt5: this.form.get('base')!.value.mtgt5,
-      jan: this.usrsrv.editFrmval(this.form.get('base')!, 'jan'),
-      gadr: this.usrsrv.editFrmval(this.form.get('base')!, 'gadr'),
+      sei: this.usrsrv.editFrmval(this.baseForm, 'sei'),
+      mei: this.usrsrv.editFrmval(this.baseForm, 'mei'),
+      kana: this.usrsrv.editFrmval(this.baseForm, 'kana'),
+      tankakbn: this.usrsrv.editFrmval(this.baseForm, 'tankakbn'),
+      mail: this.usrsrv.editFrmval(this.baseForm, 'mail'),
+      mail2: this.usrsrv.editFrmval(this.baseForm, 'mail2'),
+      mail3: this.usrsrv.editFrmval(this.baseForm, 'mail3'),
+      mail4: this.usrsrv.editFrmval(this.baseForm, 'mail4'),
+      mail5: this.usrsrv.editFrmval(this.baseForm, 'mail5'),
+      torikbn: Boolean(this.baseForm.value.torikbn),
+      sime: this.usrsrv.editFrmval(this.baseForm, 'sime'),
+      site: this.usrsrv.editFrmval(this.baseForm, 'site'),
+      inday: this.usrsrv.editFrmval(this.baseForm, 'inday'),
+      scde: this.usrsrv.editFrmval(this.baseForm, 'scde'),
+      memo: this.usrsrv.editFrmval(this.baseForm, 'memo'),
+      dmemo: this.usrsrv.editFrmval(this.baseForm, 'dmemo'),
+      pcode: this.usrsrv.editFrmval(this.baseForm, 'pcode'),
+      hcode: this.usrsrv.editFrmval(this.baseForm, 'hcode'),
+      htime: this.usrsrv.editFrmval(this.baseForm, 'htime'),
+      jcode: this.usrsrv.editFrmval(this.baseForm, 'jcode'),
+      mtax: this.usrsrv.editFrmval(this.baseForm, 'mtax'),
+      sscode: this.usrsrv.editFrmval(this.baseForm, 'sscode'),
+      daibunrui: this.usrsrv.editFrmval(this.baseForm, 'daibunrui'),
+      chubunrui: this.usrsrv.editFrmval(this.baseForm, 'chubunrui'),
+      shobunrui: this.usrsrv.editFrmval(this.baseForm, 'shobunrui'),
+      tcode1: this.usrsrv.editFrmval(this.baseForm, 'tcode1'),
+      tcode: this.usrsrv.editFrmval(this.baseForm, 'tcode'),
+      del: Boolean(this.baseForm.value.del),
+      sptnkbn: this.usrsrv.editFrmval(this.baseForm, 'sptnkbn'),
+      ntype: this.usrsrv.editFrmval(this.baseForm, 'ntype'),
+      tntype: this.usrsrv.editFrmval(this.baseForm, 'tntype'),
+      webid: this.usrsrv.editFrmval(this.baseForm, 'webid'),
+      ryoate: this.usrsrv.editFrmval(this.baseForm, 'ryoate'),
+      mtgt1: this.baseForm.value.mtgt1,
+      mtgt2: this.baseForm.value.mtgt2,
+      mtgt3: this.baseForm.value.mtgt3,
+      mtgt4: this.baseForm.value.mtgt4,
+      mtgt5: this.baseForm.value.mtgt5,
+      jan: this.usrsrv.editFrmval(this.baseForm, 'jan'),
+      gadr: this.usrsrv.editFrmval(this.baseForm, 'gadr'),
       updated_at: new Date(),
       updated_by: this.usrsrv.staff.code
     }
@@ -516,10 +532,10 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         },
       }).subscribe(({ data }) => {
         // console.log('update_msmember', data);
-        this.form.get('addr0')!.patchValue({ dmemo: member.dmemo, memo: member.memo });
+        this.addr0Form.patchValue({ dmemo: member.dmemo, memo: member.memo });
         this.children()[0].saveMadr(this.mcd, 0, this.mode);
         // console.log(this.form.get('addr1').value);
-        if (this.form.get('addr1')!.value.zip != null) {
+        if (this.addr1Form.value.zip != null) {
           this.children()[1].saveMadr(this.mcd, 1, this.flgadr1);
         }
         this.usrsrv.toastSuc('顧客コード' + this.mcd + 'の変更を保存しました');
@@ -554,7 +570,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
         console.log('Insert_msmember', data);
         this.children()[0].saveMadr(this.mcd, 0, this.mode);
         // console.log(this.form.get('addr1').get('zip'),);
-        if (this.form.get('addr1')!.value.zip != null) {
+        if (this.addr1Form.value.zip != null) {
           this.children()[1].saveMadr(this.mcd, 1, this.flgadr1);
         }
 
