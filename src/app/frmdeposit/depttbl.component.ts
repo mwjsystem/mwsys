@@ -1,9 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, input, inject } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray, AbstractControl } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { DepositService, Nyuden, DeptInput } from './deposit.service';
+
+/** 明細の 1 行のフォーム項目名 */
+type RowField = 'line' | 'ptype' | 'nmoney' | 'smoney' | 'tmoney' | 'total' | 'mmemo';
 
 @Component({
     selector: 'app-depttbl',
@@ -35,6 +38,10 @@ export class DepttblComponent implements OnInit {
       // this.dataSource = new MatTableDataSource<Nyuden>(nyuden);
       this.cdRef.detectChanges();
     });
+  }
+  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
+    return (control as UntypedFormGroup).controls as Record<RowField, AbstractControl>;
   }
   get frmArr(): UntypedFormArray {
     return this.parentForm().get('mtbl') as UntypedFormArray;
@@ -71,7 +78,7 @@ export class DepttblComponent implements OnInit {
 
   calcMei(row: number) {
     let rowData = this.frmArr.controls[row];
-    rowData.get('total')!.setValue(rowData.value.nmoney - rowData.value.smoney + rowData.value.tmoney);
+    this.rowCtl(rowData).total.setValue(rowData.value.nmoney - rowData.value.smoney + rowData.value.tmoney);
     this.calcTot();
   }
 

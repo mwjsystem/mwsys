@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input, viewChild, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -40,6 +40,11 @@ interface GoodResult { msgoods_by_pk: GoodRow | null }
 interface JmzaiRow { eda: number; gcode: string; suu: number; spec: string | null; spdet: string | null; pable: number }
 /** get_jyuden の明細行（サーバーの形）。商品・グループの情報が msgood として入れ子で付いてくる */
 interface JyumeiRaw extends mwI.Jyumei { msgood: { msggroup: Record<string, unknown> } & Record<string, unknown> }
+/** 明細の 1 行のフォーム項目名 */
+type RowField = 'chk' | 'line' | 'gcode' | 'gtext' | 'suu' | 'unit' | 'tanka' | 'toutmoney' | 'tinmoney' | 'mmemo' | 'spec' | 'spdet' | 'pable' | 'genka' | 'scode' | 'sday' | 'tanka1' | 'money' | 'mtax' | 'tgenka' | 'taxmoney' | 'taxrate' | 'currency' | 'gskbn' | 'max' | 'koguchi' | 'ordering' | 'send' | 'vcode' | 'gkbn' | 'code' | 'hgcode' | 'tanano' | 'msgzais' | 'trjyumzais';
+/** 親フォームのうち、この明細が参照する項目名 */
+type ParentField = 'okurisuu' | 'scode';
+
 @Component({
     selector: 'app-jmeitbl',
     templateUrl: './jmeitbl.component.html',
@@ -315,7 +320,7 @@ export class JmeitblComponent implements OnInit {
     }  
 
     this.autoFil();
-    parentForm.get('okurisuu')!.setValue(kogu);
+    this.parentCtl().okurisuu.setValue(kogu);
   }
 
   async setJmeikbn(kbn: string) {
@@ -350,9 +355,9 @@ export class JmeitblComponent implements OnInit {
       .forEach(control => {
         // console.log(control,this.hatden[0]);
         // console.log(control.get('spec').value=="3",control);
-        if (control.get('spec')!.value == "3" && control.get('vcode')!.value == this.hatden[0]) {
+        if (this.rowCtl(control).spec.value == "3" && this.rowCtl(control).vcode.value == this.hatden[0]) {
           jmei.push(control.value.gcode + "\t" + control.value.suu + "\t"
-            + this.jmisrv.denno + "\t" + control.get('line')!.value);
+            + this.jmisrv.denno + "\t" + this.rowCtl(control).line.value);
           control.patchValue({ spdet: hdno });
         }
       })
@@ -373,9 +378,9 @@ export class JmeitblComponent implements OnInit {
       .forEach(control => {
         // console.log(control,this.hatden[0]);
         // console.log(control.get('spec').value=="3",control);
-        if (control.get('spec')!.value == "6" && control.value.scode == this.movden[0]) {
+        if (this.rowCtl(control).spec.value == "6" && control.value.scode == this.movden[0]) {
           jmei.push(control.value.gcode + "\t" + control.value.suu + "\t"
-            + this.jmisrv.denno + "\t" + control.get('line')!.value);
+            + this.jmisrv.denno + "\t" + this.rowCtl(control).line.value);
           control.patchValue({ spdet: mdno });
         }
       })
@@ -536,7 +541,7 @@ export class JmeitblComponent implements OnInit {
               if (typeof data != 'undefined') {
                 // console.log(data,data.denno || '_' || data.line);
                 // this.frmArr.controls[i].get('spec').setValue('8');
-                this.frmArr.controls[i].get('spdet')!.setValue(data.denno + '_' + data.line);
+                this.rowCtl(this.frmArr.controls[i]).spdet.setValue(data.denno + '_' + data.line);
               }
             }
           );
@@ -574,7 +579,7 @@ export class JmeitblComponent implements OnInit {
   }
   updGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
-    this.frmArr.controls[i].get('gcode')!.setValue(val);
+    this.rowCtl(this.frmArr.controls[i]).gcode.setValue(val);
     this.apollo.watchQuery<GoodResult>({
       query: Query.GetGood,
       variables: {
@@ -591,9 +596,9 @@ export class JmeitblComponent implements OnInit {
         let msgds = (data as GoodResult).msgoods_by_pk;
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-          this.frmArr.controls[i].get('gcode')!.setErrors({ 'incorrect': true });
+          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors({ 'incorrect': true });
         } else {
-          this.frmArr.controls[i].get('gcode')!.setErrors(null);
+          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msggroup);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
@@ -686,7 +691,7 @@ export class JmeitblComponent implements OnInit {
         }
         this.calcMei(i);
         if (this.frmArr.getRawValue()[i]['spec'] == null) {
-          this.frmArr.controls[i].get('spec')!.setErrors({ 'required': true });
+          this.rowCtl(this.frmArr.controls[i]).spec.setErrors({ 'required': true });
         }
         this.jmisrv.subject.next(true);
       });
@@ -702,7 +707,7 @@ export class JmeitblComponent implements OnInit {
         }
         this.calcMei(i);
         if (this.frmArr.getRawValue()[i]['spec'] == null) {
-          this.frmArr.controls[i].get('spec')!.setErrors({ 'required': true });
+          this.rowCtl(this.frmArr.controls[i]).spec.setErrors({ 'required': true });
         }
         this.jmisrv.subject.next(true);
       });
@@ -711,9 +716,9 @@ export class JmeitblComponent implements OnInit {
 
   changeSpec(i: number) {
     if (this.frmArr.getRawValue()[i]['spec'] == null) {
-      this.frmArr.controls[i].get('spec')!.setErrors({ 'required': true });
+      this.rowCtl(this.frmArr.controls[i]).spec.setErrors({ 'required': true });
     } else {
-      this.frmArr.controls[i].get('spec')!.setErrors(null);
+      this.rowCtl(this.frmArr.controls[i]).spec.setErrors(null);
     }
   }
   changeTax(i: number, value: number) {
@@ -721,6 +726,13 @@ export class JmeitblComponent implements OnInit {
     if (this.frmArr.getRawValue()[i]['mtax'] == "0") {
       this.frmArr.controls[i].patchValue({ tinmoney: (lcmoney + value) });
     }
+  }
+  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
+    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
+  }
+  private parentCtl(): Record<ParentField, AbstractControl> {
+    return this.parentForm().controls as Record<ParentField, AbstractControl>;
   }
   get frmArr(): FormArray {
     return this.parentForm().get('mtbl') as FormArray;
@@ -784,7 +796,7 @@ export class JmeitblComponent implements OnInit {
           spdet: null,
           pable: 0,
           genka: 0,
-          scode: this.parentForm().get('scode')!.value,
+          scode: this.parentCtl().scode.value,
           sday: null,
           tanka1: 0,
           money: 0,

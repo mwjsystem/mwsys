@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GoodsService } from './../../mstgoods/goods.service';
@@ -14,6 +14,9 @@ interface AffectedRows { affected_rows: number }
 interface GoodsNameResult { msgoods_by_pk: { gtext: string; unit: string; gskbn: string } | null }
 /** upd_msgzai ミューテーションの結果 */
 interface UpdGzaiResult { delete_msgzai: AffectedRows; insert_msgzai: AffectedRows }
+/** 明細の 1 行のフォーム項目名 */
+type RowField = 'line' | 'zcode' | 'gtext' | 'irisu' | 'gskbn' | 'unit';
+
 @Component({
     selector: 'app-gzai',
     templateUrl: './gzai.component.html',
@@ -60,6 +63,10 @@ export class GzaiComponent implements OnInit {
   }
 
   ngOnInit(): void { }
+  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
+    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
+  }
   get frmArr(): FormArray {
     return this.form.get('mtbl') as FormArray;
   }
@@ -102,7 +109,7 @@ export class GzaiComponent implements OnInit {
   /** 商品コードを行に反映し、商品名・単位を取得する（直接入力と商品ヘルプの両方から呼ぶ） */
   getGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
-    this.frmArr.controls[i].get('zcode')!.setValue(val);
+    this.rowCtl(this.frmArr.controls[i]).zcode.setValue(val);
     const GetMast = gql`
     query get_goods($id: smallint!, $gcode: String!) {
       msgoods_by_pk(id:$id, gcode:$gcode) {
@@ -124,7 +131,7 @@ export class GzaiComponent implements OnInit {
         this.frmArr.controls[i].patchValue((data as GoodsNameResult).msgoods_by_pk ?? {});
       }, (error) => {
         this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-        this.frmArr.controls[i].get('zcode')!.setErrors({ 'incorrect': true });
+        this.rowCtl(this.frmArr.controls[i]).zcode.setErrors({ 'incorrect': true });
         console.log('error query get_goods', error);
       });
   }

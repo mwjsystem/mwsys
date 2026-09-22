@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input, viewChild, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -21,6 +21,11 @@ interface GoodResult {
     msgtankas: { genka: number; taxrate: number; currency: string }[];
   } | null;
 }
+/** 明細の 1 行のフォーム項目名 */
+type RowField = 'chk' | 'line' | 'gcode' | 'gtext' | 'suu' | 'genka' | 'money' | 'taxrate' | 'unit' | 'mmemo' | 'spec' | 'jdenno' | 'jline' | 'day' | 'yday' | 'ydaykbn' | 'inday' | 'mtax';
+/** 親フォームのうち、この明細が参照する項目名 */
+type ParentField = 'day' | 'mtax';
+
 @Component({
     selector: 'app-hmeitbl',
     templateUrl: './hmeitbl.component.html',
@@ -152,7 +157,7 @@ export class HmeitblComponent implements OnInit {
   updGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
     // console.log(this.frmArr.controls[i]);
-    this.frmArr.controls[i].get('gcode')!.setValue(val);
+    this.rowCtl(this.frmArr.controls[i]).gcode.setValue(val);
     const GetGood = gql`
     query get_good($id: smallint!,$gds:String!,$day: date!) {
       msgoods_by_pk(gcode: $gds, id: $id){
@@ -179,7 +184,7 @@ export class HmeitblComponent implements OnInit {
       variables: {
         id: this.usrsrv.compid,
         gds: val,
-        day: this.parentForm().get('day')!.value
+        day: this.parentCtl().day.value
       },
     })
       .valueChanges
@@ -188,13 +193,13 @@ export class HmeitblComponent implements OnInit {
 
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-          this.frmArr.controls[i].get('gcode')!.setErrors({ 'incorrect': true });
+          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors({ 'incorrect': true });
         } else {
           // console.log(msgds);
-          this.frmArr.controls[i].get('gcode')!.setErrors(null);
+          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
-          this.frmArr.controls[i].patchValue({ day: this.parentForm().get('day')!.value, mtax: this.parentForm().get('mtax')!.value });
+          this.frmArr.controls[i].patchValue({ day: this.parentCtl().day.value, mtax: this.parentCtl().mtax.value });
           this.calcTot();
         }
         this.hmisrv.subject.next(true);
@@ -250,6 +255,13 @@ export class HmeitblComponent implements OnInit {
       this.frmArr.push(this.createRow(i + 1));
     }
     this.refresh();
+  }
+  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
+    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
+  }
+  private parentCtl(): Record<ParentField, AbstractControl> {
+    return this.parentForm().controls as Record<ParentField, AbstractControl>;
   }
   get frmArr(): FormArray {
     // console.log(this.parentForm);    

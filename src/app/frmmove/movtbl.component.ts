@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input, viewChild, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -13,6 +13,11 @@ import { take } from 'rxjs/operators';
 
 /** get_good クエリの結果 */
 interface GoodResult { msgoods_by_pk: { gcode: string; gtext: string; unit: string; gskbn: string; msgzais: Gzai[] } | null }
+/** 明細の 1 行のフォーム項目名 */
+type RowField = 'chk' | 'line' | 'gcode' | 'gtext' | 'suu' | 'unit' | 'gskbn' | 'pable' | 'stock' | 'memo' | 'jdenno' | 'jline' | 'kako' | 'msgzais';
+/** 親フォームのうち、この明細が参照する項目名 */
+type ParentField = 'outcode' | 'incode' | 'day';
+
 @Component({
     selector: 'app-movtbl',
     templateUrl: './movtbl.component.html',
@@ -89,7 +94,7 @@ export class MovtblComponent implements OnInit {
 
   updGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
-    this.frmArr.controls[i].get('gcode')!.setValue(val);
+    this.rowCtl(this.frmArr.controls[i]).gcode.setValue(val);
     const GetGood = gql`
     query get_good($id: smallint!,$gds:String!) {
       msgoods_by_pk(gcode: $gds, id: $id){
@@ -119,10 +124,10 @@ export class MovtblComponent implements OnInit {
 
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-          this.frmArr.controls[i].get('gcode')!.setErrors({ 'incorrect': true });
+          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors({ 'incorrect': true });
         } else {
           console.log(msgds);
-          this.frmArr.controls[i].get('gcode')!.setErrors(null);
+          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.getMtbl(i, 'msgzais').clear(); // 商品コードを変えたとき、前の商品の構成品を残さない
           msgds.msgzais.forEach(e => {
@@ -171,25 +176,25 @@ export class MovtblComponent implements OnInit {
   setPable(i: number, gcd: string, msgzais: Gzai[]) {
     // console.log(gcd, this.parentForm.get('incode').value);
     if (this.frmArr.controls[i].value.gskbn == "0") {
-      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm().get('outcode')!.value).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentCtl().outcode.value).then(result => {
         // console.log(result);
         this.frmArr.controls[i].patchValue({ pable: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
         // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
-      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentForm().get('incode')!.value).then(result => {
+      this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentCtl().incode.value).then(result => {
         // console.log(result);
         this.frmArr.controls[i].patchValue({ stock: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
         // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
     } else if (this.frmArr.controls[i].value.gskbn == "1") {
-      this.stcsrv.getSetZai(this.parentForm().get('outcode')!.value, msgzais).then(result => {
+      this.stcsrv.getSetZai(this.parentCtl().outcode.value, msgzais).then(result => {
         this.setZai[i] = result;
         this.frmArr.controls[i].patchValue({ pable: this.stcsrv.getPaabl(result) });
         this.movsrv.subject.next(true);
       });
-      this.stcsrv.getSetZai(this.parentForm().get('incode')!.value, msgzais).then(result => {
+      this.stcsrv.getSetZai(this.parentCtl().incode.value, msgzais).then(result => {
         this.setZai[i] = result;
         this.frmArr.controls[i].patchValue({ stock: this.stcsrv.getPaabl(result) });
         this.movsrv.subject.next(true);
@@ -219,6 +224,13 @@ export class MovtblComponent implements OnInit {
       this.frmArr.push(this.createRow(i + 1));
     }
     this.refresh();
+  }
+  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
+    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
+  }
+  private parentCtl(): Record<ParentField, AbstractControl> {
+    return this.parentForm().controls as Record<ParentField, AbstractControl>;
   }
   get frmArr(): FormArray {
     // console.log(this.parentForm);    
@@ -347,16 +359,16 @@ export class MovtblComponent implements OnInit {
       e.msgood.msgzais.forEach(zai => {
         const parentForm = this.parentForm();
         this.trzaiko.push({
-          scode: parentForm.get('incode')!.value,
+          scode: this.parentCtl().incode.value,
           gcode: zai.zcode,
-          day: parentForm.get('day')!.value,
+          day: this.parentCtl().day.value,
           movi: e.suu * zai.irisu * -1,
           movo: 0
         });
         this.trzaiko.push({
-          scode: parentForm.get('outcode')!.value,
+          scode: this.parentCtl().outcode.value,
           gcode: zai.zcode,
-          day: parentForm.get('day')!.value,
+          day: this.parentCtl().day.value,
           movi: 0,
           movo: e.suu * zai.irisu * -1,
         });

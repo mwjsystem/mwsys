@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { VcdhelpComponent } from './../vcdhelp/vcdhelp.component';
 import { GrpcdhelpComponent } from './../grpcdhelp/grpcdhelp.component';
@@ -13,6 +13,9 @@ import gql from 'graphql-tag';
 /** 加工工程の 1 行（フォームの値）。項目の型は入力に応じて文字列・数値・未入力(null) */
 type MsprocValue = string | number | null;
 type MsprocRow = Record<'prcname' | 'prcbody' | 'vcode' | 'code' | 'memo' | 'tanka' | 'genka' | 'posi01' | 'posi02', MsprocValue>;
+/** 明細の 1 行のフォーム項目名 */
+type RowField = 'prcno' | 'prcname' | 'prcbody' | 'vcode' | 'code' | 'memo' | 'tanka' | 'genka' | 'posi01' | 'posi02';
+
 @Component({
     selector: 'app-msproc',
     templateUrl: './msproc.component.html',
@@ -55,7 +58,7 @@ export class MsprocComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.frmArr.controls[i].get('vcode')!.setValue(data.code);
+          this.rowCtl(this.frmArr.controls[i]).vcode.setValue(data.code);
           // this.vcdtxt = data.adrname;
         }
       }
@@ -73,13 +76,13 @@ export class MsprocComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.frmArr.controls[i].get('code')!.setValue(data.code);
+          this.rowCtl(this.frmArr.controls[i]).code.setValue(data.code);
         }
       }
     );
   }
 
-  prcprtHelp(i: number, fld: string): void {
+  prcprtHelp(i: number, fld: RowField): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     dialogConfig.data = {
@@ -90,7 +93,7 @@ export class MsprocComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.frmArr.controls[i].get(fld)!.setValue(data.patno);
+          this.rowCtl(this.frmArr.controls[i])[fld].setValue(data.patno);
         }
       }
     );
@@ -125,6 +128,10 @@ export class MsprocComponent implements OnInit {
       posi02: [proc?.posi02]
 
     });
+  }
+  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
+    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
   }
   get frmArr(): FormArray {
     return this.form.get('mtbl') as FormArray;
