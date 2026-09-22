@@ -66,7 +66,7 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setGrpcd(row)"></tr>
 </table>
-<mat-paginator #paginators [length]="$safeNavigationMigration(dataSource?.data.length)" [pageIndex]="0"
+<mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
   [pageSizeOptions]="[20, 50, 100, 250, 1000]">
 </mat-paginator>
 </div>

@@ -60,7 +60,7 @@ export class HmeihelpComponent implements OnInit {
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  dataSource!: MatTableDataSource<Hatmei>;
+  dataSource = new MatTableDataSource<Hatmei>([]);
   subject = new Subject<Hatmei[]>();
   observe = this.subject.asObservable();
   displayedColumns = [

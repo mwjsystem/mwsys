@@ -18,7 +18,7 @@
       <input matInput type="number" (input)="ftel=$event.target.value">
     </mat-form-field>
     <button class="mat-raised-button" color="warn" (click)="diaDet(-1)">新規登録</button>
-    <mat-paginator #paginators [length]="$safeNavigationMigration(dataSource?.data.length)" [pageIndex]="0"
+    <mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
       [pageSizeOptions]="[20, 50, 100, 250, 1000]">
     </mat-paginator>
   </mat-toolbar>

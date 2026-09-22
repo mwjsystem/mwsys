@@ -58,7 +58,7 @@ export class NdnohelpComponent implements OnInit {
       .position().global().centerHorizontally().centerVertically()
   });
 
-  dataSource!: MatTableDataSource<Nyusub>;
+  dataSource = new MatTableDataSource<Nyusub>([]);
   subject = new Subject<Nyusub[]>();
   observe = this.subject.asObservable();
   displayedColumns = [

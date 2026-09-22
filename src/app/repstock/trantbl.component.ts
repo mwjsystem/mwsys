@@ -19,7 +19,7 @@ export class TrantblComponent implements OnInit {
   cdRef = inject(ChangeDetectorRef);
 
   readonly paginator = viewChild(MatPaginator);
-  public dataSource!: MatTableDataSource<Trans>;
+  public dataSource = new MatTableDataSource<Trans>([]);
   public displayedColumns = ['ttype', 'sday', 'yday', 'aitec', 'aiten', 'denno', 'mline', 'tcode', 'biko', 'insuu',
     'ousuu', 'zaisu', 'yotei', 'wait'];
 

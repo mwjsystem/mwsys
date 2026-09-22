@@ -50,7 +50,7 @@ export class MdnohelpComponent implements OnInit {
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
-  dataSource!: MatTableDataSource<Movsub>;
+  dataSource = new MatTableDataSource<Movsub>([]);
   // subject = new Subject<Movsub[]>();
   // observe = this.subject.asObservable();
   displayedColumns = [

@@ -75,7 +75,7 @@
   </table>
   <mat-toolbar class="flex flex-wrap space-x-4">
     <button mat-raised-button (click)="chFlg()">日付並び順反転</button>
-    <mat-paginator #paginators [length]="$safeNavigationMigration(dataSource?.data.length)" [pageIndex]="0" [pageSize]="15"
+    <mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0" [pageSize]="15"
       [pageSizeOptions]="[15, 30, 50, 100]">
     </mat-paginator>
   </mat-toolbar>
