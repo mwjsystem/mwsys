@@ -724,7 +724,8 @@ export class JmeitblComponent implements OnInit {
   changeTax(i: number, value: string) { // 入力欄からは文字列が渡される
     const lcmoney: number = this.frmArr.controls[i].value.suu * this.frmArr.controls[i].value.tanka;
     if (this.frmArr.getRawValue()[i]['mtax'] == "0") {
-      this.frmArr.controls[i].patchValue({ tinmoney: (lcmoney + value) });
+      const lctax: number = Number(value.replace(/,/g, '')); // 消費税金額（入力欄の値は文字列。桁区切りのカンマを除いて数値にする）
+      this.frmArr.controls[i].patchValue({ tinmoney: (lcmoney + lctax) });
     }
   }
   /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
