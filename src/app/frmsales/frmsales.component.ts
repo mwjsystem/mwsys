@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, AbstractControl, Validators } from '@angular/forms';
 
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -26,6 +26,8 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
 
 /** get_member クエリの結果 */
 interface MemberResult { msmember_by_pk: mwI.Member | null }
+/** 受注入力フォームの項目名（明細の mtbl は除く） */
+type JyudenField = 'torikbn' | 'mcode' | 'scde' | 'ncode' | 'nsaki' | 'nadr' | 'buntype' | 'day' | 'yday' | 'sday' | 'uday' | 'nday' | 'tcode' | 'scode' | 'skbn' | 'jcode' | 'pcode' | 'hcode' | 'hday' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'nmemo' | 'smemo' | 'omemo' | 'cusden' | 'ryoate' | 'daibiki' | 'daibzei' | 'daibunrui' | 'chubunrui' | 'shobunrui' | 'tcode1' | 'gtotalzn' | 'soryozn' | 'tesuzn' | 'nebikizn' | 'taxtotal' | 'total' | 'genka' | 'hgenka' | 'egenka' | 'isaki' | 'iadr' | 'total8' | 'total10' | 'dokono' | 'eidome' | 'eicode';
 @Component({
     selector: 'app-frmsales',
     templateUrl: './frmsales.component.html',
@@ -60,6 +62,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 
   readonly jmeitbl = viewChild.required(JmeitblComponent);
   form!: FormGroup;
+  /** フォームの項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private get ctl(): Record<JyudenField, AbstractControl> {
+    return this.form.controls as Record<JyudenField, AbstractControl>;
+  }
   mode: number = 3;
   vnyuzan!: mwI.Vnyuzan;
   hktval: mwI.Sval[] = [];
@@ -183,30 +189,30 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   selBetsu(value: string) {
     if (value == "2") {
       console.log(this.form.get('nadr'));
-      this.form.get('nadr')!.setValue('');
-      this.form.get('nadr')!.enable();
-      this.form.get('buntype')!.setValue(this.jmisrv.tntype);
+      this.ctl.nadr.setValue('');
+      this.ctl.nadr.enable();
+      this.ctl.buntype.setValue(this.jmisrv.tntype);
     } else {
-      this.form.get('nadr')!.setValue(+value);
-      this.form.get('nadr')!.disable();
-      this.form.get('buntype')!.setValue(this.jmisrv.ntype);
+      this.ctl.nadr.setValue(+value);
+      this.ctl.nadr.disable();
+      this.ctl.buntype.setValue(this.jmisrv.ntype);
       this.changeEda(+value);
     }
   }
 
   selIrai(value: string) {
     if (value == " ") {
-      this.form.get('iadr')!.reset();
-      this.form.get('iadr')!.disable();
+      this.ctl.iadr.reset();
+      this.ctl.iadr.disable();
       this.changeIadr(null);
     } else if (value == "2") {
       // console.log(this.form.get('nadr'));
-      this.form.get('iadr')!.setValue('');
-      this.form.get('iadr')!.enable();
+      this.ctl.iadr.setValue('');
+      this.ctl.iadr.enable();
       this.changeIadr(null);
     } else {
-      this.form.get('iadr')!.setValue(+value);
-      this.form.get('iadr')!.disable();
+      this.ctl.iadr.setValue(+value);
+      this.ctl.iadr.disable();
       this.changeIadr(+value);
     }
   }
@@ -244,8 +250,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getRows(fldnm: string): number {
-    const lines: number = (this.form.get(fldnm)!.value + '\n').match(/\n/g)!.length;
+  getRows(fldnm: JyudenField): number {
+    const lines: number = (this.ctl[fldnm].value + '\n').match(/\n/g)!.length;
     return lines;
   }
 
@@ -302,16 +308,16 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           } else {
             let jyuden: mwI.Trjyuden = result;
             if (jyuden.nadr > 1) {
-              this.form.get('nsaki')!.setValue("2");
+              this.ctl.nsaki.setValue("2");
             } else {
-              this.form.get('nsaki')!.setValue(jyuden.nadr.toString());
+              this.ctl.nsaki.setValue(jyuden.nadr.toString());
             }
             if (jyuden.iadr == null) {
-              this.form.get('isaki')!.setValue(" ");
+              this.ctl.isaki.setValue(" ");
             } else if (jyuden.iadr > 1) {
-              this.form.get('isaki')!.setValue("2");
+              this.ctl.isaki.setValue("2");
             } else {
-              this.form.get('isaki')!.setValue(jyuden.nadr.toString());
+              this.ctl.isaki.setValue(jyuden.nadr.toString());
             }
             this.form.patchValue(jyuden);
             this.jmeitbl().setJyumei(jyuden);
@@ -345,7 +351,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.cdRef.detectChanges();
   }
 
-  mcdHelp(fldnm: string): void {
+  mcdHelp(fldnm: JyudenField): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width = '100vw';
     dialogConfig.height = '98%';
@@ -355,7 +361,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get(fldnm)!.setValue(data.mcode);
+          this.ctl[fldnm].setValue(data.mcode);
         }
       }
     );
@@ -377,8 +383,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       data => {
         if (typeof data != 'undefined') {
           if (flg) {
-            this.form.get('dokono')!.setValue(data.denno);
-            this.form.get('okurino')!.setValue(data.okurino);
+            this.ctl.dokono.setValue(data.denno);
+            this.ctl.okurino.setValue(data.okurino);
           } else {
             this.jmisrv.denno = data.denno;
             this.getJyuden(this.jmisrv.denno);
@@ -396,12 +402,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       lcmcode = "";
     }
     this.getMember(lcmcode, true);	
-    this.form.get('mcode')!.setValue(lcmcode);
+    this.ctl.mcode.setValue(lcmcode);
 	if (this.form.value.scde == null) {
-	　 this.form.get('scde')!.setValue(lcmcode);      
+	　 this.ctl.scde.setValue(lcmcode);      
 	}  
     if (this.form.value.ncode == null) {
-      this.form.get('ncode')!.setValue(lcmcode);
+      this.ctl.ncode.setValue(lcmcode);
 	}
 	// console.log(this.form.value);
   }
@@ -410,16 +416,16 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     if (eda !== null) {
       let i: number = this.memsrv.adrs.findIndex(obj => obj.eda == eda);
       if (i > -1) {
-        this.form.get('nadr')!.setErrors(null);
+        this.ctl.nadr.setErrors(null);
         const adr = this.memsrv.adrs[i];
-        this.form.get('nmemo')!.setValue(adr.nmemo);
-        this.form.get('smemo')!.setValue(adr.smemo);
-        this.form.get('omemo')!.setValue(adr.omemo);
+        this.ctl.nmemo.setValue(adr.nmemo);
+        this.ctl.smemo.setValue(adr.smemo);
+        this.ctl.omemo.setValue(adr.omemo);
 		// console.log('changeeda',adr.street ,adr.extend,(adr.extend ?? ''));
         this.jmisrv.address = adr.zip + '\n' + adr.region + adr.local + '\n' + (adr.street ?? '') + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
       } else {
         this.usrsrv.toastInf("別納品先枝番" + eda + "は登録されていません");
-        this.form.get('nadr')!.setErrors({ 'incorrect': true });
+        this.ctl.nadr.setErrors({ 'incorrect': true });
       }
     }
   }
@@ -438,12 +444,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     if (eda !== null) {
       let i: number = this.memsrv.adrs.findIndex(obj => obj.eda == eda);
       if (i > -1) {
-        this.form.get('iadr')!.setErrors(null);
+        this.ctl.iadr.setErrors(null);
         const adr = this.memsrv.adrs[i];
         this.jmisrv.iaddress = adr.zip + '\n' + adr.region + adr.local + '\n' + (adr.street ?? '') + '\n' + (adr.extend ?? '') + (adr.extend2 ?? '') + '\n' + adr.adrname + '\n' + adr.tel;
       } else {
         this.usrsrv.toastInf("依頼主枝番" + eda + "は登録されていません");
-        this.form.get('iadr')!.setErrors({ 'incorrect': true });
+        this.ctl.iadr.setErrors({ 'incorrect': true });
       }
     } else {
       this.jmisrv.iaddress = "";
@@ -455,7 +461,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     if (this.usrsrv.compid == 1 && this.form.value.mcode == 408223) {
       okrno = await this.jmisrv.checkAmazon(this.form.value.hcode, okrno);
     }
-    this.form.get('okurino')!.setValue(okrno);
+    this.ctl.okurino.setValue(okrno);
   }
 
   getMember(mcode: string, flg: boolean) {//flg:true⇒画面変更時、false⇒受注伝票読込時
@@ -476,12 +482,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           if (flg) {
             // console.log(member, member.gadr);
             this.form.patchValue(member);
-            this.form.get('nsaki')!.setValue(member.gadr);
+            this.ctl.nsaki.setValue(member.gadr);
             if (member.gadr == "0" || member.gadr == "1") {
-              this.form.get('nadr')!.setValue(member.gadr);
-              this.form.get('buntype')!.setValue(member.ntype);
+              this.ctl.nadr.setValue(member.gadr);
+              this.ctl.buntype.setValue(member.ntype);
             } else if (member.gadr == "2") {
-              this.form.get('buntype')!.setValue(member.tntype);
+              this.ctl.buntype.setValue(member.tntype);
             }
             this.selHcd(member.hcode);
             let i: number = this.okrsrv.hokuri.findIndex(obj => obj.code == member.hcode);
@@ -489,7 +495,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
               // console.log(this.okrsrv.hokuri[i].hscode, member.htime);
               let k: number = this.okrsrv.hktime.findIndex(obj => obj.hscode == this.okrsrv.hokuri[i].hscode && obj.bunrui == member.htime);
               if (k > -1) {
-                this.form.get('htime')!.setValue(this.okrsrv.hktime[k].code);
+                this.ctl.htime.setValue(this.okrsrv.hktime[k].code);
               }
             }
           }
@@ -504,7 +510,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           this.memsrv.edas = [];
           this.memsrv.adrs = [];
 		  this.jmisrv.dmemo = member.dmemo;
-		  this.form.get('dmemo')!.setValue("");
+		  this.ctl.dmemo.setValue("");
           this.nskVal = [];
           this.nskVal.push({ value: "0", viewval: "基本住所" });
           for (let j = 0; j < msmadrs.length; j++) {
@@ -546,7 +552,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     }
   }
 
-  diaBetsu(adrnm: string): void {
+  diaBetsu(adrnm: JyudenField): void {
     let ncd: string = this.form.value.ncode;
     let flg: boolean = false;
     if (this.mode < 3) {
@@ -568,7 +574,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
           // console.log(data);
           if (typeof data != 'undefined' && this.mode != 3) {
 
-            this.form.get(adrnm)!.setValue(data);
+            this.ctl[adrnm].setValue(data);
             if (adrnm === 'nadr') {
               this.changeEda(data);
             } else {
@@ -595,11 +601,11 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.mode = 1;
     this.form.reset();
     this.jmisrv.denno = 0;
-    this.form.get('tcode')!.setValue(this.usrsrv.staff.code);
-    this.form.get('day')!.setValue(new Date());
-    this.form.get('yday')!.setValue(this.usrsrv.getNextday(new Date()));
+    this.ctl.tcode.setValue(this.usrsrv.staff.code);
+    this.ctl.day.setValue(new Date());
+    this.ctl.yday.setValue(this.usrsrv.getNextday(new Date()));
     // this.form.get('scode').setValue(this.usrsrv.staff.scode);
-    this.form.get('skbn')!.setValue("0");
+    this.ctl.skbn.setValue("0");
     this.jmeitbl().frmArr.clear();
 	this.jmisrv.isSaving = false;
     this.refresh();
