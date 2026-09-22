@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, input, inject } from '@angular/core';
-import { FormGroupDirective, FormGroup, FormControl, Validators, ControlContainer, FormArray, FormBuilder } from '@angular/forms';
+import { FormGroupDirective, FormGroup, FormControl, Validators, ControlContainer, FormArray, FormBuilder, AbstractControl } from '@angular/forms';
 import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
@@ -7,6 +7,8 @@ import { BunruiService } from './../../services/bunrui.service';
 import { DownloadService } from './../../services/download.service';
 import { Observable, Subject } from 'rxjs';
 
+/** 住所グループの項目名 */
+type AdrField = 'zip' | 'region' | 'local' | 'street' | 'extend' | 'extend2' | 'adrname' | 'tel' | 'fax' | 'tel2' | 'tel3' | 'nmemo' | 'smemo' | 'omemo' | 'del' | 'target' | 'htitle';
 interface AffectedRows { affected_rows: number }
 /** 顧客住所（msmadr）へ渡す値。eda は住所の枝番、ftel は電話番号をまとめた表示用の値 */
 type MadrInput = mwI.Adrs & { id: number; mcode: string; ftel: string };
@@ -37,6 +39,13 @@ export class AddressComponent implements OnInit {
   private apollo = inject(Apollo);
 
   readonly formName = input.required<string>();
+  /** 親フォームへ追加した、このコンポーネントの住所グループ（名前は formName）。項目は名前を型で限定して adrCtl から取り出す */
+  private get adrForm(): FormGroup {
+    return this.parent.form.controls[this.formName()] as FormGroup;
+  }
+  private get adrCtl(): Record<AdrField, AbstractControl> {
+    return this.adrForm.controls as Record<AdrField, AbstractControl>;
+  }
 
   ngOnInit(): void {
     const form = this.parent.form;
@@ -61,16 +70,16 @@ export class AddressComponent implements OnInit {
       htitle: new FormControl('')
     }));
   }
-  updTel(fldnm: string, event: Event) {
+  updTel(fldnm: AdrField, event: Event) {
     let val: string = this.usrsrv.convTel((event.target as HTMLInputElement)?.value);
     // console.log(value,val);
-    this.parent.form.get(this.formName())!.get(fldnm)!.setValue(val);
+    this.adrCtl[fldnm].setValue(val);
   }
 
   async getAdr(event: Event) {
     this.dwlsrv.getAdr((event.target as HTMLInputElement)?.value).then(result => {
       // console.log(result, result.results)
-      this.parent.form.get(this.formName())!.patchValue({
+      this.adrForm.patchValue({
         region: result.results[0].address1,
         local: result.results[0].address2,
         street: result.results[0].address3
@@ -79,30 +88,29 @@ export class AddressComponent implements OnInit {
   }
   saveMadr(mcode: string, eda: string | number, mode: number): Subject<mwI.Adrs> {
     // console.log(this.formName,eda);
-    const form = this.parent.form;
     let neweda: Subject<mwI.Adrs> = new Subject();
     let madr: MadrInput = {
       id: this.usrsrv.compid,
       mcode: mcode,
       eda: eda as number, // 新規登録のときは、通知の前に採番した数値へ置き換える
-      zip: this.usrsrv.editFrmval(form.get(this.formName())!, 'zip'),
-      region: this.usrsrv.editFrmval(form.get(this.formName())!, 'region'),
-      local: this.usrsrv.editFrmval(form.get(this.formName())!, 'local'),
-      street: this.usrsrv.editFrmval(form.get(this.formName())!, 'street'),
-      extend: this.usrsrv.editFrmval(form.get(this.formName())!, 'extend'),
-      tel: this.usrsrv.editFrmval(form.get(this.formName())!, 'tel'),
-      fax: this.usrsrv.editFrmval(form.get(this.formName())!, 'fax'),
-      tel2: this.usrsrv.editFrmval(form.get(this.formName())!, 'tel2'),
-      tel3: this.usrsrv.editFrmval(form.get(this.formName())!, 'tel3'),
-      extend2: this.usrsrv.editFrmval(form.get(this.formName())!, 'extend2'),
-      adrname: this.usrsrv.editFrmval(form.get(this.formName())!, 'adrname'),
-      nmemo: this.usrsrv.editFrmval(form.get(this.formName())!, 'nmemo'),
-      smemo: this.usrsrv.editFrmval(form.get(this.formName())!, 'smemo'),
-      omemo: this.usrsrv.editFrmval(form.get(this.formName())!, 'omemo'),
-      del: this.usrsrv.editFrmval(form.get(this.formName())!, 'del'),
-      ftel: this.usrsrv.editFtel(form.get(this.formName())!, 'tel', 'fax', 'tel2', 'tel3'),
-      target: Boolean(form.get(this.formName())!.value.target),
-      htitle: this.usrsrv.editFrmval(form.get(this.formName())!, 'htitle')
+      zip: this.usrsrv.editFrmval(this.adrForm, 'zip'),
+      region: this.usrsrv.editFrmval(this.adrForm, 'region'),
+      local: this.usrsrv.editFrmval(this.adrForm, 'local'),
+      street: this.usrsrv.editFrmval(this.adrForm, 'street'),
+      extend: this.usrsrv.editFrmval(this.adrForm, 'extend'),
+      tel: this.usrsrv.editFrmval(this.adrForm, 'tel'),
+      fax: this.usrsrv.editFrmval(this.adrForm, 'fax'),
+      tel2: this.usrsrv.editFrmval(this.adrForm, 'tel2'),
+      tel3: this.usrsrv.editFrmval(this.adrForm, 'tel3'),
+      extend2: this.usrsrv.editFrmval(this.adrForm, 'extend2'),
+      adrname: this.usrsrv.editFrmval(this.adrForm, 'adrname'),
+      nmemo: this.usrsrv.editFrmval(this.adrForm, 'nmemo'),
+      smemo: this.usrsrv.editFrmval(this.adrForm, 'smemo'),
+      omemo: this.usrsrv.editFrmval(this.adrForm, 'omemo'),
+      del: this.usrsrv.editFrmval(this.adrForm, 'del'),
+      ftel: this.usrsrv.editFtel(this.adrForm, 'tel', 'fax', 'tel2', 'tel3'),
+      target: Boolean(this.adrForm.value.target),
+      htitle: this.usrsrv.editFrmval(this.adrForm, 'htitle')
     }
     if (mode == 2) {
       this.apollo.mutate<UpdMadrResult>({
