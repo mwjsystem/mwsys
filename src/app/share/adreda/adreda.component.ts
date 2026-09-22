@@ -24,7 +24,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   private usrsrv = inject(UserService);
   private apollo = inject(Apollo);
 
-  private readonly child = viewChild(AddressComponent);
+  private readonly child = viewChild.required(AddressComponent);
   mode: number = 3;
   form!: FormGroup;
   eda: number | string;
@@ -66,7 +66,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     if (this.mode == 3) {
       this.dialogRef.close(this.eda);
     } else {
-      this.child()!.saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
+      this.child().saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
         this.updateAdrs(madr);
         this.eda = madr.eda;
         this.mode = 3;
@@ -98,7 +98,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   }
 
   save(): void {
-    this.child()!.saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
+    this.child().saveMadr(this.memsrv.mcode, this.eda, this.mode).subscribe(madr => {
       this.updateAdrs(madr);
       this.eda = madr.eda;
       this.mode = 3;

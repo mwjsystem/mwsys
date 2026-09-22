@@ -48,7 +48,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
   private overlay = inject(Overlay);
   private cdRef = inject(ChangeDetectorRef);
 
-  readonly simeitbl = viewChild(SimeitblComponent);
+  readonly simeitbl = viewChild.required(SimeitblComponent);
   form!: FormGroup;
   denno: number = 0;
   hdenno: number = 0;
@@ -85,7 +85,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
       this.route.paramMap.subscribe((params: ParamMap) => {
         if (params.get('mode') === null) {
           this.cancel();
-        } else if (+params.get('mode')! == 1) {
+        } else if (Number(params.get('mode')) == 1) {
           this.modeToCre();
           // this.route.queryParamMap.pipe(
           //   filter(n => Object.keys(n["params"]).length !== 0)
@@ -101,12 +101,12 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
           //     })
           //   }
           // )
-          this.denno = +params.get('denno')!;
+          this.denno = Number(params.get('denno'));
           this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
         } else {
-          this.mode = +params.get('mode')!;
+          this.mode = Number(params.get('mode'));
           if (params.get('denno') !== null) {
-            this.denno = +params.get('denno')!;
+            this.denno = Number(params.get('denno'));
             this.getSiiden(this.denno);
           }
           this.refresh();
@@ -134,7 +134,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
             // this.form.patchValue(siiden.msvendor[0]);
             this.usrsrv.setTmstmp(siiden);
             this.smisrv.siimei = siiden.trsiimeis;
-            this.simeitbl()!.setSiimei();
+            this.simeitbl().setSiimei();
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             // this.denno = denno;
             // history.replaceState('', '', './frmsupply/' + this.mode + '/' + this.denno);
@@ -171,7 +171,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
             this.form.patchValue({ inday: hatden.vhatzns[0].yday });
             // this.usrsrv.setTmstmp(hatden);
             this.smisrv.convHatmei(denno, hatden.vhatzns);
-            this.simeitbl()!.setSiimei();
+            this.simeitbl().setSiimei();
           }
           this.refresh();
           this.overlayRef.detach();
@@ -190,7 +190,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
 
   test(value: unknown) {
     // this.toastr.info(this.form.value.yday);
-    console.log(this.simeitbl()!.getSiimei(this.denno));
+    console.log(this.simeitbl().getSiimei(this.denno));
     this.refresh();
     // this.router.navigate(['/mstmember','3',value]);
     // const url = this.router.createUrlTree(['/mstmember','3',value]);
@@ -257,8 +257,8 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
     this.form.get('inday')!.setValue(new Date());
     this.form.get('scode')!.setValue(this.usrsrv.staff.scode);
-    this.simeitbl()!.frmArr.clear();
-    this.simeitbl()!.addRows(1);
+    this.simeitbl().frmArr.clear();
+    this.simeitbl().addRows(1);
     this.refresh();
   }
 
@@ -297,7 +297,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     }
 
     if (this.mode == 2) {
-      let siimei = this.simeitbl()!.getSiimei(this.denno);
+      let siimei = this.simeitbl().getSiimei(this.denno);
       this.smisrv.updSiiden(this.denno, siiden, siimei)
         .then(result => {
           // console.log('update_hatden',result);
@@ -310,7 +310,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
         });
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('sdenno', 1, this.denno);
-      const siimei = this.simeitbl()!.getSiimei(this.denno);
+      const siimei = this.simeitbl().getSiimei(this.denno);
       const trsiiden: SiidenNew[] = [{
         ...{
           id: this.usrsrv.compid,

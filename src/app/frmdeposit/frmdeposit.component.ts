@@ -37,7 +37,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private cdRef = inject(ChangeDetectorRef);
 
-  readonly depttbl = viewChild(DepttblComponent);
+  readonly depttbl = viewChild.required(DepttblComponent);
   form!: FormGroup;
   denno: number = 0;
   rows: FormArray = this.fb.array([]);
@@ -72,11 +72,11 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
         if (params.get('mode') === null) {
           this.cancel();
         } else {
-          this.depsrv.mode = +params.get('mode')!;
+          this.depsrv.mode = Number(params.get('mode'));
           this.refresh();
         }
         if (params.get('denno') !== null) {
-          this.denno = +params.get('denno')!;
+          this.denno = Number(params.get('denno'));
           this.getNyuden(this.denno);
         }
       });
@@ -116,7 +116,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
                 }
               );
             }
-            this.depttbl()!.setTbl();
+            this.depttbl().setTbl();
             this.form.get('day')!.setValue(result.day);
             this.form.get('code')!.setValue(result.code);
             this.form.get('tcode')!.setValue(result.tcode);
@@ -259,8 +259,8 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     this.denno = 0;
     this.jyuden = new Jyuden();
     this.depsrv.subHis.next([new Nyuhis()]);
-    this.depttbl()!.frmArr.clear();
-    this.depttbl()!.insRow(1);
+    this.depttbl().frmArr.clear();
+    this.depttbl().insRow(1);
     this.refresh();
   }
   modeToUpd(): void {
@@ -289,7 +289,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     }
 
     if (this.depsrv.mode == 2) {
-      let dept = this.depttbl()!.getMtbl(this.denno);
+      let dept = this.depttbl().getMtbl(this.denno);
       this.depsrv.updNyuden(this.denno, head, dept)
         .then(result => {
           // console.log('update_hatden',result);
@@ -304,7 +304,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
 
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('ndenno', 1, this.denno);
-      let dept = this.depttbl()!.getMtbl(this.denno);
+      let dept = this.depttbl().getMtbl(this.denno);
       const trnyusub = [{
         ...{
           id: this.usrsrv.compid,

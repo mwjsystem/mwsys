@@ -41,7 +41,7 @@ export class FrmmoveComponent implements OnInit {
   private router = inject(Router);
   private title = inject(Title);
 
-  readonly movtbl = viewChild(MovtblComponent);
+  readonly movtbl = viewChild.required(MovtblComponent);
   form!: FormGroup;
   denno: number = 0;
   mode: number = 3;
@@ -83,7 +83,7 @@ export class FrmmoveComponent implements OnInit {
     this.route.paramMap.subscribe((params: ParamMap) => {
       if (params.get('mode') === null) {
         this.cancel();
-      } else if (+params.get('mode')! == 1) {
+      } else if (Number(params.get('mode')) == 1) {
         this.modeToCre();
         this.route.queryParams.pipe(
           filter(p => Object.keys(p).length !== 0)
@@ -91,20 +91,20 @@ export class FrmmoveComponent implements OnInit {
           params => {
             Object.keys(params).map(k => {
               if (k == "stkey") {
-                const stra = JSON.parse(localStorage.getItem(params[k])!);
+                const stra = JSON.parse(localStorage.getItem(params[k]) ?? 'null');
                 this.form.patchValue({ incode: stra.incode, outcode: stra.outcode });
-                this.movtbl()!.insRows(stra.mei, true);
+                this.movtbl().insRows(stra.mei, true);
                 localStorage.removeItem(params[k]);
               }
             })
           }
         )
-        this.denno = +params.get('denno')!;
+        this.denno = Number(params.get('denno'));
         this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
       } else {
-        this.mode = +params.get('mode')!;
+        this.mode = Number(params.get('mode'));
         if (params.get('denno') !== null) {
-          this.denno = +params.get('denno')!;
+          this.denno = Number(params.get('denno'));
           // console.log(this.denno);
           this.getMovden(this.denno);
         }
@@ -134,7 +134,7 @@ export class FrmmoveComponent implements OnInit {
             this.form.patchValue(movsub);
             this.selHcd(movsub.hcode); // 保存済みの配送方法に合わせて、配送時間の候補を出す
             this.usrsrv.setTmstmp(movsub);
-            this.movtbl()!.setMovmei(movsub.trmovdens);
+            this.movtbl().setMovmei(movsub.trmovdens);
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             this.denno = denno;
             history.replaceState('', '', './frmmove/' + this.mode + '/' + this.denno);
@@ -242,23 +242,23 @@ export class FrmmoveComponent implements OnInit {
 
     // console.log('save',this.mode,this.form)
     if (this.mode == 2) {
-      let movmei = this.movtbl()!.getMovmei(this.denno);
+      let movmei = this.movtbl().getMovmei(this.denno);
       this.movsrv.updMovden(this.denno, movsub, movmei)
         .then(result => {
           this.usrsrv.toastSuc('移動伝票' + this.denno + 'の変更を保存しました');
 
           //  zaiko更新処理 (読込時分マイナス)
-          this.movtbl()!.trzaiko.forEach(e => {
+          this.movtbl().trzaiko.forEach(e => {
             this.movsrv.updZaiko(e);
           });
 
           //  zaiko更新処理 (通常分プラス)。各明細の構成品ごとに、入庫先へ加算・出庫元から減算
-          const zaikoNew = this.movtbl()!.getZaikoNew(movsub.day, movsub.incode, movsub.outcode);
+          const zaikoNew = this.movtbl().getZaikoNew(movsub.day, movsub.incode, movsub.outcode);
           zaikoNew.forEach(z => {
             this.movsrv.updZaiko(z);
           });
           //  保存後にもう一度変更保存しても在庫が狂わないよう、取り消し用データを今回の内容に入れ替える
-          this.movtbl()!.setTrzaikoFrom(zaikoNew);
+          this.movtbl().setTrzaikoFrom(zaikoNew);
           this.form.markAsPristine();
           this.cancel();
         }).catch(error => {
@@ -270,7 +270,7 @@ export class FrmmoveComponent implements OnInit {
       
 	  this.denno = await this.usrsrv.getNumber('mdenno', 1, this.denno);
 	  // console.log('sinki1',this.denno);
-      const movmei = this.movtbl()!.getMovmei(this.denno);
+      const movmei = this.movtbl().getMovmei(this.denno);
 	  // console.log('sinki',movmei);
       const trmovsub: MovsubNew[] = [{
         ...{
@@ -287,12 +287,12 @@ export class FrmmoveComponent implements OnInit {
           this.usrsrv.toastSuc('移動伝票' + this.denno + 'を新規登録しました');
 
           //  zaiko更新処理 (新規分プラス)。各明細の構成品ごとに、入庫先へ加算・出庫元から減算
-          const zaikoNew = this.movtbl()!.getZaikoNew(movsub.day, movsub.incode, movsub.outcode);
+          const zaikoNew = this.movtbl().getZaikoNew(movsub.day, movsub.incode, movsub.outcode);
           zaikoNew.forEach(z => {
             this.movsrv.updZaiko(z);
           });
           //  登録直後に変更保存しても在庫が狂わないよう、取り消し用データを今回の内容にしておく
-          this.movtbl()!.setTrzaikoFrom(zaikoNew);
+          this.movtbl().setTrzaikoFrom(zaikoNew);
           this.form.markAsPristine();
           this.cancel();
         }).catch(error => {
@@ -309,8 +309,8 @@ export class FrmmoveComponent implements OnInit {
     this.denno = 0;
     this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
     this.form.get('day')!.setValue(new Date());
-    this.movtbl()!.frmArr.clear();
-    this.movtbl()!.addRows(1);
+    this.movtbl().frmArr.clear();
+    this.movtbl().addRows(1);
     this.refresh();
 
   }

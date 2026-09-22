@@ -45,7 +45,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
   private overlay = inject(Overlay);
   private cdRef = inject(ChangeDetectorRef);
 
-  readonly hmeitbl = viewChild(HmeitblComponent);
+  readonly hmeitbl = viewChild.required(HmeitblComponent);
   form!: FormGroup;
   denno: number = 0;
   mode: number = 3;
@@ -89,7 +89,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
       this.route.paramMap.subscribe((params: ParamMap) => {
         if (params.get('mode') === null) {
           this.cancel();
-        } else if (+params.get('mode')! == 1) {
+        } else if (Number(params.get('mode')) == 1) {
           this.modeToCre();
           // console.log(params);
           // JSON.parse(localstrage.getItem()); 
@@ -99,23 +99,23 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
             params => {
               Object.keys(params).map(k => {
                 if (k == "stkey") {
-                  const stra = JSON.parse(localStorage.getItem(params[k])!);
+                  const stra = JSON.parse(localStorage.getItem(params[k]) ?? 'null');
                   this.form.patchValue({ vcode: stra.vcd });
                   this.updVcd(stra.vcd);
-                  this.hmeitbl()!.insRows(stra.mei, true);
+                  this.hmeitbl().insRows(stra.mei, true);
                   // console.log(stra.hdno,this.denno);
                   localStorage.removeItem(params[k]);
                 }
               })
             }
           )
-          this.denno = +params.get('denno')!;
+          this.denno = Number(params.get('denno'));
           this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
           this.form.get('autoproc')!.setValue(true);
         } else {
-          this.mode = +params.get('mode')!;
+          this.mode = Number(params.get('mode'));
           if (params.get('denno') !== null) {
-            this.denno = +params.get('denno')!;
+            this.denno = Number(params.get('denno'));
             // console.log(this.denno);
             this.getHatden(this.denno);
           }
@@ -145,7 +145,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
             this.form.patchValue(hatden.msvendor[0]);
             this.usrsrv.setTmstmp(hatden);
             this.hmisrv.hatmei = hatden.vhatzns;
-            this.hmeitbl()!.setHatmei();
+            this.hmeitbl().setHatmei();
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             this.denno = denno;
             history.replaceState('', '', './frmsupply/' + this.mode + '/' + this.denno);
@@ -172,7 +172,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     // this.usrsrv.getNumber('denno',2).subscribe(value => {
     //   console.log(value);
     // });
-    console.log(this.hmeitbl()!.getHatmei(this.denno));
+    console.log(this.hmeitbl().getHatmei(this.denno));
     this.refresh();
     // this.router.navigate(['/mstmember','3',value]);
     // const url = this.router.createUrlTree(['/mstmember','3',value]);
@@ -268,8 +268,8 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.form.get('day')!.setValue(new Date());
     this.form.get('scode')!.setValue(this.usrsrv.staff.scode);
     // this.form.get('hdstatus').setValue("0"); 
-    this.hmeitbl()!.frmArr.clear();
-    const hmeitbl = this.hmeitbl()!;
+    this.hmeitbl().frmArr.clear();
+    const hmeitbl = this.hmeitbl();
     console.log(hmeitbl.frmArr);
     hmeitbl.addRows(1);
     this.refresh();
@@ -314,7 +314,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     }
 
     if (this.mode == 2) {
-      let hatmei = this.hmeitbl()!.getHatmei(this.denno);
+      let hatmei = this.hmeitbl().getHatmei(this.denno);
       this.hmisrv.updHatden(this.denno, hatden, hatmei)
         .then(result => {
           // console.log('update_hatden',result);
@@ -327,7 +327,7 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
         });
     } else {//新規登録
       this.denno = await this.usrsrv.getNumber('hdenno', 1, this.denno);
-      const hatmei = this.hmeitbl()!.getHatmei(this.denno);
+      const hatmei = this.hmeitbl().getHatmei(this.denno);
       const trhatden: HatdenNew[] = [{
         ...{
           id: this.usrsrv.compid,

@@ -75,8 +75,8 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   private apollo = inject(Apollo);
   private overlay = inject(Overlay);
 
-  readonly gdstbl = viewChild(GdstblComponent);
-  readonly gtnktbl = viewChild(GtnktblComponent);
+  readonly gdstbl = viewChild.required(GdstblComponent);
+  readonly gtnktbl = viewChild.required(GtnktblComponent);
 
   form!: FormGroup;
   mode: number = 3;
@@ -129,7 +129,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       if (params.get('mode') === null) {
         this.mode = 3;
       } else {
-        this.mode = +params.get('mode')!;
+        this.mode = Number(params.get('mode'));
       }
     });
     this.refresh();
@@ -268,8 +268,8 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
                     this.gdssrv.gtnks.push(Object.assign({ gcode: ggroup.msgoods[i].gcode }, ggroup.msgoods[i].msgtankas[j]));
                   }
                 }
-                this.gdstbl()!.setGoods();
-                this.gtnktbl()!.setGtanka();
+                this.gdstbl().setGoods();
+                this.gtnktbl().setGtanka();
                 // if(this.mode==3){
                 //   this.form.disable();
                 // }else{
@@ -313,7 +313,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     this.form.reset();
     this.frmArr.clear();
     this.frmArr2.clear();
-    this.gdstbl()!.insRow(false, 0);
+    this.gdstbl().insRow(false, 0);
     this.form.markAsPristine();
     this.refresh();
     // this.gdssrv.grpcd="新規登録"; 
@@ -521,9 +521,9 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   insTnkrow(emitParam: TnkAction) {
     // console.log(emitParam);
     if (emitParam.flg) {
-      this.gtnktbl()!.insRow(emitParam.row, emitParam.flgCP);
+      this.gtnktbl().insRow(emitParam.row, emitParam.flgCP);
     } else {
-      this.gtnktbl()!.delRow(emitParam.row);
+      this.gtnktbl().delRow(emitParam.row);
     }
 
   }
