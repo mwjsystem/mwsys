@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -12,6 +12,9 @@ import { MembsService } from './../mstmember/membs.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { NdnohelpComponent } from './../share/ndnohelp/ndnohelp.component';
+
+/** 入金入力フォーム の項目名（明細の mtbl は除く） */
+type DepositField = 'day' | 'scde' | 'code' | 'tcode' | 'memo' | 'nmoneysum' | 'smoneysum' | 'tmoneysum' | 'totalmoney' | 'jdenno' | 'sdenno';
 
 @Component({
     selector: 'app-frmdeposit',
@@ -39,6 +42,10 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
 
   readonly depttbl = viewChild.required(DepttblComponent);
   form!: FormGroup;
+  /** フォームの項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private get ctl(): Record<DepositField, AbstractControl> {
+    return this.form.controls as Record<DepositField, AbstractControl>;
+  }
   denno: number = 0;
   rows: FormArray = this.fb.array([]);
   jyuden: Jyuden = new Jyuden();
@@ -100,7 +107,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
           if (result.kubun == 1) {
             this.usrsrv.toastInf('請求入金伝票です');
           } else {
-            this.form.get('jdenno')!.setValue(+result.jdenno);
+            this.ctl.jdenno.setValue(+result.jdenno);
             this.getJyuden(result.jdenno);
             this.depsrv.nyuden = [];
             for (let i = 0; i < result.trnyudens.length; i++) {
@@ -117,9 +124,9 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
               );
             }
             this.depttbl().setTbl();
-            this.form.get('day')!.setValue(result.day);
-            this.form.get('code')!.setValue(result.code);
-            this.form.get('tcode')!.setValue(result.tcode);
+            this.ctl.day.setValue(result.day);
+            this.ctl.code.setValue(result.code);
+            this.ctl.tcode.setValue(result.tcode);
             this.refresh();
 
           }
@@ -141,10 +148,10 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
         } else if (result.nyuzan <= 0 && (this.depsrv.mode == 1 || (this.depsrv.mode == 2 && i < 0))) {
           this.usrsrv.toastInf('この受注伝票は入金済です');
         } else {
-          this.form.get('jdenno')!.setValue(denno);
+          this.ctl.jdenno.setValue(denno);
           this.jyuden = result;
-          this.form.get('scde')!.setValue(this.jyuden.scde);
-          this.form.get('code')!.setValue(this.jyuden.scde);
+          this.ctl.scde.setValue(this.jyuden.scde);
+          this.ctl.code.setValue(this.jyuden.scde);
           let nyuhis: Nyuhis[] = [];
           for (let i = 0; i < result.trnyusubs.length; i++) {
             if (this.denno !== result.trnyusubs[i].denno) {
@@ -227,14 +234,14 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get('jdenno')!.setValue(data.denno);
+          this.ctl.jdenno.setValue(data.denno);
           this.getJyuden(data.denno);
         }
       }
     );
 
   }
-  mcdHelp(fldnm: string): void {
+  mcdHelp(fldnm: DepositField): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width = '100vw';
     dialogConfig.height = '98%';
@@ -244,7 +251,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get(fldnm)!.setValue(data.mcode);
+          this.ctl[fldnm].setValue(data.mcode);
         }
       }
     );

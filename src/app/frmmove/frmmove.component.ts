@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
@@ -16,6 +16,9 @@ import { AdredaComponent } from './../share/adreda/adreda.component';
 import { MdnohelpComponent } from './../share/mdnohelp/mdnohelp.component';
 import { MovtblComponent } from './movtbl.component';
 import { filter } from 'rxjs/operators';
+
+/** 移動入力フォーム の項目名（明細の mtbl は除く） */
+type MoveField = 'day' | 'incode' | 'outcode' | 'tcode' | 'hcode' | 'hday' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'smemo' | 'omemo';
 
 @Component({
     selector: 'app-frmmove',
@@ -43,6 +46,10 @@ export class FrmmoveComponent implements OnInit {
 
   readonly movtbl = viewChild.required(MovtblComponent);
   form!: FormGroup;
+  /** フォームの項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private get ctl(): Record<MoveField, AbstractControl> {
+    return this.form.controls as Record<MoveField, AbstractControl>;
+  }
   denno: number = 0;
   mode: number = 3;
   hktval: mwI.Sval[] = [];
@@ -100,7 +107,7 @@ export class FrmmoveComponent implements OnInit {
           }
         )
         this.denno = Number(params.get('denno'));
-        this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
+        this.ctl.tcode.setValue(this.usrsrv.staff?.code);
       } else {
         this.mode = Number(params.get('mode'));
         if (params.get('denno') !== null) {
@@ -167,7 +174,7 @@ export class FrmmoveComponent implements OnInit {
 
   async setOkrno() {
     let okrno: string = await this.okrsrv.setOkurino(this.form.value.hcode);
-    this.form.get('okurino')!.setValue(okrno);
+    this.ctl.okurino.setValue(okrno);
   }
 
   selHcd(value: string) {
@@ -307,8 +314,8 @@ export class FrmmoveComponent implements OnInit {
     this.mode = 1;
     this.form.reset();
     this.denno = 0;
-    this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
-    this.form.get('day')!.setValue(new Date());
+    this.ctl.tcode.setValue(this.usrsrv.staff?.code);
+    this.ctl.day.setValue(new Date());
     this.movtbl().frmArr.clear();
     this.movtbl().addRows(1);
     this.refresh();

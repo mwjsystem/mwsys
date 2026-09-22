@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
@@ -19,6 +19,9 @@ import { SiimeiService, SiidenSet, SiidenNew } from './siimei.service';
 import { HatmeiService } from './../frmsupply/hatmei.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
+
+/** 仕入入力フォーム の項目名（明細の mtbl は除く） */
+type SiireField = 'vcode' | 'inday' | 'scode' | 'tcode' | 'currency' | 'dmemo' | 'gtotal' | 'tax' | 'total';
 
 @Component({
     selector: 'app-frmsiire',
@@ -50,6 +53,10 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
 
   readonly simeitbl = viewChild.required(SimeitblComponent);
   form!: FormGroup;
+  /** フォームの項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private get ctl(): Record<SiireField, AbstractControl> {
+    return this.form.controls as Record<SiireField, AbstractControl>;
+  }
   denno: number = 0;
   hdenno: number = 0;
   mode: number = 3;
@@ -102,7 +109,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
           //   }
           // )
           this.denno = Number(params.get('denno'));
-          this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
+          this.ctl.tcode.setValue(this.usrsrv.staff?.code);
         } else {
           this.mode = Number(params.get('mode'));
           if (params.get('denno') !== null) {
@@ -254,9 +261,9 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     this.mode = 1;
     this.form.reset();
     this.denno = 0;
-    this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
-    this.form.get('inday')!.setValue(new Date());
-    this.form.get('scode')!.setValue(this.usrsrv.staff.scode);
+    this.ctl.tcode.setValue(this.usrsrv.staff?.code);
+    this.ctl.inday.setValue(new Date());
+    this.ctl.scode.setValue(this.usrsrv.staff.scode);
     this.simeitbl().frmArr.clear();
     this.simeitbl().addRows(1);
     this.refresh();

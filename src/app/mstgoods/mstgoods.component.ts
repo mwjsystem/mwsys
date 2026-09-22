@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
@@ -51,6 +51,9 @@ interface TankaInput {
   taxrate: number;
   currency: string;
 }
+/** 商品グループのフォーム の項目名（明細の mtbl は除く） */
+type GoodsGroupField = 'kana' | 'name' | 'gkbn' | 'memo' | 'sozai' | 'vcode' | 'genre' | 'specurl' | 'category' | 'subcat';
+
 @Component({
     selector: 'app-mstgoods',
     templateUrl: './mstgoods.component.html',
@@ -79,6 +82,10 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   readonly gtnktbl = viewChild.required(GtnktblComponent);
 
   form!: FormGroup;
+  /** フォームの項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private get ctl(): Record<GoodsGroupField, AbstractControl> {
+    return this.form.controls as Record<GoodsGroupField, AbstractControl>;
+  }
   mode: number = 3;
   rows: FormArray = this.fb.array([]);
   rows2: FormArray = this.fb.array([]);
@@ -200,7 +207,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get('vcode')!.setValue(data.code);
+          this.ctl.vcode.setValue(data.code);
           this.cdRef.detectChanges();
         }
       }
@@ -210,7 +217,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   updKana(value: string) {
     let val: string = this.usrsrv.convKana(value);
     // console.log(value,val);
-    this.form.get('kana')!.setValue(val);
+    this.ctl.kana.setValue(val);
   }
 
   convUpper(event: Event) {

@@ -1,10 +1,13 @@
 import { Component, OnInit, ElementRef, ChangeDetectionStrategy, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, AbstractControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { UserService } from './../services/user.service';
 import { DownloadService } from './../services/download.service';
+
+/** 受注履歴フォーム の項目名（明細の mtbl は除く） */
+type HistoryField = 'mcode';
 
 @Component({
     selector: 'app-rephistory',
@@ -22,6 +25,10 @@ export class RephistoryComponent {
   private dialog = inject(MatDialog);
 
   form!: FormGroup;
+  /** フォームの項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private get ctl(): Record<HistoryField, AbstractControl> {
+    return this.form.controls as Record<HistoryField, AbstractControl>;
+  }
   constructor() {
     const title = this.title;
 
@@ -44,7 +51,7 @@ export class RephistoryComponent {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get('mcode')!.setValue(data.mcode);
+          this.ctl.mcode.setValue(data.mcode);
         }
       }
     );

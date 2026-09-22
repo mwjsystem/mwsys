@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
@@ -17,6 +17,9 @@ import { VendsService } from './../mstvendor/vends.service';
 import { DownloadService } from './../services/download.service';
 import { HatmeiService, HatdenSet, HatdenNew } from './hatmei.service';
 import { filter } from 'rxjs/operators';
+
+/** 発注入力フォーム の項目名（明細の mtbl は除く） */
+type SupplyField = 'vcode' | 'day' | 'scode' | 'tcode' | 'autoproc' | 'mtax' | 'currency' | 'dmemo' | 'inmemo' | 'gtotal' | 'tax' | 'total';
 
 @Component({
     selector: 'app-frmsupply',
@@ -47,6 +50,10 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
 
   readonly hmeitbl = viewChild.required(HmeitblComponent);
   form!: FormGroup;
+  /** フォームの項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
+  private get ctl(): Record<SupplyField, AbstractControl> {
+    return this.form.controls as Record<SupplyField, AbstractControl>;
+  }
   denno: number = 0;
   mode: number = 3;
   rows: FormArray = this.fb.array([]);
@@ -110,8 +117,8 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
             }
           )
           this.denno = Number(params.get('denno'));
-          this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
-          this.form.get('autoproc')!.setValue(true);
+          this.ctl.tcode.setValue(this.usrsrv.staff?.code);
+          this.ctl.autoproc.setValue(true);
         } else {
           this.mode = Number(params.get('mode'));
           if (params.get('denno') !== null) {
@@ -206,14 +213,14 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     return this.form.get('mtbl') as FormArray;
   }
 
-  vcdHelp(fldnm: string): void {
+  vcdHelp(fldnm: SupplyField): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     let dialogRef = this.dialog.open(VcdhelpComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.form.get(fldnm)!.setValue(data.code);
+          this.ctl[fldnm].setValue(data.code);
           // this.vcdtxt = data.adrname;
         }
       }
@@ -264,9 +271,9 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     this.mode = 1;
     this.form.reset();
     this.denno = 0;
-    this.form.get('tcode')!.setValue(this.usrsrv.staff?.code);
-    this.form.get('day')!.setValue(new Date());
-    this.form.get('scode')!.setValue(this.usrsrv.staff.scode);
+    this.ctl.tcode.setValue(this.usrsrv.staff?.code);
+    this.ctl.day.setValue(new Date());
+    this.ctl.scode.setValue(this.usrsrv.staff.scode);
     // this.form.get('hdstatus').setValue("0"); 
     this.hmeitbl().frmArr.clear();
     const hmeitbl = this.hmeitbl();

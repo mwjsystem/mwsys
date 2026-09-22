@@ -27,6 +27,10 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   private readonly child = viewChild.required(AddressComponent);
   mode: number = 3;
   form!: FormGroup;
+  /** 住所グループ（addr）。AddressComponent が初期化時にフォームへ追加するため、参照は都度 controls から取得する */
+  private get addrForm(): FormGroup {
+    return this.form.controls['addr'] as FormGroup;
+  }
   eda: number | string;
   edaOld!: number;
   flg: boolean; //true⇒枝番をセットボタン表示
@@ -89,7 +93,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
       omemo: this.memsrv.adrs[0].omemo,
       htitle: '0'
     };
-    this.form.get('addr')!.patchValue(memos);
+    this.addrForm.patchValue(memos);
   }
 
   modeToUpd(): void {
@@ -145,7 +149,7 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     if (i > -1) {
       let lcadrs: mwI.Adrs = this.memsrv.adrs[i];
       // console.log(adrs,this.form.get('addr'));
-      this.form.get('addr')!.patchValue(lcadrs);
+      this.addrForm.patchValue(lcadrs);
     }
     if (this.mode == 3) {
       this.form.disable();
