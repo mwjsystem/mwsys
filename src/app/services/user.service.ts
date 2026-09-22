@@ -263,33 +263,41 @@ export class UserService {
     return okrno.toString() + chkNum.toString();
   }
 
+  /** フォームの項目を取り出す。無い項目名を指定したときは、項目名を示すエラーにする */
+  private formCtl(frm: AbstractControl, fld: string): AbstractControl {
+    const ctl = frm.get(fld);
+    if (ctl === null) {
+      throw new Error('フォームに項目がありません: ' + fld);
+    }
+    return ctl;
+  }
   /** フォームの値をそのまま返す（空文字は null）。コントロールの値は未型付け（any）のため戻り値も any */
   editFrmval(frm: AbstractControl, fld: string): any {
     let val: any;
     // console.log(fld, frm.get(fld).value);
-    if (frm.get(fld)!.value == "") {
+    if (this.formCtl(frm, fld).value == "") {
       val = null;
     } else {
-      val = frm.get(fld)!.value;
+      val = this.formCtl(frm, fld).value;
     }
     return val;
   }
   editFrmday(frm: AbstractControl, fld: string): string | null {
     // console.log(fld, frm.get(fld).value);
     let val: string | null;
-    if (frm.get(fld)!.value == null) {
+    if (this.formCtl(frm, fld).value == null) {
       val = null;
     } else {
-      val = this.formatDate(frm.get(fld)!.value);
+      val = this.formatDate(this.formCtl(frm, fld).value);
     }
     return val;
   }
   editDay(frm: AbstractControl, fld: string): string {
     let val: string;
-    if (frm.get(fld)!.value == null) {
+    if (this.formCtl(frm, fld).value == null) {
       val = "2000-01-01";
     } else {
-      val = this.formatDate(frm.get(fld)!.value);
+      val = this.formatDate(this.formCtl(frm, fld).value);
     }
     // console.log(frm.get(fld).value,val);
     return val;
@@ -297,12 +305,12 @@ export class UserService {
 
   editInt(frm: AbstractControl, fld: string): string | null {
     let val: string | null;
-    if (frm.get(fld)!.value == null) {
+    if (this.formCtl(frm, fld).value == null) {
       val = null;
-    } else if (frm.get(fld)!.value == "") {
+    } else if (this.formCtl(frm, fld).value == "") {
       val = null;
     } else {
-      val = frm.get(fld)!.value.toString().replace(/,/g, "");
+      val = this.formCtl(frm, fld).value.toString().replace(/,/g, "");
     }
     return val;
   }
@@ -315,17 +323,11 @@ export class UserService {
     fld4?: string
   ): string {
     let val: string = "";
-    if (frm.get(fld1)!.value) {
-      val += frm.get(fld1)!.value.replace(/[^0-9]/g, "");
-    }
-    if (frm.get(fld2!)!.value) {
-      val += frm.get(fld2!)!.value.replace(/[^0-9]/g, "");
-    }
-    if (frm.get(fld3!)!.value) {
-      val += frm.get(fld3!)!.value.replace(/[^0-9]/g, "");
-    }
-    if (frm.get(fld4!)!.value) {
-      val += frm.get(fld4!)!.value.replace(/[^0-9]/g, "");
+    // fld2〜fld4 は省略できる（省略した項目は連結しない）
+    for (const fld of [fld1, fld2, fld3, fld4]) {
+      if (fld !== undefined && this.formCtl(frm, fld).value) {
+        val += this.formCtl(frm, fld).value.replace(/[^0-9]/g, "");
+      }
     }
     return val;
   }

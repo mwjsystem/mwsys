@@ -72,9 +72,10 @@ export class FrmkeepComponent implements OnInit {
     // console.log('start');
     this.route.paramMap.subscribe((params: ParamMap) => {
       // console.log('param',params);
-      if (params.get('denno') !== null) {
-        this.denno = Number(params.get('denno'));
-        this.getOpelog({ denno: params.get('denno')! }).subscribe(value => {
+      const denno = params.get('denno');
+      if (denno !== null) {
+        this.denno = Number(denno);
+        this.getOpelog({ denno }).subscribe(value => {
           console.log(value);
           this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
           this.overlayRef.detach();

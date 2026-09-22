@@ -128,9 +128,10 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
     this.route.paramMap.subscribe((params: ParamMap) => {
-      if (params.get('grpcd') != null) {
+      const grpcd = params.get('grpcd');
+      if (grpcd != null) {
         //１件分だけ先に読込
-        this.gdssrv.grpcd = params.get('grpcd')!;
+        this.gdssrv.grpcd = grpcd;
         this.getGgroup(this.gdssrv.grpcd);
       }
       if (params.get('mode') === null) {

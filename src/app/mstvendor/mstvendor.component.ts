@@ -84,8 +84,9 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
         this.mode = Number(params.get('mode'));
       }
       this.refresh();
-      if (params.get('vcd') !== null) {
-        this.vcd = params.get('vcd')!;
+      const vcd = params.get('vcd');
+      if (vcd !== null) {
+        this.vcd = vcd;
         this.get_vendor();
       }
     });

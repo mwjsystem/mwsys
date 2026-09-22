@@ -178,7 +178,7 @@ export class GdstblComponent {
           this.rowCtl(this.frmArr.controls[i]).gcode.setErrors({ 'exist': true });
         }
       });
-    (this.parentForm().get('mtbl2') as FormArray).controls[i].get('gcode')!.setValue(val);
+    this.rowCtl((this.parentForm().get('mtbl2') as FormArray).controls[i]).gcode.setValue(val);
   }
   createRow(flg: boolean, goods?: mwI.Goods) {
     return this.fb.group({
