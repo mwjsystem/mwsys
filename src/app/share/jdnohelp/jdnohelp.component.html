@@ -1,100 +1,104 @@
-<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">受注伝票検索</h1>
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle class="jdh-title">受注伝票検索</h1>
 
-<nav class="flex flex-wrap items-center gap-2">
-  <button class="m-1" mat-raised-button (click)="getJyuden()">検索</button>
-  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-    <mat-label>締請求</mat-label>
-    <mat-select [(ngModel)]="ftype">
-      <mat-option value="2">すべて</mat-option>
-      <mat-option value="0">都度伝票のみ</mat-option>
-      <mat-option value="1">締請求のみ</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-    <mat-label>日付</mat-label>
-    <mat-select [(ngModel)]="fdayfld">
-      <mat-option value="day">受付日</mat-option>
-      <mat-option value="yday">出荷予定日</mat-option>
-      <mat-option value="sday">出荷日</mat-option>
-      <mat-option value="uday">売上日</mat-option>
-      <mat-option value="nday">入金予定日</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-    <input matInput [(ngModel)]="fday" [matDatepicker]="picker1" [ngModelOptions]="{standalone: true}">
-    <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
-    <mat-datepicker #picker1></mat-datepicker>
-  </mat-form-field>
-  <span>以降</span>
-  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-    <mat-label>顧客コード</mat-label>
-    <mat-select [(ngModel)]="fmcdfld">
-      <mat-option value="mcode">受注先</mat-option>
-      <mat-option value="scde">請求先</mat-option>
-      <mat-option value="ncode">納入先</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-    <input matInput [(ngModel)]="fmcd" [ngModelOptions]="{standalone: true}">
-    <button mat-icon-button matSuffix (click)="mcdHelp()">
-      <mat-icon>find_replace</mat-icon>
-    </button>
-  </mat-form-field>
-  <span class="nmtxt">{{fmcd | mcdtxt}}</span>
-  @if (fmcdfld=='ncode') {
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-      <mat-label>納品先枝番</mat-label>
-      <input matInput [(ngModel)]="feda" [ngModelOptions]="{standalone: true}">
-      <button mat-icon-button matSuffix (click)="diaBetsu()">
-        <mat-icon>find_replace</mat-icon>
-      </button>
-    </mat-form-field>
-  }
-  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-    <mat-label>担当者</mat-label>
-    <mat-select [(ngModel)]="ftcd">
-      @for (sval of stfsrv.tcds; track sval) {
-        <mat-option [value]="sval.value">
-          {{sval.viewval}}
-        </mat-option>
+<section class="jdh-filters" aria-label="検索条件">
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">伝票</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>締請求</mat-label>
+        <mat-select [(ngModel)]="ftype">
+          <mat-option value="2">すべて</mat-option>
+          <mat-option value="0">都度伝票のみ</mat-option>
+          <mat-option value="1">締請求のみ</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>担当者</mat-label>
+        <mat-select [(ngModel)]="ftcd">
+          @for (sval of stfsrv.tcds; track sval) {
+            <mat-option [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
+        <mat-label>受注先伝票番号</mat-label>
+        <input matInput (input)="fcusden=$event.target.value">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">日付</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>日付の種類</mat-label>
+        <mat-select [(ngModel)]="fdayfld">
+          <mat-option value="day">受付日</mat-option>
+          <mat-option value="yday">出荷予定日</mat-option>
+          <mat-option value="sday">出荷日</mat-option>
+          <mat-option value="uday">売上日</mat-option>
+          <mat-option value="nday">入金予定日</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>この日以降</mat-label>
+        <input matInput [(ngModel)]="fday" [matDatepicker]="picker1" [ngModelOptions]="{standalone: true}">
+        <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">顧客</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>顧客の種類</mat-label>
+        <mat-select [(ngModel)]="fmcdfld">
+          <mat-option value="mcode">受注先</mat-option>
+          <mat-option value="scde">請求先</mat-option>
+          <mat-option value="ncode">納入先</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>顧客コード</mat-label>
+        <input matInput [(ngModel)]="fmcd" [ngModelOptions]="{standalone: true}">
+        <button mat-icon-button matSuffix (click)="mcdHelp()" aria-label="顧客を検索して選ぶ">
+          <mat-icon>find_replace</mat-icon>
+        </button>
+        <mat-hint>{{fmcd | mcdtxt}}</mat-hint>
+      </mat-form-field>
+      @if (fmcdfld=='ncode') {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+          <mat-label>納品先枝番</mat-label>
+          <input matInput [(ngModel)]="feda" [ngModelOptions]="{standalone: true}">
+          <button mat-icon-button matSuffix (click)="diaBetsu()" aria-label="納品先枝番を検索して選ぶ">
+            <mat-icon>find_replace</mat-icon>
+          </button>
+        </mat-form-field>
       }
-    </mat-select>
-  </mat-form-field>
-  <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
-    <mat-label>受注先伝票番号</mat-label>
-    <input matInput (input)="fcusden=$event.target.value">
-  </mat-form-field>
-<!-- <mat-form-field style="width:7em;">
-<mat-label>ｽﾃｰﾀｽ(受注伝票)</mat-label>
-<mat-select [value]="fjdst">
-  <mat-option *ngFor="let sval of bunsrv.kbn.jdstatus" [value]="sval.value">
-    {{sval.viewval}}
-  </mat-option>
-</mat-select>
-</mat-form-field>
-<mat-form-field style="width:7em;">
-  <mat-label>ｽﾃｰﾀｽ(出荷)</mat-label>
-  <mat-select [value]="fjsst">
-    <mat-option *ngFor="let sval of bunsrv.kbn.jdshsta" [value]="sval.value">
-      {{sval.viewval}}
-    </mat-option>
-  </mat-select>
-</mat-form-field> -->
-<!-- <mat-form-field>
-<mat-label>メール1～5</mat-label>
-<input matInput type="url" (input)="fmail=$event.target.value">
-</mat-form-field>
-<mat-form-field>
-  <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
-  <input matInput type="number" (input)="ftel=$event.target.value">
-</mat-form-field> -->
-<!-- </div> -->
-</nav>
-<mat-dialog-content>
-  <table mat-table [dataSource]="dataSource" aria-label="Elements">
+    </div>
+  </div>
+
+  <div class="jdh-actions">
+    <button mat-flat-button (click)="getJyuden()">
+      <mat-icon>search</mat-icon>
+      検索
+    </button>
+  </div>
+</section>
+
+<mat-dialog-content class="jdh-content">
+  <div class="jdh-summary" aria-live="polite">
+    <span class="jdh-count">{{dataSource.data.length}} 件</span>
+    <span class="jdh-hint">行をクリック（または Enter）で選択します</span>
+  </div>
+  <table mat-table [dataSource]="dataSource" class="jdh-table" aria-label="受注伝票の検索結果">
     <ng-container matColumnDef="denno">
-      <th mat-header-cell *matHeaderCellDef class="w-10">伝票番号</th>
-      <td mat-cell *matCellDef="let row">{{row.denno}}</td>
+      <th mat-header-cell *matHeaderCellDef>伝票番号</th>
+      <td mat-cell *matCellDef="let row" class="jdh-key">{{row.denno}}</td>
     </ng-container>
     <ng-container matColumnDef="day">
       <th mat-header-cell *matHeaderCellDef>受付日</th>
@@ -144,63 +148,57 @@
       <th mat-header-cell *matHeaderCellDef>受注先発注番号</th>
       <td mat-cell *matCellDef="let row">{{row.cusden}}</td>
     </ng-container>
-    <!-- <ng-container matColumnDef="skbn">
-    <th mat-header-cell *matHeaderCellDef>出荷対象区分</th>
-    <td mat-cell *matCellDef="let row">{{row.skbn}}</td>
-  </ng-container>
-  <ng-container matColumnDef="torikbn">
-    <th mat-header-cell *matHeaderCellDef>取引区分</th>
-    <td mat-cell *matCellDef="let row">{{row.torikbn}}</td>
-  </ng-container> -->
-  <ng-container matColumnDef="mcode">
-    <th mat-header-cell *matHeaderCellDef>受注顧客</th>
-    <td mat-cell *matCellDef="let row">{{row.mcode | mcdtxt}}</td>
-  </ng-container>
-  <ng-container matColumnDef="scde">
-    <th mat-header-cell *matHeaderCellDef>請求先顧客コード</th>
-    <td mat-cell *matCellDef="let row">{{row.scde}}</td>
-  </ng-container>
-  <ng-container matColumnDef="pcode">
-    <th mat-header-cell *matHeaderCellDef>入金予定コード</th>
-    <td mat-cell *matCellDef="let row">
-      <mat-select [value]="row.pcode" class="noArrow" [panelClass]="'my-panel-class'">
-        @for (sval of bunsrv.kbn.pay; track sval) {
-          <mat-option [value]="sval.value">
-            {{sval.viewval}}
-          </mat-option>
-        }
-      </mat-select>
-    </td>
-  </ng-container>
-  <ng-container matColumnDef="tcode1 ">
-    <th mat-header-cell *matHeaderCellDef>営業担当</th>
-    <td mat-cell *matCellDef="let row">{{row.tcode1 | staff}}</td>
-  </ng-container>
-  <ng-container matColumnDef="del">
-    <th mat-header-cell *matHeaderCellDef>削除フラグ</th>
-    <td mat-cell *matCellDef="let row">{{row.del}}</td>
-  </ng-container>
-  <ng-container matColumnDef="updated_at">
-    <th mat-header-cell *matHeaderCellDef>更新日時</th>
-    <td mat-cell *matCellDef="let row">{{row.updated_at}}</td>
-  </ng-container>
-  <ng-container matColumnDef="updated_by">
-    <th mat-header-cell *matHeaderCellDef>更新者</th>
-    <td mat-cell *matCellDef="let row">{{row.updated_by}}</td>
-  </ng-container>
-  <ng-container matColumnDef="gcode">
-    <th mat-header-cell *matHeaderCellDef>1行目品番</th>
-    <td mat-cell *matCellDef="let row">{{row.gcode}}</td>
-  </ng-container>
-  <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selDno(row)"></tr>
-</table>
-<mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
-  [pageSizeOptions]="[20, 50, 100, 250, 1000]">
-</mat-paginator>
-
-
+    <ng-container matColumnDef="mcode">
+      <th mat-header-cell *matHeaderCellDef>受注顧客</th>
+      <td mat-cell *matCellDef="let row">{{row.mcode | mcdtxt}}</td>
+    </ng-container>
+    <ng-container matColumnDef="scde">
+      <th mat-header-cell *matHeaderCellDef>請求先顧客コード</th>
+      <td mat-cell *matCellDef="let row">{{row.scde}}</td>
+    </ng-container>
+    <ng-container matColumnDef="pcode">
+      <th mat-header-cell *matHeaderCellDef>入金予定コード</th>
+      <td mat-cell *matCellDef="let row">
+        <mat-select [value]="row.pcode" class="noArrow" [panelClass]="'my-panel-class'">
+          @for (sval of bunsrv.kbn.pay; track sval) {
+            <mat-option [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          }
+        </mat-select>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="tcode1 ">
+      <th mat-header-cell *matHeaderCellDef>営業担当</th>
+      <td mat-cell *matCellDef="let row">{{row.tcode1 | staff}}</td>
+    </ng-container>
+    <ng-container matColumnDef="del">
+      <th mat-header-cell *matHeaderCellDef>削除フラグ</th>
+      <td mat-cell *matCellDef="let row">{{row.del}}</td>
+    </ng-container>
+    <ng-container matColumnDef="updated_at">
+      <th mat-header-cell *matHeaderCellDef>更新日時</th>
+      <td mat-cell *matCellDef="let row">{{row.updated_at}}</td>
+    </ng-container>
+    <ng-container matColumnDef="updated_by">
+      <th mat-header-cell *matHeaderCellDef>更新者</th>
+      <td mat-cell *matCellDef="let row">{{row.updated_by}}</td>
+    </ng-container>
+    <ng-container matColumnDef="gcode">
+      <th mat-header-cell *matHeaderCellDef>1行目品番</th>
+      <td mat-cell *matCellDef="let row">{{row.gcode}}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" tabindex="0"
+      (click)="selDno(row)" (keydown.enter)="selDno(row)"></tr>
+  </table>
+  @if (dataSource.data.length === 0) {
+    <p class="jdh-empty">表示する伝票がありません。条件を指定して「検索」を押してください。</p>
+  }
+  <mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
+    [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+  </mat-paginator>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-raised-button (click)="close()">閉じる</button>
+  <button mat-stroked-button (click)="close()">閉じる</button>
 </mat-dialog-actions>

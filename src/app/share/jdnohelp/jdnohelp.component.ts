@@ -46,7 +46,7 @@ interface JyudenResult { trjyuden: JyudenRow[] }
 @Component({
     selector: 'app-jdnohelp',
     templateUrl: './jdnohelp.component.html',
-    styleUrls: ['./../../help.component.scss'],
+    styleUrls: ['./../../help.component.scss', './jdnohelp.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
