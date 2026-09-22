@@ -355,7 +355,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   }
 
   getRows(fldnm: BaseField): number {
-    const lines: number = (this.baseCtl[fldnm].value + '\n').match(/\n/g)!.length;
+    const lines: number = (this.baseCtl[fldnm].value + '\n').split('\n').length - 1;
     return lines;
   }
 

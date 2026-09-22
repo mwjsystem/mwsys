@@ -251,7 +251,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   getRows(fldnm: JyudenField): number {
-    const lines: number = (this.ctl[fldnm].value + '\n').match(/\n/g)!.length;
+    const lines: number = (this.ctl[fldnm].value + '\n').split('\n').length - 1;
     return lines;
   }
 

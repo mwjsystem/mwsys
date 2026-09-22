@@ -98,7 +98,7 @@ export class DepttblComponent implements OnInit {
       nmoney: [deposit?.nmoney],
       smoney: [deposit?.smoney],
       tmoney: [deposit?.tmoney],
-      total: [deposit?.nmoney! - deposit?.smoney! + deposit?.tmoney!],
+      total: [deposit ? deposit.nmoney - deposit.smoney + deposit.tmoney : NaN], // 新規の行（deposit なし）は従来どおり NaN
       mmemo: [deposit?.mmemo]
     })
   }

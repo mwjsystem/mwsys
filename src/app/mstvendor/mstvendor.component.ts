@@ -97,7 +97,10 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
 
     script.charset = "UTF-8";
     const div = document.getElementById('script');
-    div!.insertAdjacentElement('afterend', script);
+    if (div === null) {
+      throw new Error('スクリプトの挿入先（#script）がありません');
+    }
+    div.insertAdjacentElement('afterend', script);
   }
 
   onEnter(): void {

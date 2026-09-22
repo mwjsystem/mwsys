@@ -193,7 +193,10 @@ export class FrmsupplyComponent implements OnInit, AfterViewInit {
     head['adrname'] = vend.name;
     head['tel'] = vend.tel;
     head['fax'] = vend.fax;
-    const store = (await this.strsrv.getStradr(this.form.getRawValue().scode))!;
+    const store = await this.strsrv.getStradr(this.form.getRawValue().scode);
+    if (store === null) {
+      throw new Error('倉庫の住所が取得できません');
+    }
     head['sname'] = store.name;
     head['szip'] = store.zip;
     head['sregion'] = store.region;

@@ -19,8 +19,7 @@ export class NavbarComponent implements OnInit {
   public db!: string;
 
   ngOnInit(): void {
-    this.db = localStorage.getItem('MWSYS_DB')!;
-    if (this.db == null) {
+    if (localStorage.getItem('MWSYS_DB') == null) {
       this.db = '本番環境';
     } else {
       this.db = 'テスト環境';

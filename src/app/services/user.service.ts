@@ -99,7 +99,10 @@ export class UserService {
     `;
 
     this.auth.user$.subscribe((user) => {
-      this.userInfo = user!;
+      if (user == null) {
+        throw new Error('ログインユーザーの情報がありません');
+      }
+      this.userInfo = user;
       // console.log('usersrv1', this.userInfo, this.compid);
       this.compid = this.userInfo["https://userids"][0];
       console.log('usersrv2', this.userInfo, this.compid);
@@ -205,8 +208,8 @@ export class UserService {
     `;
     // let observable:Observable<number> = new Observable<number>(observer => {
     return new Promise((resolve) => {
-      if (dno! > 0) {
-        return resolve(dno!);
+      if (dno != null && dno > 0) {
+        return resolve(dno);
       } else {
         this.apollo
           .mutate<CurnumResult>({
@@ -710,16 +713,16 @@ export class UserService {
   }
   getValiderr(obj: ValidationErrors | null, i?: number): string {
     let ret: string = "";
-    if (obj!.required) {
+    if (obj?.required) {
       ret += "未入力です！";
     }
-    if (obj!.email) {
+    if (obj?.email) {
       ret += "メールの形式が不正です！";
     }
-    if (obj!.incorrect) {
+    if (obj?.incorrect) {
       ret += "マスタ未登録です！";
     }
-    if (obj!.existed) {
+    if (obj?.existed) {
       ret += "マスタ登録済です！";
     }
     // console.log(obj);
