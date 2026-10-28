@@ -70,6 +70,9 @@ export class PickComponent implements AfterViewInit, OnDestroy {
   completed = false;
 
   private controls?: IScannerControls;
+  private stream?: MediaStream;
+  /** バーコード読み取りの部品（画面を開いたときに読み込んでおく。iPhone はカメラをタップの直後にしか起動できないため） */
+  private zxing = Promise.all([import('@zxing/browser'), import('@zxing/library')]);
   private lastText = '';
   private lastAt = 0;
   private audio?: AudioContext;
@@ -126,9 +129,8 @@ export class PickComponent implements AfterViewInit, OnDestroy {
     return this.needItems.every(e => e.done >= e.need);
   }
 
-  /** 伝票を開く */
+  /** 伝票を開く（カメラが動いていれば、そのまま商品の読み取りに使う） */
   async open(denno: number) {
-    this.stop();
     this.busy = true;
     this.otherDenno = 0;
     this.completed = false;
@@ -152,11 +154,17 @@ export class PickComponent implements AfterViewInit, OnDestroy {
         this.completed = this.doc.jdstatus == JDST.PICKED;
         if (this.doc.jdstatus == JDST.TOROKU) {
           this.show('出荷指示のあとに受注伝票が変更されています。新しい出荷指示書か確認してください', 'ng');
+          this.stop();
         } else if (this.completed) {
           this.show('この伝票はピッキング済です（もう一度確認できます）', 'info');
-        } else {
+          this.stop();
+        } else if (this.controls) {
+          this.mode = 'item';
           this.show('商品のバーコードを読んでください', 'info');
-          this.start('item');
+        } else {
+          // QR コードから開いたとき。iPhone ではタップしないとカメラを起動できないので、起動できなければボタンを案内する
+          this.show('「商品を読む」を押して、商品のバーコードを読んでください', 'info');
+          this.start('item', false);
         }
       }
     } catch (e) {
@@ -167,11 +175,16 @@ export class PickComponent implements AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  /** カメラで読み取りを始める */
-  async start(mode: 'qr' | 'item') {
-    this.stop();
+  /**
+   * カメラで読み取りを始める（QR コードも商品のバーコードも同じカメラで読む。mode は表示と解釈の切り替えだけ）。
+   * tap = false は画面を開いたときの自動起動で、起動できなくてもエラーにしない（iPhone はタップでしか起動できない）
+   */
+  async start(mode: 'qr' | 'item', tap = true) {
     this.mode = mode;
-    this.cdRef.detectChanges();
+    if (this.controls) {
+      this.cdRef.detectChanges();
+      return;
+    }
     const video = this.video()?.nativeElement;
     if (!video) {
       return;
@@ -182,26 +195,34 @@ export class PickComponent implements AfterViewInit, OnDestroy {
       this.cdRef.detectChanges();
       return;
     }
+    let stream: MediaStream | undefined;
     try {
-      const [{ BrowserMultiFormatReader }, { BarcodeFormat, DecodeHintType }] = await Promise.all([
-        import('@zxing/browser'), import('@zxing/library')
-      ]);
+      // タップの直後に、ほかの処理を挟まずにカメラを求める（iPhone の制限）
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+      const [{ BrowserMultiFormatReader }, { BarcodeFormat, DecodeHintType }] = await this.zxing;
       const hints = new Map<unknown, unknown>([
-        [DecodeHintType.POSSIBLE_FORMATS, mode == 'qr'
-          ? [BarcodeFormat.QR_CODE]
-          : [BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.UPC_E, BarcodeFormat.CODE_128, BarcodeFormat.QR_CODE]]
+        [DecodeHintType.POSSIBLE_FORMATS,
+          [BarcodeFormat.QR_CODE, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.UPC_E, BarcodeFormat.CODE_128]]
       ]);
       const reader = new BrowserMultiFormatReader(hints as Map<never, never>, { delayBetweenScanAttempts: 150 });
-      this.controls = await reader.decodeFromConstraints(
-        { video: { facingMode: { ideal: 'environment' } }, audio: false }, video,
-        result => {
-          if (result) {
-            this.onCode(result.getText());
-          }
-        });
+      this.stream = stream;
+      this.controls = await reader.decodeFromStream(stream, video, result => {
+        if (result) {
+          this.onCode(result.getText());
+        }
+      });
     } catch (e) {
-      this.show('カメラを起動できませんでした：' + (e as Error).message, 'ng');
+      stream?.getTracks().forEach(t => t.stop());
       this.mode = '';
+      const name = (e as DOMException)?.name;
+      if (name == 'NotAllowedError' && !tap) {
+        // 自動起動できなかっただけ。案内のメッセージはそのまま
+      } else if (name == 'NotAllowedError') {
+        this.show('カメラの使用が許可されていません。iPhone は「設定」→ 使っているブラウザ（Safari・Chrome）→「カメラ」を許可にし、' +
+          'ブラウザのこのサイトの設定でもカメラを許可してから、もう一度「商品を読む」を押してください', 'ng');
+      } else {
+        this.show('カメラを起動できませんでした：' + (e as Error).message, 'ng');
+      }
       console.log('error pick camera', e);
     }
     this.cdRef.detectChanges();
@@ -210,6 +231,8 @@ export class PickComponent implements AfterViewInit, OnDestroy {
   stop() {
     this.controls?.stop();
     this.controls = undefined;
+    this.stream?.getTracks().forEach(t => t.stop());
+    this.stream = undefined;
     this.mode = '';
   }
 
