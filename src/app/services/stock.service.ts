@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './user.service';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, firstValueFrom } from 'rxjs';
 
 export class Goods {
   gcode!: string;
@@ -100,7 +100,7 @@ interface GtanaResult { trgtana: { scode: string; gcode: string; tana: number | 
 /** get_zaiko クエリの結果（入出庫の合計のみ） */
 interface ZaikoSumResult { trzaiko_aggregate: ZaikoAgg }
 /** get_zaiko クエリの結果（getZaiko） */
-interface ZaikoResult extends ZaikoSumResult { today: SuuAgg; keepd: SuuAgg; hikat: SuuAgg; kpchk: SuuAgg; juzan: SuuAgg; tommo: SuuAgg }
+interface ZaikoResult extends ZaikoSumResult { today: SuuAgg; keepd: SuuAgg; hikat: SuuAgg; juzan: SuuAgg; tommo: SuuAgg }
 /** get_zaiko クエリの結果（getZaiko1: 内訳用） */
 interface Zaiko1Result extends ZaikoSumResult { hikat: SuuAgg; keepd: SuuAgg; vhatzn: { yday: Date; hatzn: number }[]; vhatzn_aggregate: HatznAgg }
 @Injectable({
@@ -521,13 +521,24 @@ export class StockService {
         aggregate { sum { suu }}}
       hikat:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in:["1","4","5","6"]},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
-      kpchk:vkeepzai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},del:{_eq:false}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
-        aggregate { sum { suu }}}
       juzan:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}} 
       tommo:vjmeizai_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $nextd}, trjyuden: {del: {_eq: false}}}) {
         aggregate { sum { suu }}}         
     }`;
+
+    // 倉庫で確保できた数（キープ表）。別に問い合わせ、失敗しても在庫の表示は止めない（0 として扱う）
+    const GetKeep = gql`
+    query get_keepzai($id: smallint!, $gcode: String!, $scode: String!, $today: date!) {
+      vkeepzai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},del:{_eq:false}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+        aggregate { sum { suu }}}
+    }`;
+    const keepPromise = firstValueFrom(this.apollo.query<{ vkeepzai_aggregate: SuuAgg }>({
+      query: GetKeep, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, gcode: gcd, scode: scd, today: tdy }
+    })).then(r => Number(r.data?.vkeepzai_aggregate.aggregate.sum.suu ?? 0)).catch(e => {
+      console.log('error query get_keepzai（Hasura で vkeepzai の Track・select と集計の権限を確認）', e);
+      return 0;
+    });
 
     return new Promise<Stock>(resolve => {
 
@@ -543,15 +554,16 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data: raw }) => {
+        .subscribe(async ({ data: raw }) => {
           if (!raw) {
             return;
           }
           const data = raw as ZaikoResult;
+          const kpchk = await keepPromise;
           // キープ済 = 倉庫でキープを確認して確保できた数（キープ表）。引当済 = それ以外の引当
           // （受注可能数 = 在庫 − 引当済 − キープ済 は、今までの引当〈引当区分 1,4,5,6〉＋キープ〈2〉の合計と同じ）
           const alloc = (data.hikat.aggregate.sum.suu || 0) + (data.keepd.aggregate.sum.suu || 0);
-          const kept = Math.min(data.kpchk.aggregate.sum.suu || 0, alloc);
+          const kept = Math.min(kpchk, alloc);
           // console.log(this.usrsrv.getNextday(tdy), data);
           let lcstcs: Stock = {
             gcode: gcd,
