@@ -7,6 +7,7 @@ import localeJa from '@angular/common/locales/ja';
 import { FrmshipRoutingModule } from './frmship-routing.module';
 import { FrmshipComponent } from './frmship.component';
 import { ShipprintComponent } from './shipprint.component';
+import { PickComponent } from './pick.component';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -41,7 +42,8 @@ registerLocaleData(localeJa);
         MatTooltipModule,
         MatToolbarModule,
         FrmshipComponent,
-        ShipprintComponent
+        ShipprintComponent,
+        PickComponent
     ],
     providers: [
         { provide: LOCALE_ID, useValue: 'ja-JP' }

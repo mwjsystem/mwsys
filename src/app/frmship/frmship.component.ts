@@ -160,7 +160,7 @@ export class FrmshipComponent implements OnInit, AfterViewInit {
         if (sel.length == 0) {
             return;
         }
-        const again = sel.filter(e => e.jdstatus == JDST.FOLDER || e.jdstatus == JDST.PRINTED);
+        const again = sel.filter(e => e.jdstatus == JDST.FOLDER || e.jdstatus == JDST.PRINTED || e.jdstatus == JDST.PICKED);
         if (again.length > 0 && !confirm('出荷指示フォルダを作成済の伝票が ' + again.length + ' 件あります（' + again.map(e => e.denno).join(', ') +
             '）。\nもう一度作成しますか？（倉庫で出力済のときは「差替分」のフォルダになります）')) {
             return;
@@ -222,7 +222,7 @@ export class FrmshipComponent implements OnInit, AfterViewInit {
     }
 
     statusColor(value: string | null): string {
-        return value == JDST.PRINTED ? '#2e7d32' : value == JDST.FOLDER ? '#1565c0' : value == JDST.TOROKU ? '#e65100' : '#666666';
+        return value == JDST.PICKED || value == JDST.PRINTED ? '#2e7d32' : value == JDST.FOLDER ? '#1565c0' : value == JDST.TOROKU ? '#e65100' : '#666666';
     }
 
     formName(buntype: string | null): string {

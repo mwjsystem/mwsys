@@ -6,7 +6,7 @@ import { CHECKERS, DenForm, isObi, shipNote } from './ship-forms';
 /** 住所（msmadr） */
 export interface ShipAdr { mcode: string; eda: number; zip: string | null; region: string | null; local: string | null; street: string | null; extend: string | null; extend2: string | null; adrname: string | null }
 /** 受注明細（trjyumei + 商品マスタの単位・棚番） */
-export interface ShipLine { line: number; gcode: string; gtext: string; suu: number; touttanka: number; toutmoney: number; taxrate: string | null; mmemo: string | null; unit: string | null; tanano: string | null }
+export interface ShipLine { line: number; gcode: string; gtext: string; suu: number; touttanka: number; toutmoney: number; taxrate: string | null; mmemo: string | null; unit: string | null; tanano: string | null; jan?: string | null }
 /** 会社情報（mssystem） */
 export interface ShipSystem { kname: string | null; invno: string | null; zip: string | null; adr: string | null; tel: string | null; fax: string | null }
 
@@ -48,6 +48,8 @@ export interface ShipDoc {
   total10: number;
   lines: ShipLine[];
   system: ShipSystem;
+  /** 出荷指示書の QR コード（倉庫のスマホでピッキングの画面を開く URL）。空なら出さない */
+  pickUrl?: string;
 }
 
 const yen = (v: number | null | undefined): string => Number(v ?? 0).toLocaleString('ja-JP');
@@ -279,6 +281,10 @@ export class ShipPdfService {
     }
     // 右上の大きな注意（納品書を同梱しない・帯の本数）
     const big: Content[] = [];
+    if (d.pickUrl) {
+      big.push({ qr: d.pickUrl, fit: 72, alignment: 'center', eccLevel: 'M' });
+      big.push({ text: 'ピッキング', fontSize: 7, alignment: 'center', margin: [0, 1, 0, 2] });
+    }
     if (noDoc) {
       big.push({ text: '納品書\n同梱なし', fontSize: 20, bold: true, alignment: 'center' });
     }

@@ -103,6 +103,9 @@
             @if (row.jdstatus == JDST.PRINTED && row.print_at) {
               <div style="font-size: 11px;">{{row.print_at | date:'M/d H:mm'}} 出力</div>
             }
+            @if (row.jdstatus == JDST.PICKED && row.pick_at) {
+              <div style="font-size: 11px;">{{row.pick_at | date:'M/d H:mm'}} 確認</div>
+            }
           </td>
         </ng-container>
         <ng-container matColumnDef="sday">

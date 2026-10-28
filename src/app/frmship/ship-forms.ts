@@ -13,6 +13,8 @@ export const JDST = {
   FOLDER: '3',
   /** 出荷指示出力済（倉庫で印刷した） */
   PRINTED: '4',
+  /** ピッキング済（倉庫のスマホで商品を確認した） */
+  PICKED: '5',
   KANRYO: '6',
   TORIKESI: '9'
 } as const;

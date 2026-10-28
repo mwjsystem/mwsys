@@ -1,0 +1,67 @@
+// ピッキング（スマホの縦画面向け）
+.pick {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 8px 10px 40px;
+  font-size: 16px;
+}
+.head {
+  margin-bottom: 6px;
+  .denno { font-size: 22px; font-weight: bold; }
+}
+.sub { color: #666666; font-size: 13px; }
+.video {
+  width: 100%;
+  max-height: 38vh;
+  background: #000000;
+  border-radius: 6px;
+  object-fit: cover;
+  &.hidden { display: none; }
+}
+.msg {
+  margin: 6px 0;
+  padding: 10px;
+  border-radius: 6px;
+  background: #eeeeee;
+  font-size: 17px;
+  font-weight: bold;
+  &.ok { background: #c8e6c9; color: #1b5e20; }
+  &.ng { background: #ffcdd2; color: #b71c1c; }
+  button { margin-top: 6px; }
+}
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+  button { min-height: 44px; }
+  .big { font-size: 18px; min-height: 52px; flex: 1 1 100%; }
+}
+.manual {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  input { flex: 1; font-size: 16px; padding: 8px; border: 1px solid #bbbbbb; border-radius: 4px; }
+}
+.progress { font-size: 18px; font-weight: bold; margin: 6px 0; }
+.item {
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 6px;
+  &.done { background: #e8f5e9; border-color: #66bb6a; }
+  &.skip { background: #fafafa; color: #888888; }
+  .code { font-size: 18px; font-weight: bold; }
+  .tana { margin-left: 10px; font-size: 15px; color: #1565c0; }
+  .name { font-size: 14px; }
+  .memo { color: #666666; font-size: 13px; }
+  .count {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    button { min-width: 44px; min-height: 40px; font-size: 18px; }
+    .num { font-size: 20px; font-weight: bold; min-width: 64px; text-align: center; }
+    .nojan { color: #e65100; font-size: 13px; }
+  }
+}

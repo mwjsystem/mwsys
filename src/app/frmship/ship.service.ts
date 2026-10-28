@@ -27,6 +27,7 @@ export interface ShipRow {
   shipdir: string | null;
   ship_at: string | null;
   print_at: string | null;
+  pick_at: string | null;
   total: number | null;
   denku: number | null;
   keep: string | null;
@@ -74,7 +75,7 @@ interface LoadResult {
   mshokuri: { code: string; name: string }[];
   mssystem: ShipSystem[];
 }
-interface GoodsResult { msgoods: { gcode: string; unit: string | null; tanano: string | null }[] }
+interface GoodsResult { msgoods: { gcode: string; unit: string | null; tanano: string | null; jan: string | null }[] }
 
 /** 空白（全角・半角）を詰める（現行マクロの Condese_Sp と同じ。フォルダ名に使う） */
 const condense = (s: string): string => s.replace(/[\s　]/g, '');
@@ -119,7 +120,7 @@ export class ShipService {
     const GetList = gql`
       query get_shiplist($where: trjyuden_bool_exp!) {
         trjyuden(where: $where, order_by: [{sday: asc}, {denno: asc}]) {
-          denno mcode ncode nadr buntype sday hday hcode okurisuu okurino tcode jdstatus shipdir ship_at print_at total denku keep
+          denno mcode ncode nadr buntype sday hday hcode okurisuu okurino tcode jdstatus shipdir ship_at print_at pick_at total denku keep
         }
       }`;
     const { data } = await firstValueFrom(this.apollo.query<{ trjyuden: ShipRow[] }>({
@@ -156,7 +157,7 @@ export class ShipService {
     const gcds = [...new Set(q.trjyumei.map(e => e.gcode).filter(e => !!e))];
     const GetGoods = gql`
       query get_shipgoods($id: smallint!, $gcds: [String!]!) {
-        msgoods(where: {id: {_eq: $id}, gcode: {_in: $gcds}}) { gcode unit tanano }
+        msgoods(where: {id: {_eq: $id}, gcode: {_in: $gcds}}) { gcode unit tanano jan }
       }`;
     const goods = gcds.length == 0 ? [] : ((await firstValueFrom(this.apollo.query<GoodsResult>({
       query: GetGoods, fetchPolicy: 'network-only', variables: { id: id, gcds: gcds }
@@ -208,16 +209,40 @@ export class ShipService {
           return {
             line: m.line, gcode: m.gcode, gtext: m.gtext, suu: sign * Number(m.suu ?? 0),
             touttanka: Number(m.touttanka ?? 0), toutmoney: sign * Number(m.toutmoney ?? 0),
-            taxrate: m.taxrate, mmemo: m.mmemo, unit: g?.unit ?? null, tanano: g?.tanano ?? null
+            taxrate: m.taxrate, mmemo: m.mmemo, unit: g?.unit ?? null, tanano: g?.tanano ?? null, jan: g?.jan ?? null
           };
         }),
         system: q.mssystem[0] ?? { kname: null, invno: null, zip: null, adr: null, tel: null, fax: null },
+        pickUrl: this.pickUrl(j.denno),
         // 以下は保存処理で使う（ShipDoc の外）
         staffSei: staff?.sei ?? '',
         buntype: j.buntype,
         jdstatus: j.jdstatus
       } as ShipDoc & { staffSei: string; buntype: string | null; jdstatus: string | null };
     });
+  }
+
+  /**
+   * 出荷指示書の QR コードの URL（スマホのカメラで読むと、ピッキングの画面が開く）。
+   * テスト環境で作った出荷指示書には ?db=test を付ける（スマホ側の接続先と違うときに画面で知らせるため）
+   */
+  pickUrl(denno: number): string {
+    return window.location.origin + '/frmship/pick/' + denno + (localStorage.getItem('MWSYS_DB') == null ? '' : '?db=test');
+  }
+
+  /** 受注ステータスを「ピッキング済」にする */
+  async setPicked(denno: number): Promise<void> {
+    const Upd = gql`
+      mutation upd_picked($id: smallint!, $dno: Int!, $set: trjyuden_set_input!) {
+        update_trjyuden(where: {id: {_eq: $id}, denno: {_eq: $dno}}, _set: $set) { affected_rows }
+      }`;
+    await firstValueFrom(this.apollo.mutate({
+      mutation: Upd,
+      variables: {
+        id: this.usrsrv.compid, dno: denno,
+        set: { jdstatus: JDST.PICKED, pick_at: new Date(), pick_by: this.usrsrv.staff.code }
+      }
+    }));
   }
 
   /** 納品書・出荷指示書の PDF（確認用。保存はしない） */
@@ -279,7 +304,7 @@ export class ShipService {
         const exists = (await this.nassrv.names(parent, 'directory')).filter(e => e.startsWith(d.denno + '_'));
         let name = base;
         if (exists.length > 0) {
-          const printed = exists.some(e => e.includes('【済')) || d.jdstatus == JDST.PRINTED;
+          const printed = exists.some(e => e.includes('【済')) || d.jdstatus == JDST.PRINTED || d.jdstatus == JDST.PICKED;
           const near = this.usrsrv.formatDate(new Date()) >= this.usrsrv.formatDate(this.usrsrv.getPrevday(this.toDate(d.sday)));
           if (printed || near) {
             const now = new Date();
