@@ -28,6 +28,10 @@ export class NasfolderComponent implements OnInit {
   folderName = '';
   /** 書き込みテストの結果 */
   result = '';
+  /** フォルダへの保存が使えないときの原因の表示用 */
+  secure = window.isSecureContext;
+  origin = window.location.origin;
+  agent = navigator.userAgent;
   busy = false;
 
   async ngOnInit() {

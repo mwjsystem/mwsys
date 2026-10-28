@@ -1,7 +1,13 @@
 <h1 mat-dialog-title>出荷フォルダ（NAS）の設定</h1>
 <mat-dialog-content>
   @if (!nassrv.supported) {
-    <p style="color: #c62828;">このブラウザはフォルダへの保存に対応していません。Chrome または Edge を使ってください。</p>
+    @if (!secure) {
+      <p style="color: #c62828;">この画面は https または http://localhost で開いたときだけ、フォルダへ保存できます。</p>
+      <p>現在のアドレス：{{origin}}</p>
+    } @else {
+      <p style="color: #c62828;">このブラウザはフォルダへの保存に対応していません。Chrome または Edge を使ってください。</p>
+    }
+    <p style="color: #666; font-size: 12px;">ブラウザの情報：{{agent}}</p>
   } @else {
     <p>出荷指示書・納品書・送り状データを保存する、NAS のフォルダを選んでください（この PC で最初に一度だけ）。</p>
     <p style="color: #666;">例：\\192.168.30.133\share\asago出荷（「ネットワーク」から NAS を開くか、割り当てたドライブから選びます）</p>

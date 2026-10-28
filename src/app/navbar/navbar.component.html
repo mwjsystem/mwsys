@@ -120,7 +120,8 @@
       <button mat-menu-item [matMenuTriggerFor]="setmenu">
         <mat-icon>settings</mat-icon>初期設定(ﾀﾞｳﾝﾛｰﾄﾞを使用する場合)
       </button>
-      <button mat-menu-item (click)="openNasfolder()">
+      <!-- form の中なので type="button" にする（無いと送信ボタンになり、押すとページが読み込み直される） -->
+      <button mat-menu-item type="button" (click)="openNasfolder()">
         <mat-icon>folder_shared</mat-icon>出荷フォルダ（NAS）の設定
       </button>
       <mat-menu #setmenu="matMenu">
