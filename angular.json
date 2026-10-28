@@ -21,7 +21,9 @@
               "zen-observable",
               "file-saver",
               "json2csv",
-              "vanilla-autokana"
+              "vanilla-autokana",
+              "pdfmake",
+              "jszip"
             ],
             "outputPath": {
               "base": "dist/"

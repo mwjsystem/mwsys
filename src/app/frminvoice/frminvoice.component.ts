@@ -5,6 +5,9 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Invoice, InvoiceService, Shime } from './invoice.service';
 import { JdentblComponent } from './jdentbl.component';
+import { InvoicePdfService } from './invoice-pdf.service';
+import { PdfService } from './../services/pdf.service';
+import { MailerService } from './../services/mailer.service';
 import { BeforeunloadBase } from '../beforeunload-base';
 import { UserService } from './../services/user.service';
 import { MembsService } from './../mstmember/membs.service';
@@ -39,6 +42,9 @@ export class FrminvoiceComponent extends BeforeunloadBase implements OnInit, Aft
     memsrv = inject(MembsService);
     stfsrv = inject(StaffService);
     invsrv = inject(InvoiceService);
+    private ipdfsrv = inject(InvoicePdfService);
+    private pdfsrv = inject(PdfService);
+    private mailsrv = inject(MailerService);
     private fb = inject(FormBuilder);
     private title = inject(Title);
     private route = inject(ActivatedRoute);
@@ -242,6 +248,85 @@ export class FrminvoiceComponent extends BeforeunloadBase implements OnInit, Aft
         if (this.chkRows.length == 0) {
             this.form.markAsPristine();
         }
+        this.cdRef.detectChanges();
+    }
+
+    /** 一覧で請求済になっている請求伝票 */
+    get doneRows(): Shime[] {
+        return this.rows.filter(e => e.done && e.head.denno);
+    }
+
+    /** 照会中の請求伝票の請求書を PDF で保存する */
+    async pdfOne() {
+        if (this.invoice == null) {
+            return;
+        }
+        await this.makePdf([this.invoice.head.denno]);
+    }
+
+    /** 一覧で請求済の請求伝票の請求書を、まとめて ZIP で保存する */
+    async pdfBatch() {
+        const dennos = this.doneRows.map(e => e.head.denno);
+        if (dennos.length == 0) {
+            return;
+        }
+        await this.makePdf(dennos, '請求書_締め日' + this.usrsrv.formatDate(this.form.value.sday) + '.zip');
+    }
+
+    /**
+     * 請求書を添付したメールの作成画面（Thunderbird）を開く。照会中の 1 件、または一覧で請求済の全件。
+     * kind = 'sales'（営業担当へ確認依頼）/ 'customer'（顧客へ送付）。送信は作成画面で担当者が行う。
+     */
+    async mail(kind: 'sales' | 'customer', all: boolean) {
+        const dennos = all ? this.doneRows.map(e => e.head.denno) : (this.invoice ? [this.invoice.head.denno] : []);
+        if (dennos.length == 0) {
+            return;
+        }
+        const what = kind == 'sales' ? '営業担当への確認依頼' : '顧客への送付';
+        if (all && !confirm('請求書' + dennos.length + '件の' + what + 'メールを作成します（Thunderbird の作成画面が' + dennos.length + '件開きます）。よろしいですか？')) {
+            return;
+        }
+        this.busy = true;
+        this.cdRef.detectChanges();
+        try {
+            const pdfs = await this.ipdfsrv.create(dennos);
+            const items = pdfs.map(e => ({ pdf: e, mail: kind == 'sales' ? e.salesMail : e.customerMail }));
+            const nomail = items.filter(e => !e.mail.to);
+            const targets = items.filter(e => e.mail.to);
+            if (targets.length > 0) {
+                await this.mailsrv.compose(targets.map(e => ({
+                    denno: e.pdf.denno, fileName: e.pdf.fileName, blob: e.pdf.blob, ...e.mail
+                })));
+                this.usrsrv.toastSuc(what + 'メールを' + targets.length + '件作成します（Thunderbird の作成画面を確認して送信してください）');
+            }
+            if (nomail.length > 0) {
+                const who = kind == 'sales' ? '営業担当（顧客マスタの営業担当・担当者マスタのメール）' : '顧客マスタのメール';
+                this.usrsrv.toastWar(who + 'が無いため作成しませんでした：' + nomail.map(e => e.pdf.mcode + ' ' + e.pdf.name).join('、'));
+            }
+        } catch (error) {
+            this.usrsrv.toastErr('メールの作成エラー', what + 'メールを作成できませんでした');
+            console.log('error invoice mail', error);
+        }
+        this.busy = false;
+        this.cdRef.detectChanges();
+    }
+
+    private async makePdf(dennos: number[], zipName?: string) {
+        this.busy = true;
+        this.cdRef.detectChanges();
+        try {
+            const pdfs = await this.ipdfsrv.create(dennos);
+            if (zipName) {
+                await this.pdfsrv.downloadZip(pdfs.map(e => ({ name: e.fileName, blob: e.blob })), zipName);
+            } else {
+                pdfs.forEach(e => this.pdfsrv.download(e.blob, e.fileName));
+            }
+            this.usrsrv.toastSuc('請求書を' + pdfs.length + '件作成しました');
+        } catch (error) {
+            this.usrsrv.toastErr('請求書の作成エラー', '請求書（PDF）を作成できませんでした');
+            console.log('error invoice pdf', error);
+        }
+        this.busy = false;
         this.cdRef.detectChanges();
     }
 

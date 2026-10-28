@@ -9,6 +9,17 @@
       </button>
     </mat-form-field>
     @if (invoice && !invoice.head.del) {
+      <button mat-button (click)="pdfOne()" [disabled]="busy">
+        <mat-icon>picture_as_pdf</mat-icon>請求書PDF
+      </button>
+      <button mat-button (click)="mail('sales', false)" [disabled]="busy">
+        <mat-icon>forward_to_inbox</mat-icon>営業へ確認依頼
+      </button>
+      <button mat-button (click)="mail('customer', false)" [disabled]="busy">
+        <mat-icon>send</mat-icon>顧客へ送付
+      </button>
+    }
+    @if (invoice && !invoice.head.del) {
       <button mat-button (click)="cancelInvoice()" [disabled]="busy || !!invoice.lock">
         <mat-icon matTooltip="{{invoice.lock}}" matTooltipClass="ttips">delete_forever</mat-icon>請求取消
       </button>
@@ -53,6 +64,15 @@
         </button>
         <button mat-raised-button color="accent" type="button" (click)="create()" [disabled]="busy || chkRows.length == 0">
           <mat-icon>receipt_long</mat-icon>請求伝票作成（{{chkRows.length}}件）
+        </button>
+        <button mat-raised-button type="button" (click)="pdfBatch()" [disabled]="busy || doneRows.length == 0">
+          <mat-icon>picture_as_pdf</mat-icon>請求済をPDF一括（{{doneRows.length}}件）
+        </button>
+        <button mat-raised-button type="button" (click)="mail('sales', true)" [disabled]="busy || doneRows.length == 0">
+          <mat-icon>forward_to_inbox</mat-icon>請求済を営業へ確認依頼
+        </button>
+        <button mat-raised-button type="button" (click)="mail('customer', true)" [disabled]="busy || doneRows.length == 0">
+          <mat-icon>send</mat-icon>請求済を顧客へ送付
         </button>
       </form>
       @if (nosime.length > 0) {
