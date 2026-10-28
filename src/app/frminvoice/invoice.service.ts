@@ -4,6 +4,11 @@ import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
+/** 送付の進捗（trseikyu.sstatus）の名前。添字が値 */
+export const SSTATUS = ['未確認', '経理確認済', '営業確認依頼済', '営業OK', '顧客送付済'] as const;
+/** 送付の進捗の値 */
+export const SST = { MIKAKUNIN: 0, KEIRI: 1, IRAI: 2, EIGYO_OK: 3, SOFU: 4 } as const;
+
 /** 請求伝票（trseikyu、月次締め）のヘッダ */
 export class Seikyu {
   denno!: number;
@@ -30,6 +35,10 @@ export class Seikyu {
   /** 取消済のときは取消した日時・担当者 */
   updated_at!: Date;
   updated_by!: string;
+  /** 送付の進捗（SSTATUS）と、最後に進めた／戻した日時・担当者 */
+  sstatus: number = 0;
+  sstatus_at!: Date | null;
+  sstatus_by!: string | null;
   constructor(init?: Partial<Seikyu>) {
     Object.assign(this, init);
   }
@@ -87,7 +96,7 @@ interface NyusubRow { denno: number; mcode: string; day: string; nmoney: number;
 /** 抽出クエリで受け取る請求先（掛売の締め日つき顧客） */
 interface MemberRow { mcode: string; sime: number | null; tcode: string | null }
 /** 抽出クエリで受け取る各請求先の直近の請求伝票 */
-interface LastRow { denno: number; mcode: string; sday: string; seikyu: number }
+interface LastRow { denno: number; mcode: string; sday: string; seikyu: number; sstatus: number }
 
 /** get_shime クエリの結果 */
 interface ShimeResult { trjyuden: JyudenRow[]; trnyusub: NyusubRow[]; msmember: MemberRow[]; trseikyu: LastRow[]; later: { mcode: string }[] }
@@ -248,6 +257,7 @@ export class InvoiceService {
           mcode
           sday
           seikyu
+          sstatus
         }
         later: trseikyu(where: {id: {_eq: $id}, sday: {_gt: $day}, del: {_eq: false}}, distinct_on: mcode, order_by: {mcode: asc}) {
           mcode
@@ -297,7 +307,8 @@ export class InvoiceService {
             sday: day,
             fday: this.usrsrv.formatDate(fday ?? this.firstDay(sime.get(mcode) as number, sday)),
             zenkai: done ? 0 : Number(prev?.seikyu ?? 0),
-            seikyu: done ? Number(prev?.seikyu ?? 0) : 0
+            seikyu: done ? Number(prev?.seikyu ?? 0) : 0,
+            sstatus: done ? Number(prev?.sstatus ?? 0) : 0
           }),
           jyudens: [],
           nyusubs: []
@@ -459,6 +470,9 @@ export class InvoiceService {
           created_by
           updated_at
           updated_by
+          sstatus
+          sstatus_at
+          sstatus_by
         }
         trseikyusub(where: {id: {_eq: $id}, denno: {_eq: $dno}}, order_by: {line: asc}) {
           line
@@ -504,7 +518,9 @@ export class InvoiceService {
         fetchPolicy: 'network-only',
         variables: { id: id, mcd: head.mcode, day: head.sday }
       }));
-      if ((later.data as { later: { denno: number }[] }).later.length > 0) {
+      if (head.sstatus >= SST.SOFU) {
+        lock = '顧客へ送付済です（取り消すときは、進捗を戻してから取り消してください）';
+      } else if ((later.data as { later: { denno: number }[] }).later.length > 0) {
         lock = 'この請求先には、より後の締め日の請求伝票があります（後の請求伝票から取り消してください）';
       } else if (result.clear.length > 0) {
         lock = 'この請求伝票には請求入金伝票（消込）が登録されています（' + result.clear.map(e => e.denno).join(',') + '）';
@@ -520,6 +536,25 @@ export class InvoiceService {
       })),
       lock: lock
     };
+  }
+
+  /**
+   * 送付の進捗を from から to（1 段階）に変える。進捗が from の、取消していない請求伝票だけを変える。
+   * 変更した件数を返す（他の人が先に変えていた伝票は数に入らない）。履歴は DB のトリガーで tropelog に残る。
+   */
+  async setStatus(dennos: number[], from: number, to: number): Promise<number> {
+    const UpdateStatus = gql`
+      mutation upd_sstatus($id: smallint!, $dnos: [Int!]!, $from: smallint!, $to: smallint!, $at: timestamptz!, $by: String!) {
+        update_trseikyu(where: {id: {_eq: $id}, denno: {_in: $dnos}, sstatus: {_eq: $from}, del: {_eq: false}},
+                        _set: {sstatus: $to, sstatus_at: $at, sstatus_by: $by}) {
+          affected_rows
+        }
+      }`;
+    const { data } = await firstValueFrom(this.apollo.mutate<{ update_trseikyu: mwI.AffectedRows }>({
+      mutation: UpdateStatus,
+      variables: { id: this.usrsrv.compid, dnos: dennos, from: from, to: to, at: new Date(), by: this.usrsrv.staff.code }
+    }));
+    return (data as { update_trseikyu: mwI.AffectedRows }).update_trseikyu.affected_rows;
   }
 
   /**

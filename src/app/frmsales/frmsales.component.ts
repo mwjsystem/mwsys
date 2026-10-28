@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, AbstractControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
+import gql from 'graphql-tag';
 
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -25,6 +26,8 @@ import { DownloadService } from './../services/download.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { AdredaComponent } from './../share/adreda/adreda.component';
+import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
+import { SSTATUS } from './../frminvoice/invoice.service';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -90,6 +93,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   vnyuzan!: mwI.Vnyuzan;
   /** 計上先の請求伝票番号。請求済（null 以外）の伝票は編集・取消できない */
   idenno: number | null = null;
+  /** 計上先の請求伝票の送付の進捗（例: 営業OK）。請求済でないときは空 */
+  istatus: string = '';
   hktval: mwI.Sval[] = [];
   rows: FormArray = this.fb.array([]);
   getden!: number;
@@ -288,6 +293,40 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     window.open(this.okrsrv.getUrl(hcode) + value, '_blank');
   }
 
+  /** 受注伝票の操作ログ（登録・変更・取消・請求計上など）を表示する */
+  opelog() {
+    if (!this.jmisrv.denno) {
+      return;
+    }
+    const data: OpelogParam = { extype: '1', keycode: String(this.jmisrv.denno), title: '受注伝票 ' + this.jmisrv.denno, table: 'trjyuden' };
+    this.dialog.open(OpelogComponent, { width: '900px', maxWidth: '95vw', data: data });
+  }
+
+  /** 計上先の請求伝票の送付の進捗を取得する */
+  private async getIstatus(idenno: number | null) {
+    this.istatus = '';
+    if (!idenno || idenno <= 0) {
+      return;
+    }
+    const GetStatus = gql`
+      query get_istatus($id: smallint!, $dno: Int!) {
+        trseikyu(where: {id: {_eq: $id}, denno: {_eq: $dno}}) {
+          sstatus
+          del
+        }
+      }`;
+    try {
+      const { data } = await firstValueFrom(this.apollo.query<{ trseikyu: { sstatus: number; del: boolean }[] }>({
+        query: GetStatus, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, dno: idenno }
+      }));
+      const s = (data as { trseikyu: { sstatus: number; del: boolean }[] }).trseikyu[0];
+      this.istatus = s ? (s.del ? '取消済' : SSTATUS[s.sstatus] ?? '') : '';
+    } catch (error) {
+      console.log('error query get_istatus', error);
+    }
+    this.cdRef.detectChanges();
+  }
+
   test() {
     // this.usrsrv.toastInf(this.form.value.yday);
     // console.log(value);
@@ -329,6 +368,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
           this.form.reset();
           this.jmisrv.trzaiko = [];
           this.idenno = result?.idenno ?? null;
+          this.getIstatus(this.idenno);
           if (result == null) {
             this.usrsrv.toastInf("受注伝票番号" + denno + "は登録されていません");
             history.replaceState('', '', './frmsales');
@@ -625,6 +665,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.form.reset();
     this.jmisrv.denno = 0;
     this.idenno = null;
+    this.istatus = '';
     this.ctl.tcode.setValue(this.usrsrv.staff.code);
     this.ctl.day.setValue(new Date());
     this.ctl.yday.setValue(this.usrsrv.getNextday(new Date()));

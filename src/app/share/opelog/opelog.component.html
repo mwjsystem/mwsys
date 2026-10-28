@@ -1,0 +1,28 @@
+<h1 mat-dialog-title>操作ログ【{{data.title}}】</h1>
+<mat-dialog-content>
+  @if (loading) {
+    <p>読み込んでいます…</p>
+  } @else if (rows.length == 0) {
+    <p>この伝票の操作ログはありません（現行システムから移行した伝票や、記録を始める前の操作は残っていません）。</p>
+  } @else {
+    <table mat-table [dataSource]="rows" aria-label="操作ログ">
+      <ng-container matColumnDef="created_at">
+        <th mat-header-cell *matHeaderCellDef>日時</th>
+        <td mat-cell *matCellDef="let row" style="white-space: nowrap;">{{row.created_at | date:'yyyy/M/d H:mm:ss'}}</td>
+      </ng-container>
+      <ng-container matColumnDef="created_by">
+        <th mat-header-cell *matHeaderCellDef>担当者</th>
+        <td mat-cell *matCellDef="let row" style="white-space: nowrap;">{{staff(row.created_by)}}</td>
+      </ng-container>
+      <ng-container matColumnDef="memo">
+        <th mat-header-cell *matHeaderCellDef>内容</th>
+        <td mat-cell *matCellDef="let row">{{memo(row.memo)}}</td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  }
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-stroked-button (click)="close()">閉じる</button>
+</mat-dialog-actions>

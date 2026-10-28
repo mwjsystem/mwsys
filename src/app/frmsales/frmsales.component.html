@@ -18,7 +18,7 @@
     }
     @if ((mode==3 || mode==4) && idenno) {
       <button mat-flat-button (click)="usrsrv.openMst('frminvoice', '' + idenno)" [color]="usrsrv.getColor(mode)">
-        <mat-icon matTooltip="請求済の伝票は編集・取消できません。修正する場合は請求伝票を取り消してください" matTooltipClass="ttips">lock</mat-icon>請求済（{{idenno}}）
+        <mat-icon matTooltip="請求済の伝票は編集・取消できません。修正する場合は請求伝票を取り消してください" matTooltipClass="ttips">lock</mat-icon>請求済（{{idenno}}{{istatus ? '・' + istatus : ''}}）
       </button>
     }
     @if (mode==4 && this.jmisrv.denno && !idenno) {
@@ -53,7 +53,7 @@
       </button>
     }
     @if (mode!=1) {
-      <button mat-flat-button (click)="test()" [color]="usrsrv.getColor(mode)">
+      <button mat-flat-button (click)="opelog()" [color]="usrsrv.getColor(mode)" [disabled]="!jmisrv.denno">
         <mat-icon>history</mat-icon>操作ログ
       </button>
     }

@@ -12,11 +12,35 @@
       <button mat-button (click)="pdfOne()" [disabled]="busy">
         <mat-icon>picture_as_pdf</mat-icon>請求書PDF
       </button>
-      <button mat-button (click)="mail('sales', false)" [disabled]="busy">
-        <mat-icon>forward_to_inbox</mat-icon>営業へ確認依頼
-      </button>
-      <button mat-button (click)="mail('customer', false)" [disabled]="busy">
-        <mat-icon>send</mat-icon>顧客へ送付
+      @if (invoice.head.sstatus == SST.MIKAKUNIN) {
+        <button mat-button (click)="keiri(false)" [disabled]="busy">
+          <mat-icon>fact_check</mat-icon>経理確認
+        </button>
+      }
+      @if (invoice.head.sstatus == SST.KEIRI || invoice.head.sstatus == SST.IRAI) {
+        <button mat-button (click)="mail('sales', false)" [disabled]="busy">
+          <mat-icon>forward_to_inbox</mat-icon>営業へ確認依頼{{invoice.head.sstatus == SST.IRAI ? '（再送）' : ''}}
+        </button>
+      }
+      @if (invoice.head.sstatus == SST.IRAI) {
+        <button mat-button (click)="eigyoOk(false)" [disabled]="busy">
+          <mat-icon>thumb_up</mat-icon>営業OK
+        </button>
+      }
+      @if (invoice.head.sstatus == SST.EIGYO_OK || invoice.head.sstatus == SST.SOFU) {
+        <button mat-button (click)="mail('customer', false)" [disabled]="busy">
+          <mat-icon>send</mat-icon>顧客へ送付{{invoice.head.sstatus == SST.SOFU ? '（再送）' : ''}}
+        </button>
+      }
+      @if (invoice.head.sstatus > SST.MIKAKUNIN) {
+        <button mat-button (click)="stepBack()" [disabled]="busy">
+          <mat-icon>undo</mat-icon>一つ戻す
+        </button>
+      }
+    }
+    @if (invoice) {
+      <button mat-button (click)="opelog()">
+        <mat-icon>history</mat-icon>操作ログ
       </button>
     }
     @if (invoice && !invoice.head.del) {
@@ -65,16 +89,28 @@
         <button mat-raised-button color="accent" type="button" (click)="create()" [disabled]="busy || chkRows.length == 0">
           <mat-icon>receipt_long</mat-icon>請求伝票作成（{{chkRows.length}}件）
         </button>
-        <button mat-raised-button type="button" (click)="pdfBatch()" [disabled]="busy || doneRows.length == 0">
-          <mat-icon>picture_as_pdf</mat-icon>請求済をPDF一括（{{doneRows.length}}件）
-        </button>
-        <button mat-raised-button type="button" (click)="mail('sales', true)" [disabled]="busy || doneRows.length == 0">
-          <mat-icon>forward_to_inbox</mat-icon>請求済を営業へ確認依頼
-        </button>
-        <button mat-raised-button type="button" (click)="mail('customer', true)" [disabled]="busy || doneRows.length == 0">
-          <mat-icon>send</mat-icon>請求済を顧客へ送付
-        </button>
       </form>
+      @if (doneRows.length > 0) {
+        <div class="flex flex-row flex-wrap items-center" style="gap: 8px; margin: 6px 0;">
+          <mat-checkbox [checked]="allDoneChecked" (change)="checkAllDone($event.checked)">請求済を全て選択</mat-checkbox>
+          <span>チェックした請求済（{{selRows.length}}件）を：</span>
+          <button mat-stroked-button type="button" (click)="pdfBatch()" [disabled]="busy || selRows.length == 0">
+            <mat-icon>picture_as_pdf</mat-icon>PDF一括（{{selRows.length}}）
+          </button>
+          <button mat-stroked-button type="button" (click)="keiri(true)" [disabled]="busy || selIn(SST.MIKAKUNIN).length == 0">
+            <mat-icon>fact_check</mat-icon>経理確認（{{selIn(SST.MIKAKUNIN).length}}）
+          </button>
+          <button mat-stroked-button type="button" (click)="mail('sales', true)" [disabled]="busy || selIn(SST.KEIRI, SST.IRAI).length == 0">
+            <mat-icon>forward_to_inbox</mat-icon>営業へ確認依頼（{{selIn(SST.KEIRI, SST.IRAI).length}}）
+          </button>
+          <button mat-stroked-button type="button" (click)="eigyoOk(true)" [disabled]="busy || selIn(SST.IRAI).length == 0">
+            <mat-icon>thumb_up</mat-icon>営業OK（{{selIn(SST.IRAI).length}}）
+          </button>
+          <button mat-stroked-button type="button" (click)="mail('customer', true)" [disabled]="busy || selIn(SST.EIGYO_OK, SST.SOFU).length == 0">
+            <mat-icon>send</mat-icon>顧客へ送付（{{selIn(SST.EIGYO_OK, SST.SOFU).length}}）
+          </button>
+        </div>
+      }
       @if (nosime.length > 0) {
         <p class="mat-warn" style="color: #c62828;">
           締め日が未設定・削除済・対象外の大分類のため除外した請求先（未請求の掛売伝票あり）：
@@ -91,8 +127,12 @@
             </th>
             <td mat-cell *matCellDef="let row">
               @if (row.done) {
-                <a href="javascript:void(0)" (click)="denno = row.head.denno; getInvoice(row.head.denno)"
-                  matTooltip="作成済の請求伝票を表示">請求済 {{row.head.denno}}</a>
+                <div class="flex flex-row items-center" style="gap: 4px; white-space: nowrap;">
+                  <mat-checkbox [(ngModel)]="row.chk" [ngModelOptions]="{standalone: true}"></mat-checkbox>
+                  <a href="javascript:void(0)" (click)="denno = row.head.denno; getInvoice(row.head.denno)"
+                    matTooltip="作成済の請求伝票を表示">請求済 {{row.head.denno}}</a>
+                  <span [style.color]="row.head.sstatus == SST.SOFU ? '#2e7d32' : '#e65100'">（{{statusName(row.head.sstatus)}}）</span>
+                </div>
               } @else if (row.later) {
                 <span style="color: #c62828;" matTooltip="この請求先には、より後の締め日の請求伝票があります。締め処理は日付順に行ってください">後の締めあり</span>
               } @else {
@@ -186,6 +226,15 @@
             現行システムから移行
           }
         </p>
+        @if (!invoice.head.del) {
+          <p style="margin: 0 0 8px;">
+            進捗：<b [style.color]="invoice.head.sstatus == SST.SOFU ? '#2e7d32' : '#e65100'">{{statusName(invoice.head.sstatus)}}</b>
+            @if (invoice.head.sstatus_at) {
+              （{{invoice.head.sstatus_at | date:'yyyy/M/d H:mm'}} {{stfsrv.getName(invoice.head.sstatus_by ?? '')}}）
+            }
+            <span style="color: #666;">　未確認 → 経理確認済 → 営業確認依頼済 → 営業OK → 顧客送付済</span>
+          </p>
+        }
         <div class="flex flex-row flex-wrap items-end" style="gap: 5px;">
           <mat-form-field style="width: 9em;">
             <mat-label>請求先</mat-label>

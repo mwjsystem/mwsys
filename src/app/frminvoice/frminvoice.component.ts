@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, FormControl, FormsModule, ReactiveFormsModule }
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { Invoice, InvoiceService, Shime } from './invoice.service';
+import { Invoice, InvoiceService, Shime, SSTATUS, SST } from './invoice.service';
 import { JdentblComponent } from './jdentbl.component';
 import { InvoicePdfService } from './invoice-pdf.service';
 import { PdfService } from './../services/pdf.service';
@@ -13,6 +13,7 @@ import { UserService } from './../services/user.service';
 import { MembsService } from './../mstmember/membs.service';
 import { StaffService } from './../services/staff.service';
 import { SeikyuhelpComponent } from './../share/seikyuhelp/seikyuhelp.component';
+import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -62,6 +63,8 @@ export class FrminvoiceComponent extends BeforeunloadBase implements OnInit, Aft
     nosime: string[] = [];
     /** 抽出・作成・取消の処理中 */
     busy: boolean = false;
+    /** 送付の進捗の値（テンプレートで使う） */
+    readonly SST = SST;
     shimeColumns = ['chk', 'mcode', 'fday', 'zenkai', 'nmon', 'tmon', 'kurikosi', 'taxmon', 'tax', 'seikyu', 'dencnt'];
 
     constructor() {
@@ -255,6 +258,33 @@ export class FrminvoiceComponent extends BeforeunloadBase implements OnInit, Aft
     get doneRows(): Shime[] {
         return this.rows.filter(e => e.done && e.head.denno);
     }
+    /** 一覧で請求済のうち、チェックした請求伝票 */
+    get selRows(): Shime[] {
+        return this.doneRows.filter(e => e.chk);
+    }
+    get allDoneChecked(): boolean {
+        const done = this.doneRows;
+        return done.length > 0 && done.every(e => e.chk);
+    }
+    checkAllDone(flg: boolean) {
+        this.doneRows.forEach(e => e.chk = flg);
+    }
+    /** チェックした請求伝票のうち、進捗が sts のいずれかのもの */
+    selIn(...sts: number[]): Shime[] {
+        return this.selRows.filter(e => sts.includes(e.head.sstatus));
+    }
+    statusName(sts: number): string {
+        return SSTATUS[sts] ?? '';
+    }
+
+    /** 照会中の請求伝票の操作ログ（登録・進捗・取消）を表示する */
+    opelog() {
+        if (this.invoice == null) {
+            return;
+        }
+        const data: OpelogParam = { extype: '5', keycode: String(this.invoice.head.denno), title: '請求伝票 ' + this.invoice.head.denno };
+        this.dialog.open(OpelogComponent, { width: '900px', maxWidth: '95vw', data: data });
+    }
 
     /** 照会中の請求伝票の請求書を PDF で保存する */
     async pdfOne() {
@@ -264,21 +294,85 @@ export class FrminvoiceComponent extends BeforeunloadBase implements OnInit, Aft
         await this.makePdf([this.invoice.head.denno]);
     }
 
-    /** 一覧で請求済の請求伝票の請求書を、まとめて ZIP で保存する */
+    /** 一覧でチェックした請求済の請求伝票の請求書を、まとめて ZIP で保存する */
     async pdfBatch() {
-        const dennos = this.doneRows.map(e => e.head.denno);
+        const dennos = this.selRows.map(e => e.head.denno);
         if (dennos.length == 0) {
             return;
         }
         await this.makePdf(dennos, '請求書_締め日' + this.usrsrv.formatDate(this.form.value.sday) + '.zip');
     }
 
+    /** 進捗の操作の対象（照会中の 1 件、または一覧でチェックした請求伝票のうち、進捗が sts のもの） */
+    private targetsOf(all: boolean, ...sts: number[]): number[] {
+        if (all) {
+            return this.selIn(...sts).map(e => e.head.denno);
+        }
+        return this.invoice && !this.invoice.head.del && sts.includes(this.invoice.head.sstatus) ? [this.invoice.head.denno] : [];
+    }
+
+    /** 進捗を from から to に変え、一覧と照会の表示を合わせる */
+    private async changeStatus(dennos: number[], from: number, to: number): Promise<number> {
+        const cnt = await this.invsrv.setStatus(dennos, from, to);
+        this.rows.filter(e => dennos.includes(e.head.denno) && e.head.sstatus == from).forEach(e => e.head.sstatus = to);
+        if (this.invoice && dennos.includes(this.invoice.head.denno)) {
+            await this.getInvoice(this.invoice.head.denno);
+        }
+        return cnt;
+    }
+
+    /** 経理確認済にする（未確認 → 経理確認済） */
+    async keiri(all: boolean) {
+        await this.stepStatus(all, SST.MIKAKUNIN, SST.KEIRI, '経理確認済にします');
+    }
+    /** 営業OK にする（営業確認依頼済 → 営業OK） */
+    async eigyoOk(all: boolean) {
+        await this.stepStatus(all, SST.IRAI, SST.EIGYO_OK, '営業OKにします');
+    }
+    /** 照会中の請求伝票の進捗を一つ戻す */
+    async stepBack() {
+        if (this.invoice == null || this.invoice.head.sstatus <= SST.MIKAKUNIN) {
+            return;
+        }
+        const from = this.invoice.head.sstatus;
+        if (!confirm('請求伝票' + this.invoice.head.denno + 'の進捗を「' + this.statusName(from) + '」から「' + this.statusName(from - 1) + '」に戻します。よろしいですか？')) {
+            return;
+        }
+        await this.stepStatus(false, from, from - 1, '');
+    }
+    private async stepStatus(all: boolean, from: number, to: number, what: string) {
+        const dennos = this.targetsOf(all, from);
+        if (dennos.length == 0) {
+            return;
+        }
+        if (all && !confirm('チェックした請求伝票のうち「' + this.statusName(from) + '」の' + dennos.length + '件を、' + what + '。よろしいですか？')) {
+            return;
+        }
+        this.busy = true;
+        this.cdRef.detectChanges();
+        try {
+            const cnt = await this.changeStatus(dennos, from, to);
+            this.usrsrv.toastSuc(cnt + '件の進捗を「' + this.statusName(to) + '」にしました');
+            if (cnt < dennos.length) {
+                this.usrsrv.toastWar((dennos.length - cnt) + '件は、ほかの人が先に進捗を変えたため変更しませんでした（抽出し直してください）');
+            }
+        } catch (error) {
+            this.usrsrv.toastErr('データベースエラー', '進捗を変更できませんでした');
+            console.log('error update sstatus', error);
+        }
+        this.busy = false;
+        this.cdRef.detectChanges();
+    }
+
     /**
-     * 請求書を添付したメールの作成画面（Thunderbird）を開く。照会中の 1 件、または一覧で請求済の全件。
-     * kind = 'sales'（営業担当へ確認依頼）/ 'customer'（顧客へ送付）。送信は作成画面で担当者が行う。
+     * 請求書を添付したメールの作成画面（Thunderbird）を開く。照会中の 1 件、または一覧でチェックした請求伝票。
+     * kind = 'sales'（営業担当へ確認依頼。経理確認済・営業確認依頼済［再送］が対象）
+     *       / 'customer'（顧客へ送付。営業OK・顧客送付済［再送］が対象）。
+     * 送信は作成画面で担当者が行う。作成画面を開いた時点で、進捗を営業確認依頼済／顧客送付済に進める。
      */
     async mail(kind: 'sales' | 'customer', all: boolean) {
-        const dennos = all ? this.doneRows.map(e => e.head.denno) : (this.invoice ? [this.invoice.head.denno] : []);
+        const [from, to] = kind == 'sales' ? [SST.KEIRI, SST.IRAI] : [SST.EIGYO_OK, SST.SOFU];
+        const dennos = this.targetsOf(all, from, to);
         if (dennos.length == 0) {
             return;
         }
@@ -297,6 +391,8 @@ export class FrminvoiceComponent extends BeforeunloadBase implements OnInit, Aft
                 await this.mailsrv.compose(targets.map(e => ({
                     denno: e.pdf.denno, fileName: e.pdf.fileName, blob: e.pdf.blob, ...e.mail
                 })));
+                // 作成画面を開いた請求伝票の進捗を進める（再送のものは進捗が from ではないので変わらない）
+                await this.changeStatus(targets.map(e => e.pdf.denno), from, to);
                 this.usrsrv.toastSuc(what + 'メールを' + targets.length + '件作成します（Thunderbird の作成画面を確認して送信してください）');
             }
             if (nomail.length > 0) {

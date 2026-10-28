@@ -40,6 +40,16 @@ CREATE TABLE IF NOT EXISTS trseikyu_load (
 COMMENT ON TABLE trseikyu_load IS 'データ移行用: 現行システムの請求伝票 CSV を受ける表（02_after_load.sql で trseikyu へ移す）';
 TRUNCATE trseikyu_load;
 
+-- 1b. 受注伝票の操作の記録（trjyuden_opelog）を止める。移行データの登録を操作ログに残さないため。
+--     02_after_load.sql の最後で戻す（02 を実行しないと止まったままになるので注意）
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgrelid = to_regclass('trjyuden') AND tgname = 'trjyuden_opelog') THEN
+    ALTER TABLE trjyuden DISABLE TRIGGER trjyuden_opelog;
+  END IF;
+END
+$$;
+
 -- 2. trnyusub の \copy コマンド（kdenno を除く列名つき）
 SELECT '\copy ' || :'schema' || '.trnyusub ('
        || string_agg(column_name, ', ' ORDER BY ordinal_position)

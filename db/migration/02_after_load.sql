@@ -53,8 +53,9 @@ TRUNCATE trseikyu CASCADE;
 
 ALTER TABLE trseikyu DISABLE TRIGGER trseikyu_opelog;
 
+-- 移行した請求伝票は、現行システムで送付済なので進捗（sstatus）を 4 顧客送付済にする
 INSERT INTO trseikyu (id, mcode, denno, sday, zenkai, nmon, tmon, taxmon, tax, seikyu, bcode,
-                      kurikosi, del, created_at, created_by, updated_at, updated_by)
+                      kurikosi, del, created_at, created_by, updated_at, updated_by, sstatus)
 WITH g AS (
   SELECT id, denno,
          min(mcode) AS mcode, min(sday) AS sday,
@@ -74,7 +75,7 @@ WITH g AS (
 )
 SELECT g.id, g.mcode, g.denno, g.sday, g.zenkai, g.nmon, g.tmon, g.taxmon, g.tax, g.seikyu, g.bcode,
        coalesce(g.zenkai, 0) - coalesce(g.nmon, 0) - coalesce(g.tmon, 0),
-       false, NULL, NULL, NULL, NULL
+       false, NULL, NULL, NULL, NULL, 4
   FROM g
  WHERE NOT EXISTS (SELECT 1 FROM z WHERE z.id = g.id AND z.denno = g.denno);
 -- 金額のある請求伝票同士が同一顧客・同一締め日で重なっていると、一意インデックス
@@ -174,5 +175,14 @@ UNION ALL SELECT '請求入金 次の締めで計上', count(*)::text || ' 件�
   FROM trnyusub WHERE kubun = 1 AND kdenno IS NULL AND del IS NULL
 UNION ALL SELECT '請求明細 受注(J) / 入金(N)', count(*) FILTER (WHERE kind = 'J') || ' / ' || count(*) FILTER (WHERE kind = 'N') FROM trseikyusub
 UNION ALL SELECT '採番 idenno', string_agg(curnum::text, ', ') FROM trnumber WHERE type = 'idenno';
+
+-- 01_before_load.sql で止めた受注伝票の操作の記録を戻す
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_trigger WHERE tgrelid = to_regclass('trjyuden') AND tgname = 'trjyuden_opelog') THEN
+    ALTER TABLE trjyuden ENABLE TRIGGER trjyuden_opelog;
+  END IF;
+END
+$$;
 
 COMMIT;
