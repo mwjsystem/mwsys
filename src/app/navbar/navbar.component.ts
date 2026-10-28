@@ -7,6 +7,8 @@ import { MatIconButton, MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatDialog } from '@angular/material/dialog';
+import { NasfolderComponent } from './../share/nasfolder/nasfolder.component';
 
 @Component({
     selector: 'app-navbar',
@@ -20,6 +22,7 @@ export class NavbarComponent implements OnInit {
   navsrv = inject(NavmenuService);
   dwlsrv = inject(DownloadService);
   elementRef = inject(ElementRef);
+  private dialog = inject(MatDialog);
 
   public db!: string;
 
@@ -45,6 +48,11 @@ export class NavbarComponent implements OnInit {
   //   }
   //   localStorage.setItem(this.usrsrv.userInfo['nickname'] + 'MWSYS_COLOR', colorname);
   // }
+  /** 出荷フォルダ（NAS）の設定（各 PC で保存先のフォルダを選ぶ） */
+  openNasfolder() {
+    this.dialog.open(NasfolderComponent, { width: '640px', maxWidth: '95vw' });
+  }
+
   setDB(flg: boolean) {
     if (flg) {
       localStorage.setItem('MWSYS_DB', 'test');

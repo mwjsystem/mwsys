@@ -120,6 +120,9 @@
       <button mat-menu-item [matMenuTriggerFor]="setmenu">
         <mat-icon>settings</mat-icon>初期設定(ﾀﾞｳﾝﾛｰﾄﾞを使用する場合)
       </button>
+      <button mat-menu-item (click)="openNasfolder()">
+        <mat-icon>folder_shared</mat-icon>出荷フォルダ（NAS）の設定
+      </button>
       <mat-menu #setmenu="matMenu">
         <a mat-menu-item
           href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5XVMJM"
