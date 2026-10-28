@@ -117,11 +117,12 @@ export class FrmshipComponent implements OnInit, AfterViewInit {
                 this.rows = await this.shipsrv.list({
                     from: this.usrsrv.formatDate(v.from), to: this.usrsrv.formatDate(v.to ?? v.from),
                     tcode: v.tcode || null,
-                    jdstatus: v.status == 'todo' ? [JDST.TOROKU] : []
+                    jdstatus: v.status == 'todo' ? [JDST.TOROKU, JDST.KEEP_FAX, JDST.KEEP_CHANGED, JDST.KEEP_OK, JDST.KEEP_SHORT] : []
                 });
             }
-            // 出荷指示フォルダが未作成（受注登録）の伝票を初めからチェックする
-            this.rows.forEach(e => e.chk = e.jdstatus == JDST.TOROKU || !!this.denno);
+            // 出荷指示フォルダが未作成（受注登録・キープ確認済）の伝票を初めからチェックする
+            // （キープ表の確認待ち・FAX 後の変更・欠品は、確かめてから選ぶ）
+            this.rows.forEach(e => e.chk = e.jdstatus == JDST.TOROKU || e.jdstatus == JDST.KEEP_OK || !!this.denno);
             if (this.rows.length == 0) {
                 this.usrsrv.toastWar('条件に合う受注伝票がありません');
             }
@@ -222,7 +223,10 @@ export class FrmshipComponent implements OnInit, AfterViewInit {
     }
 
     statusColor(value: string | null): string {
-        return value == JDST.PICKED || value == JDST.PRINTED ? '#2e7d32' : value == JDST.FOLDER ? '#1565c0' : value == JDST.TOROKU ? '#e65100' : '#666666';
+        return value == JDST.PICKED || value == JDST.PRINTED ? '#2e7d32'
+            : value == JDST.FOLDER || value == JDST.KEEP_OK ? '#1565c0'
+            : value == JDST.KEEP_SHORT || value == JDST.KEEP_CHANGED ? '#c62828'
+            : value == JDST.TOROKU || value == JDST.KEEP_FAX ? '#e65100' : '#666666';
     }
 
     formName(buntype: string | null): string {

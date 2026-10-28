@@ -6,7 +6,7 @@ import { CHECKERS, DenForm, isObi, shipNote } from './ship-forms';
 /** 住所（msmadr） */
 export interface ShipAdr { mcode: string; eda: number; zip: string | null; region: string | null; local: string | null; street: string | null; extend: string | null; extend2: string | null; adrname: string | null }
 /** 受注明細（trjyumei + 商品マスタの単位・棚番） */
-export interface ShipLine { line: number; gcode: string; gtext: string; suu: number; touttanka: number; toutmoney: number; taxrate: string | null; mmemo: string | null; unit: string | null; tanano: string | null; jan?: string | null }
+export interface ShipLine { line: number; gcode: string; gtext: string; suu: number; touttanka: number; toutmoney: number; taxrate: string | null; mmemo: string | null; unit: string | null; tanano: string | null; jan?: string | null; spec?: string | null; scode?: string | null }
 /** 会社情報（mssystem） */
 export interface ShipSystem { kname: string | null; invno: string | null; zip: string | null; adr: string | null; tel: string | null; fax: string | null }
 
@@ -92,6 +92,72 @@ export class ShipPdfService {
   /** 出荷指示書 */
   async shiji(d: ShipDoc, form: DenForm | undefined): Promise<Blob> {
     return this.pdfsrv.createPdf(this.shijiDoc(d, form));
+  }
+
+  /** キープ表（A4 縦。倉庫へ FAX して在庫を確保してもらう。実物の商品だけを載せる） */
+  async keep(d: ShipDoc, url: string): Promise<Blob> {
+    return this.pdfsrv.createPdf(this.keepDoc(d, url));
+  }
+
+  private keepDoc(d: ShipDoc, url: string): TDocumentDefinitions {
+    const now = new Date();
+    const items = d.lines.filter(l => shipNote(l.gcode ?? '', l.gtext ?? '', d.mcode).check && Number(l.suu) > 0);
+    const head: TableCell[] = ['No', '商品コード', '数量', '商品名', '棚番', '確保数', '備考']
+      .map(t => ({ text: t, alignment: 'center', fillColor: '#bbbbbb', fontSize: 8 }));
+    const body: TableCell[][] = items.map(l => [
+      { text: String(l.line), fontSize: 8 },
+      { text: l.gcode ?? '', fontSize: 12, bold: true },
+      { text: yen(l.suu), fontSize: Number(l.suu) != 1 ? 14 : 12, bold: Number(l.suu) != 1 },
+      { text: (l.gtext ?? '') + (l.mmemo ? '\n' + l.mmemo : ''), fontSize: 8 },
+      { text: l.tanano ? '棚' + l.tanano : '', fontSize: 11, bold: true },
+      '',
+      ''
+    ]);
+    if (body.length == 0) {
+      body.push([{ text: '確保する商品がありません', colSpan: 7, alignment: 'center' }, '', '', '', '', '', '']);
+    }
+    const info: TableCell[][] = [
+      [{ text: '伝票No:', alignment: 'right' }, { text: String(d.denno), fontSize: 14 }],
+      [{ text: '出荷予定日:', alignment: 'right' }, { text: jday(d.sday), fontSize: 12 }],
+      [{ text: '担当者:', alignment: 'right' }, { text: d.staffName, fontSize: 12 }],
+      [{ text: '配送伝票:', alignment: 'right' }, { text: d.hname, fontSize: 12 }],
+      [{ text: 'FAX日時:', alignment: 'right' }, now.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })]
+    ];
+    return {
+      pageSize: 'A4',
+      pageMargins: [28, 30, 28, 40],
+      info: { title: 'キープ表 ' + d.denno },
+      defaultStyle: { fontSize: 9, lineHeight: 1.1 },
+      header: (page: number, pages: number) => ({ text: 'Page : ' + page + '/' + pages, alignment: 'right', fontSize: 7, margin: [0, 10, 20, 0] }),
+      footer: () => ({ columns: [{ text: d.orderer.name + '　　様' }, { text: 'キープ表　伝票No:' + d.denno, alignment: 'right' }], margin: [28, 10, 28, 0], fontSize: 9 }),
+      content: [
+        {
+          columns: [
+            {
+              width: '*',
+              stack: [
+                { table: { widths: [140], body: [[{ text: 'キープ表', fontSize: 18, alignment: 'center' }]] } },
+                { text: d.orderer.name + '　　様', fontSize: 15, bold: true, margin: [0, 10, 0, 2] },
+                { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 300, y2: 0, lineWidth: 0.8 }] },
+                d.betsuno ? { text: '納入先：' + d.nsaki.name + '　様', margin: [0, 4, 0, 0] } : { text: '' }
+              ]
+            },
+            { width: 170, table: { widths: [56, '*'], body: info }, layout: 'noBorders' },
+            { width: 80, stack: [{ qr: url, fit: 72, alignment: 'center', eccLevel: 'M' }, { text: 'キープ確認', fontSize: 7, alignment: 'center' }] }
+          ]
+        },
+        {
+          margin: [0, 8, 0, 6],
+          table: { widths: ['*'], heights: [30], body: [[{ text: [...lines(d.dmemo), ...lines(d.nmemo)].join('\n'), fontSize: 10 }]] },
+          layout: thin
+        },
+        { text: '在庫を確認して確保してください。スマホで右上の QR コードを読み、商品のバーコードを読んで確保数を入力してください。', fontSize: 8, margin: [0, 0, 0, 4] },
+        {
+          table: { headerRows: 1, dontBreakRows: true, widths: [14, 130, 36, '*', 46, 46, 70], heights: (i: number) => i == 0 ? 10 : 30, body: [head, ...body] },
+          layout: thin
+        }
+      ]
+    };
   }
 
   private nohinDoc(d: ShipDoc, form: DenForm): TDocumentDefinitions {

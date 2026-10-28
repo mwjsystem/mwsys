@@ -9,6 +9,8 @@ const routes: Routes = [
   { path: 'print', component: ShipprintComponent },
   { path: 'pick', component: PickComponent },
   { path: 'pick/:denno', component: PickComponent },
+  { path: 'keep', component: PickComponent, data: { kind: 'keep' } },
+  { path: 'keep/:denno', component: PickComponent, data: { kind: 'keep' } },
   { path: ':mode/:denno', component: FrmshipComponent },
 ];
 

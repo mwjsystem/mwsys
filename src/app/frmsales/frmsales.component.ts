@@ -28,7 +28,8 @@ import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
 import { SSTATUS } from './../frminvoice/invoice.service';
-import { JDST } from './../frmship/ship-forms';
+import { JDST, shipNote } from './../frmship/ship-forms';
+import { ShipService } from './../frmship/ship.service';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -79,6 +80,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   strsrv = inject(StoreService);
   jmisrv = inject(JyumeiService);
   private dwlsrv = inject(DownloadService);
+  private shipsrv = inject(ShipService);
   private apollo = inject(Apollo);
   private overlay = inject(Overlay);
   private cdRef = inject(ChangeDetectorRef);
@@ -98,6 +100,12 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   istatus: string = '';
   /** 受注ステータス（分類マスタ jdstatus。出荷指示フォルダ作成済など） */
   jdstatus: string = '';
+  /** キープ表を送るよう促すときの理由（受注可能数が少ない商品など）。空なら促さない */
+  keepSuggest: string = '';
+  keepBusy = false;
+  readonly JDST = JDST;
+  /** 表示中の伝票番号（別の伝票を開いたら、キープ表の案内を消す） */
+  private shownDenno = 0;
   hktval: mwI.Sval[] = [];
   rows: FormArray = this.fb.array([]);
   getden!: number;
@@ -296,8 +304,35 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     return lines;
   }
 
-  makeFrmKeep() {
-    this.dwlsrv.dlKick(this.usrsrv.system.urischema + 'FRM-KEEP_' + this.usrsrv.compid + "-" + this.jmisrv.denno, this.elementRef);
+  /**
+   * キープ表: 倉庫宛 FAX フォルダ（NAS）に保存し、受注ステータスを「キープ表FAX済」にする
+   * （倉庫のマクロが印刷し、倉庫のスマホでキープ表の QR を読んで確保数を入れる）
+   */
+  async makeFrmKeep() {
+    if (!this.jmisrv.denno) {
+      return;
+    }
+    this.keepBusy = true;
+    this.cdRef.detectChanges();
+    try {
+      const file = await this.shipsrv.keepFax(this.jmisrv.denno);
+      this.keepSuggest = '';
+      this.usrsrv.toastSuc('キープ表を倉庫宛FAXフォルダに保存しました（' + file + '）');
+      this.getJyuden(this.jmisrv.denno);
+    } catch (e) {
+      this.usrsrv.toastErr('キープ表を保存できませんでした', (e as Error).message);
+      console.log('error makeFrmKeep', e);
+    }
+    this.keepBusy = false;
+    this.cdRef.detectChanges();
+  }
+
+  /** 受注可能数が 10 未満の実物の商品（キープ表を送るよう促すため）。保存の前に、入力中の明細から調べる */
+  private lowStock(): string[] {
+    const mcode = this.form.value.mcode ?? '';
+    return (this.frmArr.getRawValue() as { gcode: string; gtext: string; suu: number; pable: number | null }[])
+      .filter(r => r.gcode && r.pable != null && Number(r.pable) < 10 && Number(r.suu) > 0 && shipNote(r.gcode, r.gtext ?? '', mcode).check)
+      .map(r => r.gcode + '（' + r.pable + '）');
   }
 
   openOkuri(hcode: string, value: string) {
@@ -379,7 +414,14 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
           this.form.reset();
           this.jmisrv.trzaiko = [];
           this.idenno = result?.idenno ?? null;
+          if (denno != this.shownDenno) {
+            this.keepSuggest = '';
+          }
+          this.shownDenno = denno;
           this.jdstatus = result?.jdstatus ?? '';
+          if (this.jdstatus == JDST.KEEP_CHANGED) {
+            this.keepSuggest = 'キープ表のFAX後に明細が変わりました。キープ表を送り直してください';
+          }
           this.getIstatus(this.idenno);
           if (result == null) {
             this.usrsrv.toastInf("受注伝票番号" + denno + "は登録されていません");
@@ -814,6 +856,23 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       del: false
     }
     console.log('save jyuden',jyuden);
+    // 受注可能数が 10 未満の商品（保存後にキープ表を促す）。保存すると明細を読み直すので、先に調べる
+    const low = this.lowStock();
+    const suggest = (st: string) => {
+      this.shownDenno = this.jmisrv.denno;
+      if (st == JDST.KEEP_CHANGED) {
+        this.keepSuggest = 'キープ表のFAX後に明細が変わりました。キープ表を送り直してください';
+      } else if (st == JDST.TOROKU && low.length > 0) {
+        this.keepSuggest = '受注可能数が 10 未満の商品があります：' + low.join('、') + '。キープ表を倉庫へ送ってください';
+      } else {
+        this.keepSuggest = '';
+      }
+    };
+    if (this.mode == 2) {
+      // キープ表の段階では、明細の追加・削除や数量の増減があれば「キープ表FAX後の変更」、無ければそのまま
+      jyuden.jdstatus = await this.shipsrv.statusOnSave(this.jmisrv.denno, this.jdstatus,
+        (this.frmArr.getRawValue() as { gcode: string; suu: number }[]).map(r => ({ gcode: r.gcode, suu: Number(r.suu) })));
+    }
     if (this.mode == 2) {
       return new Promise(resolve => {
         // let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno); 
@@ -832,6 +891,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
             if (jyuden.skbn != "1") {
               this.jmisrv.zaikoNew.forEach(z => this.jmisrv.updZaiko(z));
             }
+            suggest(jyuden.jdstatus);
             this.form.markAsPristine();
             this.cancel();
             return resolve(true);
@@ -867,18 +927,11 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
             // console.log('insert_trjyu', result);
             this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'を新規登録しました');
             //  zaiko更新処理 　新規
-            let cnt_keep: number = 0;
             if (jyuden.skbn != "1") {
               this.jmisrv.zaikoNew.forEach(z => this.jmisrv.updZaiko(z));
             }
-            jyumei.forEach(e => {
-              if (e.spec == '2') {
-                cnt_keep += 1;
-              }
-            });
-            if (cnt_keep > 0) {
-              this.makeFrmKeep();
-            }
+            // 受注可能数が少ない商品があれば、キープ表を送るよう促す（NAS への保存はボタンを押してから）
+            suggest(JDST.TOROKU);
             this.form.markAsPristine();
             this.cancel();
             return resolve(true);

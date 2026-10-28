@@ -1,7 +1,7 @@
 <div class="pick">
   @if (dbMismatch) {
     <div class="msg ng">
-      この出荷指示書は{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}のものですが、このスマホは{{dbMismatch == 'test' ? '本番環境' : 'テスト環境'}}につながっています。
+      この{{sheetName}}は{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}のものですが、このスマホは{{dbMismatch == 'test' ? '本番環境' : 'テスト環境'}}につながっています。
       <button mat-raised-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
     </div>
   }
@@ -12,8 +12,8 @@
       <div>{{doc.orderer.name}} 様　{{doc.hname}}　個口 {{doc.okurisuu}}</div>
       <div class="sub">担当 {{doc.staffName}}　状態：{{statusName(doc.jdstatus)}}</div>
     } @else {
-      <div class="denno">ピッキング</div>
-      <div class="sub">出荷指示書の右上の QR コードを読んでください</div>
+      <div class="denno">{{kindName}}</div>
+      <div class="sub">{{sheetName}}の右上の QR コードを読んでください</div>
     }
   </div>
 
@@ -35,11 +35,11 @@
       <button mat-raised-button color="primary" type="button" (click)="start('item')"><mat-icon>document_scanner</mat-icon>商品を読む</button>
     }
     @if (!doc && mode != 'qr') {
-      <button mat-raised-button color="primary" type="button" (click)="start('qr')"><mat-icon>qr_code_scanner</mat-icon>出荷指示書の QR を読む</button>
+      <button mat-raised-button color="primary" type="button" (click)="start('qr')"><mat-icon>qr_code_scanner</mat-icon>{{sheetName}}の QR を読む</button>
     }
-    @if (doc && allDone && !completed) {
-      <button mat-raised-button color="accent" type="button" class="big" (click)="complete()" [disabled]="busy">
-        <mat-icon>task_alt</mat-icon>ピッキング完了
+    @if (doc && !completed && (allDone || kind == 'keep')) {
+      <button mat-raised-button [color]="allDone ? 'accent' : 'warn'" type="button" class="big" (click)="complete()" [disabled]="busy">
+        <mat-icon>task_alt</mat-icon>{{kind == 'keep' ? (allDone ? 'キープ確認完了' : '欠品ありで確認完了') : 'ピッキング完了'}}
       </button>
     }
     @if (doc && (completed || allDone)) {
@@ -73,8 +73,8 @@
         }
       </div>
     }
-    @if (completed && doc.jdstatus == '5') {
-      <p class="sub">ピッキング済の伝票です。</p>
+    @if (completed) {
+      <p class="sub">{{kind == 'keep' ? 'キープ確認済' : 'ピッキング済'}}の伝票です。</p>
     }
   }
 </div>

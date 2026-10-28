@@ -6,18 +6,30 @@
 
 /** 受注ステータス（分類マスタ kubun = 'jdstatus'） */
 export const JDST = {
-  MIHOZON: '0',
-  KARI: '1',
-  TOROKU: '2',
+  MIHOZON: '00',
+  KARI: '10',
+  TOROKU: '20',
+  /** キープ表FAX済（NAS の asago宛FAX に保存した） */
+  KEEP_FAX: '21',
+  /** キープ表FAX後の変更（FAX 後に明細が増えた・数量が変わった。送り直しが必要） */
+  KEEP_CHANGED: '22',
+  /** キープ確認済（倉庫のスマホで、すべて確保できた） */
+  KEEP_OK: '23',
+  /** 欠品（倉庫のスマホで、確保できない明細があった） */
+  KEEP_SHORT: '24',
   /** 出荷指示フォルダ作成済（NAS へ保存した） */
-  FOLDER: '3',
+  FOLDER: '30',
   /** 出荷指示出力済（倉庫で印刷した） */
-  PRINTED: '4',
+  PRINTED: '40',
   /** ピッキング済（倉庫のスマホで商品を確認した） */
-  PICKED: '5',
-  KANRYO: '6',
-  TORIKESI: '9'
+  PICKED: '50',
+  KANRYO: '60',
+  TORIKESI: '90'
 } as const;
+
+/** キープ表の段階（FAX 済〜欠品）か */
+export const isKeepStage = (s: string | null | undefined): boolean =>
+  s == JDST.KEEP_FAX || s == JDST.KEEP_CHANGED || s == JDST.KEEP_OK || s == JDST.KEEP_SHORT;
 
 /** 帳票タイプ（受注伝票の buntype） */
 export interface DenForm {

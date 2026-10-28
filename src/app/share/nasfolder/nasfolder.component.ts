@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { NasService } from './../../services/nas.service';
@@ -7,6 +7,26 @@ import { UserService } from './../../services/user.service';
 
 /** 出荷フォルダ（NAS）の用途名（NasService の key） */
 export const NAS_SHIP = 'ship';
+/** 倉庫宛 FAX フォルダ（NAS。キープ表を保存する）の用途名 */
+export const NAS_FAX = 'fax';
+
+/** ダイアログに渡す設定（省略時は出荷フォルダ） */
+export interface NasfolderParam {
+  key: string;
+  title: string;
+  /** 説明 */
+  usage: string;
+  /** 例（フォルダの場所） */
+  example: string;
+}
+export const NASFOLDER_SHIP: NasfolderParam = {
+  key: NAS_SHIP, title: '出荷フォルダ（NAS）の設定',
+  usage: '出荷指示書・納品書・送り状データを保存する', example: '\\\\192.168.30.133\\share\\asago出荷'
+};
+export const NASFOLDER_FAX: NasfolderParam = {
+  key: NAS_FAX, title: '倉庫宛FAXフォルダ（NAS）の設定',
+  usage: 'キープ表を保存する（倉庫のマクロが印刷する）', example: '\\\\192.168.30.133\\share\\asago宛FAX'
+};
 
 /**
  * 出荷フォルダ（NAS）の設定。各 PC で最初に一度、保存先のフォルダ（例: \\192.168.30.133\share\asago出荷）を選ぶ。
@@ -23,6 +43,8 @@ export class NasfolderComponent implements OnInit {
   private usrsrv = inject(UserService);
   private cdRef = inject(ChangeDetectorRef);
   private dialogRef = inject<MatDialogRef<NasfolderComponent>>(MatDialogRef);
+  /** どのフォルダの設定か */
+  param: NasfolderParam = inject<NasfolderParam | null>(MAT_DIALOG_DATA, { optional: true }) ?? NASFOLDER_SHIP;
 
   /** 選んであるフォルダの名前（未設定は空） */
   folderName = '';
@@ -36,7 +58,7 @@ export class NasfolderComponent implements OnInit {
 
   async ngOnInit() {
     if (this.nassrv.supported) {
-      this.folderName = (await this.nassrv.get(NAS_SHIP))?.name ?? '';
+      this.folderName = (await this.nassrv.get(this.param.key))?.name ?? '';
     }
     this.cdRef.detectChanges();
   }
@@ -44,7 +66,7 @@ export class NasfolderComponent implements OnInit {
   async pick() {
     this.result = '';
     try {
-      const dir = await this.nassrv.pick(NAS_SHIP);
+      const dir = await this.nassrv.pick(this.param.key);
       if (dir) {
         this.folderName = dir.name;
       }
@@ -59,7 +81,7 @@ export class NasfolderComponent implements OnInit {
     this.result = '書き込んでいます…';
     this.cdRef.detectChanges();
     try {
-      const root = await this.nassrv.open(NAS_SHIP);
+      const root = await this.nassrv.open(this.param.key);
       const now = new Date();
       const stamp = this.usrsrv.formatDate(now).replace(/-/g, '') + ('0' + now.getHours()).slice(-2) + ('0' + now.getMinutes()).slice(-2) + ('0' + now.getSeconds()).slice(-2);
       const name = 'テスト_' + stamp + '.txt';

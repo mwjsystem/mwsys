@@ -71,7 +71,7 @@
       </button>
     }
     <mat-menu #papermenu="matMenu">
-      <button mat-menu-item (click)="makeFrmKeep()">キープ表</button>
+      <button mat-menu-item (click)="makeFrmKeep()" [disabled]="keepBusy">キープ表（倉庫へFAX）</button>
       @for (msbun of bnssrv.bunsho; track msbun) {
         <button mat-menu-item (click)="makeFrmShip(msbun.code + 'hkaeNONNNON')">{{msbun.group}} {{msbun.name}}</button>
       }
@@ -96,6 +96,16 @@
   </a></button>
 </div>
 </mat-toolbar>
+@if (keepSuggest && mode == 3 && jmisrv.denno) {
+  <div class="flex flex-row flex-wrap items-center" style="gap: 10px; margin: 6px 12px; padding: 8px 12px; background: #fff3e0; border-left: 4px solid #e65100;">
+    <mat-icon style="color: #e65100;">inventory_2</mat-icon>
+    <span style="color: #bf360c; font-weight: bold;">{{keepSuggest}}</span>
+    <button mat-raised-button color="accent" type="button" (click)="makeFrmKeep()" [disabled]="keepBusy">
+      <mat-icon>fax</mat-icon>キープ表を送る
+    </button>
+    <button mat-button type="button" (click)="keepSuggest = ''">今は送らない</button>
+  </div>
+}
 <form [formGroup]="form" (keydown.enter)="usrsrv.canEnter($event)">
   <!-- <mat-card> -->
   <div class="flex justify-between items-center space-x-4 p-3">

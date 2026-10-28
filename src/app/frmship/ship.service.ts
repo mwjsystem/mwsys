@@ -6,9 +6,9 @@ import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { OkuriService } from './../services/okuri.service';
 import { NasService } from './../services/nas.service';
-import { NAS_SHIP } from './../share/nasfolder/nasfolder.component';
+import { NAS_SHIP, NAS_FAX } from './../share/nasfolder/nasfolder.component';
 import { ShipPdfService, ShipAdr, ShipDoc, ShipLine, ShipSystem } from './ship-pdf.service';
-import { JDST, denForm, shipNote } from './ship-forms';
+import { JDST, denForm, isKeepStage, shipNote } from './ship-forms';
 
 /** 受注一覧の 1 行 */
 export interface ShipRow {
@@ -140,7 +140,7 @@ export class ShipService {
           total taxtotal gtotalzn soryozn tesuzn nebikizn total8 total10 denku jdstatus shipdir
         }
         trjyumei(where: {id: {_eq: $id}, denno: {_in: $dnos}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, order_by: [{denno: asc}, {line: asc}]) {
-          denno line gcode gtext suu touttanka toutmoney taxrate mmemo
+          denno line gcode gtext suu touttanka toutmoney taxrate mmemo spec scode
         }
         msstaff(where: {id: {_eq: $id}}) { code sei mei }
         mshokuri(where: {id: {_eq: $id}}) { code name }
@@ -213,7 +213,8 @@ export class ShipService {
           return {
             line: m.line, gcode: m.gcode, gtext: m.gtext, suu: sign * Number(m.suu ?? 0),
             touttanka: Number(m.touttanka ?? 0), toutmoney: sign * Number(m.toutmoney ?? 0),
-            taxrate: m.taxrate, mmemo: m.mmemo, unit: g?.unit ?? null, tanano: g?.tanano ?? null, jan: g?.jan ?? null
+            taxrate: m.taxrate, mmemo: m.mmemo, unit: g?.unit ?? null, tanano: g?.tanano ?? null, jan: g?.jan ?? null,
+            spec: m.spec ?? null, scode: m.scode ?? null
           };
         }),
         system: q.mssystem[0] ?? { kname: null, invno: null, zip: null, adr: null, tel: null, fax: null },
@@ -232,6 +233,111 @@ export class ShipService {
    */
   pickUrl(denno: number): string {
     return window.location.origin + '/frmship/pick/' + denno + (localStorage.getItem('MWSYS_DB') == null ? '' : '?db=test');
+  }
+
+  /** キープ表の QR コードの URL（スマホのカメラで読むと、キープ確認の画面が開く） */
+  keepUrl(denno: number): string {
+    return window.location.origin + '/frmship/keep/' + denno + (localStorage.getItem('MWSYS_DB') == null ? '' : '?db=test');
+  }
+
+  /**
+   * キープ表を NAS の倉庫宛 FAX フォルダ（{担当者}/{伝票番号}キープ表.pdf）に保存し、受注ステータスを「キープ表FAX済」にする。
+   * 載せた明細を trkeep に写しておく（倉庫で確保できた数を記録し、後の変更を見分けるため）。
+   * ボタンを押した処理の中で呼ぶこと（最初に NAS への書き込みの許可を求めるため）。保存したファイル（相対パス）を返す
+   */
+  async keepFax(denno: number): Promise<string> {
+    const root = await this.nassrv.open(NAS_FAX);
+    const d = (await this.load([denno]) as (ShipDoc & { staffSei: string })[])[0];
+    if (!d) {
+      throw new Error('受注伝票 ' + denno + ' が見つかりません');
+    }
+    if (!d.staffSei) {
+      throw new Error('担当者が未設定です');
+    }
+    const dir = await this.nassrv.folder(root, d.staffSei);
+    const name = d.denno + 'キープ表.pdf';
+    await this.nassrv.write(dir, name, await this.spdfsrv.keep(d, this.keepUrl(d.denno)));
+    const now = new Date();
+    const by = this.usrsrv.staff.code;
+    const Upd = gql`
+      mutation upd_keepfax($id: smallint!, $dno: Int!, $objs: [trkeep_insert_input!]!, $set: trjyuden_set_input!) {
+        delete_trkeep(where: {id: {_eq: $id}, denno: {_eq: $dno}}) { affected_rows }
+        insert_trkeep(objects: $objs) { affected_rows }
+        update_trjyuden(where: {id: {_eq: $id}, denno: {_eq: $dno}}, _set: $set) { affected_rows }
+      }`;
+    await firstValueFrom(this.apollo.mutate({
+      mutation: Upd,
+      variables: {
+        id: this.usrsrv.compid, dno: denno,
+        objs: d.lines.map(l => ({
+          id: this.usrsrv.compid, denno: denno, line: l.line, gcode: l.gcode, gtext: l.gtext, suu: l.suu,
+          scode: l.scode ?? null, spec: l.spec ?? null, faxed_at: now, faxed_by: by
+        })),
+        set: { jdstatus: JDST.KEEP_FAX, keep_at: now, keep_by: by }
+      }
+    }));
+    return d.staffSei + '/' + name;
+  }
+
+  /**
+   * 倉庫で確かめたキープの結果（明細ごとに確保できた数）を記録し、受注ステータスを
+   * 「キープ確認済」（すべて確保できた）または「欠品」にする
+   */
+  async setKeepChecked(d: ShipDoc, kpsuu: { line: number; kpsuu: number }[], short: boolean): Promise<void> {
+    const now = new Date();
+    const by = this.usrsrv.staff.code;
+    const Upd = gql`
+      mutation upd_keepchk($id: smallint!, $dno: Int!, $objs: [trkeep_insert_input!]!, $set: trjyuden_set_input!) {
+        insert_trkeep(objects: $objs, on_conflict: {constraint: trkeep_pkey, update_columns: [kpsuu, checked_at, checked_by]}) { affected_rows }
+        update_trjyuden(where: {id: {_eq: $id}, denno: {_eq: $dno}}, _set: $set) { affected_rows }
+      }`;
+    await firstValueFrom(this.apollo.mutate({
+      mutation: Upd,
+      variables: {
+        id: this.usrsrv.compid, dno: d.denno,
+        objs: d.lines.map(l => ({
+          id: this.usrsrv.compid, denno: d.denno, line: l.line, gcode: l.gcode, gtext: l.gtext, suu: l.suu,
+          scode: l.scode ?? null, spec: l.spec ?? null,
+          kpsuu: kpsuu.find(k => k.line == l.line)?.kpsuu ?? null, checked_at: now, checked_by: by
+        })),
+        set: { jdstatus: short ? JDST.KEEP_SHORT : JDST.KEEP_OK, kpchk_at: now, kpchk_by: by }
+      }
+    }));
+  }
+
+  /** キープ表で確保できた数（明細ごと）。未確認・キープ表なしは空 */
+  async keepResult(denno: number): Promise<{ line: number; gcode: string; suu: number; kpsuu: number | null }[]> {
+    const Get = gql`
+      query get_keep($id: smallint!, $dno: Int!) {
+        trkeep(where: {id: {_eq: $id}, denno: {_eq: $dno}}, order_by: {line: asc}) { line gcode suu kpsuu }
+      }`;
+    const { data } = await firstValueFrom(this.apollo.query<{ trkeep: { line: number; gcode: string; suu: number; kpsuu: number | null }[] }>({
+      query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, dno: denno }
+    }));
+    return data?.trkeep ?? [];
+  }
+
+  /**
+   * 受注伝票を保存し直したときの受注ステータス。
+   *   ・キープ表の段階（FAX 済〜欠品）: 明細の追加・削除や数量の増減（商品ごとの数の違い）があれば「キープ表FAX後の変更」、無ければそのまま
+   *   ・それ以外（出荷指示フォルダ作成後など）: 受注登録に戻す（出荷指示の作り直しの対象）
+   */
+  async statusOnSave(denno: number, current: string | null, lines: { gcode: string; suu: number }[]): Promise<string> {
+    if (!isKeepStage(current)) {
+      return JDST.TOROKU;
+    }
+    if (current == JDST.KEEP_CHANGED) {
+      return current;
+    }
+    const sum = (ls: { gcode: string; suu: number }[]) => {
+      const m = new Map<string, number>();
+      ls.filter(e => e.gcode).forEach(e => m.set(e.gcode, (m.get(e.gcode) ?? 0) + Number(e.suu ?? 0)));
+      return m;
+    };
+    const before = sum(await this.keepResult(denno));
+    const after = sum(lines);
+    const same = before.size == after.size && [...after].every(([g, s]) => before.get(g) == s);
+    return same ? current! : JDST.KEEP_CHANGED;
   }
 
   /** 受注ステータスを「ピッキング済」にする */

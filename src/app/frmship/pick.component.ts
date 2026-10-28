@@ -77,8 +77,13 @@ export class PickComponent implements AfterViewInit, OnDestroy {
   private lastAt = 0;
   private audio?: AudioContext;
 
+  /** pick = ピッキング（出荷指示書の QR）、keep = キープ確認（キープ表の QR） */
+  readonly kind: 'pick' | 'keep' = inject(ActivatedRoute).snapshot.data['kind'] == 'keep' ? 'keep' : 'pick';
+  readonly kindName = this.kind == 'keep' ? 'キープ確認' : 'ピッキング';
+  readonly sheetName = this.kind == 'keep' ? 'キープ表' : '出荷指示書';
+
   constructor() {
-    this.title.setTitle('ピッキング(MWSystem)');
+    this.title.setTitle(this.kindName + '(MWSystem)');
   }
 
   ngAfterViewInit(): void {
@@ -139,25 +144,36 @@ export class PickComponent implements AfterViewInit, OnDestroy {
     this.show('伝票 ' + denno + ' を読み込んでいます…', 'info');
     this.cdRef.detectChanges();
     try {
-      const docs = await this.shipsrv.load([denno]) as PickDoc[];
+      const [docs, kept] = await Promise.all([
+        this.shipsrv.load([denno]) as Promise<PickDoc[]>,
+        this.kind == 'keep' ? this.shipsrv.keepResult(denno) : Promise.resolve([])
+      ]);
       this.doc = docs[0];
       this.denno = denno;
-      history.replaceState('', '', './frmship/pick/' + denno);
+      history.replaceState('', '', './frmship/' + this.kind + '/' + denno);
       if (!this.doc) {
         this.show('伝票 ' + denno + ' が見つかりません', 'ng');
       } else {
+        const st = this.doc.jdstatus;
+        this.completed = this.kind == 'keep' ? st == JDST.KEEP_OK || st == JDST.KEEP_SHORT : st == JDST.PICKED;
         this.items = this.doc.lines.map(l => ({
           line: l.line, gcode: l.gcode ?? '', gtext: l.gtext ?? '', mmemo: l.mmemo, tanano: l.tanano,
           jan: (l.jan ?? '').trim(),
           need: shipNote(l.gcode ?? '', l.gtext ?? '', this.doc!.mcode).check && l.suu > 0 ? l.suu : 0,
-          done: 0
+          // キープ確認済の伝票は、前回確保できた数を表示する
+          done: this.completed ? Number(kept.find(k => k.line == l.line)?.kpsuu ?? 0) : 0
         }));
-        this.completed = this.doc.jdstatus == JDST.PICKED;
-        if (this.doc.jdstatus == JDST.TOROKU) {
-          this.show('出荷指示のあとに受注伝票が変更されています。新しい出荷指示書か確認してください', 'ng');
+        const warn = this.kind == 'keep'
+          ? (st == JDST.KEEP_CHANGED ? 'キープ表のFAX後に受注伝票が変更されています。新しいキープ表か確認してください'
+            : st != JDST.KEEP_FAX && !this.completed ? 'キープ表をFAXしていない伝票です（状態：' + this.statusName(st) + '）' : '')
+          : (st == JDST.TOROKU ? '出荷指示のあとに受注伝票が変更されています。新しい出荷指示書か確認してください' : '');
+        if (warn) {
+          this.show(warn, 'ng');
           this.stop();
         } else if (this.completed) {
-          this.show('この伝票はピッキング済です（もう一度確認できます）', 'info');
+          this.show(this.kind == 'keep'
+            ? 'この伝票はキープ確認済です（状態：' + this.statusName(st) + '。もう一度確認できます）'
+            : 'この伝票はピッキング済です（もう一度確認できます）', 'info');
           this.stop();
         } else if (this.controls) {
           this.mode = 'item';
@@ -255,9 +271,15 @@ export class PickComponent implements AfterViewInit, OnDestroy {
     }
     this.lastText = text;
     this.lastAt = now;
-    const m = text.match(/\/frmship\/pick\/(\d+)/) ?? (this.mode == 'qr' || !this.doc ? text.match(/^(\d{6,8})$/) : null);
+    const q = text.match(/\/frmship\/(pick|keep)\/(\d+)/);
+    if (q && q[1] != this.kind) {
+      this.show((q[1] == 'keep' ? 'キープ表' : '出荷指示書') + 'の QR コードです。' + this.sheetName + 'の QR コードを読んでください', 'ng');
+      this.cdRef.detectChanges();
+      return;
+    }
+    const m = q ? q[2] : (this.mode == 'qr' || !this.doc ? text.match(/^(\d{6,8})$/)?.[1] : null);
     if (m) {
-      const dno = Number(m[1]);
+      const dno = Number(m);
       if (!this.doc || this.doneCount == 0) {
         this.open(dno);
       } else if (dno != this.denno) {
@@ -268,7 +290,7 @@ export class PickComponent implements AfterViewInit, OnDestroy {
       return;
     }
     if (!this.doc) {
-      this.show('先に出荷指示書の QR コードを読んでください', 'ng');
+      this.show('先に' + this.sheetName + 'の QR コードを読んでください', 'ng');
       this.cdRef.detectChanges();
       return;
     }
@@ -294,18 +316,33 @@ export class PickComponent implements AfterViewInit, OnDestroy {
     item.done = Math.max(0, Math.min(item.need, item.done + n));
   }
 
-  /** ピッキング完了 */
+  /**
+   * 完了。ピッキングはすべて確認できたときだけ。
+   * キープ確認は、足りない商品があっても「欠品」として登録できる（明細ごとに確保できた数を残す）
+   */
   async complete() {
-    if (!this.doc || !this.allDone) {
+    if (!this.doc || (this.kind == 'pick' && !this.allDone)) {
+      return;
+    }
+    const short = !this.allDone;
+    if (short && !confirm('確保できない商品があります（' + this.needItems.filter(e => e.done < e.need).map(e => e.gcode + ' ' + e.done + '/' + e.need).join('、') +
+      '）。\n欠品として登録しますか？')) {
       return;
     }
     this.busy = true;
     this.cdRef.detectChanges();
     try {
-      await this.shipsrv.setPicked(this.doc.denno);
+      if (this.kind == 'keep') {
+        await this.shipsrv.setKeepChecked(this.doc, this.needItems.map(e => ({ line: e.line, kpsuu: e.done })), short);
+        this.doc.jdstatus = short ? JDST.KEEP_SHORT : JDST.KEEP_OK;
+        this.show((short ? '欠品' : 'キープ確認済') + 'にしました（伝票 ' + this.doc.denno + '）', short ? 'ng' : 'ok');
+      } else {
+        await this.shipsrv.setPicked(this.doc.denno);
+        this.doc.jdstatus = JDST.PICKED;
+        this.show('ピッキング完了にしました（伝票 ' + this.doc.denno + '）', 'ok');
+      }
       this.completed = true;
-      this.doc.jdstatus = JDST.PICKED;
-      this.show('ピッキング完了にしました（伝票 ' + this.doc.denno + '）', 'ok');
+      this.stop();
     } catch (e) {
       this.show('ステータスを更新できませんでした：' + (e as Error).message, 'ng');
       console.log('error pick complete', e);
@@ -314,14 +351,14 @@ export class PickComponent implements AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  /** 次の伝票（出荷指示書の QR を読む） */
+  /** 次の伝票（出荷指示書・キープ表の QR を読む） */
   next() {
     this.doc = undefined;
     this.items = [];
     this.denno = 0;
     this.completed = false;
-    history.replaceState('', '', './frmship/pick');
-    this.show('出荷指示書の QR コードを読んでください', 'info');
+    history.replaceState('', '', './frmship/' + this.kind);
+    this.show(this.sheetName + 'の QR コードを読んでください', 'info');
     this.start('qr');
   }
 

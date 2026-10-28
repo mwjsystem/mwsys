@@ -94,7 +94,7 @@ SELECT coalesce(nullif(:'cutoff', '')::date,
 --     出荷予定日が今日より前の伝票は 4 出荷指示出力済、それ以外は 2 受注登録にする
 UPDATE trjyuden
    SET denku = CASE WHEN jdstatus = '2' THEN 2 ELSE 0 END,
-       jdstatus = CASE WHEN sday < current_date THEN '4' ELSE '2' END;
+       jdstatus = CASE WHEN sday < current_date THEN '40' ELSE '20' END;
 
 -- 3. 受注伝票 idenno
 UPDATE trjyuden SET idenno = NULL

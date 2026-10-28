@@ -65,4 +65,5 @@ SELECT '\copy ' || :'schema' || '.trjyuden ('
        || ') FROM ''<CSVのパス>\trjyuden.csv'' with csv header;' AS "trjyuden の \copy コマンド"
   FROM information_schema.columns
  WHERE table_schema = :'schema' AND table_name = 'trjyuden'
-   AND column_name NOT IN ('denku', 'shipdir', 'ship_at', 'ship_by', 'print_at', 'print_by', 'pick_at', 'pick_by');
+   AND column_name NOT IN ('denku', 'shipdir', 'ship_at', 'ship_by', 'print_at', 'print_by', 'pick_at', 'pick_by',
+                           'keep_at', 'keep_by', 'kpchk_at', 'kpchk_by');

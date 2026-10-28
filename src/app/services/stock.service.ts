@@ -100,7 +100,7 @@ interface GtanaResult { trgtana: { scode: string; gcode: string; tana: number | 
 /** get_zaiko クエリの結果（入出庫の合計のみ） */
 interface ZaikoSumResult { trzaiko_aggregate: ZaikoAgg }
 /** get_zaiko クエリの結果（getZaiko） */
-interface ZaikoResult extends ZaikoSumResult { today: SuuAgg; keepd: SuuAgg; hikat: SuuAgg; juzan: SuuAgg; tommo: SuuAgg }
+interface ZaikoResult extends ZaikoSumResult { today: SuuAgg; keepd: SuuAgg; hikat: SuuAgg; kpchk: SuuAgg; juzan: SuuAgg; tommo: SuuAgg }
 /** get_zaiko クエリの結果（getZaiko1: 内訳用） */
 interface Zaiko1Result extends ZaikoSumResult { hikat: SuuAgg; keepd: SuuAgg; vhatzn: { yday: Date; hatzn: number }[]; vhatzn_aggregate: HatznAgg }
 @Injectable({
@@ -521,6 +521,8 @@ export class StockService {
         aggregate { sum { suu }}}
       hikat:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in:["1","4","5","6"]},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
+      kpchk:vkeepzai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},del:{_eq:false}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+        aggregate { sum { suu }}}
       juzan:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}} 
       tommo:vjmeizai_aggregate(where: {id: {_eq: $id}, gcode: {_eq: $gcode}, scode: {_eq: $scode}, sday: {_eq: $nextd}, trjyuden: {del: {_eq: false}}}) {
@@ -546,6 +548,10 @@ export class StockService {
             return;
           }
           const data = raw as ZaikoResult;
+          // キープ済 = 倉庫でキープを確認して確保できた数（キープ表）。引当済 = それ以外の引当
+          // （受注可能数 = 在庫 − 引当済 − キープ済 は、今までの引当〈引当区分 1,4,5,6〉＋キープ〈2〉の合計と同じ）
+          const alloc = (data.hikat.aggregate.sum.suu || 0) + (data.keepd.aggregate.sum.suu || 0);
+          const kept = Math.min(data.kpchk.aggregate.sum.suu || 0, alloc);
           // console.log(this.usrsrv.getNextday(tdy), data);
           let lcstcs: Stock = {
             gcode: gcd,
@@ -559,10 +565,10 @@ export class StockService {
               - (data.trzaiko_aggregate.aggregate.sum.movo || 0)
               - (data.trzaiko_aggregate.aggregate.sum.teno || 0)
               - (data.trzaiko_aggregate.aggregate.sum.haki || 0),
-            hikat: data.hikat.aggregate.sum.suu || 0,
+            hikat: alloc - kept,
             juzan: data.juzan.aggregate.sum.suu || 0,
             today: data.today.aggregate.sum.suu || 0,
-            keepd: data.keepd.aggregate.sum.suu || 0,
+            keepd: kept,
             tommo: data.tommo.aggregate.sum.suu || 0
           }
           // console.log(lcstcs);

@@ -8,6 +8,7 @@
   <mat-menu #ship="matMenu">
     <a mat-menu-item routerLink="/frmship">受注一覧・出荷指示</a>
     <a mat-menu-item routerLink="/frmship/print">出荷指示 印刷（倉庫）</a>
+    <a mat-menu-item routerLink="/frmship/keep">キープ確認（倉庫のスマホ）</a>
     <a mat-menu-item routerLink="/frmship/pick">ピッキング（倉庫のスマホ）</a>
   </mat-menu>
   <button mat-button [matMenuTriggerFor]="cust">顧客関連</button>
@@ -127,8 +128,11 @@
         <mat-icon>settings</mat-icon>初期設定(ﾀﾞｳﾝﾛｰﾄﾞを使用する場合)
       </button>
       <!-- form の中なので type="button" にする（無いと送信ボタンになり、押すとページが読み込み直される） -->
-      <button mat-menu-item type="button" (click)="openNasfolder()">
+      <button mat-menu-item type="button" (click)="openNasfolder(false)">
         <mat-icon>folder_shared</mat-icon>出荷フォルダ（NAS）の設定
+      </button>
+      <button mat-menu-item type="button" (click)="openNasfolder(true)">
+        <mat-icon>fax</mat-icon>倉庫宛FAXフォルダ（NAS）の設定
       </button>
       <mat-menu #setmenu="matMenu">
         <a mat-menu-item
