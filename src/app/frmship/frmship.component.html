@@ -17,7 +17,7 @@
     @if (!denno) {
       <form [formGroup]="form" class="flex flex-row flex-wrap items-center" style="gap: 10px;" (keydown.enter)="usrsrv.canEnter($event)">
         <mat-form-field style="width: 9em;">
-          <mat-label>出荷予定日（から）</mat-label>
+          <mat-label>出荷日（から）</mat-label>
           <input matInput [matDatepicker]="picker1" formControlName="from">
           <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
           <mat-datepicker #picker1></mat-datepicker>
@@ -109,7 +109,7 @@
           </td>
         </ng-container>
         <ng-container matColumnDef="sday">
-          <th mat-header-cell *matHeaderCellDef>出荷予定日</th>
+          <th mat-header-cell *matHeaderCellDef>出荷日</th>
           <td mat-cell *matCellDef="let row">{{row.sday | date:'M/d(E)'}}</td>
         </ng-container>
         <ng-container matColumnDef="mcode">
@@ -152,7 +152,7 @@
         <tr mat-row *matRowDef="let row; columns: columns;"></tr>
       </table>
       @if (rows.length == 0) {
-        <p style="padding: 10px;">出荷予定日・担当者を指定して「抽出」を押してください。NAS の保存先は、設定メニューの「出荷フォルダ（NAS）の設定」で各 PC で一度選んでおきます。</p>
+        <p style="padding: 10px;">出荷日・担当者を指定して「抽出」を押してください。NAS の保存先は、設定メニューの「出荷フォルダ（NAS）の設定」で各 PC で一度選んでおきます。</p>
       }
     </div>
   </mat-card-content>

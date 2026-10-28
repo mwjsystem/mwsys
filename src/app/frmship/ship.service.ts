@@ -37,7 +37,7 @@ export interface ShipRow {
 
 /** 受注一覧の絞り込み */
 export interface ShipFilter {
-  /** 出荷予定日（から・まで。yyyy-mm-dd） */
+  /** 出荷日（から・まで。yyyy-mm-dd） */
   from: string;
   to: string;
   /** 担当者（空は全担当者） */
@@ -61,7 +61,7 @@ export interface ShipResult {
 
 interface JyudenQ {
   denno: number; mcode: string; ncode: string | null; nadr: number | null; iadr: number | null; buntype: string | null;
-  sday: string | null; uday: string | null; hcode: string | null; okurisuu: number | null; okurino: string | null;
+  yday: string | null; sday: string | null; uday: string | null; hcode: string | null; okurisuu: number | null; okurino: string | null;
   tcode: string | null; pcode: string | null; dmemo: string | null; nmemo: string | null; keep: string | null;
   total: number | null; taxtotal: number | null; gtotalzn: number | null; soryozn: number | null; tesuzn: number | null; nebikizn: number | null;
   total8: number | null; total10: number | null; denku: number | null; jdstatus: string | null; shipdir: string | null;
@@ -136,7 +136,7 @@ export class ShipService {
     const GetDoc = gql`
       query get_shipdoc($id: smallint!, $dnos: [Int!]!) {
         trjyuden(where: {id: {_eq: $id}, denno: {_in: $dnos}}) {
-          denno mcode ncode nadr iadr buntype sday uday hcode okurisuu okurino tcode pcode dmemo nmemo keep
+          denno mcode ncode nadr iadr buntype yday sday uday hcode okurisuu okurino tcode pcode dmemo nmemo keep
           total taxtotal gtotalzn soryozn tesuzn nebikizn total8 total10 denku jdstatus shipdir
         }
         trjyumei(where: {id: {_eq: $id}, denno: {_in: $dnos}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, order_by: [{denno: asc}, {line: asc}]) {
@@ -193,6 +193,7 @@ export class ShipService {
         nsaki: { name: nAdr?.adrname || memberName(j.ncode ?? j.mcode), adr: nAdr },
         irai: j.iadr != null ? { name: adr(j.mcode, j.iadr)?.adrname || memberName(j.mcode), adr: adr(j.mcode, j.iadr) } : undefined,
         sday: j.sday ?? '',
+        yday: j.yday,
         uday: j.uday,
         okurino: j.okurino,
         okurisuu: j.okurisuu,
@@ -398,7 +399,7 @@ export class ShipService {
           throw new Error('納品書タイプが未設定です');
         }
         if (!d.sday) {
-          throw new Error('出荷予定日が未入力です');
+          throw new Error('出荷日が未入力です');
         }
         if (!d.staffSei) {
           throw new Error('担当者が未設定です');

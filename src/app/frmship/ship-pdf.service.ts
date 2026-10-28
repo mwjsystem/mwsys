@@ -23,8 +23,10 @@ export interface ShipDoc {
   nsaki: { name: string; adr?: ShipAdr };
   /** 依頼主（受注伝票の依頼主住所）。無ければ undefined */
   irai?: { name: string; adr?: ShipAdr };
-  /** 出荷予定日（yyyy-mm-dd） */
+  /** 出荷日（yyyy-mm-dd。出荷指示の日付） */
   sday: string;
+  /** 出荷予定日（yyyy-mm-dd） */
+  yday?: string | null;
   /** 売上日（yyyy-mm-dd） */
   uday: string | null;
   okurino: string | null;
@@ -101,13 +103,14 @@ export class ShipPdfService {
 
   private keepDoc(d: ShipDoc, url: string): TDocumentDefinitions {
     const now = new Date();
-    const items = d.lines.filter(l => shipNote(l.gcode ?? '', l.gtext ?? '', d.mcode).check && Number(l.suu) > 0);
+    // 実物の商品の明細はすべて載せる（数量が未入力の明細も、倉庫で確かめられるように載せる）
+    const items = d.lines.filter(l => shipNote(l.gcode ?? '', l.gtext ?? '', d.mcode).check && Number(l.suu ?? 0) >= 0);
     const head: TableCell[] = ['No', '商品コード', '数量', '商品名', '棚番', '確保数', '備考']
       .map(t => ({ text: t, alignment: 'center', fillColor: '#bbbbbb', fontSize: 8 }));
     const body: TableCell[][] = items.map(l => [
       { text: String(l.line), fontSize: 8 },
       { text: l.gcode ?? '', fontSize: 12, bold: true },
-      { text: yen(l.suu), fontSize: Number(l.suu) != 1 ? 14 : 12, bold: Number(l.suu) != 1 },
+      { text: l.suu ? yen(l.suu) : '', fontSize: Number(l.suu) != 1 ? 14 : 12, bold: Number(l.suu) != 1 },
       { text: (l.gtext ?? '') + (l.mmemo ? '\n' + l.mmemo : ''), fontSize: 8 },
       { text: l.tanano ? '棚' + l.tanano : '', fontSize: 11, bold: true },
       '',
@@ -118,7 +121,8 @@ export class ShipPdfService {
     }
     const info: TableCell[][] = [
       [{ text: '伝票No:', alignment: 'right' }, { text: String(d.denno), fontSize: 14 }],
-      [{ text: '出荷予定日:', alignment: 'right' }, { text: jday(d.sday), fontSize: 12 }],
+      [{ text: '出荷予定日:', alignment: 'right' }, { text: jday(d.yday ?? null), fontSize: 12 }],
+      ...(d.sday ? [[{ text: '出荷日:', alignment: 'right' }, { text: jday(d.sday), fontSize: 12 }] as TableCell[]] : []),
       [{ text: '担当者:', alignment: 'right' }, { text: d.staffName, fontSize: 12 }],
       [{ text: '配送伝票:', alignment: 'right' }, { text: d.hname, fontSize: 12 }],
       [{ text: 'FAX日時:', alignment: 'right' }, now.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })]
