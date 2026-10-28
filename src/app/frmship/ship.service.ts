@@ -132,8 +132,9 @@ export class ShipService {
   /** 帳票を作るためのデータをまとめて読む */
   async load(dennos: number[]): Promise<ShipDoc[]> {
     const id = this.usrsrv.compid;
+    // 1 回目: 受注伝票・明細と、件数の少ないマスタ
     const GetDoc = gql`
-      query get_shipdoc($id: smallint!, $dnos: [Int!]!, $mcds: [String!]!) {
+      query get_shipdoc($id: smallint!, $dnos: [Int!]!) {
         trjyuden(where: {id: {_eq: $id}, denno: {_in: $dnos}}) {
           denno mcode ncode nadr iadr buntype sday uday hcode okurisuu okurino tcode pcode dmemo nmemo keep
           total taxtotal gtotalzn soryozn tesuzn nebikizn total8 total10 denku jdstatus shipdir
@@ -141,28 +142,31 @@ export class ShipService {
         trjyumei(where: {id: {_eq: $id}, denno: {_in: $dnos}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, order_by: [{denno: asc}, {line: asc}]) {
           denno line gcode gtext suu touttanka toutmoney taxrate mmemo
         }
-        msmember(where: {id: {_eq: $id}, mcode: {_in: $mcds}}) { mcode sei mei }
-        msmadr(where: {id: {_eq: $id}, mcode: {_in: $mcds}}) { mcode eda zip region local street extend extend2 adrname }
         msstaff(where: {id: {_eq: $id}}) { code sei mei }
         mshokuri(where: {id: {_eq: $id}}) { code name }
         mssystem(where: {id: {_eq: $id}}) { kname invno zip adr tel fax }
       }`;
-    const query = async (mcds: string[]) => (await firstValueFrom(this.apollo.query<LoadResult>({
-      query: GetDoc, fetchPolicy: 'network-only', variables: { id: id, dnos: dennos, mcds: mcds }
-    }))).data as LoadResult;
-    // 受注先・納品先の顧客は、受注伝票を読んでから分かるので 2 回に分けて読む
-    let q = await query([]);
-    const mcds = [...new Set(q.trjyuden.flatMap(j => [j.mcode, j.ncode]).filter((e): e is string => !!e))];
-    q = await query(mcds);
-    const gcds = [...new Set(q.trjyumei.map(e => e.gcode).filter(e => !!e))];
-    const GetGoods = gql`
-      query get_shipgoods($id: smallint!, $gcds: [String!]!) {
+    // 2 回目: 1 回目で分かった顧客（受注先・納品先）と商品だけ
+    const GetRef = gql`
+      query get_shipref($id: smallint!, $mcds: [String!]!, $gcds: [String!]!) {
+        msmember(where: {id: {_eq: $id}, mcode: {_in: $mcds}}) { mcode sei mei }
+        msmadr(where: {id: {_eq: $id}, mcode: {_in: $mcds}}) { mcode eda zip region local street extend extend2 adrname }
         msgoods(where: {id: {_eq: $id}, gcode: {_in: $gcds}}) { gcode unit tanano jan }
       }`;
-    const goods = gcds.length == 0 ? [] : ((await firstValueFrom(this.apollo.query<GoodsResult>({
-      query: GetGoods, fetchPolicy: 'network-only', variables: { id: id, gcds: gcds }
-    }))).data as GoodsResult).msgoods;
-    await this.bunsrv.qryBunrui();
+    const [doc] = await Promise.all([
+      firstValueFrom(this.apollo.query<Omit<LoadResult, 'msmember' | 'msmadr'>>({
+        query: GetDoc, fetchPolicy: 'network-only', variables: { id: id, dnos: dennos }
+      })),
+      this.bunsrv.qryBunrui()
+    ]);
+    const d1 = doc.data as Omit<LoadResult, 'msmember' | 'msmadr'>;
+    const mcds = [...new Set(d1.trjyuden.flatMap(j => [j.mcode, j.ncode]).filter((e): e is string => !!e))];
+    const gcds = [...new Set(d1.trjyumei.map(e => e.gcode).filter(e => !!e))];
+    const d2 = (await firstValueFrom(this.apollo.query<Pick<LoadResult, 'msmember' | 'msmadr'> & GoodsResult>({
+      query: GetRef, fetchPolicy: 'network-only', variables: { id: id, mcds: mcds, gcds: gcds }
+    }))).data as Pick<LoadResult, 'msmember' | 'msmadr'> & GoodsResult;
+    const q: LoadResult = { ...d1, msmember: d2.msmember, msmadr: d2.msmadr };
+    const goods = d2.msgoods;
 
     const memberName = (mcode: string | null): string => {
       const m = q.msmember.find(e => e.mcode == mcode);

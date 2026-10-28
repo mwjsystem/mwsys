@@ -136,6 +136,7 @@ export class PickComponent implements AfterViewInit, OnDestroy {
     this.completed = false;
     this.doc = undefined;
     this.items = [];
+    this.show('伝票 ' + denno + ' を読み込んでいます…', 'info');
     this.cdRef.detectChanges();
     try {
       const docs = await this.shipsrv.load([denno]) as PickDoc[];
