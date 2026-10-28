@@ -87,15 +87,14 @@ export type NyusubSet = Pick<Nyusub, 'day' | 'mcode' | 'code' | 'jdenno' | 'tcod
 /** 新規登録時に入金伝票（trnyusub）へ渡す値 */
 export type NyusubNew = NyusubSet & Pick<Nyusub, 'denno' | 'created_at' | 'created_by'> & { id: number };
 
-interface AffectedRows { affected_rows: number }
 /** get_jyuden クエリの結果（受注の入金残） */
 interface NyuzanResult { vnyuzan: Jyuden[] }
 /** get_nyuden クエリの結果 */
 interface NyusubResult { trnyusub: Nyusub[] }
 /** upd_nyusub ミューテーションの結果 */
-export interface UpdNyudenResult { update_trnyusub: AffectedRows; delete_trnyuden: AffectedRows; insert_trnyuden: AffectedRows }
+export interface UpdNyudenResult { update_trnyusub: mwI.AffectedRows; delete_trnyuden: mwI.AffectedRows; insert_trnyuden: mwI.AffectedRows }
 /** ins_nyuden ミューテーションの結果 */
-export interface InsNyudenResult { insert_trnyusub: AffectedRows; insert_trnyuden: AffectedRows }
+export interface InsNyudenResult { insert_trnyusub: mwI.AffectedRows; insert_trnyuden: mwI.AffectedRows }
 @Injectable({
   providedIn: 'root'
 })
@@ -193,13 +192,17 @@ export class DepositService {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log(data);
-          if ((data as NyuzanResult).vnyuzan.length == 0) {
+          if (!data) {
+            return;
+          }
+          const result = data as NyuzanResult;
+          if (result.vnyuzan.length == 0) {
             observer.error('受注伝票' + denno + 'は未登録です');
 
-          } else if ((data as NyuzanResult).vnyuzan[0].torikbn == true) {
+          } else if (result.vnyuzan[0].torikbn == true) {
             observer.error('締請求の伝票です');
           } else {
-            observer.next((data as NyuzanResult).vnyuzan[0]);
+            observer.next(result.vnyuzan[0]);
           }
         }, (error) => {
           observer.error(error);
@@ -219,7 +222,7 @@ export class DepositService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          observer.next((data as NyusubResult).trnyusub[0]); // 伝票が無いときは undefined
+          observer.next(data ? (data as NyusubResult).trnyusub[0] : undefined); // 伝票が無いときは undefined
         }, (error) => {
           observer.error(error);
         });

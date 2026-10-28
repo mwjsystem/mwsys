@@ -1,44 +1,18 @@
-<mat-toolbar [color]="invsrv.mode==3 ? 'primary' : invsrv.mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
-  <div class="icon-area" fxLayout="row wrap">
-    @if (invsrv.mode==3) {
-      <button mat-button (click)="modeToCre()">
-        <mat-icon>add_box</mat-icon>新規
-      </button>
-    }
-    @if (invsrv.mode==3 && denno) {
-      <button mat-button (click)="modeToUpd()">
-        <mat-icon>edit</mat-icon>編集
-      </button>
-    }
-    @if (invsrv.mode!=3) {
-      <button mat-button (click)="save()" [disabled]="form.invalid">
-        <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
-      </button>
-    }
-    @if (invsrv.mode!=3) {
-      <button mat-button (click)="cancel()">
-        <mat-icon>cancel</mat-icon>中止
-      </button>
-    }
-    <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="icon-area flex flex-row flex-wrap">
+    <mat-form-field class="frm-fld-in-bar" style="flex: 0 0 12em; align-self: end;">
       <mat-label>請求伝票番号</mat-label>
       <input matInput [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
-        (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
-        [disabled]="invsrv.mode==1 || (invsrv.mode==2 && form.dirty)">
-      @if (invsrv.mode==3) {
-        <button mat-icon-button matSuffix (click)="dennoHelp()">
-          <mat-icon>find_replace</mat-icon>
-        </button>
-      }
+        (blur)="onEnter()" [ngModelOptions]="{standalone: true}">
+      <button mat-icon-button matSuffix (click)="dennoHelp()">
+        <mat-icon>find_replace</mat-icon>
+      </button>
     </mat-form-field>
-    @if (form.value.scde) {
-      <button mat-button (click)="test()">
-        <mat-icon>receipt</mat-icon>入金確認
+    @if (invoice && !invoice.head.del) {
+      <button mat-button (click)="cancelInvoice()" [disabled]="busy || !!invoice.lock">
+        <mat-icon matTooltip="{{invoice.lock}}" matTooltipClass="ttips">delete_forever</mat-icon>請求取消
       </button>
     }
-    <button mat-button (click)="onEnter()" [style.display]="invsrv.mode==1 ? 'none' : 'inline-block'">
-      <mat-icon>history</mat-icon>操作ログ
-    </button>
     <button mat-button><a mat-button
       href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
       target="_blank">
@@ -46,3 +20,208 @@
     </a></button>
   </div>
 </mat-toolbar>
+<div class="flex flex-row flex-wrap" style="gap: 5px;">
+  <mat-card>
+    <mat-card-header class="flex flex-row flex-wrap" style="gap: 5px;">
+      <mat-card-title>
+        締め処理【請求伝票作成（掛売）】
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="form" class="flex flex-row flex-wrap items-center" style="gap: 10px;" (keydown.enter)="usrsrv.canEnter($event)">
+        <div class="flex flex-row flex-wrap items-end">
+          <mat-form-field style="width: 9em;">
+            <mat-label>締め日</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="sday">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <span class="ybtxt">{{form.value.sday | jdate}}</span>
+        </div>
+        <mat-form-field style="width: 9em;">
+          <mat-label>担当者</mat-label>
+          <mat-select formControlName="tcode" [panelClass]="'my-panel-class'">
+            @for (sval of stfsrv.tcds; track sval) {
+              <mat-option [value]="sval.value">
+                {{sval.value ? sval.viewval : '（全担当者）'}}
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button mat-raised-button type="button" (click)="getShime()" [disabled]="busy">
+          <mat-icon>search</mat-icon>対象抽出
+        </button>
+        <button mat-raised-button color="accent" type="button" (click)="create()" [disabled]="busy || chkRows.length == 0">
+          <mat-icon>receipt_long</mat-icon>請求伝票作成（{{chkRows.length}}件）
+        </button>
+      </form>
+      @if (nosime.length > 0) {
+        <p class="mat-warn" style="color: #c62828;">
+          締め日が未設定・削除済・対象外の大分類のため除外した請求先（未請求の掛売伝票あり）：
+          @for (mcd of nosime; track mcd) {
+            <a href="javascript:void(0)" (click)="usrsrv.openMst('mstmember', mcd)">{{mcd}}</a>&nbsp;
+          }
+        </p>
+      }
+      <div class="mat-elevation-z8">
+        <table mat-table [dataSource]="rows" aria-label="締め処理の対象">
+          <ng-container matColumnDef="chk">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox [checked]="allChecked" (change)="checkAll($event.checked)"></mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              @if (row.done) {
+                <a href="javascript:void(0)" (click)="denno = row.head.denno; getInvoice(row.head.denno)"
+                  matTooltip="作成済の請求伝票を表示">請求済 {{row.head.denno}}</a>
+              } @else if (row.later) {
+                <span style="color: #c62828;" matTooltip="この請求先には、より後の締め日の請求伝票があります。締め処理は日付順に行ってください">後の締めあり</span>
+              } @else {
+                <mat-checkbox [(ngModel)]="row.chk" [ngModelOptions]="{standalone: true}"></mat-checkbox>
+              }
+            </td>
+            <td mat-footer-cell *matFooterCellDef>選択計</td>
+          </ng-container>
+          <ng-container matColumnDef="mcode">
+            <th mat-header-cell *matHeaderCellDef>請求先</th>
+            <td mat-cell *matCellDef="let row">{{row.head.mcode | mcdtxt}}</td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
+          <ng-container matColumnDef="fday">
+            <th mat-header-cell *matHeaderCellDef>締め期間</th>
+            <td mat-cell *matCellDef="let row">{{row.head.fday}}～{{row.head.sday}}</td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
+          <ng-container matColumnDef="zenkai">
+            <th mat-header-cell *matHeaderCellDef class="i_num">前回請求額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.head.zenkai | number}}</td>
+            <td mat-footer-cell *matFooterCellDef class="i_num">{{sumRows('zenkai') | number}}</td>
+          </ng-container>
+          <ng-container matColumnDef="nmon">
+            <th mat-header-cell *matHeaderCellDef class="i_num">御入金額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.head.nmon | number}}</td>
+            <td mat-footer-cell *matFooterCellDef class="i_num">{{sumRows('nmon') | number}}</td>
+          </ng-container>
+          <ng-container matColumnDef="tmon">
+            <th mat-header-cell *matHeaderCellDef class="i_num">調整額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.head.tmon | number}}</td>
+            <td mat-footer-cell *matFooterCellDef class="i_num">{{sumRows('tmon') | number}}</td>
+          </ng-container>
+          <ng-container matColumnDef="kurikosi">
+            <th mat-header-cell *matHeaderCellDef class="i_num">前回繰越額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.head.kurikosi | number}}</td>
+            <td mat-footer-cell *matFooterCellDef class="i_num">{{sumRows('kurikosi') | number}}</td>
+          </ng-container>
+          <ng-container matColumnDef="taxmon">
+            <th mat-header-cell *matHeaderCellDef class="i_num">今回御買上額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.head.taxmon | number}}</td>
+            <td mat-footer-cell *matFooterCellDef class="i_num">{{sumRows('taxmon') | number}}</td>
+          </ng-container>
+          <ng-container matColumnDef="tax">
+            <th mat-header-cell *matHeaderCellDef class="i_num">消費税</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.head.tax | number}}</td>
+            <td mat-footer-cell *matFooterCellDef class="i_num">{{sumRows('tax') | number}}</td>
+          </ng-container>
+          <ng-container matColumnDef="seikyu">
+            <th mat-header-cell *matHeaderCellDef class="i_num">今回請求額</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.head.seikyu | number}}</td>
+            <td mat-footer-cell *matFooterCellDef class="i_num">{{sumRows('seikyu') | number}}</td>
+          </ng-container>
+          <ng-container matColumnDef="dencnt">
+            <th mat-header-cell *matHeaderCellDef class="i_num">伝票数</th>
+            <td mat-cell *matCellDef="let row" class="i_num">{{row.head.dencnt | number}}</td>
+            <td mat-footer-cell *matFooterCellDef class="i_num">{{sumRows('dencnt') | number}}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="shimeColumns;"></tr>
+          <tr mat-row *matRowDef="let row; columns: shimeColumns;"></tr>
+          <tr mat-footer-row *matFooterRowDef="shimeColumns;"></tr>
+        </table>
+        @if (rows.length == 0) {
+          <p style="padding: 10px;">締め日を指定して「対象抽出」を押してください。</p>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  @if (invoice) {
+    <mat-card id="invoice-card">
+      <mat-card-header class="flex flex-row flex-wrap justify-between">
+        <mat-card-title>
+          照会【請求伝票 {{invoice.head.denno}}】@if (invoice.head.del) {<span style="color: #c62828;">取消済</span>}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (invoice.head.del) {
+          <p style="color: #c62828;">
+            {{invoice.head.updated_at | date:'yyyy/M/d H:mm'}} に {{stfsrv.getName(invoice.head.updated_by)}}（{{invoice.head.updated_by}}）が取り消しました。
+            計上していた受注伝票・請求入金伝票は未請求に戻っています（下の一覧は請求登録時点の内容です）。
+          </p>
+        } @else if (invoice.lock) {
+          <p style="color: #c62828;">取消不可：{{invoice.lock}}</p>
+        }
+        <p style="margin: 0 0 8px;">
+          登録：
+          @if (invoice.head.created_at) {
+            {{invoice.head.created_at | date:'yyyy/M/d H:mm'}} {{stfsrv.getName(invoice.head.created_by)}}（{{invoice.head.created_by}}）
+          } @else {
+            現行システムから移行
+          }
+        </p>
+        <div class="flex flex-row flex-wrap items-end" style="gap: 5px;">
+          <mat-form-field style="width: 9em;">
+            <mat-label>請求先</mat-label>
+            <input matInput [value]="invoice.head.mcode" disabled>
+            <button mat-icon-button matSuffix (click)="usrsrv.openMst('mstmember', invoice.head.mcode)">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+          </mat-form-field>
+          <span class="nmtxt">{{invoice.head.mcode | mcdtxt}}</span>
+          <mat-form-field style="width: 14em;">
+            <mat-label>締め期間</mat-label>
+            <input matInput [value]="(invoice.head.fday ?? '') + '～' + invoice.head.sday" disabled>
+          </mat-form-field>
+        </div>
+        <div class="flex flex-row flex-wrap" style="gap: 5px;">
+          <mat-form-field style="width: 8em;" class="i_num">
+            <mat-label>前回請求額</mat-label>
+            <input matInput [value]="invoice.head.zenkai | number" class="i_num" disabled>
+          </mat-form-field>
+          <mat-form-field style="width: 8em;" class="i_num">
+            <mat-label>御入金額</mat-label>
+            <input matInput [value]="invoice.head.nmon | number" class="i_num" disabled>
+          </mat-form-field>
+          <mat-form-field style="width: 8em;" class="i_num">
+            <mat-label>調整額</mat-label>
+            <input matInput [value]="invoice.head.tmon | number" class="i_num" disabled>
+          </mat-form-field>
+          <mat-form-field style="width: 8em;" class="i_num">
+            <mat-label>前回繰越額</mat-label>
+            <input matInput [value]="invoice.head.kurikosi | number" class="i_num" disabled>
+          </mat-form-field>
+          <mat-form-field style="width: 8em;" class="i_num">
+            <mat-label>今回御買上額</mat-label>
+            <input matInput [value]="invoice.head.taxmon | number" class="i_num" disabled>
+          </mat-form-field>
+          <mat-form-field style="width: 8em;" class="i_num">
+            <mat-label>消費税額</mat-label>
+            <input matInput [value]="invoice.head.tax | number" class="i_num" disabled>
+          </mat-form-field>
+          <mat-form-field style="width: 8em;" class="i_num">
+            <mat-label>今回請求額</mat-label>
+            <input matInput [value]="invoice.head.seikyu | number" class="i_num" disabled>
+          </mat-form-field>
+        </div>
+        <div class="flex flex-row flex-wrap" style="gap: 5px;">
+          <mat-form-field style="width: 12em;" class="i_num">
+            <mat-label>8%対象（消費税）</mat-label>
+            <input matInput [value]="(invoice.head.taxmon8 | number) + '（' + (invoice.head.tax8 | number) + '）'" class="i_num" disabled>
+          </mat-form-field>
+          <mat-form-field style="width: 12em;" class="i_num">
+            <mat-label>10%対象（消費税）</mat-label>
+            <input matInput [value]="(invoice.head.taxmon10 | number) + '（' + (invoice.head.tax10 | number) + '）'" class="i_num" disabled>
+          </mat-form-field>
+        </div>
+        <app-jdentbl [jyudens]="invoice.jyudens" [nyusubs]="invoice.nyusubs"></app-jdentbl>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

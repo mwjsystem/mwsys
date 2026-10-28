@@ -3,7 +3,6 @@ import { TabService } from './tab.service';
 
 @Directive({
     selector: '[tabIndex]',
-    standalone: false,
     host: {
         '(keydown)': 'onInput($event)'
     }

@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -12,6 +12,22 @@ import { MembsService } from './../mstmember/membs.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { NdnohelpComponent } from './../share/ndnohelp/ndnohelp.component';
+import { BeforeunloadBase } from '../beforeunload-base';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
+import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { HisttblComponent } from './histtbl.component';
+import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { DecimalPipe, DatePipe } from '@angular/common';
+import { JdatePipe } from '../core/pipes/jdate.pipe';
+import { McdtxtPipe } from '../core/pipes/mcdtxt.pipe';
+import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
 
 /** 入金入力フォーム の項目名（明細の mtbl は除く） */
 type DepositField = 'day' | 'scde' | 'code' | 'tcode' | 'memo' | 'nmoneysum' | 'smoneysum' | 'tmoneysum' | 'totalmoney' | 'jdenno' | 'sdenno';
@@ -21,12 +37,12 @@ type DepositField = 'day' | 'scde' | 'code' | 'tcode' | 'memo' | 'nmoneysum' | '
     templateUrl: './frmdeposit.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatFormField, MatLabel, MatInput, FormsModule, MatIconButton, MatSuffix, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatSelect, MatOption, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, HisttblComponent, TabDirective, DepttblComponent, DecimalPipe, DatePipe, JdatePipe, McdtxtPipe, ModetxtPipe]
 })
-export class FrmdepositComponent implements OnInit, AfterViewInit {
+export class FrmdepositComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
   bunsrv = inject(BunruiService);
   stfsrv = inject(StaffService);
@@ -50,6 +66,7 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
   rows: FormArray = this.fb.array([]);
   jyuden: Jyuden = new Jyuden();
   constructor() {
+    super();
     const title = this.title;
 
     title.setTitle('入金伝票(MWSystem)');
@@ -355,16 +372,6 @@ export class FrmdepositComponent implements OnInit, AfterViewInit {
       }
     }
     return tooltip;
-  }
-
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
-    }
   }
 
 }

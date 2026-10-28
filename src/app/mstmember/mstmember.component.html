@@ -79,7 +79,7 @@
 </a></button>
 </div>
 </mat-toolbar>
-<form [formGroup]="form" (keydown.enter)="canEnter($event)">
+<form [formGroup]="form" (keydown.enter)="usrsrv.canEnter($event)">
   <mat-card>
     <mat-card-header class="flex justify-between">
       <mat-card-title>
@@ -295,7 +295,7 @@
 <mat-accordion multi>
   <form formGroupName="base">
     <mat-expansion-panel>
-      <mat-expansion-panel-header fxLayoutGap="10px">
+      <mat-expansion-panel-header style="gap: 10px;">
         <mat-label> 掛請求</mat-label>
         <mat-checkbox formControlName="torikbn"></mat-checkbox>
         <small style="margin-left:20px">締め日、入金日の末日は99を入力</small>

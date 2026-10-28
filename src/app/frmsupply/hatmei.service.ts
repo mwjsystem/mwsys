@@ -21,13 +21,12 @@ export type HatdenSet = Pick<mwI.Hatden, 'vcode' | 'scode' | 'tcode' | 'dmemo' |
 /** 新規登録時に発注伝票（trhatden）へ渡す値。hdstatus は発注状況 */
 export type HatdenNew = HatdenSet & { id: number; denno: number; created_at: Date; created_by: string; hdstatus: string };
 
-interface AffectedRows { affected_rows: number }
 /** get_hatden クエリの結果 */
 interface HatdenResult { trhatden_by_pk: mwI.Trhatden | null }
 /** upd_hatden ミューテーションの結果 */
-export interface UpdHatdenResult { update_trhatden: AffectedRows; delete_trhatmei: AffectedRows; insert_trhatmei: AffectedRows }
+export interface UpdHatdenResult { update_trhatden: mwI.AffectedRows; delete_trhatmei: mwI.AffectedRows; insert_trhatmei: mwI.AffectedRows }
 /** ins_hatden ミューテーションの結果 */
-export interface InsHatdenResult { insert_trhatden: AffectedRows; insert_trhatmei: AffectedRows }
+export interface InsHatdenResult { insert_trhatden: mwI.AffectedRows; insert_trhatmei: mwI.AffectedRows }
 @Injectable({
   providedIn: 'root'
 })
@@ -99,9 +98,10 @@ export class HatmeiService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          // console.log(data);
+          if (!data) {
+            return;
+          }
           observer.next((data as HatdenResult).trhatden_by_pk);
-          // return resolve(data.trhatden_by_pk);
         }, (error) => {
           // return reject(error);
           observer.error(error);

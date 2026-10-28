@@ -53,7 +53,7 @@ export class GoodsService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          this.ggrps = (data as GgroupsResult).msggroup;
+          this.ggrps = data ? (data as GgroupsResult).msggroup : [];
           resolve(true);
         }, (error) => {
           console.log('error query get_ggroups', error);

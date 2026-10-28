@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ViewEncapsulation, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, output, input, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
@@ -12,6 +12,15 @@ import { StockService, GzaiRef } from './../services/stock.service';
 import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
 import { GzaiComponent } from './../share/gzai/gzai.component';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatPrefix, MatFormField, MatInput, MatSuffix, MatLabel } from '@angular/material/input';
+import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { DecimalPipe } from '@angular/common';
+import { rowCtl } from '../core/form-helpers';
 
 /** 単価行の追加(flg=true)・削除(flg=false)を、親の mstgoods へ伝えるイベントの値 */
 export type TnkAction = { flg: boolean; row: number; flgCP?: boolean };
@@ -28,7 +37,7 @@ type RowField = 'ins' | 'gcode' | 'gtext' | 'size' | 'color' | 'pable' | 'unit' 
     styleUrls: ['./../tbl.component.scss'],
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatIconButton, MatIcon, MatCellDef, MatCell, MatPrefix, MatFormField, MatInput, TabDirective, MatSelect, MatOption, MatButton, MatSuffix, MatTooltip, MatCheckbox, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatLabel, MatPaginator, DecimalPipe]
 })
 export class GdstblComponent {
   private cdRef = inject(ChangeDetectorRef);
@@ -81,7 +90,7 @@ export class GdstblComponent {
     this.dataSource.paginator = this.paginator;
     // console.log(this.usrsrv);
     this.usrsrv.getStaff(this.usrsrv.userInfo['email']).then(result => {
-      this.scode = result.scode;
+      this.scode = result?.scode ?? '';
     });
   }
 
@@ -104,7 +113,7 @@ export class GdstblComponent {
     return tooltip;
   }
   async setJan(i: number) {
-    this.rowCtl(this.frmArr.controls[i]).jan.setValue(this.usrsrv.addCheckDigit(await this.usrsrv.getNumber('jan', 1)));
+    rowCtl<RowField>(this.frmArr.controls[i]).jan.setValue(this.usrsrv.addCheckDigit(await this.usrsrv.getNumber('jan', 1)));
   }
   diaGzai(i: number) {
     let dialogConfig = new MatDialogConfig();
@@ -116,10 +125,6 @@ export class GdstblComponent {
     let dialogRef = this.dialog.open(GzaiComponent, dialogConfig);
   }
 
-  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
-  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
-    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
-  }
   get frmArr(): FormArray {
     return this.parentForm().get('mtbl') as FormArray;
   }
@@ -140,7 +145,7 @@ export class GdstblComponent {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.rowCtl(this.frmArr.controls[i]).hgcode.setValue(data.gcode);
+          rowCtl<RowField>(this.frmArr.controls[i]).hgcode.setValue(data.gcode);
         }
       }
     );
@@ -150,8 +155,8 @@ export class GdstblComponent {
 
   updGds(i: number, event: Event) {
     let val: string = this.usrsrv.convUpper((event.target as HTMLInputElement)?.value);  //小文字全角→大文字半角変換
-    this.rowCtl(this.frmArr.controls[i]).gcode.setErrors(null);
-    this.rowCtl(this.frmArr.controls[i]).gcode.setValue(val);
+    rowCtl<RowField>(this.frmArr.controls[i]).gcode.setErrors(null);
+    rowCtl<RowField>(this.frmArr.controls[i]).gcode.setValue(val);
     this.apollo.watchQuery<GoodsCheckResult>({
       query: Query.GetMast2,
       variables: {
@@ -161,24 +166,28 @@ export class GdstblComponent {
       },
     }).valueChanges
       .subscribe(({ data }) => {
-        // console.log(data); 
-        if ((data as GoodsCheckResult).msgoods.length == 0) {
+        // console.log(data);
+        if (!data) {
+          return;
+        }
+        const result = data as GoodsCheckResult;
+        if (result.msgoods.length == 0) {
           let j: number = 0;
           this.frmArr.controls
             .forEach(control => {
-              if (this.rowCtl(control).gcode.value == val && j != i) {
+              if (rowCtl<RowField>(control).gcode.value == val && j != i) {
 
                 this.usrsrv.toastErr(val + 'は重複しています(' + (j + 1) + '行目)', '商品コード入力エラー');
-                this.rowCtl(this.frmArr.controls[i]).gcode.setErrors({ 'exist': true });
+                rowCtl<RowField>(this.frmArr.controls[i]).gcode.setErrors({ 'exist': true });
               }
               j += 1;
             });
         } else {
-          this.usrsrv.toastErr(val + 'は商品ｸﾞﾙｰﾌﾟ' + (data as GoodsCheckResult).msgoods[0].msggroup.code + 'で登録済です', '商品コード入力エラー');
-          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors({ 'exist': true });
+          this.usrsrv.toastErr(val + 'は商品ｸﾞﾙｰﾌﾟ' + result.msgoods[0].msggroup.code + 'で登録済です', '商品コード入力エラー');
+          rowCtl<RowField>(this.frmArr.controls[i]).gcode.setErrors({ 'exist': true });
         }
       });
-    this.rowCtl((this.parentForm().get('mtbl2') as FormArray).controls[i]).gcode.setValue(val);
+    rowCtl<RowField>((this.parentForm().get('mtbl2') as FormArray).controls[i]).gcode.setValue(val);
   }
   createRow(flg: boolean, goods?: mwI.Goods) {
     return this.fb.group({

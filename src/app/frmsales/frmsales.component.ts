@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, AbstractControl, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, AbstractControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -11,6 +12,7 @@ import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
 
 import { JmeitblComponent } from './jmeitbl.component';
+import { BeforeunloadBase } from '../beforeunload-base';
 import { JyumeiService, JyudenSet, JyudenNew } from './jyumei.service';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
@@ -23,6 +25,24 @@ import { DownloadService } from './../services/download.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { AdredaComponent } from './../share/adreda/adreda.component';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatFormField, MatInput, MatSuffix, MatLabel, MatPrefix } from '@angular/material/input';
+import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatExpansionPanel, MatExpansionPanelHeader } from '@angular/material/expansion';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
+import { NuminputDirective } from '../core/directives/numinput.directive';
+import { DecimalPipe, PercentPipe } from '@angular/common';
+import { JdatePipe } from '../core/pipes/jdate.pipe';
+import { McdtxtPipe } from '../core/pipes/mcdtxt.pipe';
+import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
 
 /** get_member クエリの結果 */
 interface MemberResult { msmember_by_pk: mwI.Member | null }
@@ -34,12 +54,12 @@ type JyudenField = 'torikbn' | 'mcode' | 'scde' | 'ncode' | 'nsaki' | 'nadr' | '
     styleUrls: ['./../app.component.scss'],
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatFormField, MatInput, FormsModule, TabDirective, MatIconButton, MatSuffix, MatMenuTrigger, MatMenu, MatMenuItem, ReactiveFormsModule, MatCheckbox, TmstmpComponent, MatLabel, MatSelect, MatOption, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatPrefix, MatExpansionPanel, MatExpansionPanelHeader, MatCard, MatCardHeader, MatCardTitle, NuminputDirective, MatCardContent, JmeitblComponent, DecimalPipe, PercentPipe, JdatePipe, McdtxtPipe, ModetxtPipe]
 })
-export class FrmsalesComponent implements OnInit, AfterViewInit {
+export class FrmsalesComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
   private fb = inject(FormBuilder);
   private title = inject(Title);
@@ -68,6 +88,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
   mode: number = 3;
   vnyuzan!: mwI.Vnyuzan;
+  /** 計上先の請求伝票番号。請求済（null 以外）の伝票は編集・取消できない */
+  idenno: number | null = null;
   hktval: mwI.Sval[] = [];
   rows: FormArray = this.fb.array([]);
   getden!: number;
@@ -80,7 +102,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     positionStrategy: this.overlay
       .position().global().centerHorizontally().centerVertically()
   });
+  private jyudenSub?: Subscription;
+  private memberSub?: Subscription;
   constructor() {
+    super();
     const title = this.title;
 
     title.setTitle('受注伝票(MWSystem)');
@@ -298,10 +323,12 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       if (!this.overlayRef.hasAttached()) {
         this.overlayRef.attach(new ComponentPortal(MatSpinner));
       }
-      this.jmisrv.qryJyuden(denno).subscribe(
+      this.jyudenSub?.unsubscribe();
+      this.jyudenSub = this.jmisrv.qryJyuden(denno).subscribe(
         result => {
           this.form.reset();
           this.jmisrv.trzaiko = [];
+          this.idenno = result?.idenno ?? null;
           if (result == null) {
             this.usrsrv.toastInf("受注伝票番号" + denno + "は登録されていません");
             history.replaceState('', '', './frmsales');
@@ -465,7 +492,8 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   getMember(mcode: string, flg: boolean) {//flg:true⇒画面変更時、false⇒受注伝票読込時
-    this.apollo.watchQuery<MemberResult>({
+    this.memberSub?.unsubscribe();
+    this.memberSub = this.apollo.watchQuery<MemberResult>({
       query: Query.GetMember,
       variables: {
         id: this.usrsrv.compid,
@@ -474,6 +502,9 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
+        if (!data) {
+          return;
+        }
         const msmember = (data as MemberResult).msmember_by_pk;
         if (msmember == null) {
           this.usrsrv.toastInf("顧客コード" + mcode + "は登録されていません");
@@ -544,14 +575,6 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       });
   }
 
-  canEnter(e: Event): void {
-    let element = e.target as HTMLElement;
-    // console.log(element,element.tagName);
-    if (element.tagName !== 'TEXTAREA') {
-      e.preventDefault();
-    }
-  }
-
   diaBetsu(adrnm: JyudenField): void {
     let ncd: string = this.form.value.ncode;
     let flg: boolean = false;
@@ -601,6 +624,7 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
     this.mode = 1;
     this.form.reset();
     this.jmisrv.denno = 0;
+    this.idenno = null;
     this.ctl.tcode.setValue(this.usrsrv.staff.code);
     this.ctl.day.setValue(new Date());
     this.ctl.yday.setValue(this.usrsrv.getNextday(new Date()));
@@ -613,6 +637,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
   }
 
   modeToUpd(): void {
+    if (this.idenno) {
+      this.usrsrv.toastWar('受注伝票' + this.jmisrv.denno + 'は請求済（請求伝票' + this.idenno + '）のため編集できません');
+      return;
+    }
     this.mode = 2;
 	this.jmisrv.isSaving = false;
     this.refresh();
@@ -621,6 +649,10 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
 
   modeToDel(flg: boolean, mode: number): void {
     let lctxt: string = (flg ? '取消' : '取消解除');
+    if (this.idenno) {
+      this.usrsrv.toastWar('受注伝票' + this.jmisrv.denno + 'は請求済（請求伝票' + this.idenno + '）のため' + lctxt + 'できません');
+      return;
+    }
     if (window.confirm(lctxt + 'してもよろしいですか？')) {
       this.jmisrv.delJyuden(this.jmisrv.denno, flg);
       this.mode = mode;
@@ -805,16 +837,6 @@ export class FrmsalesComponent implements OnInit, AfterViewInit {
       });
     } else {//照会
       return new Promise(resolve => { return resolve(true); })
-    }
-  }
-
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
     }
   }
 

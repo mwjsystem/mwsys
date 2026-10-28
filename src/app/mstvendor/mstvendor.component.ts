@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -11,6 +11,18 @@ import { DownloadService } from './../services/download.service';
 import { VendsService } from './vends.service';
 // import { ToastrService } from 'ngx-toastr';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
+import { BeforeunloadBase } from '../beforeunload-base';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatSuffix, MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
+import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { MatExpansionPanel, MatExpansionPanelHeader } from '@angular/material/expansion';
+import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
 
 /** get_vendor クエリの結果 */
 interface VendorResult { msvendor_by_pk: mwI.Vendor & { created_at: Date; updated_at: Date; created_by: string; updated_by: string } }
@@ -22,12 +34,12 @@ interface VendorResult { msvendor_by_pk: mwI.Vendor & { created_at: Date; update
     encapsulation: ViewEncapsulation.None //グローバルにCSSが効く
     ,
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatButton, MatIcon, FormsModule, MatIconButton, MatSuffix, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, MatSelect, MatOption, MatCheckbox, CdkTextareaAutosize, MatExpansionPanel, MatExpansionPanelHeader, ModetxtPipe]
 })
-export class MstvendorComponent implements OnInit, AfterViewInit {
+export class MstvendorComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);
   private title = inject(Title);
   private route = inject(ActivatedRoute);
@@ -44,6 +56,7 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
   mode: number = 3;
 
   constructor() {
+    super();
     this.title.setTitle('仕入先マスタ(MWSystem)')
   }
 
@@ -112,6 +125,9 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
 
   vcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.autoFocus = true;
     let dialogRef = this.dialog.open(VcdhelpComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(
@@ -164,6 +180,9 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
+        if (!data) {
+          return;
+        }
         const vendor = (data as VendorResult).msvendor_by_pk;
         this.form.patchValue(vendor);
         console.log(vendor);
@@ -209,6 +228,10 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
   async getAdr(event: Event) {
     this.dwlsrv.getAdr((event.target as HTMLInputElement)?.value).then(result => {
       // console.log(result, result.results)
+      if (!result.results || result.results.length === 0) {
+        this.usrsrv.toastWar("該当する住所が見つかりませんでした");
+        return;
+      }
       this.form.patchValue({
         region: result.results[0].address1,
         local: result.results[0].address2,
@@ -226,16 +249,6 @@ export class MstvendorComponent implements OnInit, AfterViewInit {
     this.refresh();
     this.form.markAsPristine();
     history.replaceState('', '', './mstvendor/' + this.mode + '/' + this.vcd);
-  }
-
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
-    }
   }
 
   refresh(): void {

@@ -1,82 +1,30 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-// import { Apollo } from 'apollo-angular';
-// import gql from 'graphql-tag';
-import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
-// import { UserService } from './../services/user.service';
-import { InvoiceService } from './invoice.service';
+import { Component, ChangeDetectionStrategy, input, inject } from '@angular/core';
+import { MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterCellDef, MatFooterCell, MatFooterRowDef, MatFooterRow } from '@angular/material/table';
+import { DecimalPipe } from '@angular/common';
+import { UserService } from './../services/user.service';
+import { InvJyuden, InvNyusub } from './invoice.service';
 
-interface Jyuden {
-  denno: number;
-  zandaka: number;
-  jtotal: number;
-  htotal: number;
-  ntotal: number;
-  stotal: number;
-  ttotal: number;
-}
-
+/** 請求伝票に計上した受注伝票の一覧 */
 @Component({
     selector: 'app-jdentbl',
     templateUrl: './jdentbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterCellDef, MatFooterCell, MatFooterRowDef, MatFooterRow, DecimalPipe]
 })
-export class JdentblComponent implements OnInit {
-  invsrv = inject(InvoiceService);
-  private cdRef = inject(ChangeDetectorRef);
-  private dialog = inject(MatDialog);
+export class JdentblComponent {
+  usrsrv = inject(UserService);
 
-  // @Input() parentForm: FormGroup;
-  jdno: number = 0;
-  dataSource: MatTableDataSource<Jyuden>;
-  displayedColumns = [
-    'action',
-    'denno',
-    'zandaka',
-    'jtotal',
-    'htotal',
-    'ntotal',
-    'stotal',
-    'ttotal'
-  ]
-  constructor() {
-    this.dataSource = new MatTableDataSource<Jyuden>();
+  readonly jyudens = input<InvJyuden[]>([]);
+  readonly nyusubs = input<InvNyusub[]>([]);
+
+  jColumns = ['denno', 'uday', 'taxmon', 'tax', 'total'];
+  nColumns = ['denno', 'day', 'nmoney', 'smoney', 'tmoney', 'memo'];
+
+  sumJ(fld: 'taxmon' | 'tax' | 'total'): number {
+    return this.jyudens().reduce((sum, e) => sum + e[fld], 0);
   }
-
-  dennoHelp() {
-    let dialogConfig = new MatDialogConfig();
-    dialogConfig.width = '100vw';
-    dialogConfig.height = '98%';
-    dialogConfig.panelClass = 'full-screen-modal';
-    let dialogRef = this.dialog.open(JdnohelpComponent, dialogConfig);
-
-    dialogRef.afterClosed().subscribe(
-      data => {
-        if (typeof data != 'undefined') {
-          this.jdno = data.denno;
-          this.cdRef.detectChanges();
-          console.log(this.jdno);
-          // this.get_hatden(this.denno);
-        }
-      }
-    );
-  }
-
-  ngOnInit(): void {
-    // this.add_rows(1);
-
-  }
-
-  refresh(): void {
-    // this.dataSource.data = this.frmArr.controls;
-  }
-  add(): void {
-
-  }
-  delRow(i: number): void {
-
+  sumN(fld: 'nmoney' | 'smoney' | 'tmoney'): number {
+    return this.nyusubs().reduce((sum, e) => sum + e[fld], 0);
   }
 }

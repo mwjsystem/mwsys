@@ -1,10 +1,15 @@
 import { Component, AfterViewInit, ChangeDetectorRef, OnInit, ElementRef, ChangeDetectionStrategy, viewChildren, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogActions, MatDialogTitle, MatDialogContent } from "@angular/material/dialog";
 import { UserService } from './../../services/user.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 // import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
+import { MatButton } from '@angular/material/button';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatGridList, MatGridTile, MatGridTileText, MatGridTileFooterCssMatStyler } from '@angular/material/grid-list';
 
 /** get_specurl クエリの結果 */
 interface SpecurlResult { msggroup_by_pk: { catalog: string; specurl: string } }
@@ -16,7 +21,7 @@ interface SetUrlResult { update_msggroup: { affected_rows: number } }
     templateUrl: './gdsimage.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogActions, MatDialogTitle, MatButton, CdkScrollable, MatDialogContent, MatFormField, MatLabel, MatInput, FormsModule, MatSuffix, MatGridList, MatGridTile, MatGridTileText, MatGridTileFooterCssMatStyler]
 })
 export class GdsimageComponent implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
@@ -66,8 +71,12 @@ export class GdsimageComponent implements OnInit, AfterViewInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.url = (data as SpecurlResult).msggroup_by_pk.specurl;
-        this.cat = (data as SpecurlResult).msggroup_by_pk.catalog;
+        if (!data) {
+          return;
+        }
+        const result = data as SpecurlResult;
+        this.url = result.msggroup_by_pk.specurl;
+        this.cat = result.msggroup_by_pk.catalog;
       }, (error) => {
         console.log('error query get_url', error);
       });

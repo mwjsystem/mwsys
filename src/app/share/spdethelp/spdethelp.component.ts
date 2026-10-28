@@ -1,10 +1,12 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 // import { Apollo } from 'apollo-angular';
 // import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatSelect, MatOption } from '@angular/material/select';
 // import { ToastrService } from 'ngx-toastr';
 
 
@@ -25,7 +27,7 @@ export interface Nymat {
     templateUrl: './spdethelp.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
 })
 export class SpdethelpComponent implements OnInit {
   usrsrv = inject(UserService);

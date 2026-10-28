@@ -7,6 +7,9 @@ import localeJa from '@angular/common/locales/ja';
 
 import { FrmclearRoutingModule } from './frmclear-routing.module';
 import { FrmclearComponent } from './frmclear.component';
+import { ClearttblComponent } from './clearttbl.component';
+import { ClearhisttblComponent } from './clearhisttbl.component';
+import { NdnohelpComponent } from '../share/ndnohelp/ndnohelp.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -24,38 +27,40 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 registerLocaleData(localeJa);
 
 @NgModule({
-  declarations: [
-    FrmclearComponent
-  ],
-  imports: [
-    CommonModule,
-    CoreModule,
-    FrmclearRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatMenuModule,
-    MatPaginatorModule,
-    MatProgressSpinnerModule,
-    MatSelectModule,
-    MatTableModule,
-    MatToolbarModule
-  ],
-  providers: [
-    { provide: LOCALE_ID, useValue: 'ja-JP' }
-  ]
+    imports: [
+        CommonModule,
+        CoreModule,
+        FrmclearRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatDatepickerModule,
+        MatDialogModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatMenuModule,
+        MatPaginatorModule,
+        MatProgressSpinnerModule,
+        MatSelectModule,
+        MatTableModule,
+        MatToolbarModule,
+        MatTooltipModule,
+        FrmclearComponent,
+        ClearttblComponent,
+        ClearhisttblComponent,
+        NdnohelpComponent
+    ],
+    providers: [
+        { provide: LOCALE_ID, useValue: 'ja-JP' }
+    ]
 })
 export class FrmclearModule { }

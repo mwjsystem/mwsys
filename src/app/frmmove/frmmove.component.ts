@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
@@ -15,7 +15,20 @@ import { OkuriService } from './../services/okuri.service';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { MdnohelpComponent } from './../share/mdnohelp/mdnohelp.component';
 import { MovtblComponent } from './movtbl.component';
+import { BeforeunloadBase } from '../beforeunload-base';
 import { filter } from 'rxjs/operators';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatSuffix, MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
+import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
+import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { JdatePipe } from '../core/pipes/jdate.pipe';
+import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
 
 /** 移動入力フォーム の項目名（明細の mtbl は除く） */
 type MoveField = 'day' | 'incode' | 'outcode' | 'tcode' | 'hcode' | 'hday' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'smemo' | 'omemo';
@@ -25,12 +38,12 @@ type MoveField = 'day' | 'incode' | 'outcode' | 'tcode' | 'hcode' | 'hday' | 'ht
     templateUrl: './frmmove.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, MatSuffix, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, TabDirective, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect, MatOption, MovtblComponent, JdatePipe, ModetxtPipe]
 })
-export class FrmmoveComponent implements OnInit {
+export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
   usrsrv = inject(UserService);
   stfsrv = inject(StaffService);
   okrsrv = inject(OkuriService);
@@ -60,6 +73,7 @@ export class FrmmoveComponent implements OnInit {
       .position().global().centerHorizontally().centerVertically()
   });
   constructor() {
+    super();
     const title = this.title;
 
     title.setTitle('移動伝票(MWSystem)');
@@ -208,14 +222,6 @@ export class FrmmoveComponent implements OnInit {
     );
 
   }
-  canEnter(e: Event): void {
-    let element = e.target as HTMLElement;
-    // console.log(element,element.tagName);
-    if (element.tagName !== 'TEXTAREA') {
-      e.preventDefault();
-    }
-  }
-
   refresh(): void {
     // if (this.denno >0 ){
     // }
@@ -244,7 +250,7 @@ export class FrmmoveComponent implements OnInit {
       omemo: this.usrsrv.editFrmval(this.form, 'omemo'),
       smemo: this.usrsrv.editFrmval(this.form, 'smemo'),
       updated_at: new Date(),
-      updated_by: this.usrsrv.staff.code,
+      updated_by: this.usrsrv.staff?.code,
     }
 
     // console.log('save',this.mode,this.form)
@@ -284,7 +290,7 @@ export class FrmmoveComponent implements OnInit {
           id: this.usrsrv.compid,
           denno: this.denno,
           created_at: new Date(),
-          created_by: this.usrsrv.staff.code,
+          created_by: this.usrsrv.staff?.code,
         }
         , ...movsub,
       }]
@@ -357,16 +363,5 @@ export class FrmmoveComponent implements OnInit {
     // }
     return tooltip;
   }
-
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
-    }
-  }
-
 
 }

@@ -1,123 +1,135 @@
-<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">顧客コード検索</h1>
-<mat-dialog-content>
-  <!-- <mat-dialog-content style="height: calc(100% - 90px);">     -->
-  <div class="mat-elevation-z8">
-    <mat-toolbar class="flex flex-row">
-      <button mat-raised-button (click)="filterMcd()">検索</button>
-      <div class="flex flex-row items-center space-x-1">
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-          <mat-label>顧客名(姓、名)</mat-label>
-          <input matInput [(ngModel)]="fname" [ngModelOptions]="{standalone: true}">
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-          <mat-label>ﾌﾘｶﾞﾅ</mat-label>
-          <input matInput [(ngModel)]="fkana" (input)="fkana=convKana($event)" [ngModelOptions]="{standalone: true}">
-        </mat-form-field>
-        <!-- <mat-form-field>
-        <mat-label>メール1～5</mat-label>
-        <input matInput type="url" [(ngModel)]="fmail" [ngModelOptions]="{standalone: true}">
-      </mat-form-field> -->
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
-          <mat-label>建物、道場名、宛名</mat-label>
-          <input matInput [(ngModel)]="fadrnm" [ngModelOptions]="{standalone: true}">
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
-          <mat-label>電話番号 or FAX</mat-label>
-          <input matInput type="number" [(ngModel)]="ftel" [ngModelOptions]="{standalone: true}"
-            placeholder="ハイフン(-)なし">
-        </mat-form-field>
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-          <mat-label>内勤担当</mat-label>
-          <mat-select [(ngModel)]="ftcd">
-            @for (sval of stfsrv.tcds; track sval) {
-              <mat-option [value]="sval.value">
-                {{sval.viewval}}
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-checkbox [(ngModel)]="fnorm"><span class="text-black">通販顧客除く</span></mat-checkbox>
-        <!-- <mat-form-field>
-        <mat-label>Web会員ID</mat-label>
-        <input matInput [(ngModel)]="fwebid" [ngModelOptions]="{standalone: true}">
-        </mat-form-field> -->
-        <!-- <mat-checkbox [(ngModel)]="feda0" class="inline">基本住所のみ表示</mat-checkbox> -->
-      </div>
-    </mat-toolbar>
-<table mat-table [dataSource]="dataSource" aria-label="Elements">
-  <ng-container matColumnDef="mcode">
-    <th mat-header-cell *matHeaderCellDef class="w-16">顧客ｺｰﾄﾞ</th>
-    <td mat-cell *matCellDef="let row" class="w-16">{{row.mcode}}</td>
-  </ng-container>
-  <ng-container matColumnDef="sei">
-    <th mat-header-cell *matHeaderCellDef class="w-40">名前</th>
-    <td mat-cell *matCellDef="let row">{{row.sei + (row.mei || '') }}</td>
-  </ng-container>
-  <ng-container matColumnDef="kana">
-    <th mat-header-cell *matHeaderCellDef class="w-20">カナ</th>
-    <td mat-cell *matCellDef="let row">{{row.kana}}</td>
-  </ng-container>
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle class="jdh-title">顧客コード検索</h1>
 
-  <ng-container matColumnDef="webid">
-    <th mat-header-cell *matHeaderCellDef>Web会員ID</th>
-    <td mat-cell *matCellDef="let row">{{row.webid}}</td>
-  </ng-container>
-  <ng-container matColumnDef="tcode1">
-    <th mat-header-cell *matHeaderCellDef>営業</th>
-    <td mat-cell *matCellDef="let row">{{row.tcode1}}</td>
-  </ng-container>
-  <ng-container matColumnDef="tcode2">
-    <th mat-header-cell *matHeaderCellDef>内勤</th>
-    <td mat-cell *matCellDef="let row">{{row.tcode2}}</td>
-  </ng-container>
-  <ng-container matColumnDef="eda">
-    <th mat-header-cell *matHeaderCellDef>枝番</th>
-    <td mat-cell *matCellDef="let row">{{row.eda}}</td>
-  </ng-container>
-  <ng-container matColumnDef="zip">
-    <th mat-header-cell *matHeaderCellDef>郵便番号</th>
-    <td mat-cell *matCellDef="let row">{{row.zip}}</td>
-  </ng-container>
-  <ng-container matColumnDef="region">
-    <th mat-header-cell *matHeaderCellDef>都道府県</th>
-    <td mat-cell *matCellDef="let row">{{row.region}}</td>
-  </ng-container>
-  <ng-container matColumnDef="local">
-    <th mat-header-cell *matHeaderCellDef>市区町村</th>
-    <td mat-cell *matCellDef="let row">{{row.local}}</td>
-  </ng-container>
-  <ng-container matColumnDef="street">
-    <th mat-header-cell *matHeaderCellDef>住所番地</th>
-    <td mat-cell *matCellDef="let row">{{row.street}}</td>
-  </ng-container>
-  <ng-container matColumnDef="extend">
-    <th mat-header-cell *matHeaderCellDef>建物その他</th>
-    <td mat-cell *matCellDef="let row">{{row.extend}}</td>
-  </ng-container>
-  <ng-container matColumnDef="extend2">
-    <th mat-header-cell *matHeaderCellDef>道場名/組織名</th>
-    <td mat-cell *matCellDef="let row">{{row.extend2}}</td>
-  </ng-container>
-  <ng-container matColumnDef="adrname">
-    <th mat-header-cell *matHeaderCellDef>宛名</th>
-    <td mat-cell *matCellDef="let row">{{row.adrname}}</td>
-  </ng-container>
-  <ng-container matColumnDef="tel">
-    <th mat-header-cell *matHeaderCellDef class="w-16">電話番号</th>
-    <td mat-cell *matCellDef="let row">{{row.tel}}</td>
-  </ng-container>
-  <ng-container matColumnDef="mail">
-    <th mat-header-cell *matHeaderCellDef class="w-20">Mail</th>
-    <td mat-cell *matCellDef="let row">{{row.mail}}</td>
-  </ng-container>
-  <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selMcd(row)"></tr>
-</table>
-<mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
-  [pageSizeOptions]="[20, 50, 100, 250, 1000]">
-</mat-paginator>
-</div>
+<section class="jdh-filters" aria-label="検索条件">
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">顧客</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>顧客名(姓、名)</mat-label>
+        <input matInput [(ngModel)]="fname" [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>ﾌﾘｶﾞﾅ</mat-label>
+        <input matInput [(ngModel)]="fkana" (input)="fkana=convKana($event)" [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>内勤担当</mat-label>
+        <mat-select [(ngModel)]="ftcd">
+          @for (sval of stfsrv.tcds; track sval) {
+            <mat-option [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-checkbox [(ngModel)]="fnorm"><span class="text-black">通販顧客除く</span></mat-checkbox>
+    </div>
+  </div>
+
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">住所・連絡先</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
+        <mat-label>建物、道場名、宛名</mat-label>
+        <input matInput [(ngModel)]="fadrnm" [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
+        <mat-label>電話番号 or FAX</mat-label>
+        <input matInput type="number" [(ngModel)]="ftel" [ngModelOptions]="{standalone: true}"
+          placeholder="ハイフン(-)なし">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="jdh-actions">
+    <button mat-flat-button (click)="filterMcd()">
+      <mat-icon>search</mat-icon>
+      検索
+    </button>
+  </div>
+</section>
+
+<mat-dialog-content class="jdh-content">
+  <div class="jdh-summary" aria-live="polite">
+    <span class="jdh-count">{{dataSource.data.length}} 件</span>
+    <span class="jdh-hint">行をクリックで選択します</span>
+  </div>
+  <table mat-table [dataSource]="dataSource" class="jdh-table" aria-label="顧客の検索結果">
+    <ng-container matColumnDef="mcode">
+      <th mat-header-cell *matHeaderCellDef class="w-16">顧客ｺｰﾄﾞ</th>
+      <td mat-cell *matCellDef="let row" class="w-16 jdh-key">{{row.mcode}}</td>
+    </ng-container>
+    <ng-container matColumnDef="sei">
+      <th mat-header-cell *matHeaderCellDef class="w-40">名前</th>
+      <td mat-cell *matCellDef="let row">{{row.sei + (row.mei || '') }}</td>
+    </ng-container>
+    <ng-container matColumnDef="kana">
+      <th mat-header-cell *matHeaderCellDef class="w-20">カナ</th>
+      <td mat-cell *matCellDef="let row">{{row.kana}}</td>
+    </ng-container>
+    <ng-container matColumnDef="webid">
+      <th mat-header-cell *matHeaderCellDef>Web会員ID</th>
+      <td mat-cell *matCellDef="let row">{{row.webid}}</td>
+    </ng-container>
+    <ng-container matColumnDef="tcode1">
+      <th mat-header-cell *matHeaderCellDef>営業</th>
+      <td mat-cell *matCellDef="let row">{{row.tcode1}}</td>
+    </ng-container>
+    <ng-container matColumnDef="tcode2">
+      <th mat-header-cell *matHeaderCellDef>内勤</th>
+      <td mat-cell *matCellDef="let row">{{row.tcode2}}</td>
+    </ng-container>
+    <ng-container matColumnDef="eda">
+      <th mat-header-cell *matHeaderCellDef>枝番</th>
+      <td mat-cell *matCellDef="let row">{{row.eda}}</td>
+    </ng-container>
+    <ng-container matColumnDef="zip">
+      <th mat-header-cell *matHeaderCellDef>郵便番号</th>
+      <td mat-cell *matCellDef="let row">{{row.zip}}</td>
+    </ng-container>
+    <ng-container matColumnDef="region">
+      <th mat-header-cell *matHeaderCellDef>都道府県</th>
+      <td mat-cell *matCellDef="let row">{{row.region}}</td>
+    </ng-container>
+    <ng-container matColumnDef="local">
+      <th mat-header-cell *matHeaderCellDef>市区町村</th>
+      <td mat-cell *matCellDef="let row">{{row.local}}</td>
+    </ng-container>
+    <ng-container matColumnDef="street">
+      <th mat-header-cell *matHeaderCellDef>住所番地</th>
+      <td mat-cell *matCellDef="let row">{{row.street}}</td>
+    </ng-container>
+    <ng-container matColumnDef="extend">
+      <th mat-header-cell *matHeaderCellDef>建物その他</th>
+      <td mat-cell *matCellDef="let row">{{row.extend}}</td>
+    </ng-container>
+    <ng-container matColumnDef="extend2">
+      <th mat-header-cell *matHeaderCellDef>道場名/組織名</th>
+      <td mat-cell *matCellDef="let row">{{row.extend2}}</td>
+    </ng-container>
+    <ng-container matColumnDef="adrname">
+      <th mat-header-cell *matHeaderCellDef>宛名</th>
+      <td mat-cell *matCellDef="let row">{{row.adrname}}</td>
+    </ng-container>
+    <ng-container matColumnDef="tel">
+      <th mat-header-cell *matHeaderCellDef class="w-16">電話番号</th>
+      <td mat-cell *matCellDef="let row">{{row.tel}}</td>
+    </ng-container>
+    <ng-container matColumnDef="mail">
+      <th mat-header-cell *matHeaderCellDef class="w-20">Mail</th>
+      <td mat-cell *matCellDef="let row">{{row.mail}}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" tabindex="0"
+      (click)="selMcd(row)" (keydown.enter)="selMcd(row)"></tr>
+  </table>
+  @if (dataSource.data.length === 0) {
+    <p class="jdh-empty">表示する顧客がありません。条件を指定して「検索」を押してください。</p>
+  }
+  <mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
+    [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+  </mat-paginator>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-raised-button (click)="close()">閉じる</button>
+  <button mat-stroked-button (click)="close()">閉じる</button>
 </mat-dialog-actions>

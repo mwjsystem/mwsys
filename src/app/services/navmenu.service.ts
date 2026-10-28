@@ -12,13 +12,13 @@ export class NavmenuService {
   private usrsrv = inject(UserService);
   private apollo = inject(Apollo);
 
-  
+
   public menu: { [key: string]: mwI.Navmenu[]; } = {};
 
   getNavmenu(): void {
     this.qryNavmenu();
   }
-  
+
   async qryNavmenu(): Promise<{ [key: string]: mwI.Navmenu[]; }> {
     const GetMast = gql`
       query get_bunrui($id: smallint!){
@@ -32,29 +32,38 @@ export class NavmenuService {
       }`;
 
     return new Promise(resolve => {
-		this.apollo.watchQuery<NavmenuResult>({
-		  query: GetMast,
-		  variables: {
-			id: this.usrsrv.compid
-		  },
-		})
-		  .valueChanges
-		  .subscribe(({ data }) => {
+		this.usrsrv.auth.user$.subscribe(user => {
+		  if (!user) {
+			return;
+		  }
+		  this.apollo.watchQuery<NavmenuResult>({
+			query: GetMast,
+			variables: {
+			  id: this.usrsrv.compid
+			},
+		  })
+			.valueChanges
+			.subscribe(({ data }) => {
+			  if (!data) {
+				return;
+			  }
+			  this.menu = {};
+			  (data as NavmenuResult).msnavmenu.forEach(element => {
+				this.menu[element.mmenu] = this.menu[element.mmenu] || [];
+				this.menu[element.mmenu].push({
+				                  smenu: element.smenu,
+								  tag: element.tag,
+								  link: element.link,
+								  sort: element.sort
+								  });
 
-			(data as NavmenuResult).msnavmenu.forEach(element => {
-			  this.menu[element.mmenu].push({ 
-			                    smenu: element.smenu,
-								tag: element.tag,
-								link: element.link,	
-								sort: element.sort
-								});
-			  
+			  });
+			  return resolve(this.menu);
+			}, (error) => {
+			  console.log('error query get_navmenu', error);
 			});
-			return resolve(this.menu);
-		  }, (error) => {
-			console.log('error query get_navmenu', error);
 		});
     })
 
-  }  
+  }
 }

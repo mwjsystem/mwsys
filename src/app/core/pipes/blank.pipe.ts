@@ -1,9 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({
-    name: 'blank',
-    standalone: false
-})
+@Pipe({ name: 'blank' })
 export class BlankPipe implements PipeTransform {
 
   transform<T>(value: T): T | '' {

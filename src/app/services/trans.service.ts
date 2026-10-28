@@ -224,6 +224,9 @@ export class TransService {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log('出荷',data);
+          if (!data) {
+            return;
+          }
           const rows = data as TransQueryResult;
           let trans: Trans[] = [];
           rows.shukka.forEach(e => {

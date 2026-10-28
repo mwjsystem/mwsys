@@ -1,10 +1,14 @@
 import { Component, OnInit, ElementRef, ChangeDetectionStrategy, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { UserService } from './../services/user.service';
 import { DownloadService } from './../services/download.service';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatIcon } from '@angular/material/icon';
+import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { McdtxtPipe } from '../core/pipes/mcdtxt.pipe';
 
 /** 受注履歴フォーム の項目名（明細の mtbl は除く） */
 type HistoryField = 'mcode';
@@ -14,7 +18,7 @@ type HistoryField = 'mcode';
     templateUrl: './rephistory.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatToolbar, MatIcon, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, McdtxtPipe]
 })
 export class RephistoryComponent {
   usrsrv = inject(UserService);

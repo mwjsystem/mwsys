@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren, inject } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig } from "@angular/material/dialog";
+import { MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogConfig, MatDialogActions, MatDialogTitle, MatDialogContent } from "@angular/material/dialog";
 import { TreatService } from './treat.service';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
@@ -10,6 +10,13 @@ import { StaffService } from './../services/staff.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 // import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatGridList, MatGridTile, MatGridTileText, MatGridTileFooterCssMatStyler } from '@angular/material/grid-list';
 
 /** 問合せ詳細フォーム。seq / created_at / created_by は、新規登録時に表示用の値が入るため型を広げている */
 type TrtForm = {
@@ -29,19 +36,18 @@ type TrtForm = {
   result: FormControl<string>;
 };
 
-interface AffectedRows { affected_rows: number }
 /** 保存時に問合せ対応（trtreat）へ渡す値 */
 type TreatSet = Pick<mwI.Trtreat, 'genre' | 'mcode' | 'grpcode' | 'gcode' | 'tel' | 'email' | 'question' | 'answer' | 'kaizen' | 'result'> & { id: number };
 /** ins_treat ミューテーションの結果 */
-interface InsTreatResult { insert_trtreat: AffectedRows }
+interface InsTreatResult { insert_trtreat: mwI.AffectedRows }
 /** upd_treat ミューテーションの結果 */
-interface UpdTreatResult { update_trtreat: AffectedRows }
+interface UpdTreatResult { update_trtreat: mwI.AffectedRows }
 @Component({
     selector: 'app-trtdetail',
     templateUrl: './trtdetail.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogActions, MatDialogTitle, MatButton, MatIcon, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatSelect, MatOption, MatIconButton, MatGridList, MatGridTile, MatGridTileText, MatGridTileFooterCssMatStyler]
 })
 export class TrtdetailComponent implements OnInit {
   trtsrv = inject(TreatService);

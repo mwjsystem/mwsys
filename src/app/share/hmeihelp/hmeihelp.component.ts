@@ -1,7 +1,7 @@
 import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig, MatDialogActions, MatDialogTitle, MatDialogContent } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
@@ -11,6 +11,14 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { HasuraWhere } from './../help-where';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { VcdtxtPipe } from '../../core/pipes/vcdtxt.pipe';
 // import { StaffService } from './../../services/staff.service';
 // import { BunruiService } from './../../services/bunrui.service';
 
@@ -44,7 +52,7 @@ interface HatmeiResult { vhatzn: Hatmei[] }
     templateUrl: './hmeihelp.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogActions, MatDialogTitle, MatPaginator, CdkScrollable, MatDialogContent, MatToolbar, MatFormField, MatLabel, MatInput, FormsModule, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatIconButton, MatIcon, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, VcdtxtPipe]
 })
 export class HmeihelpComponent implements OnInit {
   usrsrv = inject(UserService);
@@ -141,7 +149,9 @@ export class HmeihelpComponent implements OnInit {
         }
       }
     }`;
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    if (!this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
     this.apollo.watchQuery<HatmeiResult>({
       query: GetTran,
       variables: varWh
@@ -149,11 +159,15 @@ export class HmeihelpComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        if ((data as HatmeiResult).vhatzn.length == 0) {
+        if (!data) {
+          return;
+        }
+        const result = data as HatmeiResult;
+        if (result.vhatzn.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
           let srcdata: Hatmei[] = [];
-          (data as HatmeiResult).vhatzn.forEach(element => {
+          result.vhatzn.forEach(element => {
             srcdata.push(element);
           });
           this.dataSource = new MatTableDataSource<Hatmei>(srcdata);
@@ -163,6 +177,7 @@ export class HmeihelpComponent implements OnInit {
         this.cdRef.detectChanges();
       }, (error) => {
         console.log('error query get_vhatzn', error);
+        this.overlayRef.detach();
       });
 
   }

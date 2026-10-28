@@ -27,11 +27,11 @@ class ZipAdr {
   }
 }
 
-/** 郵便番号検索 API（zipcloud）の応答。該当なしのとき results は null（呼び出し側は従来どおり確認していない） */
+/** 郵便番号検索 API（zipcloud）の応答。該当なしのとき results は null */
 export interface ZipcloudResponse {
   status: number;
   message: string | null;
-  results: { zipcode: string; address1: string; address2: string; address3: string }[];
+  results: { zipcode: string; address1: string; address2: string; address3: string }[] | null;
 }
 @Injectable({
   providedIn: 'root'

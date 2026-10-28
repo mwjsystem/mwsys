@@ -1,19 +1,27 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { GoodsService } from './../../mstgoods/goods.service';
 import { UserService } from './../../services/user.service';
 import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatInput, MatPrefix, MatSuffix } from '@angular/material/input';
+import { ModetxtPipe } from '../../core/pipes/modetxt.pipe';
+import { rowCtl } from '../../core/form-helpers';
+import { BeforeunloadBase } from '../../beforeunload-base';
 
-interface AffectedRows { affected_rows: number }
 /** get_goods クエリの結果（構成品の商品名・単位・数量区分） */
 interface GoodsNameResult { msgoods_by_pk: { gtext: string; unit: string; gskbn: string } | null }
 /** upd_msgzai ミューテーションの結果 */
-interface UpdGzaiResult { delete_msgzai: AffectedRows; insert_msgzai: AffectedRows }
+interface UpdGzaiResult { delete_msgzai: mwI.AffectedRows; insert_msgzai: mwI.AffectedRows }
 /** 明細の 1 行のフォーム項目名 */
 type RowField = 'line' | 'zcode' | 'gtext' | 'irisu' | 'gskbn' | 'unit';
 
@@ -22,12 +30,12 @@ type RowField = 'line' | 'zcode' | 'gtext' | 'irisu' | 'gskbn' | 'unit';
     templateUrl: './gzai.component.html',
     styleUrls: ['./../../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatDialogTitle, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatIconButton, MatCellDef, MatCell, MatFormField, MatInput, MatPrefix, MatSuffix, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions, ModetxtPipe]
 })
-export class GzaiComponent implements OnInit {
+export class GzaiComponent extends BeforeunloadBase implements OnInit {
   private fb = inject(FormBuilder);
   private dialogRef = inject<MatDialogRef<GzaiComponent>>(MatDialogRef);
   private dialog = inject(MatDialog);
@@ -42,6 +50,7 @@ export class GzaiComponent implements OnInit {
   dataSource = new MatTableDataSource();
   displayedColumns = ['line', 'zcode', 'gtext', 'irisu', 'unit'];
   constructor() {
+    super();
     const data = inject(MAT_DIALOG_DATA);
 
     this.form = this.fb.group({ mtbl: this.fb.array([]) });
@@ -63,10 +72,6 @@ export class GzaiComponent implements OnInit {
   }
 
   ngOnInit(): void { }
-  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
-  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
-    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
-  }
   get frmArr(): FormArray {
     return this.form.get('mtbl') as FormArray;
   }
@@ -109,7 +114,7 @@ export class GzaiComponent implements OnInit {
   /** 商品コードを行に反映し、商品名・単位を取得する（直接入力と商品ヘルプの両方から呼ぶ） */
   getGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
-    this.rowCtl(this.frmArr.controls[i]).zcode.setValue(val);
+    rowCtl<RowField>(this.frmArr.controls[i]).zcode.setValue(val);
     const GetMast = gql`
     query get_goods($id: smallint!, $gcode: String!) {
       msgoods_by_pk(id:$id, gcode:$gcode) {
@@ -127,11 +132,13 @@ export class GzaiComponent implements OnInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        // console.log(data.msgoods_by_pk);
+        if (!data) {
+          return;
+        }
         this.frmArr.controls[i].patchValue((data as GoodsNameResult).msgoods_by_pk ?? {});
       }, (error) => {
         this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-        this.rowCtl(this.frmArr.controls[i]).zcode.setErrors({ 'incorrect': true });
+        rowCtl<RowField>(this.frmArr.controls[i]).zcode.setErrors({ 'incorrect': true });
         console.log('error query get_goods', error);
       });
   }
@@ -220,14 +227,6 @@ export class GzaiComponent implements OnInit {
   close() {
     if (this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
       this.dialogRef.close();
-    }
-  }
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
     }
   }
 }

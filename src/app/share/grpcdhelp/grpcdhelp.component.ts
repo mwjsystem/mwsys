@@ -1,13 +1,21 @@
 import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, viewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { Subject } from 'rxjs';
 import { HasuraWhere } from './../help-where';
+import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { StaffPipe } from '../../core/pipes/staff.pipe';
+import { VcdtxtPipe } from '../../core/pipes/vcdtxt.pipe';
 
 interface Ggrp {
   code: string;
@@ -25,9 +33,9 @@ interface GgroupResult { msggroup: Ggrp[] }
 @Component({
     selector: 'app-grpcdhelp',
     templateUrl: './grpcdhelp.component.html',
-    styleUrls: ['./../../help.component.scss'],
+    styleUrls: ['./../../help.component.scss', './../search-dialog.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatInput, FormsModule, MatButton, MatIcon, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions, StaffPipe, VcdtxtPipe]
 })
 export class GrpcdhelpComponent implements OnInit {
   private dialogRef = inject<MatDialogRef<GrpcdhelpComponent>>(MatDialogRef);
@@ -109,10 +117,14 @@ export class GrpcdhelpComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         // if(data.msggroup.length===0){
-        if ((data as GgroupResult).msggroup.length == 0) {
+        if (!data) {
+          return;
+        }
+        const result = data as GgroupResult;
+        if (result.msggroup.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          this.ggrps = (data as GgroupResult).msggroup;
+          this.ggrps = result.msggroup;
           this.subject.next(true);
         }
         // }

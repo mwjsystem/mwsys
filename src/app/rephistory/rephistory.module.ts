@@ -15,24 +15,22 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
-  declarations: [
-    RephistoryComponent
-  ],
-  imports: [
-    CommonModule,
-    CoreModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RephistoryRoutingModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatTooltipModule,
-    MatToolbarModule
-  ],
-  providers: [
-    { provide: LOCALE_ID, useValue: 'ja-JP' }
-  ]
+    imports: [
+        CommonModule,
+        CoreModule,
+        FormsModule,
+        ReactiveFormsModule,
+        RephistoryRoutingModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatTooltipModule,
+        MatToolbarModule,
+        RephistoryComponent
+    ],
+    providers: [
+        { provide: LOCALE_ID, useValue: 'ja-JP' }
+    ]
 })
 export class RephistoryModule { }

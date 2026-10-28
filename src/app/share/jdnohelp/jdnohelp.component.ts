@@ -1,11 +1,11 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, OnDestroy, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
@@ -15,6 +15,15 @@ import { MembsService } from './../../mstmember/membs.service';
 import { McdhelpComponent } from './../mcdhelp/mcdhelp.component';
 import { AdredaComponent } from './../adreda/adreda.component';
 import { HasuraCond, HasuraWhere } from './../help-where';
+import { MatFormField, MatLabel, MatInput, MatSuffix, MatHint } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { StaffPipe } from '../../core/pipes/staff.pipe';
+import { McdtxtPipe } from '../../core/pipes/mcdtxt.pipe';
 
 
 interface Jyuden {
@@ -48,9 +57,9 @@ interface JyudenResult { trjyuden: JyudenRow[] }
     templateUrl: './jdnohelp.component.html',
     styleUrls: ['./../../help.component.scss', './jdnohelp.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatSelect, FormsModule, MatOption, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatIconButton, MatIcon, MatHint, MatButton, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions, StaffPipe, McdtxtPipe]
 })
-export class JdnohelpComponent implements OnInit {
+export class JdnohelpComponent implements OnInit, OnDestroy {
   usrsrv = inject(UserService);
   stfsrv = inject(StaffService);
   memsrv = inject(MembsService);
@@ -107,6 +116,7 @@ export class JdnohelpComponent implements OnInit {
   fcusden: string = "";
   fjdst: string = "";
   fjsst: string = "";
+  private querySub?: Subscription;
 
   constructor() {
     const data = inject(MAT_DIALOG_DATA);
@@ -129,7 +139,12 @@ export class JdnohelpComponent implements OnInit {
     //     this.dataSource= new MatTableDataSource<Jyuden>(value);
     //     this.overlayRef.detach();
     //     this.cdRef.detectChanges();
-    // });  
+    // });
+  }
+
+  ngOnDestroy(): void {
+    this.querySub?.unsubscribe();
+    this.overlayRef.dispose();
   }
 
   mcdHelp(): void {
@@ -232,8 +247,11 @@ export class JdnohelpComponent implements OnInit {
         }
       }
     }`;
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<JyudenResult>({
+    if (!this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
+    this.querySub?.unsubscribe();
+    this.querySub = this.apollo.watchQuery<JyudenResult>({
       query: GetTran,
       variables: varWh
     })
@@ -241,11 +259,15 @@ export class JdnohelpComponent implements OnInit {
       .subscribe(({ data }) => {
         // console.log(data);
         // this.subject.next(data.trjyuden);
+        if (!data) {
+          return;
+        }
+        const result = data as JyudenResult;
         let srcdata: Jyuden[] = [];
-        if ((data as JyudenResult).trjyuden.length == 0) {
+        if (result.trjyuden.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          (data as JyudenResult).trjyuden.forEach(element => {
+          result.trjyuden.forEach(element => {
             let { trjyumeis, ...rest } = element;
             // console.log(element.denno, trjyumeis);
             let gcd = { gcode: trjyumeis[0].gcode };
@@ -259,6 +281,7 @@ export class JdnohelpComponent implements OnInit {
         // this.subject.complete();
       }, (error) => {
         console.log('error query get_jyuden', error);
+        this.overlayRef.detach();
       });
   }
   selDno(selected: Jyuden) {

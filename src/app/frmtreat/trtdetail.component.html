@@ -1,5 +1,5 @@
 <mat-dialog-actions class="flex flex-wrap space-x-4" style="margin-bottom:10px;">
-  <div class="icon-area" fxLayout="row" fxLayoutGap="5px">
+  <div class="icon-area flex flex-row" style="gap: 5px;">
     <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">問い合わせ詳細</h1>
     @if (idx>-1) {
       <button mat-button class="mat-primary" (click)="setPrev()">
@@ -18,8 +18,8 @@
   </div>
 </mat-dialog-actions>
 <mat-dialog-content style="height: calc(100% - 50px);">
-  <form [formGroup]="form" fxLayout="column">
-    <div fxLayout="row wrap" fxLayoutGap="5px">
+  <form [formGroup]="form" class="flex flex-col">
+    <div class="flex flex-row flex-wrap" style="gap: 5px;">
       <mat-form-field style="width:5em">
         <mat-label>連番</mat-label>
         <input matInput [value]="form.value.seq" disabled>
@@ -84,7 +84,7 @@
         <input matInput formControlName="email">
       </mat-form-field>
     </div>
-    <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+    <div class="flex flex-row flex-wrap" style="gap: 5px;">
       <mat-form-field style="width:100%;">
         <mat-label>質問、問合せ、クレーム</mat-label>
         <textarea matInput formControlName="question" matTextareaAutosize></textarea>
@@ -109,7 +109,7 @@
             <img #img
               src="{{usrsrv.system.imgurl + 'treat/' + form.value.seq + '_' + i.toString() + '.jpg?' + usrsrv.formatTime()}}"
               onload="row=0;" onError="this.onError=null;this.src='assets/noimage.gif';">
-              <mat-grid-tile-footer fxLayoutAlign="space-between">
+              <mat-grid-tile-footer class="flex flex-row justify-between">
                 <input name="upfile" style="display: none" type="file" #upfile accept=".jpg"
                   (change)="onchange(upfile.files,i.toString())" capture="enviroment" />
                 <button mat-raised-button color="primary" class="file-select-button" (click)="onClickFileInputButton(i)">

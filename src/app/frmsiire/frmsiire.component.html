@@ -43,9 +43,9 @@
   </a></button>
 </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="canEnter($event)">
+<form [formGroup]="form" class="flex flex-row flex-wrap" style="gap: 5px;" (keydown.enter)="usrsrv.canEnter($event)">
   <mat-card>
-    <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between" style="margin-bottom: 10px;">
+    <mat-card-header class="flex flex-row flex-wrap justify-between" style="margin-bottom: 10px;">
       <mat-card-title>
         {{mode|modetxt}}
       </mat-card-title>
@@ -63,8 +63,8 @@
       <button mat-flat-button color="warn" (click)="get_hatden(hdenno,true)" *ngIf="hdenno>0">追加読込</button> -->
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
-    <mat-card-content fxLayout="column">
-      <div fxLayout="row wrap" fxLayoutGap="5px" fxLayoutAlign="start end">
+    <mat-card-content class="flex flex-col">
+      <div class="flex flex-row flex-wrap items-end" style="gap: 5px;">
         <mat-form-field style="width: 7em;">
           <mat-label>入荷日</mat-label>
           <input matInput [matDatepickerFilter]="usrsrv.holidayFltr" [matDatepicker]="picker"
@@ -120,7 +120,7 @@
       </mat-select>
     </mat-form-field>
   </div>
-  <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+  <div class="flex flex-row flex-wrap" style="gap: 5px;">
     <mat-form-field class="txtar">
       <mat-label>伝票備考</mat-label>
       <textarea matInput formControlName="dmemo" matTextareaAutosize></textarea>
@@ -129,7 +129,7 @@
 </mat-card-content>
 </mat-card>
 <mat-card>
-  <mat-card-header fxLayout="row wrap" fxLayoutAlign="start start" fxLayoutGap="10px" style="height: 40px;">
+  <mat-card-header class="flex flex-row flex-wrap items-start" style="height: 40px; gap: 10px;">
     <mat-card-title>仕入明細</mat-card-title>
     <mat-form-field style="width:6em;">
       <mat-label>商品計</mat-label>

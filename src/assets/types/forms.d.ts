@@ -59,6 +59,8 @@ declare namespace mwI {
     total10: number;
     dokono: number;
 	daibzei: number;
+	/** 計上先の請求伝票番号（掛売の締め処理で設定。null = 未請求） */
+	idenno: number | null;
 	vnyuzan: Vnyuzan;
     // keep:string;
     // gtotal:number;

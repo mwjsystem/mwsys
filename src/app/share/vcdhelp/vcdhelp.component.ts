@@ -1,12 +1,17 @@
 import { Component, OnInit, ElementRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialogRef } from "@angular/material/dialog";
+import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { Observable } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { VendsService } from './../../mstvendor/vends.service';
+import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { CdkScrollable } from '@angular/cdk/scrolling';
 // import { Ggrp,GoodsService } from './../../services/goods.service';
 
 interface Vendor {
@@ -34,9 +39,9 @@ interface Vendor {
 @Component({
     selector: 'app-vcdhelp',
     templateUrl: './vcdhelp.component.html',
-    styleUrls: ['./../../help.component.scss'],
+    styleUrls: ['./../../help.component.scss', './../search-dialog.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatInput, FormsModule, MatButton, MatIcon, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions]
 })
 export class VcdhelpComponent implements OnInit {
   usrsrv = inject(UserService);
@@ -55,15 +60,15 @@ export class VcdhelpComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.vensrv.observe.subscribe(value => {
-    this.dataSource = new MatTableDataSource<mwI.Vendor>(this.vensrv.vends);
+    this.dataSource.data = this.vensrv.vends;
     this.dataSource.paginator = this.paginator() ?? null;
-    // });
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  search(): void {
+    const term = this.filter.trim().toLowerCase();
+    this.dataSource.data = term
+      ? this.vensrv.vends.filter(v => JSON.stringify(v).toLowerCase().includes(term))
+      : this.vensrv.vends;
   }
 
   selVcd(selected: Vendor) {

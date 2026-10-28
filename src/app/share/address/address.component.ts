@@ -1,23 +1,27 @@
 import { Component, OnInit, ChangeDetectionStrategy, input, inject } from '@angular/core';
-import { FormGroupDirective, FormGroup, FormControl, Validators, ControlContainer, FormArray, FormBuilder, AbstractControl } from '@angular/forms';
+import { FormGroupDirective, FormGroup, FormControl, Validators, ControlContainer, FormArray, FormBuilder, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { DownloadService } from './../../services/download.service';
 import { Observable, Subject } from 'rxjs';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { TabDirective } from '../../core/directives/tabidx/tab.directive';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 /** 住所グループの項目名 */
 type AdrField = 'zip' | 'region' | 'local' | 'street' | 'extend' | 'extend2' | 'adrname' | 'tel' | 'fax' | 'tel2' | 'tel3' | 'nmemo' | 'smemo' | 'omemo' | 'del' | 'target' | 'htitle';
-interface AffectedRows { affected_rows: number }
 /** 顧客住所（msmadr）へ渡す値。eda は住所の枝番、ftel は電話番号をまとめた表示用の値 */
 type MadrInput = mwI.Adrs & { id: number; mcode: string; ftel: string };
 /** get_eda クエリの結果（顧客の住所枝番の最大値） */
 interface MaxEdaResult { msmadr_aggregate: { aggregate: { max: { eda: number } } } }
 /** upd_madr ミューテーションの結果 */
-interface UpdMadrResult { update_msmadr: AffectedRows }
+interface UpdMadrResult { update_msmadr: mwI.AffectedRows }
 /** ins_madr ミューテーションの結果 */
-interface InsMadrResult { insert_msmadr: AffectedRows }
+interface InsMadrResult { insert_msmadr: mwI.AffectedRows }
 @Component({
     selector: 'app-address',
     templateUrl: './address.component.html',
@@ -29,7 +33,7 @@ interface InsMadrResult { insert_msmadr: AffectedRows }
         }
     ],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, MatCheckbox, MatFormField, MatLabel, MatInput, TabDirective, MatSelect, MatOption, CdkTextareaAutosize]
 })
 export class AddressComponent implements OnInit {
   private parent = inject(FormGroupDirective);
@@ -79,6 +83,10 @@ export class AddressComponent implements OnInit {
   async getAdr(event: Event) {
     this.dwlsrv.getAdr((event.target as HTMLInputElement)?.value).then(result => {
       // console.log(result, result.results)
+      if (!result.results || result.results.length === 0) {
+        this.usrsrv.toastWar("該当する住所が見つかりませんでした");
+        return;
+      }
       this.adrForm.patchValue({
         region: result.results[0].address1,
         local: result.results[0].address2,
@@ -140,7 +148,7 @@ export class AddressComponent implements OnInit {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log(data, data.msmadr_aggregate.aggregate.max.eda);
-          let lceda = (data as MaxEdaResult).msmadr_aggregate.aggregate.max.eda + 1;
+          let lceda = (data ? (data as MaxEdaResult).msmadr_aggregate.aggregate.max.eda : 0) + 1;
           if (lceda > 10) {
             madr.eda = lceda;
           } else {

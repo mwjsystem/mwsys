@@ -5,18 +5,23 @@
         <mat-icon>add_box</mat-icon>新規
       </button>
     }
-    @if (mode==3 && this.jmisrv.denno) {
+    @if (mode==3 && this.jmisrv.denno && !idenno) {
       <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)">
         <mat-icon>edit</mat-icon>編集
       </button>
     }
-    @if (mode==3 && this.jmisrv.denno) {
+    @if (mode==3 && this.jmisrv.denno && !idenno) {
       <button mat-flat-button (click)="modeToDel(true,4)"
         [color]="usrsrv.getColor(mode)">
         <mat-icon>delete</mat-icon>取消
       </button>
     }
-    @if (mode==4 && this.jmisrv.denno) {
+    @if ((mode==3 || mode==4) && idenno) {
+      <button mat-flat-button (click)="usrsrv.openMst('frminvoice', '' + idenno)" [color]="usrsrv.getColor(mode)">
+        <mat-icon matTooltip="請求済の伝票は編集・取消できません。修正する場合は請求伝票を取り消してください" matTooltipClass="ttips">lock</mat-icon>請求済（{{idenno}}）
+      </button>
+    }
+    @if (mode==4 && this.jmisrv.denno && !idenno) {
       <button mat-flat-button (click)="modeToDel(false,3)"
         [color]="usrsrv.getColor(mode)">
         <mat-icon>restore</mat-icon>取消解除
@@ -91,7 +96,7 @@
   </a></button>
 </div>
 </mat-toolbar>
-<form [formGroup]="form" (keydown.enter)="canEnter($event)">
+<form [formGroup]="form" (keydown.enter)="usrsrv.canEnter($event)">
   <!-- <mat-card> -->
   <div class="flex justify-between items-center space-x-4 p-3">
     <span class="inline-block align-middle">

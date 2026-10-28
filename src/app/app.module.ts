@@ -1,8 +1,6 @@
-import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 
 import { AppRoutingModule } from "./app-routing.module";
-import { AppComponent } from "./app.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { REMOVE_STYLES_ON_COMPONENT_DESTROY } from '@angular/platform-browser';
 
@@ -29,14 +27,15 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatNativeDateModule, MAT_DATE_LOCALE } from "@angular/material/core";
 import { MatToolbarModule } from "@angular/material/toolbar";
 
-@NgModule({ declarations: [AppComponent, LoginComponent, NavbarComponent],
-    bootstrap: [AppComponent], imports: [BrowserModule,
+@NgModule({
+    exports: [LoginComponent, NavbarComponent], imports: [CommonModule,
         AppRoutingModule,
         AuthModule.forRoot({
             domain: environment.AUTH0_DOMAIN,
             clientId: environment.AUTH0_CLIENT_ID,
             authorizationParams: {
                 redirect_uri: window.location.origin,
+                audience: environment.AUTH0_AUDIENCE,
             },
         }),
         BrowserAnimationsModule,
@@ -49,7 +48,7 @@ import { MatToolbarModule } from "@angular/material/toolbar";
         MatInputModule,
         MatMenuModule,
         MatNativeDateModule,
-        MatToolbarModule], providers: [
+        MatToolbarModule, LoginComponent, NavbarComponent], providers: [
         Apollo,
         UserService,
         BeforeunloadGuard,

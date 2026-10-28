@@ -58,6 +58,9 @@ export class UserService {
   userInfo: User = {};
   compid!: number;
   staff!: mwI.Staff;
+  private staffResolve!: (staff: mwI.Staff) => void;
+  /** ログインユーザーの担当者（staff）の読み込みが終わると解決する */
+  readonly staffReady: Promise<mwI.Staff> = new Promise(resolve => (this.staffResolve = resolve));
   tmstmp: TmStmp = new TmStmp();
   system: System = new System();
   tbldef: mwI.Tbldef[] = [];
@@ -100,7 +103,8 @@ export class UserService {
 
     this.auth.user$.subscribe((user) => {
       if (user == null) {
-        throw new Error('ログインユーザーの情報がありません');
+        // 未ログイン（またはトークン再取得中で一時的にnull）。AuthGuardがログイン画面へ誘導するので、ここでは何もしない。
+        return;
       }
       this.userInfo = user;
       // console.log('usersrv1', this.userInfo, this.compid);
@@ -115,7 +119,7 @@ export class UserService {
         })
         .valueChanges.subscribe(
           ({ data }) => {
-            this.system = (data as SystemResult).mssystem[0];
+            this.system = data ? (data as SystemResult).mssystem[0] : this.system;
 			console.log('UserService constructor',data);
           },
           (error) => {
@@ -140,9 +144,10 @@ export class UserService {
         // }
       // }
       this.getHolidays();
-      this.getStaff(this.userInfo["email"]).then(
-        (result) => (this.staff = result)
-      );
+      this.getStaff(this.userInfo["email"]).then((result) => {
+        this.staff = result;
+        this.staffResolve(result);
+      });
     });
     this.getTbldef();
   }
@@ -184,7 +189,10 @@ export class UserService {
         })
         .valueChanges.subscribe(
           ({ data }) => {
-            return resolve((data as StaffResult).msstaff[0]);
+            if (!data) {
+              return; // 読み込み中（データ未着）の通知は無視し、データが届いてから解決する
+            }
+            return resolve((data as StaffResult).msstaff[0] ?? this.staff);
           },
           (error) => {
             console.log("error query get_staff", error);
@@ -693,7 +701,7 @@ export class UserService {
       })
       .valueChanges.subscribe(
         ({ data }) => {
-          this.tbldef = (data as TbldefResult).vtbldef;
+          this.tbldef = data ? (data as TbldefResult).vtbldef : [];
         },
         (error) => {
           console.log("error query getVtbldef", error);
@@ -748,7 +756,7 @@ export class UserService {
       })
       .valueChanges.subscribe(
         ({ data }) => {
-          (data as HolidayResult).msholiday.forEach(element => {
+          (data ? (data as HolidayResult).msholiday : []).forEach(element => {
             this.holidays.push(this.formatDate(new Date(element.holiday)));
           });
         },

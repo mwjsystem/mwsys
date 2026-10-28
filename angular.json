@@ -70,8 +70,15 @@
                   "maximumError": "10kb"
                 }
               ]
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             }
-          }
+          },
+          "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
@@ -79,11 +86,14 @@
             "buildTarget": "mwsys:build"
           },
           "configurations": {
-			"development": {},
+            "development": {
+              "buildTarget": "mwsys:build:development"
+            },
             "production": {
               "buildTarget": "mwsys:build:production"
             }
-          }
+          },
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n",
@@ -109,18 +119,6 @@
               "src/styles.scss"
             ],
             "scripts": []
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "mwsys:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "mwsys:serve:production"
-            }
           }
         }
       }

@@ -1,50 +1,60 @@
-<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">商品グループコード検索</h1>
-<mat-dialog-content>
-  <div class="mat-elevation-z8">
-    <mat-toolbar class="flex flex-row" style="font-size: 10px;">
-      <button mat-raised-button (click)="filterGcd()">検索</button>
-      <div class="flex flex-wrap space-x-4">
-        <mat-form-field>
-          <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
-          <input matInput [(ngModel)]="code" (change)="code=convUpper($event)"
-            [ngModelOptions]="{standalone: true}">
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>ﾌﾘｶﾞﾅ</mat-label>
-          <input matInput [(ngModel)]="kana" (change)="kana=convKana($event)"
-            [ngModelOptions]="{standalone: true}">
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>名称</mat-label>
-          <input matInput [(ngModel)]="name" [ngModelOptions]="{standalone: true}">
-        </mat-form-field>
-      </div>
-    </mat-toolbar>
-    <table mat-table [dataSource]="dataSource" aria-label="Elements">
-      <ng-container matColumnDef="code">
-        <th mat-header-cell *matHeaderCellDef>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</th>
-        <td mat-cell *matCellDef="let row">{{row.code}}</td>
-      </ng-container>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>グループ名</th>
-        <td mat-cell *matCellDef="let row">{{row.name}}</td>
-      </ng-container>
-      <ng-container matColumnDef="kana">
-        <th mat-header-cell *matHeaderCellDef>フリガナ</th>
-        <td mat-cell *matCellDef="let row">{{row.kana}}</td>
-      </ng-container>
-      <ng-container matColumnDef="gkbn">
-        <th mat-header-cell *matHeaderCellDef>商品区分</th>
-        <td mat-cell *matCellDef="let row">
-          <!-- <mat-form-field> -->
-          <mat-select [value]="row.gkbn" class="noArrow" [panelClass]="'my-panel-class'">
-            @for (sval of bunsrv.kbn['gkbn']; track sval) {
-              <mat-option [value]="sval.value">
-                {{sval.viewval}}
-              </mat-option>
-            }
-          </mat-select>
-        <!-- </mat-form-field> -->
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle class="jdh-title">商品グループコード検索</h1>
+
+<section class="jdh-filters" aria-label="検索条件">
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">商品グループ</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
+        <input matInput [(ngModel)]="code" (change)="code=convUpper($event)" [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>ﾌﾘｶﾞﾅ</mat-label>
+        <input matInput [(ngModel)]="kana" (change)="kana=convKana($event)" [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
+        <mat-label>名称</mat-label>
+        <input matInput [(ngModel)]="name" [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="jdh-actions">
+    <button mat-flat-button (click)="filterGcd()">
+      <mat-icon>search</mat-icon>
+      検索
+    </button>
+  </div>
+</section>
+
+<mat-dialog-content class="jdh-content">
+  <div class="jdh-summary" aria-live="polite">
+    <span class="jdh-count">{{dataSource.data.length}} 件</span>
+    <span class="jdh-hint">行をクリックで選択します</span>
+  </div>
+  <table mat-table [dataSource]="dataSource" class="jdh-table" aria-label="商品グループの検索結果">
+    <ng-container matColumnDef="code">
+      <th mat-header-cell *matHeaderCellDef>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</th>
+      <td mat-cell *matCellDef="let row" class="jdh-key">{{row.code}}</td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>グループ名</th>
+      <td mat-cell *matCellDef="let row">{{row.name}}</td>
+    </ng-container>
+    <ng-container matColumnDef="kana">
+      <th mat-header-cell *matHeaderCellDef>フリガナ</th>
+      <td mat-cell *matCellDef="let row">{{row.kana}}</td>
+    </ng-container>
+    <ng-container matColumnDef="gkbn">
+      <th mat-header-cell *matHeaderCellDef>商品区分</th>
+      <td mat-cell *matCellDef="let row">
+        <mat-select [value]="row.gkbn" class="noArrow" [panelClass]="'my-panel-class'">
+          @for (sval of bunsrv.kbn['gkbn']; track sval) {
+            <mat-option [value]="sval.value">
+              {{sval.viewval}}
+            </mat-option>
+          }
+        </mat-select>
       </td>
     </ng-container>
     <ng-container matColumnDef="sozai">
@@ -53,24 +63,23 @@
     </ng-container>
     <ng-container matColumnDef="vcode">
       <th mat-header-cell *matHeaderCellDef>仕入先</th>
-      <td mat-cell *matCellDef="let row">{{row.vcode|vcdtxt}}</td>
+      <td mat-cell *matCellDef="let row">{{row.vcode | vcdtxt}}</td>
     </ng-container>
     <ng-container matColumnDef="tcode">
       <th mat-header-cell *matHeaderCellDef>担当者</th>
-      <td mat-cell *matCellDef="let row">{{row.tcode|staff}}</td>
+      <td mat-cell *matCellDef="let row">{{row.tcode | staff}}</td>
     </ng-container>
-    <!-- <ng-container matColumnDef="bikou">
-    <th mat-header-cell *matHeaderCellDef>備考</th>
-    <td mat-cell *matCellDef="let row">{{row.bikou}}</td>
-  </ng-container> -->
-  <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="setGrpcd(row)"></tr>
-</table>
-<mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
-  [pageSizeOptions]="[20, 50, 100, 250, 1000]">
-</mat-paginator>
-</div>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" tabindex="0"
+      (click)="setGrpcd(row)" (keydown.enter)="setGrpcd(row)"></tr>
+  </table>
+  @if (dataSource.data.length === 0) {
+    <p class="jdh-empty">表示する商品グループがありません。条件を指定して「検索」を押してください。</p>
+  }
+  <mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
+    [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+  </mat-paginator>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-raised-button (click)="close()">閉じる</button>
+  <button mat-stroked-button (click)="close()">閉じる</button>
 </mat-dialog-actions>

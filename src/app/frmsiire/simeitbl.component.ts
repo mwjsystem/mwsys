@@ -1,6 +1,6 @@
 import { Component, OnInit, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, input, viewChild, viewChildren, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { HmeihelpComponent } from './../share/hmeihelp/hmeihelp.component';
@@ -12,13 +12,20 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 // import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
+import { MatIconButton } from '@angular/material/button';
+import { MatPrefix, MatFormField, MatInput, MatSuffix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { NuminputDirective } from '../core/directives/numinput.directive';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { DecimalPipe } from '@angular/common';
+import { objectToArray } from '../core/form-helpers';
 
 @Component({
     selector: 'app-simeitbl',
     templateUrl: './simeitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatIconButton, MatPrefix, MatIcon, MatCellDef, MatCell, MatFormField, MatInput, MatSuffix, NuminputDirective, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
 })
 export class SimeitblComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
@@ -174,10 +181,10 @@ export class SimeitblComponent implements OnInit {
     this.refresh();
   }
   copyData() {
-    this.copyToClipboard = this.objectToArray(this.displayedColumns);
+    this.copyToClipboard = objectToArray(this.displayedColumns);
     this.frmArr.getRawValue().forEach(row => {
       if (row.gcode !== '') {
-        this.copyToClipboard += this.objectToArray(row);
+        this.copyToClipboard += objectToArray(row);
       }
     })
     this.usrsrv.toastInf('クリップボードにコピーしました');
@@ -232,15 +239,6 @@ export class SimeitblComponent implements OnInit {
         }
       }
     );
-  }
-  objectToArray(obj: object): string {
-    var result = Object.keys(obj).map((key: string) => {
-      let value = (obj as Record<string, unknown>)[key];
-      // console.log(value)
-      return value;
-    });
-    // console.log(result.toString())
-    return result.toString() + "\n";
   }
   setSiimei() {
     let i: number = 0;

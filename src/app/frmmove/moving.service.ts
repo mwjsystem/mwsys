@@ -82,16 +82,15 @@ export interface MovmeiInput { id: number; denno: number; line: number; gcode: s
 /** 新規登録時に移動伝票（trmovsub）へ渡す値 */
 export type MovsubNew = MovsubSet & { id: number; denno: number; created_at: Date; created_by: string };
 
-interface AffectedRows { affected_rows: number }
 /** get_movden クエリの結果 */
 interface MovdenResult { trmovsub_by_pk: Movsub | null }
 /** upd_zaiko / ins_zaiko ミューテーションの結果 */
-interface UpdZaikoResult { update_trzaiko: AffectedRows }
-interface InsZaikoResult { insert_trzaiko: AffectedRows }
+interface UpdZaikoResult { update_trzaiko: mwI.AffectedRows }
+interface InsZaikoResult { insert_trzaiko: mwI.AffectedRows }
 /** upd_movsub ミューテーションの結果 */
-export interface UpdMovdenResult { update_trmovsub: AffectedRows; delete_trmovden: AffectedRows; insert_trmovden: AffectedRows }
+export interface UpdMovdenResult { update_trmovsub: mwI.AffectedRows; delete_trmovden: mwI.AffectedRows; insert_trmovden: mwI.AffectedRows }
 /** ins_movsub ミューテーションの結果 */
-export interface InsMovdenResult { insert_trmovsub: AffectedRows; insert_trmovden: AffectedRows }
+export interface InsMovdenResult { insert_trmovsub: mwI.AffectedRows; insert_trmovden: mwI.AffectedRows }
 @Injectable({
   providedIn: 'root'
 })
@@ -151,6 +150,9 @@ export class MovingService {
       })
         .valueChanges
         .subscribe(({ data }) => {
+          if (!data) {
+            return;
+          }
           observer.next((data as MovdenResult).trmovsub_by_pk);
         }, (error) => {
           observer.error(error);

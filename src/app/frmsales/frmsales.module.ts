@@ -33,40 +33,37 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 registerLocaleData(localeJa);
 
 @NgModule({
-  declarations: [
-    FrmsalesComponent,
-    JmeitblComponent,
-    JdnohelpComponent,
-    SpdethelpComponent,
-    JmzaitblComponent
-  ],
-  imports: [
-    CommonModule,
-    CoreModule,
-    FrmsalesRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-
-    ClipboardModule,
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatMenuModule,
-    MatPaginatorModule,
-    MatProgressSpinnerModule,
-    MatSelectModule,
-    MatTableModule,
-    MatTooltipModule,
-    MatToolbarModule
-  ],
-  providers: [
-    { provide: LOCALE_ID, useValue: 'ja-JP' }
-  ]
+    imports: [
+        CommonModule,
+        CoreModule,
+        FrmsalesRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        ClipboardModule,
+        MatButtonModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatDatepickerModule,
+        MatDialogModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatMenuModule,
+        MatPaginatorModule,
+        MatProgressSpinnerModule,
+        MatSelectModule,
+        MatTableModule,
+        MatTooltipModule,
+        MatToolbarModule,
+        FrmsalesComponent,
+        JmeitblComponent,
+        JdnohelpComponent,
+        SpdethelpComponent,
+        JmzaitblComponent
+    ],
+    providers: [
+        { provide: LOCALE_ID, useValue: 'ja-JP' }
+    ]
 })
 export class FrmsalesModule { }

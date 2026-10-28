@@ -14,7 +14,7 @@
   @if (frmArr.enabled) {
     <mat-form-field style="width: 10em;">
       <mat-label>在庫状態一括設定</mat-label>
-      <mat-select [(ngModel)]="jmeikbn" [panelClass]="'my-panel-class'">
+      <mat-select [(ngModel)]="jmeikbn" [ngModelOptions]="{standalone: true}" [panelClass]="'my-panel-class'">
         @for (sval of bunsrv.kbn.jmeikbn; track sval) {
           <mat-option [value]="sval.value">
             {{sval.viewval}}
@@ -35,7 +35,7 @@
   <mat-menu #cnp="matMenu">
     <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
     @if (frmArr.enabled && navCli) {
-      <button mat-menu-item (click)="pasteFromClipboard(true)" == 1
+      <button mat-menu-item (click)="pasteFromClipboard(true)"
       >ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(明細洗替)</button>
     }
     @if (frmArr.enabled && navCli) {

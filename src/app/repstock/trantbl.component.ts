@@ -1,9 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MatSpinner } from '@angular/material/progress-spinner';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { Trans, TransService } from './../services/trans.service';
 import { UserService } from './../services/user.service';
+import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatToolbar } from '@angular/material/toolbar';
+import { StaffPipe } from '../core/pipes/staff.pipe';
+import { BlankPipe } from '../core/pipes/blank.pipe';
 
 
 @Component({
@@ -11,7 +17,7 @@ import { UserService } from './../services/user.service';
     templateUrl: './trantbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFormField, MatInput, MatIconButton, MatSuffix, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatToolbar, MatButton, MatPaginator, StaffPipe, BlankPipe]
 })
 export class TrantblComponent implements OnInit {
   trnsrv = inject(TransService);

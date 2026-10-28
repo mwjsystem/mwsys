@@ -5,8 +5,7 @@ import { AuthService } from '@auth0/auth0-angular';
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./../app.component.scss'],
-    changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    changeDetection: ChangeDetectionStrategy.Eager
 })
 export class LoginComponent implements OnInit {
   auth = inject(AuthService);

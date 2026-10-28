@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { SpdethelpComponent, Nymat } from './../share/spdethelp/spdethelp.component';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
@@ -8,6 +8,12 @@ import { BunruiService } from './../services/bunrui.service';
 // import { ToastrService } from 'ngx-toastr';
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 /** get_nymat クエリの結果（入荷予定） */
 interface NymatResult { vnymat: Nymat[] }
@@ -26,7 +32,7 @@ export class Jmzai {
     templateUrl: './jmzaitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFormField, MatSelect, FormsModule, MatOption, MatInput, MatIconButton, MatSuffix, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
 })
 export class JmzaitblComponent implements OnInit {
   private dialogRef = inject<MatDialogRef<JmzaitblComponent>>(MatDialogRef);
@@ -63,11 +69,15 @@ export class JmzaitblComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        if ((data as NymatResult).vnymat.length == 0) {
+        if (!data) {
+          return;
+        }
+        const result = data as NymatResult;
+        if (result.vnymat.length == 0) {
           this.usrsrv.toastWar("入荷予定が見つかりません");
         } else {
           dialogConfig.data = {
-            nymat: (data as NymatResult).vnymat,
+            nymat: result.vnymat,
             suu: this.dataSource.data[i].suu
           };
           let dialogRef = this.dialog.open(SpdethelpComponent, dialogConfig);

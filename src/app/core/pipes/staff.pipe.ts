@@ -1,10 +1,7 @@
 import { Pipe, PipeTransform, inject } from '@angular/core';
 import { StaffService } from './../../services/staff.service';
 
-@Pipe({
-    name: 'staff',
-    standalone: false
-})
+@Pipe({ name: 'staff' })
 export class StaffPipe implements PipeTransform {
   private stfsrv = inject(StaffService);
 

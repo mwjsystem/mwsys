@@ -1,9 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-@Pipe({
-    name: 'jdate',
-    standalone: false
-})
+@Pipe({ name: 'jdate' })
 export class JdatePipe implements PipeTransform {
 
   transform(date: string | number | Date): string {

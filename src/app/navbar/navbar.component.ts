@@ -2,13 +2,18 @@ import { Component, OnInit, ElementRef, ChangeDetectionStrategy, inject } from '
 import { UserService } from './../services/user.service';
 import { NavmenuService } from './../services/navmenu.service';
 import { DownloadService } from './../services/download.service';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
+import { MatIcon } from '@angular/material/icon';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 
 @Component({
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatToolbar, MatIconButton, RouterLink, MatIcon, MatButton, MatMenuTrigger, MatMenu, MatMenuItem]
 })
 export class NavbarComponent implements OnInit {
   usrsrv = inject(UserService);
@@ -42,7 +47,7 @@ export class NavbarComponent implements OnInit {
   // }
   setDB(flg: boolean) {
     if (flg) {
-      localStorage.setItem('MWSYS_DB', 'mwsystbl');
+      localStorage.setItem('MWSYS_DB', 'test');
       window.location.reload();
     } else {
       localStorage.removeItem('MWSYS_DB');

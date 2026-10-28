@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, ElementRef, ChangeDetectorRef, Change
 import { ActivatedRoute } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
-import { MatSpinner } from '@angular/material/progress-spinner';
+import { MatSpinner, MatProgressSpinner } from '@angular/material/progress-spinner';
 import { Title } from '@angular/platform-browser';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
@@ -16,17 +16,27 @@ import { Trans, TransService } from './../services/trans.service';
 // import { ToastrService } from 'ngx-toastr';
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { StcscdsComponent } from './../share/stcscds/stcscds.component';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatFormField, MatInput, MatSuffix, MatLabel } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { GzaitblComponent } from './gzaitbl.component';
+import { TrantblComponent } from './trantbl.component';
+import { DecimalPipe } from '@angular/common';
 // import * as Query from './queries.frms';
 
 /** get_goods クエリの結果 */
-interface GoodResult { msgoods_by_pk: Pick<StGds, 'gtext' | 'gskbn' | 'unit' | 'msgzais'> }
+interface GoodResult { msgoods_by_pk: Pick<StGds, 'gtext' | 'gskbn' | 'unit' | 'msgzais'> | null }
 
 @Component({
     selector: 'app-repstock',
     templateUrl: './repstock.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatToolbar, MatFormField, MatInput, FormsModule, MatIconButton, MatSuffix, MatIcon, MatButton, MatCard, MatCardContent, MatLabel, MatSelect, MatOption, MatProgressSpinner, GzaitblComponent, TrantblComponent, DecimalPipe]
 })
 export class RepstockComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
@@ -125,6 +135,9 @@ export class RepstockComponent implements OnInit, AfterViewInit {
 
   gcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.autoFocus = true;
     dialogConfig.data = {
       gcode: this.gcode,
@@ -303,7 +316,16 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       // this.stcsrv.stc.tommo = 0;
       this.gcode = this.usrsrv.convUpper(this.gcode);
       // console.log('getZinfo2', this.stcsrv.goods);
-      if (this.stcsrv.goods.length == 0) {
+      let i: number = this.stcsrv.goods.findIndex(obj => obj.gcode == this.gcode);
+      if (i > -1) {
+        this.stgds.gtext = this.stcsrv.goods[i].gtext;
+        this.stgds.gskbn = this.stcsrv.goods[i].gskbn;
+        this.stgds.unit = this.stcsrv.goods[i].unit;
+        this.stgds.msgzais = this.stcsrv.goods[i].msgzais;
+        this.selScd();
+      } else {
+        // ローカルの一覧に無くても未登録とは限らない（一覧が別の商品グループ分しか読み込まれていない場合がある）ので、
+        // 直接問い合わせてから最終判断する
         const GetMast = gql`
         query get_goods($id: smallint!,$gcd:String!) {
           msgoods_by_pk(id:$id, gcode:$gcd) {
@@ -329,28 +351,22 @@ export class RepstockComponent implements OnInit, AfterViewInit {
         })
           .valueChanges
           .subscribe(({ data }) => {
+            if (!data) {
+              return;
+            }
             const msgood = (data as GoodResult).msgoods_by_pk;
+            if (!msgood) {
+              this.usrsrv.toastWar("商品コード" + this.gcode + "は登録されていません。");
+              return;
+            }
             this.stgds.gtext = msgood.gtext;
             this.stgds.gskbn = msgood.gskbn;
             this.stgds.unit = msgood.unit;
             this.stgds.msgzais = msgood.msgzais;
-            console.log(this.stgds.msgzais,this.stcsrv.goods);
             this.selScd();
           }, (error) => {
             console.log('error query get_goods', error);
           });
-      } else {
-        let i: number = this.stcsrv.goods.findIndex(obj => obj.gcode == this.gcode);
-        if (i > -1) {
-          this.stgds.gtext = this.stcsrv.goods[i].gtext;
-          this.stgds.gskbn = this.stcsrv.goods[i].gskbn;
-          this.stgds.unit = this.stcsrv.goods[i].unit;
-          this.stgds.msgzais = this.stcsrv.goods[i].msgzais;
-          this.selScd();
-        } else {
-          this.usrsrv.toastWar("商品コード" + this.gcode + "は登録されていません。");
-        }
-
       }
     }
   }

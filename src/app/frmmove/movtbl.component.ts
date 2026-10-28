@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input, viewChild, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
@@ -10,6 +10,15 @@ import { Zaiko, Gzai, Movden, MovmeiInput, MovingService } from './moving.servic
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { take } from 'rxjs/operators';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatPrefix, MatFormField, MatInput, MatSuffix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { DecimalPipe } from '@angular/common';
+import { rowCtl, objectToArray } from '../core/form-helpers';
 
 /** get_good クエリの結果 */
 interface GoodResult { msgoods_by_pk: { gcode: string; gtext: string; unit: string; gskbn: string; msgzais: Gzai[] } | null }
@@ -23,7 +32,7 @@ type ParentField = 'outcode' | 'incode' | 'day';
     templateUrl: './movtbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, MatFormField, MatInput, TabDirective, MatSuffix, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
 })
 export class MovtblComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
@@ -94,7 +103,7 @@ export class MovtblComponent implements OnInit {
 
   updGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
-    this.rowCtl(this.frmArr.controls[i]).gcode.setValue(val);
+    rowCtl<RowField>(this.frmArr.controls[i]).gcode.setValue(val);
     const GetGood = gql`
     query get_good($id: smallint!,$gds:String!) {
       msgoods_by_pk(gcode: $gds, id: $id){
@@ -120,14 +129,17 @@ export class MovtblComponent implements OnInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
+        if (!data) {
+          return;
+        }
         let msgds = (data as GoodResult).msgoods_by_pk;
 
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors({ 'incorrect': true });
+          rowCtl<RowField>(this.frmArr.controls[i]).gcode.setErrors({ 'incorrect': true });
         } else {
           console.log(msgds);
-          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors(null);
+          rowCtl<RowField>(this.frmArr.controls[i]).gcode.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.getMtbl(i, 'msgzais').clear(); // 商品コードを変えたとき、前の商品の構成品を残さない
           msgds.msgzais.forEach(e => {
@@ -225,10 +237,6 @@ export class MovtblComponent implements OnInit {
     }
     this.refresh();
   }
-  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
-  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
-    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
-  }
   private parentCtl(): Record<ParentField, AbstractControl> {
     return this.parentForm().controls as Record<ParentField, AbstractControl>;
   }
@@ -286,10 +294,10 @@ export class MovtblComponent implements OnInit {
     this.refresh();
   }
   copyData() {
-    this.copyToClipboard = this.objectToArray(this.displayedColumns);
+    this.copyToClipboard = objectToArray(this.displayedColumns);
     this.frmArr.getRawValue().forEach(row => {
       if (row.gcode !== '') {
-        this.copyToClipboard += this.objectToArray(row);
+        this.copyToClipboard += objectToArray(row);
       }
     })
     this.usrsrv.toastInf('クリップボードにコピーしました');
@@ -320,26 +328,23 @@ export class MovtblComponent implements OnInit {
     const lcday: string = day;
     this.frmArr.controls
       .forEach(control => {
-        control.value.msgzais.forEach((zai: Pick<Gzai, 'zcode' | 'irisu'>) => {
-          const lcsuu: number = control.value.suu * zai.irisu;
-          zaikoNew.push({ scode: incode, gcode: zai.zcode, day: lcday, movi: lcsuu, movo: 0 });
-          zaikoNew.push({ scode: outcode, gcode: zai.zcode, day: lcday, movi: 0, movo: lcsuu });
-        });
+        if (control.value.gskbn == "0") { // 在庫品は自分自身のコード・数量をそのまま在庫調整に使う
+          const lcsuu: number = control.value.suu;
+          zaikoNew.push({ scode: incode, gcode: control.value.gcode, day: lcday, movi: lcsuu, movo: 0 });
+          zaikoNew.push({ scode: outcode, gcode: control.value.gcode, day: lcday, movi: 0, movo: lcsuu });
+        } else if (control.value.gskbn == "1") { // セット品は構成品ごとに在庫調整する
+          control.value.msgzais.forEach((zai: Pick<Gzai, 'zcode' | 'irisu'>) => {
+            const lcsuu: number = control.value.suu * zai.irisu;
+            zaikoNew.push({ scode: incode, gcode: zai.zcode, day: lcday, movi: lcsuu, movo: 0 });
+            zaikoNew.push({ scode: outcode, gcode: zai.zcode, day: lcday, movi: 0, movo: lcsuu });
+          });
+        }
       });
     return zaikoNew;
   }
   /** 保存した内容の取り消し用データに入れ替える（保存後にもう一度変更保存したとき、保存済みの内容を戻せるようにする） */
   setTrzaikoFrom(zaikoNew: Zaiko[]) {
     this.trzaiko = zaikoNew.map(z => ({ ...z, movi: z.movi == 0 ? 0 : z.movi * -1, movo: z.movo == 0 ? 0 : z.movo * -1 }));
-  }
-  objectToArray(obj: object): string {
-    var result = Object.keys(obj).map((key: string) => {
-      let value = (obj as Record<string, unknown>)[key];
-      // console.log(value)
-      return value;
-    });
-    // console.log(result.toString())
-    return result.toString() + "\n";
   }
   refresh(): void {
     this.dataSource.paginator = this.paginator() ?? null;

@@ -1,17 +1,25 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, OnDestroy, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialogRef, MatDialog } from "@angular/material/dialog";
+import { MatDialogRef, MatDialog, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
 import { StoreService } from './../../services/store.service';
 import { StaffService } from './../../services/staff.service';
 import { HasuraWhere } from './../help-where';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { StaffPipe } from '../../core/pipes/staff.pipe';
 
 interface Movsub {
   denno: number;
@@ -30,11 +38,11 @@ interface MovsubResult { trmovsub: Movsub[] }
 @Component({
     selector: 'app-mdnohelp',
     templateUrl: './mdnohelp.component.html',
-    styleUrls: ['./../../help.component.scss'],
+    styleUrls: ['./../../help.component.scss', './../search-dialog.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatSelect, FormsModule, MatOption, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatButton, MatIcon, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions, StaffPipe]
 })
-export class MdnohelpComponent implements OnInit {
+export class MdnohelpComponent implements OnInit, OnDestroy {
   usrsrv = inject(UserService);
   stfsrv = inject(StaffService);
   strsrv = inject(StoreService);
@@ -67,10 +75,16 @@ export class MdnohelpComponent implements OnInit {
   foutcd: string = "";
   fday: Date = new Date();
   ftcd: string = "";
+  private querySub?: Subscription;
 
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;
     this.fday.setMonth(this.fday.getMonth() - 1);
+  }
+
+  ngOnDestroy(): void {
+    this.querySub?.unsubscribe();
+    this.overlayRef.dispose();
   }
   get_movden(): void {
     let varWh: HasuraWhere = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
@@ -99,17 +113,24 @@ export class MdnohelpComponent implements OnInit {
         updated_by
       }
     }`;
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<MovsubResult>({
+    if (!this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
+    this.querySub?.unsubscribe();
+    this.querySub = this.apollo.watchQuery<MovsubResult>({
       query: GetTran,
       variables: varWh
     })
       .valueChanges
       .subscribe(({ data }) => {
-        if ((data as MovsubResult).trmovsub.length == 0) {
+        if (!data) {
+          return;
+        }
+        const result = data as MovsubResult;
+        if (result.trmovsub.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          let srcdata = (data as MovsubResult).trmovsub;
+          let srcdata = result.trmovsub;
           this.dataSource = new MatTableDataSource<Movsub>(srcdata);
           this.dataSource.paginator = this.paginator() ?? null;
         }
@@ -117,6 +138,7 @@ export class MdnohelpComponent implements OnInit {
         this.cdRef.detectChanges();
       }, (error) => {
         console.log('error query get_movsub', error);
+        this.overlayRef.detach();
       });
 
   }

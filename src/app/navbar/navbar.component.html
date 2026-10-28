@@ -89,7 +89,7 @@
     </button>
     <mat-menu #mstmenu="matMenu">
       @for (elm of navsrv.menu['mstmenu']; track elm) {
-        <button mat-menu-item (click)="elm.tag">
+        <button mat-menu-item (click)="dlKick(elm.tag)">
           {{elm.smenu}}
         </button>
       }

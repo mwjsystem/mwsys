@@ -49,7 +49,7 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-		 (data as HokuriResult).mshokuri.forEach(element => {
+		 (data ? (data as HokuriResult).mshokuri : []).forEach(element => {
             this.hokuri.push({ code: element.code, 
 			                   name: element.code + ' ' + element.name,
 							   htype: element.htype,
@@ -88,7 +88,7 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.haisou = (data as HaisouResult).mshaisou;
+        this.haisou = data ? (data as HaisouResult).mshaisou : [];
       }, (error) => {
         console.log('error query get_haisou', error);
       });
@@ -112,7 +112,7 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.hktime = (data as HktimeResult).mshktime;
+        this.hktime = data ? (data as HktimeResult).mshktime : [];
       }, (error) => {
         console.log('error query get_hktime', error);
       });

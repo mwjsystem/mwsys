@@ -3,7 +3,7 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
@@ -11,6 +11,13 @@ import { BunruiService } from './../services/bunrui.service';
 import { DownloadService } from './../services/download.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
+import { MatCard } from '@angular/material/card';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { DatePipe } from '@angular/common';
+import { StaffPipe } from '../core/pipes/staff.pipe';
 // import { ToastrService } from 'ngx-toastr';
 
 interface GetOpe {
@@ -28,7 +35,7 @@ interface UpdOpelogResult { update_tropelog: { returning: Pick<mwI.Tropelog, 'st
     templateUrl: './frmkeep.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatCard, MatFormField, MatLabel, MatInput, FormsModule, MatButton, MatSuffix, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe, StaffPipe]
 })
 export class FrmkeepComponent implements OnInit {
   usrsrv = inject(UserService);
@@ -117,7 +124,7 @@ export class FrmkeepComponent implements OnInit {
         .valueChanges
         .subscribe(({ data }) => {
           // console.log(data.tropelog);
-          observer.next((data as OpelogResult).tropelog);
+          observer.next(data ? (data as OpelogResult).tropelog : []);
           // return resolve(data.tropelog);
           // observer.complete();
           // console.log(data.tropelog);
@@ -131,7 +138,9 @@ export class FrmkeepComponent implements OnInit {
   }
 
   toReq() {
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    if (!this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
     this.denno = 0;
     this.getOpelog({ status: "依頼中" }).subscribe(value => {
       this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
@@ -142,7 +151,9 @@ export class FrmkeepComponent implements OnInit {
   }
 
   toDenno(pdenno: string) {
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    if (!this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
     this.getOpelog({ denno: pdenno }).subscribe(value => {
       this.dataSource = new MatTableDataSource<mwI.Tropelog>(value);
       this.overlayRef.detach();

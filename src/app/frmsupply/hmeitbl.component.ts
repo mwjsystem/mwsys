@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChildren, QueryList, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, input, viewChild, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
@@ -12,6 +12,18 @@ import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 // import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
+import { MatFormField, MatLabel, MatInput, MatSuffix, MatPrefix } from '@angular/material/input';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatIcon } from '@angular/material/icon';
+import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { NuminputDirective } from '../core/directives/numinput.directive';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { rowCtl, objectToArray } from '../core/form-helpers';
+import { DecimalPipe } from '@angular/common';
 
 /** get_good クエリの結果 */
 interface GoodResult {
@@ -31,7 +43,7 @@ type ParentField = 'day' | 'mtax';
     templateUrl: './hmeitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatFormField, MatLabel, MatInput, FormsModule, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, TabDirective, NuminputDirective, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
 })
 export class HmeitblComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
@@ -157,7 +169,7 @@ export class HmeitblComponent implements OnInit {
   updGds(i: number, value: string): void {
     let val: string = this.usrsrv.convUpper(value);
     // console.log(this.frmArr.controls[i]);
-    this.rowCtl(this.frmArr.controls[i]).gcode.setValue(val);
+    rowCtl<RowField>(this.frmArr.controls[i]).gcode.setValue(val);
     const GetGood = gql`
     query get_good($id: smallint!,$gds:String!,$day: date!) {
       msgoods_by_pk(gcode: $gds, id: $id){
@@ -189,14 +201,17 @@ export class HmeitblComponent implements OnInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
+        if (!data) {
+          return;
+        }
         let msgds = (data as GoodResult).msgoods_by_pk;
 
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
-          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors({ 'incorrect': true });
+          rowCtl<RowField>(this.frmArr.controls[i]).gcode.setErrors({ 'incorrect': true });
         } else {
           // console.log(msgds);
-          this.rowCtl(this.frmArr.controls[i]).gcode.setErrors(null);
+          rowCtl<RowField>(this.frmArr.controls[i]).gcode.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
           this.frmArr.controls[i].patchValue({ day: this.parentCtl().day.value, mtax: this.parentCtl().mtax.value });
@@ -255,10 +270,6 @@ export class HmeitblComponent implements OnInit {
       this.frmArr.push(this.createRow(i + 1));
     }
     this.refresh();
-  }
-  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
-  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
-    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
   }
   private parentCtl(): Record<ParentField, AbstractControl> {
     return this.parentForm().controls as Record<ParentField, AbstractControl>;
@@ -330,10 +341,10 @@ export class HmeitblComponent implements OnInit {
     this.refresh();
   }
   copyData() {
-    this.copyToClipboard = this.objectToArray(this.displayedColumns);
+    this.copyToClipboard = objectToArray(this.displayedColumns);
     this.frmArr.getRawValue().forEach(row => {
       if (row.gcode !== '') {
-        this.copyToClipboard += this.objectToArray(row);
+        this.copyToClipboard += objectToArray(row);
       }
     })
     this.usrsrv.toastInf('クリップボードにコピーしました');
@@ -365,15 +376,6 @@ export class HmeitblComponent implements OnInit {
         });
       });
     return hatmei;
-  }
-  objectToArray(obj: object): string {
-    var result = Object.keys(obj).map((key: string) => {
-      let value = (obj as Record<string, unknown>)[key];
-      // console.log(value)
-      return value;
-    });
-    // console.log(result.toString())
-    return result.toString() + "\n";
   }
   refresh(): void {
     this.dataSource.paginator = this.paginator() ?? null;

@@ -27,36 +27,32 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 registerLocaleData(localeJa);
 
 @NgModule({
-  declarations: [
-    FrmkeepComponent
-  ],
-  imports: [
-    CommonModule,
-    CoreModule,
-    FrmkeepRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatMenuModule,
-    MatPaginatorModule,
-    MatProgressSpinnerModule,
-    MatSelectModule,
-    MatTableModule,
-    MatTooltipModule,
-    MatToolbarModule
-
-  ],
-  providers: [
-    { provide: LOCALE_ID, useValue: 'ja-JP' }
-  ]
+    imports: [
+        CommonModule,
+        CoreModule,
+        FrmkeepRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatDatepickerModule,
+        MatDialogModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatMenuModule,
+        MatPaginatorModule,
+        MatProgressSpinnerModule,
+        MatSelectModule,
+        MatTableModule,
+        MatTooltipModule,
+        MatToolbarModule,
+        FrmkeepComponent
+    ],
+    providers: [
+        { provide: LOCALE_ID, useValue: 'ja-JP' }
+    ]
 })
 export class FrmkeepModule { }

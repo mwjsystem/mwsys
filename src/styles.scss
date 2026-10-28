@@ -8,6 +8,28 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 // }
 
 /* ---------------------------------------------------------------------------
+ * full-screen-modal
+ * 多数のコンポーネントが dialogConfig.panelClass = 'full-screen-modal' と
+ * width: '100vw' / height: '98%' を指定してダイアログを全画面表示しようとしているが、
+ * Angular Material の M3 ダイアログは中の .mdc-dialog__surface 側に既定の
+ * max-width（M3 の large dialog 規定値、概ね 560px 程度）が別途かかっており、
+ * オーバーレイ側の width/height を広げただけでは中身が既定サイズのまま縮んでしまう。
+ * panelClass 側でサーフェスの幅・高さそのものを明示的に広げて解消する。
+ * ------------------------------------------------------------------------- */
+.full-screen-modal {
+  max-width: 100vw !important;
+
+  .mat-mdc-dialog-container,
+  .mdc-dialog__surface {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100vw !important;
+    max-height: 100% !important;
+    border-radius: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
  * Mode colours (primary / accent / warn)
  * The M3 prebuilt theme ignores the `color` input, but the components still get
  * .mat-primary / .mat-accent / .mat-warn. The screens colour their toolbars and

@@ -9,13 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 
 
 @NgModule({
-  declarations: [HomeComponent],
-  imports: [
-    CommonModule,
-    HomeRoutingModule,
-
-    MatCardModule,
-    MatIconModule
-  ]
+    imports: [
+        CommonModule,
+        HomeRoutingModule,
+        MatCardModule,
+        MatIconModule,
+        HomeComponent
+    ]
 })
 export class HomeModule { }

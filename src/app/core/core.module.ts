@@ -11,30 +11,28 @@ import { ModetxtPipe } from './pipes/modetxt.pipe';
 import { BlankPipe } from './pipes/blank.pipe';
 
 @NgModule({
-  declarations: [
-    TmstmpComponent,
-    NuminputDirective,
-    TabDirective,
-    StaffPipe,
-    JdatePipe,
-    McdtxtPipe,
-    VcdtxtPipe,
-    ModetxtPipe,
-    BlankPipe
-  ],
-  imports: [
-    CommonModule
-  ],
-  exports: [
-    NuminputDirective,
-    TabDirective,
-    StaffPipe,
-    JdatePipe,
-    McdtxtPipe,
-    VcdtxtPipe,
-    ModetxtPipe,
-    BlankPipe,
-    TmstmpComponent
-  ]
+    imports: [
+        CommonModule,
+        TmstmpComponent,
+        NuminputDirective,
+        TabDirective,
+        StaffPipe,
+        JdatePipe,
+        McdtxtPipe,
+        VcdtxtPipe,
+        ModetxtPipe,
+        BlankPipe
+    ],
+    exports: [
+        NuminputDirective,
+        TabDirective,
+        StaffPipe,
+        JdatePipe,
+        McdtxtPipe,
+        VcdtxtPipe,
+        ModetxtPipe,
+        BlankPipe,
+        TmstmpComponent
+    ]
 })
 export class CoreModule { }

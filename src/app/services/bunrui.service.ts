@@ -46,7 +46,7 @@ export class BunruiService {
           .valueChanges
           .subscribe(({ data }) => {
 
-            const msbkbn = (data as BunruiResult).msbkbn;
+            const msbkbn = data ? (data as BunruiResult).msbkbn : [];
             for (let i = 0; i < msbkbn.length; i++) {
               this.kbn[msbkbn[i].kubun] = msbkbn[i].msbunruis;
             }

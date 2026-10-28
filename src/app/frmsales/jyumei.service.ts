@@ -6,7 +6,6 @@ import { OkuriService } from './../services/okuri.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
-interface AffectedRows { affected_rows: number }
 /** 受注明細行（jmeitbl.editJyumei が組み立てて trjyumei_insert_input に渡す） */
 export type TrjyumeiRow = Pick<mwI.Jyumei, 'line' | 'gcode' | 'gtext' | 'suu' | 'tanka' | 'toutmoney' | 'tinmoney' | 'mmemo' | 'spec' | 'spdet' | 'genka' | 'scode' | 'sday' | 'tanka1' | 'money' | 'mtax' | 'tgenka' | 'taxmoney' | 'taxrate' | 'gskbn' | 'currency'> & {
   id: number;
@@ -30,11 +29,11 @@ export type JyudenSet = Pick<mwI.Jyuden, 'torikbn' | 'updated_by' | 'mcode' | 's
 /** 新規登録時に受注伝票（trjyuden）へ渡す値 */
 export type JyudenNew = JyudenSet & { id: number; denno: number; created_at: Date; created_by: string };
 interface JyudenResult { trjyuden_by_pk: mwI.Trjyuden }
-interface ZaikoUpdateResult { update_trzaiko: AffectedRows }
-interface ZaikoInsertResult { insert_trzaiko: AffectedRows }
-export interface JyudenUpdateResult { update_trjyuden: AffectedRows; delete_trjyumei: AffectedRows; insert_trjyumei: AffectedRows; delete_trjyumzai: AffectedRows; insert_trjyumzai: AffectedRows }
-export interface JyudenInsertResult { insert_trjyuden: AffectedRows; insert_trjyumei: AffectedRows; insert_trjyumzai: AffectedRows }
-interface JyudenDeleteResult { update_trjyuden: AffectedRows }
+interface ZaikoUpdateResult { update_trzaiko: mwI.AffectedRows }
+interface ZaikoInsertResult { insert_trzaiko: mwI.AffectedRows }
+export interface JyudenUpdateResult { update_trjyuden: mwI.AffectedRows; delete_trjyumei: mwI.AffectedRows; insert_trjyumei: mwI.AffectedRows; delete_trjyumzai: mwI.AffectedRows; insert_trjyumzai: mwI.AffectedRows }
+export interface JyudenInsertResult { insert_trjyuden: mwI.AffectedRows; insert_trjyumei: mwI.AffectedRows; insert_trjyumzai: mwI.AffectedRows }
+interface JyudenDeleteResult { update_trjyuden: mwI.AffectedRows }
 interface CheckOkrnoResult { trjyuden: { denno: number }[] }
 @Injectable({
   providedIn: 'root'
@@ -121,6 +120,7 @@ export class JyumeiService {
         total10
         dokono
         daibzei
+        idenno
 		vnyuzan {
           nyuzan
         }
@@ -178,8 +178,8 @@ export class JyumeiService {
       }
     }`;
 
-  qryJyuden(denno: number): Observable<mwI.Trjyuden> {
-    let observable: Observable<mwI.Trjyuden> = new Observable<mwI.Trjyuden>(observer => {
+  qryJyuden(denno: number): Observable<mwI.Trjyuden | null> {
+    let observable: Observable<mwI.Trjyuden | null> = new Observable<mwI.Trjyuden | null>(observer => {
       this.apollo.watchQuery<JyudenResult>({
         query: this.GetTran,
         variables: {
@@ -189,7 +189,9 @@ export class JyumeiService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          // console.log(data);
+          if (!data) {
+            return;
+          }
           observer.next((data as JyudenResult).trjyuden_by_pk);
         }, (error) => {
           observer.error(error);
@@ -387,7 +389,10 @@ export class JyumeiService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          // console.log(pOkrno,data); 
+          // console.log(pOkrno,data);
+          if (!data) {
+            return;
+          }
           if ((data as CheckOkrnoResult).trjyuden.length == 0) {
             return resolve(pOkrno);
           } else {

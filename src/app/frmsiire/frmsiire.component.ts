@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
@@ -10,6 +10,7 @@ import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 import { SdnohelpComponent } from './../share/sdnohelp/sdnohelp.component';
 import { HdnohelpComponent } from './../share/hdnohelp/hdnohelp.component';
 import { SimeitblComponent } from './simeitbl.component';
+import { BeforeunloadBase } from '../beforeunload-base';
 import { filter } from 'rxjs/operators';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
@@ -19,6 +20,19 @@ import { SiimeiService, SiidenSet, SiidenNew } from './siimei.service';
 import { HatmeiService } from './../frmsupply/hatmei.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatInput, MatSuffix, MatFormField, MatLabel } from '@angular/material/input';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
+import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { DecimalPipe } from '@angular/common';
+import { JdatePipe } from '../core/pipes/jdate.pipe';
+import { VcdtxtPipe } from '../core/pipes/vcdtxt.pipe';
+import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
 
 /** 仕入入力フォーム の項目名（明細の mtbl は除く） */
 type SiireField = 'vcode' | 'inday' | 'scode' | 'tcode' | 'currency' | 'dmemo' | 'gtotal' | 'tax' | 'total';
@@ -29,12 +43,12 @@ type SiireField = 'vcode' | 'inday' | 'scode' | 'tcode' | 'currency' | 'dmemo' |
     styleUrls: ['./../app.component.scss'],
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatInput, FormsModule, MatIconButton, MatSuffix, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, MatFormField, MatLabel, TmstmpComponent, MatCardContent, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect, MatOption, SimeitblComponent, DecimalPipe, JdatePipe, VcdtxtPipe, ModetxtPipe]
 })
-export class FrmsiireComponent implements OnInit, AfterViewInit {
+export class FrmsiireComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
   private fb = inject(FormBuilder);
   private title = inject(Title);
@@ -67,6 +81,7 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
       .position().global().centerHorizontally().centerVertically()
   });
   constructor() {
+    super();
     const title = this.title;
 
     title.setTitle('仕入伝票(MWSystem)');
@@ -209,12 +224,6 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
   onEnter() {
     this.denno = this.usrsrv.convNumber(this.denno);
     this.getSiiden(this.denno);
-  }
-  canEnter(e: Event): void {
-    let element = e.target as HTMLElement;
-    if (element.tagName !== 'TEXTAREA') {
-      e.preventDefault();
-    }
   }
   refresh(): void {
     if (this.mode == 3) {
@@ -360,17 +369,5 @@ export class FrmsiireComponent implements OnInit, AfterViewInit {
     }
     return tooltip;
   }
-
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
-    }
-  }
-
-
 
 }

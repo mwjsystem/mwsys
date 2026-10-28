@@ -1,15 +1,23 @@
-import { Component, OnInit, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, viewChild, inject } from '@angular/core';
-import { MatDialogRef } from "@angular/material/dialog";
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ElementRef, ChangeDetectorRef, viewChild, inject } from '@angular/core';
+import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
+import { Subscription } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
 import { StaffService } from './../../services/staff.service';
 import { HasuraCond, HasuraWhere } from './../help-where';
+import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { CdkScrollable } from '@angular/cdk/scrolling';
 
 export interface Mcd {
   mcode: string;
@@ -41,11 +49,11 @@ interface McdResult { msmember: McdMember[] }
 @Component({
     selector: 'app-mcdhelp',
     templateUrl: './mcdhelp.component.html',
-    styleUrls: ['./../../help.component.scss'],
+    styleUrls: ['./../../help.component.scss', './../search-dialog.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatInput, FormsModule, MatSelect, MatOption, MatCheckbox, MatButton, MatIcon, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions]
 })
-export class McdhelpComponent implements OnInit {
+export class McdhelpComponent implements OnInit, OnDestroy {
   private dialogRef = inject<MatDialogRef<McdhelpComponent>>(MatDialogRef);
   usrsrv = inject(UserService);
   stfsrv = inject(StaffService);
@@ -73,6 +81,7 @@ export class McdhelpComponent implements OnInit {
       .position().global().centerHorizontally().centerVertically()
   });
   public mcds: Mcd[] = [];
+  private querySub?: Subscription;
 
   constructor() {
     this.dataSource = new MatTableDataSource<Mcd>(this.mcds);
@@ -82,6 +91,11 @@ export class McdhelpComponent implements OnInit {
     this.ftcd = this.usrsrv.staff.code;
     this.dataSource = new MatTableDataSource<Mcd>(this.mcds);
     this.dataSource.paginator = this.paginator() ?? null;
+  }
+
+  ngOnDestroy(): void {
+    this.querySub?.unsubscribe();
+    this.overlayRef.dispose();
   }
 
   convKana(event: Event): string {
@@ -144,13 +158,21 @@ export class McdhelpComponent implements OnInit {
     }
     // console.log(varWh, varWh['where2'] != null);
     this.mcds = [];
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<McdResult>({
+    if (!this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
+    this.querySub?.unsubscribe();
+    this.querySub = this.apollo.watchQuery<McdResult>({
       query: Query.GetMast,
       variables: varWh
     })
       .valueChanges
       .subscribe(({ data: raw }) => {
+        if (!raw) {
+          this.overlayRef.detach();
+          this.cdRef.detectChanges();
+          return;
+        }
         const data = raw as McdResult;
         for (let i = 0; i < data.msmember.length; i++) {
           for (let j = 0; j < data.msmember[i].msmadrs.length; j++) {

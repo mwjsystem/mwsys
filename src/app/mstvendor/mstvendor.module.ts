@@ -21,33 +21,32 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
-  declarations: [
-    MstvendorComponent,
-    VcdhelpComponent
-  ],
-  imports: [
-    CommonModule,
-    CoreModule,
-    MstvendorRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatMenuModule,
-    MatPaginatorModule,
-    MatSelectModule,
-    MatTableModule,
-    MatToolbarModule
-  ]
+    imports: [
+        CommonModule,
+        CoreModule,
+        MstvendorRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatDatepickerModule,
+        MatDialogModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatMenuModule,
+        MatPaginatorModule,
+        MatSelectModule,
+        MatTableModule,
+        MatToolbarModule,
+        MatTooltipModule,
+        MstvendorComponent,
+        VcdhelpComponent
+    ]
 })
 export class MstvendorModule { }

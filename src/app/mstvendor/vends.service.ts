@@ -54,7 +54,7 @@ export class VendsService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          this.vends = (data as VendorsResult).msvendor;
+          this.vends = data ? (data as VendorsResult).msvendor : [];
           resolve(true);
         }, (error) => {
           console.log('error query get_vendors', error);

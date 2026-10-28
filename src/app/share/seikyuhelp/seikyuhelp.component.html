@@ -1,0 +1,99 @@
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle class="jdh-title">請求伝票検索</h1>
+
+<section class="jdh-filters" aria-label="検索条件">
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">伝票番号</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>請求伝票番号</mat-label>
+        <input matInput [(ngModel)]="fdenno" [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">締日</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>締日</mat-label>
+        <input matInput [(ngModel)]="fday" [matDatepicker]="picker1" [ngModelOptions]="{standalone: true}">
+        <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">請求先</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>請求先コード</mat-label>
+        <input matInput [(ngModel)]="fmcd" [ngModelOptions]="{standalone: true}">
+        <button mat-icon-button matSuffix (click)="mcdHelp()" aria-label="請求先を検索して選ぶ">
+          <mat-icon>find_replace</mat-icon>
+        </button>
+        <mat-hint>{{fmcd | mcdtxt}}</mat-hint>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="jdh-actions">
+    <button mat-flat-button (click)="getSeikyu()">
+      <mat-icon>search</mat-icon>
+      検索
+    </button>
+  </div>
+</section>
+
+<mat-dialog-content class="jdh-content">
+  <div class="jdh-summary" aria-live="polite">
+    <span class="jdh-count">{{dataSource.data.length}} 件</span>
+    <span class="jdh-hint">行をクリック（または Enter）で選択します</span>
+  </div>
+  <table mat-table [dataSource]="dataSource" class="jdh-table" aria-label="請求伝票の検索結果">
+    <ng-container matColumnDef="denno">
+      <th mat-header-cell *matHeaderCellDef>伝票番号</th>
+      <td mat-cell *matCellDef="let row" class="jdh-key">{{row.denno}}</td>
+    </ng-container>
+    <ng-container matColumnDef="mcode">
+      <th mat-header-cell *matHeaderCellDef>請求先</th>
+      <td mat-cell *matCellDef="let row">{{row.mcode | mcdtxt}}</td>
+    </ng-container>
+    <ng-container matColumnDef="sday">
+      <th mat-header-cell *matHeaderCellDef>締日</th>
+      <td mat-cell *matCellDef="let row">{{row.sday}}</td>
+    </ng-container>
+    <ng-container matColumnDef="zenkai">
+      <th mat-header-cell *matHeaderCellDef>前回繰越</th>
+      <td mat-cell *matCellDef="let row">{{row.zenkai | number}}</td>
+    </ng-container>
+    <ng-container matColumnDef="taxmon">
+      <th mat-header-cell *matHeaderCellDef>当月請求額(税抜)</th>
+      <td mat-cell *matCellDef="let row">{{row.taxmon | number}}</td>
+    </ng-container>
+    <ng-container matColumnDef="tax">
+      <th mat-header-cell *matHeaderCellDef>消費税</th>
+      <td mat-cell *matCellDef="let row">{{row.tax | number}}</td>
+    </ng-container>
+    <ng-container matColumnDef="seikyu">
+      <th mat-header-cell *matHeaderCellDef>請求残高</th>
+      <td mat-cell *matCellDef="let row">{{row.seikyu | number}}</td>
+    </ng-container>
+    <ng-container matColumnDef="bcode">
+      <th mat-header-cell *matHeaderCellDef>部門</th>
+      <td mat-cell *matCellDef="let row">{{row.bcode}}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" tabindex="0"
+      (click)="selDno(row)" (keydown.enter)="selDno(row)"></tr>
+  </table>
+  @if (dataSource.data.length === 0) {
+    <p class="jdh-empty">表示する伝票がありません。条件を指定して「検索」を押してください。</p>
+  }
+  <mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
+    [pageSizeOptions]="[20, 50, 100, 250, 1000]">
+  </mat-paginator>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-stroked-button (click)="close()">閉じる</button>
+</mat-dialog-actions>

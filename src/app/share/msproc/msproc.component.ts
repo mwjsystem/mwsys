@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { VcdhelpComponent } from './../vcdhelp/vcdhelp.component';
 import { GrpcdhelpComponent } from './../grpcdhelp/grpcdhelp.component';
 import { MsprcprtComponent } from './../msprcprt/msprcprt.component';
@@ -9,6 +9,15 @@ import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatInput, MatPrefix, MatSuffix } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { NuminputDirective } from '../../core/directives/numinput.directive';
+import { rowCtl } from '../../core/form-helpers';
+import { BeforeunloadBase } from '../../beforeunload-base';
 
 /** 加工工程の 1 行（フォームの値）。項目の型は入力に応じて文字列・数値・未入力(null) */
 type MsprocValue = string | number | null;
@@ -21,12 +30,12 @@ type RowField = 'prcno' | 'prcname' | 'prcbody' | 'vcode' | 'code' | 'memo' | 't
     templateUrl: './msproc.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatButton, MatIcon, MatDialogTitle, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatIconButton, MatCellDef, MatCell, MatFormField, MatInput, MatPrefix, MatSelect, MatOption, MatSuffix, NuminputDirective, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
 })
-export class MsprocComponent implements OnInit {
+export class MsprocComponent extends BeforeunloadBase implements OnInit {
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
   usrsrv = inject(UserService);
@@ -41,6 +50,7 @@ export class MsprocComponent implements OnInit {
   displayedColumns = ['prcno', 'prcname', 'prcbody', 'vcode', 'code', 'memo', 'tanka', 'genka', 'posi01', 'posi02'];
 
   constructor() {
+    super();
     const data = inject(MAT_DIALOG_DATA);
 
     this.mcode = data.mcode;
@@ -53,12 +63,15 @@ export class MsprocComponent implements OnInit {
 
   vcdHelp(i: number): void {
     let dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.autoFocus = true;
     let dialogRef = this.dialog.open(VcdhelpComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.rowCtl(this.frmArr.controls[i]).vcode.setValue(data.code);
+          rowCtl<RowField>(this.frmArr.controls[i]).vcode.setValue(data.code);
           // this.vcdtxt = data.adrname;
         }
       }
@@ -67,6 +80,9 @@ export class MsprocComponent implements OnInit {
 
   grpcdHelp(i: number): void {
     let dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.autoFocus = true;
     dialogConfig.data = {
       code: this.frmArr.controls[i].value.code
@@ -76,7 +92,7 @@ export class MsprocComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.rowCtl(this.frmArr.controls[i]).code.setValue(data.code);
+          rowCtl<RowField>(this.frmArr.controls[i]).code.setValue(data.code);
         }
       }
     );
@@ -93,7 +109,7 @@ export class MsprocComponent implements OnInit {
     dialogRef.afterClosed().subscribe(
       data => {
         if (typeof data != 'undefined') {
-          this.rowCtl(this.frmArr.controls[i])[fld].setValue(data.patno);
+          rowCtl<RowField>(this.frmArr.controls[i])[fld].setValue(data.patno);
         }
       }
     );
@@ -129,10 +145,6 @@ export class MsprocComponent implements OnInit {
 
     });
   }
-  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
-  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
-    return (control as FormGroup).controls as Record<RowField, AbstractControl>;
-  }
   get frmArr(): FormArray {
     return this.form.get('mtbl') as FormArray;
   }
@@ -161,13 +173,5 @@ export class MsprocComponent implements OnInit {
   }
   close() {
     this.dialogRef.close();
-  }
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
-    }
   }
 }

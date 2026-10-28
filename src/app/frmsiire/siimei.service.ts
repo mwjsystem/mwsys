@@ -18,13 +18,12 @@ export type SiidenSet = Pick<mwI.Siiden, 'vcode' | 'scode' | 'tcode' | 'dmemo' |
 /** 新規登録時に仕入伝票（trsiiden）へ渡す値 */
 export type SiidenNew = SiidenSet & { id: number; denno: number; created_at: Date; created_by: string };
 
-interface AffectedRows { affected_rows: number }
 /** get_siiden クエリの結果 */
 interface SiidenResult { trsiiden_by_pk: mwI.Trsiiden | null }
 /** upd_siiden ミューテーションの結果 */
-export interface UpdSiidenResult { update_trsiiden: AffectedRows; delete_trsiimei: AffectedRows; insert_trsiimei: AffectedRows }
+export interface UpdSiidenResult { update_trsiiden: mwI.AffectedRows; delete_trsiimei: mwI.AffectedRows; insert_trsiimei: mwI.AffectedRows }
 /** ins_siiden ミューテーションの結果 */
-export interface InsSiidenResult { insert_trsiiden: AffectedRows; insert_trsiimei: AffectedRows }
+export interface InsSiidenResult { insert_trsiiden: mwI.AffectedRows; insert_trsiimei: mwI.AffectedRows }
 @Injectable({
   providedIn: 'root'
 })
@@ -82,9 +81,10 @@ export class SiimeiService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          // console.log(data);
+          if (!data) {
+            return;
+          }
           observer.next((data as SiidenResult).trsiiden_by_pk);
-          // return resolve(data.trhatden_by_pk);
         }, (error) => {
           // return reject(error);
           observer.error(error);

@@ -1,11 +1,11 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { Component, OnInit, OnDestroy, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatDialogRef, MatDialog, MatDialogConfig, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
@@ -15,6 +15,16 @@ import { VendsService } from './../../mstvendor/vends.service';
 import { VcdhelpComponent } from './../vcdhelp/vcdhelp.component';
 import { HdnohelpComponent } from './../hdnohelp/hdnohelp.component';
 import { HasuraWhere } from './../help-where';
+import { MatFormField, MatLabel, MatInput, MatSuffix, MatHint } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { DatePipe } from '@angular/common';
+import { StaffPipe } from '../../core/pipes/staff.pipe';
+import { VcdtxtPipe } from '../../core/pipes/vcdtxt.pipe';
 
 interface Siiden {
   denno: number;
@@ -36,11 +46,11 @@ interface SiidenResult { trsiiden: SiidenRow[] }
 @Component({
     selector: 'app-sdnohelp',
     templateUrl: './sdnohelp.component.html',
-    styleUrls: ['./../../help.component.scss'],
+    styleUrls: ['./../../help.component.scss', './../search-dialog.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatSelect, FormsModule, MatOption, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatIconButton, MatIcon, MatHint, MatButton, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions, DatePipe, StaffPipe, VcdtxtPipe]
 })
-export class SdnohelpComponent implements OnInit {
+export class SdnohelpComponent implements OnInit, OnDestroy {
   usrsrv = inject(UserService);
   stfsrv = inject(StaffService);
   vensrv = inject(VendsService);
@@ -77,6 +87,7 @@ export class SdnohelpComponent implements OnInit {
   ftcd: string = "";
   fsdno!: number;
   fhdno!: number;
+  private querySub?: Subscription;
 
   constructor() {
     this.dataSource = new MatTableDataSource<Siiden>();
@@ -85,6 +96,11 @@ export class SdnohelpComponent implements OnInit {
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;
     this.fday.setMonth(this.fday.getMonth() - 1);
+  }
+
+  ngOnDestroy(): void {
+    this.querySub?.unsubscribe();
+    this.overlayRef.dispose();
   }
 
   vcdHelp(): void {
@@ -154,19 +170,26 @@ export class SdnohelpComponent implements OnInit {
         }
       }
     }`;
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    this.apollo.watchQuery<SiidenResult>({
+    if (!this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
+    this.querySub?.unsubscribe();
+    this.querySub = this.apollo.watchQuery<SiidenResult>({
       query: GetTran,
       variables: varWh
     })
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        if ((data as SiidenResult).trsiiden.length == 0) {
+        if (!data) {
+          return;
+        }
+        const result = data as SiidenResult;
+        if (result.trsiiden.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
           let srcdata: Siiden[] = [];
-          (data as SiidenResult).trsiiden.forEach(element => {
+          result.trsiiden.forEach(element => {
             let { trsiimeis, ...rest } = element;
             let gcd = { gcode: trsiimeis[0].gcode };
             srcdata.push({ ...rest, ...gcd });
@@ -178,6 +201,7 @@ export class SdnohelpComponent implements OnInit {
         this.cdRef.detectChanges();
       }, (error) => {
         console.log('error query get_siiden', error);
+        this.overlayRef.detach();
       });
   }
   sel_dno(selected: Siiden) {

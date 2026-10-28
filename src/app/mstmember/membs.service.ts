@@ -37,7 +37,7 @@ export class MembsService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          this.membs = (data as MembersResult).msmember;
+          this.membs = data ? (data as MembersResult).msmember : [];
           resolve(true);
         }, (error) => {
           console.log('error query get_members', error);

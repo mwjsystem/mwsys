@@ -4,7 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import { TrtdetailComponent } from './trtdetail.component';
@@ -15,6 +15,12 @@ import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { filter } from 'rxjs/operators';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import { StaffPipe } from '../core/pipes/staff.pipe';
 // import { ToastrService } from 'ngx-toastr';
 
 
@@ -27,7 +33,7 @@ interface TreatResult { trtreat: mwI.Trtreat[] }
     templateUrl: './frmtreat.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatToolbar, MatFormField, MatLabel, MatInput, MatPaginator, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSelect, FormsModule, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe, StaffPipe]
 })
 export class FrmtreatComponent implements OnInit {
   trtsrv = inject(TreatService);
@@ -144,7 +150,7 @@ export class FrmtreatComponent implements OnInit {
     })
       .valueChanges
       .subscribe(({ data }) => {
-        this.trtsrv.trts = (data as TreatResult).trtreat;
+        this.trtsrv.trts = data ? (data as TreatResult).trtreat : [];
         if (this.trtsrv.trts.length == 0) {
           this.usrsrv.toastInf("条件に一致する問合せ記録はありません");
         }

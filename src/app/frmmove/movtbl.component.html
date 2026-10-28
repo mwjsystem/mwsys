@@ -1,4 +1,4 @@
-<div fxLayout="row wrap" class="flex flex-wrap content-between" style="height: 40px;">
+<div class="flex flex-row flex-wrap content-between" style="height: 40px;">
   <button mat-flat-button color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
   <mat-menu #cnp="matMenu">
     <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
@@ -103,7 +103,7 @@
       <ng-container matColumnDef="stock">
         <th mat-header-cell *matHeaderCellDef class="i_num">入庫倉庫</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
-          <mat-form-field style="width:4em;"
+          <mat-form-field style="width:7em;"
             [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
             @if (frmArr.getRawValue()[getIdx(i)]['gcode']) {
               <button mat-icon-button matPrefix
@@ -119,7 +119,7 @@
       <ng-container matColumnDef="pable">
         <th mat-header-cell *matHeaderCellDef class="i_num">出庫倉庫</th>
         <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
-          <mat-form-field style="width:4em;"
+          <mat-form-field style="width:7em;"
             [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
             @if (frmArr.getRawValue()[getIdx(i)]['gcode']) {
               <button mat-icon-button matPrefix

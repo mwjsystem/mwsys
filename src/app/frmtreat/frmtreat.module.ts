@@ -23,35 +23,34 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @NgModule({
-  declarations: [
-    FrmtreatComponent,
-    TrtdetailComponent
-  ],
-  imports: [
-    CommonModule,
-    CoreModule,
-    FrmtreatRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatGridListModule,
-    MatIconModule,
-    MatInputModule,
-    MatMenuModule,
-    MatPaginatorModule,
-    MatSelectModule,
-    MatTableModule,
-    MatToolbarModule
-  ]
+    imports: [
+        CommonModule,
+        CoreModule,
+        FrmtreatRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatDatepickerModule,
+        MatDialogModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatGridListModule,
+        MatIconModule,
+        MatInputModule,
+        MatMenuModule,
+        MatPaginatorModule,
+        MatSelectModule,
+        MatTableModule,
+        MatToolbarModule,
+        MatTooltipModule,
+        FrmtreatComponent,
+        TrtdetailComponent
+    ]
 })
 export class FrmtreatModule { }

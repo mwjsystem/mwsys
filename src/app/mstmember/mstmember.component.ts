@@ -1,8 +1,8 @@
 import { Component, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChildren, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, AbstractControl, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, AbstractControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { Title } from '@angular/platform-browser';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Router, ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
@@ -16,17 +16,31 @@ import { OkuriService } from './../services/okuri.service';
 import { StaffService } from './../services/staff.service';
 import { MembsService } from './membs.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
+import { BeforeunloadBase } from '../beforeunload-base';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { AddressComponent } from './../share/address/address.component';
 import { MsprocComponent } from './../share/msproc/msproc.component';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatSuffix, MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
+import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
+import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { AddressComponent as AddressComponent_1 } from '../share/address/address.component';
+import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { McdtxtPipe } from '../core/pipes/mcdtxt.pipe';
+import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
 
-interface AffectedRows { affected_rows: number }
 /** get_member クエリの結果 */
 interface MemberResult { msmember_by_pk: mwI.Member | null }
 /** upd_member / del_jyuden ミューテーションの結果 */
-interface UpdMemberResult { update_msmember: AffectedRows }
+interface UpdMemberResult { update_msmember: mwI.AffectedRows }
 /** ins_member ミューテーションの結果 */
-interface InsMemberResult { insert_msmember: AffectedRows }
+interface InsMemberResult { insert_msmember: mwI.AffectedRows }
 /** 保存時に顧客（msmember）へ渡す値。新規登録では created_at / created_by が付く */
 type MemberInput = Pick<mwI.Member, 'mcode' | 'sei' | 'mei' | 'kana' | 'tankakbn' | 'mail' | 'mail2' | 'mail3' | 'mail4' | 'mail5' | 'torikbn' | 'sime' | 'site' | 'inday' | 'pcode' | 'hcode' | 'htime' | 'jcode' | 'mtax' | 'sscode' | 'tcode1' | 'tcode' | 'del' | 'dmemo' | 'sptnkbn' | 'chubunrui' | 'shobunrui' | 'ntype' | 'tntype' | 'webid' | 'ryoate' | 'mtgt1' | 'mtgt2' | 'mtgt3' | 'mtgt4' | 'mtgt5' | 'gadr' | 'updated_at' | 'updated_by'> & {
   id: number;
@@ -50,12 +64,12 @@ class Sval {
     templateUrl: './mstmember.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, MatSuffix, RouterLink, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, TabDirective, MatSelect, MatOption, MatCheckbox, AddressComponent_1, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, McdtxtPipe, ModetxtPipe]
 })
-export class MstmemberComponent implements OnInit, AfterViewInit {
+export class MstmemberComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
   private fb = inject(FormBuilder);
   private title = inject(Title);
@@ -102,6 +116,7 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
   });
 
   constructor() {
+    super();
     this.title.setTitle('顧客マスタ(MWSystem)');
   }
 
@@ -225,12 +240,6 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
     );
   }
 
-  canEnter(e: Event): void {
-    let element = e.target as HTMLElement;
-    if (element.tagName !== 'TEXTAREA') {
-      e.preventDefault();
-    }
-  }
   refresh(): void {
     // if( this.checkMcode(this.mcd) ){
     //   this.get_member(+this.mcd);
@@ -291,6 +300,9 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       })
         .valueChanges
         .subscribe(({ data }) => {
+          if (!data) {
+            return;
+          }
           this.form.reset();
           const msmember = (data as MemberResult).msmember_by_pk;
           if (msmember == null) {
@@ -589,16 +601,6 @@ export class MstmemberComponent implements OnInit, AfterViewInit {
       //                     {closeButton: true,disableTimeOut: true,tapToDismiss: false});
       //   console.log('error query get_maxmcode', error);
       // });          
-    }
-  }
-
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
     }
   }
 

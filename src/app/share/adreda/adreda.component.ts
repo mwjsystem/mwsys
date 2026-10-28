@@ -1,19 +1,27 @@
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
-import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
+import { FormGroup, FormBuilder, FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Apollo } from 'apollo-angular';
 import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
 import { MembsService } from './../../mstmember/membs.service';
 import { EdahelpComponent } from './edahelp.component';
 import { AddressComponent } from './../address/address.component';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatSuffix } from '@angular/material/input';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { AddressComponent as AddressComponent_1 } from '../address/address.component';
+import { ModetxtPipe } from '../../core/pipes/modetxt.pipe';
 
 @Component({
     selector: 'app-adreda',
     templateUrl: './adreda.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, MatSuffix, MatDialogTitle, CdkScrollable, MatDialogContent, ReactiveFormsModule, AddressComponent_1, MatDialogActions, ModetxtPipe]
 })
 export class AdredaComponent implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);

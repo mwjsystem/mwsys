@@ -44,7 +44,7 @@
     </a></button>
   </div>
 </mat-toolbar>
-<form [formGroup]="form" class="flex flex-wrap space-x-4" (keydown.enter)="canEnter($event)">
+<form [formGroup]="form" class="flex flex-wrap space-x-4" (keydown.enter)="usrsrv.canEnter($event)">
   <mat-card>
     <mat-card-header class="flex justify-between">
       <mat-card-title>
@@ -95,7 +95,7 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div fxLayout="row wrap">
+      <div class="flex flex-row flex-wrap">
         <mat-form-field style="width: 7em;">
           <mat-label>配送方法</mat-label>
           <mat-select formControlName="hcode" (selectionChange)="selHcd($event.value)" [panelClass]="'my-panel-class'">
@@ -107,7 +107,7 @@
             }
           </mat-select>
         </mat-form-field>
-        <div fxLayout="row wrap" fxLayoutAlign="start end">
+        <div class="flex flex-row flex-wrap items-end">
           <mat-form-field style="width: 9em;">
             <mat-label>配送希望日</mat-label>
             <input matInput [matDatepicker]="picker5" formControlName="hday">
@@ -126,7 +126,7 @@
             }
           </mat-select>
         </mat-form-field>
-        <div fxLayout="row wrap" fxLayoutAlign="start end">
+        <div class="flex flex-row flex-wrap items-end">
           <mat-form-field style="width: 4em;">
             <mat-label>荷物個数</mat-label>
             <input type="number" matInput formControlName="okurisuu" class="i_num">
@@ -151,7 +151,7 @@
           }
         </mat-form-field>
       </div>
-      <div fxLafxLayout="row wrap" fxLayoutGap="5px">
+      <div class="flex flex-row flex-wrap" style="gap: 5px;">
         <mat-form-field class="txtar">
           <mat-label>伝票備考</mat-label>
           <textarea matInput formControlName="dmemo" matTextareaAutosize></textarea>
@@ -168,7 +168,7 @@
     </mat-card-content>
   </mat-card>
   <mat-card>
-    <mat-card-header fxLayout="row wrap" fxLayoutAlign="start start" fxLayoutGap="10px" style="height: 40px;">
+    <mat-card-header class="flex flex-row flex-wrap items-start" style="height: 40px; gap: 10px;">
       <mat-card-title>移動明細</mat-card-title>
 
     </mat-card-header>

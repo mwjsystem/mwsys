@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
@@ -15,19 +15,30 @@ import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { GrpcdhelpComponent } from './../share/grpcdhelp/grpcdhelp.component';
 import { VcdhelpComponent } from './../share/vcdhelp/vcdhelp.component';
 import { GdsimageComponent } from './../share/gdsimage/gdsimage.component';
+import { BeforeunloadBase } from '../beforeunload-base';
 import { UserService } from './../services/user.service';
 import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
 import { VendsService } from './../mstvendor/vends.service';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatFormField, MatInput, MatSuffix, MatLabel } from '@angular/material/input';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
+import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
+import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { VcdtxtPipe } from '../core/pipes/vcdtxt.pipe';
+import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
 
-interface AffectedRows { affected_rows: number }
 /** get_grpcode クエリの結果 */
 interface GgroupCodeResult { msggroup: { code: string }[] }
 /** get_ggroup クエリの結果 */
 interface GgroupResult { msggroup_by_pk: mwI.Ggroup }
 /** upd_ggroup / ins_group ミューテーションの結果 */
-interface GgroupUpdateResult { update_msggroup: AffectedRows; insert_msgoods: AffectedRows; insert_msgtanka: AffectedRows }
-interface GgroupInsertResult { insert_msggroup: AffectedRows; insert_msgoods: AffectedRows; insert_msgtanka: AffectedRows }
+interface GgroupUpdateResult { update_msggroup: mwI.AffectedRows; insert_msgoods: mwI.AffectedRows; insert_msgtanka: mwI.AffectedRows }
+interface GgroupInsertResult { insert_msggroup: mwI.AffectedRows; insert_msgoods: mwI.AffectedRows; insert_msgtanka: mwI.AffectedRows }
 /** 保存時に msggroup へ渡す値（登録時のみ created_at / created_by を追加する） */
 type GgroupInput = Pick<mwI.Ggroup, 'code' | 'kana' | 'name' | 'gkbn' | 'memo' | 'sozai' | 'vcode' | 'specurl' | 'category' | 'subcat' | 'updated_at' | 'updated_by'> & {
   id: number;
@@ -59,12 +70,12 @@ type GoodsGroupField = 'kana' | 'name' | 'gkbn' | 'memo' | 'sozai' | 'vcode' | '
     templateUrl: './mstgoods.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatFormField, MatInput, FormsModule, MatIconButton, MatSuffix, RouterLink, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatLabel, TabDirective, MatSelect, MatOption, GdstblComponent, GtnktblComponent, VcdtxtPipe, ModetxtPipe]
 })
-export class MstgoodsComponent implements OnInit, AfterViewInit {
+export class MstgoodsComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);
   private el = inject(ElementRef);
   private title = inject(Title);
@@ -95,6 +106,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
       .position().global().centerHorizontally().centerVertically()
   });
   constructor() {
+    super();
     this.title.setTitle('商品マスタ(MWSystem)');
   }
 
@@ -194,15 +206,11 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     );
   }
 
-  canEnter(e: Event): void {
-    let element = e.target as HTMLElement;
-    // console.log(element,element.tagName);
-    if (element.tagName !== 'TEXTAREA') {
-      e.preventDefault();
-    }
-  }
   vcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.autoFocus = true;
     let dialogRef = this.dialog.open(VcdhelpComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(
@@ -227,9 +235,9 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
   }
 
   getGgroup(grpcd: string) {
-    // if (!this.overlayRef) {
-    this.overlayRef.attach(new ComponentPortal(MatSpinner));
-    // }
+    if (!this.overlayRef.hasAttached()) {
+      this.overlayRef.attach(new ComponentPortal(MatSpinner));
+    }
     if (grpcd) {
       grpcd = this.usrsrv.convUpper(grpcd);
       this.apollo.watchQuery<GgroupCodeResult>({
@@ -240,7 +248,11 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
         },
       }).valueChanges
         .subscribe(({ data }) => {
-          if ((data as GgroupCodeResult).msggroup.length == 0) {
+          if (!data) {
+            return;
+          }
+          const result = data as GgroupCodeResult;
+          if (result.msggroup.length == 0) {
             this.form.reset();
             history.replaceState('', '', './mstgoods');
             this.overlayRef.detach();
@@ -250,7 +262,7 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
               this.el.nativeElement.querySelector('#first-fld').focus();
             }
           } else {
-            let lcgrpcd = (data as GgroupCodeResult).msggroup[0].code;
+            let lcgrpcd = result.msggroup[0].code;
             if (this.mode == 1) {
               this.usrsrv.toastWar("商品グループコード" + lcgrpcd + "は登録済です。新規登録ボタンからやり直してください");
               this.mode = 3;
@@ -264,6 +276,10 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
             }).valueChanges
               .subscribe(({ data }) => {
                 this.form.reset();
+                if (!data) {
+                  this.overlayRef.detach();
+                  return;
+                }
                 let ggroup: mwI.Ggroup = (data as GgroupResult).msggroup_by_pk;
                 this.form.patchValue(ggroup);
                 this.usrsrv.setTmstmp(ggroup);
@@ -517,15 +533,6 @@ export class MstgoodsComponent implements OnInit, AfterViewInit {
     console.log(this.form);
   }
 
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
-    }
-  }
   insTnkrow(emitParam: TnkAction) {
     // console.log(emitParam);
     if (emitParam.flg) {

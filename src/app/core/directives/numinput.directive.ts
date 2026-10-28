@@ -2,7 +2,6 @@ import { Directive, ElementRef, OnInit, inject } from '@angular/core';
 
 @Directive({
     selector: '[numInput]',
-    standalone: false,
     host: {
         '(blur)': 'onBlur($any($event.target).value)'
     }

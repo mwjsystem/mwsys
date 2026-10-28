@@ -32,39 +32,36 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
-  declarations: [
-    MstmemberComponent,
-    AddressComponent,
-    AdredaComponent,
-    McdhelpComponent,
-    EdahelpComponent,
-    MsprcprtComponent,
-    MsprocComponent,
-    PartshelpComponent,
-  ],
-  imports: [
-    CommonModule,
-    CoreModule,
-    MstmemberRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-
-    MatButtonModule,
-    MatCardModule,
-    MatCheckboxModule,
-    MatDatepickerModule,
-    MatDialogModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatMenuModule,
-    MatPaginatorModule,
-    MatProgressSpinnerModule,
-    MatSelectModule,
-    MatTableModule,
-    MatTooltipModule,
-    MatToolbarModule
-  ]
+    imports: [
+        CommonModule,
+        CoreModule,
+        MstmemberRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatDatepickerModule,
+        MatDialogModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatMenuModule,
+        MatPaginatorModule,
+        MatProgressSpinnerModule,
+        MatSelectModule,
+        MatTableModule,
+        MatTooltipModule,
+        MatToolbarModule,
+        MstmemberComponent,
+        AddressComponent,
+        AdredaComponent,
+        McdhelpComponent,
+        EdahelpComponent,
+        MsprcprtComponent,
+        MsprocComponent,
+        PartshelpComponent
+    ]
 })
 export class MstmemberModule { }

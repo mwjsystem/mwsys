@@ -1,7 +1,7 @@
 import { Component, OnInit, ElementRef, ChangeDetectorRef, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { UserService } from './../../services/user.service';
@@ -9,6 +9,12 @@ import { BunruiService } from './../../services/bunrui.service';
 import { GrpcdhelpComponent } from './../grpcdhelp/grpcdhelp.component';
 import { Subject } from 'rxjs';
 import { HasuraWhere } from './../help-where';
+import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { CdkScrollable } from '@angular/cdk/scrolling';
 
 export interface Gcd {
   code: string;
@@ -29,9 +35,9 @@ interface GoodsResult { msgoods: Gcd[] }
 @Component({
     selector: 'app-gcdhelp',
     templateUrl: './gcdhelp.component.html',
-    styleUrls: ['./../../help.component.scss'],
+    styleUrls: ['./../../help.component.scss', './../search-dialog.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatInput, FormsModule, MatIconButton, MatSuffix, MatIcon, MatSelect, MatOption, MatButton, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions]
 })
 export class GcdhelpComponent implements OnInit {
   private dialogRef = inject<MatDialogRef<GcdhelpComponent>>(MatDialogRef);
@@ -115,10 +121,14 @@ export class GcdhelpComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         // console.log(data);
-        if ((data as GoodsResult).msgoods.length == 0) {
+        if (!data) {
+          return;
+        }
+        const result = data as GoodsResult;
+        if (result.msgoods.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
         } else {
-          this.gcds = (data as GoodsResult).msgoods;
+          this.gcds = result.msgoods;
           this.subject.next(true);
         }
         // this.subject.complete();
@@ -129,6 +139,9 @@ export class GcdhelpComponent implements OnInit {
 
   grpcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
     dialogConfig.autoFocus = true;
     let dialogRef = this.dialog.open(GrpcdhelpComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(

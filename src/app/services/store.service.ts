@@ -37,7 +37,7 @@ export class StoreService {
       })
         .valueChanges
         .subscribe(({ data }) => {
-          (data as StoreResult).msstore.forEach(e => {
+          (data ? (data as StoreResult).msstore : []).forEach(e => {
             this.scds.push({ value: e.code, viewval: e.subname });
           });
         }, (error) => {
@@ -71,6 +71,9 @@ export class StoreService {
       })
         .valueChanges
         .subscribe(({ data }) => {
+          if (!data) {
+            return;
+          }
           return resolve((data as StradrResult).msstore_by_pk);
         }, (error) => {
           console.log('error query get_stradr', error);

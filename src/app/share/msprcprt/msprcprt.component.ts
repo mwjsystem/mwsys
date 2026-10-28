@@ -1,12 +1,16 @@
 import { Component, OnInit, ChangeDetectorRef, ElementRef, ChangeDetectionStrategy, viewChildren, inject } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig } from "@angular/material/dialog";
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
+import { FormArray, FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog, MatDialogConfig, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 import { UserService } from './../../services/user.service';
 import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 import { HttpClient } from '@angular/common/http';
+import { MatToolbar } from '@angular/material/toolbar';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatInput } from '@angular/material/input';
+import { BeforeunloadBase } from '../../beforeunload-base';
 
 type PartRowControls = {
   line: FormControl<number | null>;
@@ -19,12 +23,12 @@ type PartRowControls = {
     templateUrl: './msprcprt.component.html',
     styleUrls: ['./../../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
-    }
+    },
+    imports: [MatToolbar, MatDialogTitle, CdkScrollable, MatDialogContent, FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFormField, MatInput, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
 })
-export class MsprcprtComponent implements OnInit {
+export class MsprcprtComponent extends BeforeunloadBase implements OnInit {
   private http = inject(HttpClient);
   usrsrv = inject(UserService);
   cdRef = inject(ChangeDetectorRef);
@@ -38,6 +42,7 @@ export class MsprcprtComponent implements OnInit {
   readonly inputs = viewChildren('upfile', { read: ElementRef });
   displayedColumns = ['line', 'partno', 'seq', 'pic'];
   constructor() {
+    super();
     const data = inject(MAT_DIALOG_DATA);
 
     this.mcode = data.mcode;
@@ -141,12 +146,4 @@ export class MsprcprtComponent implements OnInit {
   //     );
   // }
 
-  shouldConfirmOnBeforeunload(): boolean {
-    return this.form.dirty;
-  }
-  beforeUnload(e: Event) {
-    if (this.shouldConfirmOnBeforeunload()) {
-      e.returnValue = true;
-    }
-  }
 }

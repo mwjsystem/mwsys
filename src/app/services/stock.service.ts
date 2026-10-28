@@ -37,37 +37,37 @@ export class Stcbs {
 
 
 export class Stock {
-  gcode!: string;
-  scode!: string;
-  stock!: number;
-  hikat!: number;
-  juzan!: number;
-  today!: number;
-  keepd!: number;
-  tommo!: number;
+  gcode: string = '';
+  scode: string = '';
+  stock: number = 0;
+  hikat: number = 0;
+  juzan: number = 0;
+  today: number = 0;
+  keepd: number = 0;
+  tommo: number = 0;
   constructor(init?: Partial<Stock>) {
     Object.assign(this, init);
   }
 }
 
 export class StGds {
-  gcode!: string;
-  gtext!: string;
-  gskbn!: string;
-  yday!: Date | null;
-  suu!: number;
-  htzan!: number;
-  moavg!: number;
-  unit!: string;
-  motai!: string;
+  gcode: string = '';
+  gtext: string = '';
+  gskbn: string = '';
+  yday: Date | null = null;
+  suu: number = 0;
+  htzan: number = 0;
+  moavg: number = 0;
+  unit: string = '';
+  motai: string = '';
   ydtxt: string;
-  msgzais!: {
+  msgzais: {
         zcode: string;
         irisu: string;
         msgoods: {
             gskbn: string;
         };
-    }[];
+    }[] = [];
   constructor(init?: Partial<StGds>) {
     Object.assign(this, init);
     this.ydtxt = '入荷予定日';
@@ -169,6 +169,9 @@ export class StockService {
     })
       .valueChanges
       .subscribe(({ data: raw }) => {
+        if (!raw) {
+          return;
+        }
         const data = raw as GoodsResult;
         this.goods = data.msgoods;
       }, (error) => {
@@ -212,6 +215,9 @@ export class StockService {
       })
         .valueChanges
         .subscribe(({ data: raw }) => {
+          if (!raw) {
+            return;
+          }
           const data = raw as Shcount0Result;
           // console.log(data);
           for (let i = 0; i < 12; i++) {
@@ -287,6 +293,9 @@ export class StockService {
       })
         .valueChanges
         .subscribe(({ data: raw }) => {
+          if (!raw) {
+            return;
+          }
           const data = raw as Shcount1Result;
           // console.log(data);
           for (let i = 0; i < 12; i++) {
@@ -355,6 +364,9 @@ export class StockService {
       })
         .valueChanges
         .subscribe(({ data: raw }) => {
+          if (!raw) {
+            return;
+          }
           const data = raw as GstanaResult;
           // console.log(data);
           // this.stgds.gtext=data.vgstana[0]?.gtext;
@@ -420,6 +432,9 @@ export class StockService {
       })
         .valueChanges
         .subscribe(({ data: raw }) => {
+          if (!raw) {
+            return;
+          }
           const data = raw as GtanaResult;
           let lcday: Date = data.trgtana[0]?.day ?? new Date('2000-01-01');
           let lctana: number = data.trgtana[0]?.tana ?? 0;
@@ -436,6 +451,9 @@ export class StockService {
           })
             .valueChanges
             .subscribe(({ data: raw }) => {
+              if (!raw) {
+                return;
+              }
               const data = raw as ZaikoSumResult;
               // console.log('StockService2',data.trzaiko_aggregate.aggregate.sum,lctana);  				
               lctana = lctana + (data.trzaiko_aggregate.aggregate.sum.hnyu || 0)
@@ -524,6 +542,9 @@ export class StockService {
       })
         .valueChanges
         .subscribe(({ data: raw }) => {
+          if (!raw) {
+            return;
+          }
           const data = raw as ZaikoResult;
           // console.log(this.usrsrv.getNextday(tdy), data);
           let lcstcs: Stock = {
@@ -601,6 +622,9 @@ export class StockService {
       })
         .valueChanges
         .subscribe(({ data: raw }) => {
+          if (!raw) {
+            return;
+          }
           const data = raw as Zaiko1Result;
           let lcstcs: Stcbs = {
             gcode: gcd,

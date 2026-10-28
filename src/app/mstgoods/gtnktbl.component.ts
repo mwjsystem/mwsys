@@ -1,17 +1,23 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy, input, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { UserService } from './../services/user.service';
 import { GoodsService } from './goods.service';
 import { BunruiService } from './../services/bunrui.service';
+import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { NuminputDirective } from '../core/directives/numinput.directive';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { PercentPipe } from '@angular/common';
 
 @Component({
     selector: 'app-gtnktbl',
     templateUrl: './gtnktbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFormField, MatInput, MatDatepickerInput, TabDirective, MatDatepickerToggle, MatSuffix, MatDatepicker, NuminputDirective, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, PercentPipe]
 })
 export class GtnktblComponent implements OnInit, AfterViewInit {
   bunsrv = inject(BunruiService);

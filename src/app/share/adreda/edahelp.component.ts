@@ -1,15 +1,18 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
 import { MembsService } from './../../mstmember/membs.service';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatDialogRef } from "@angular/material/dialog";
+import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
 
 @Component({
     selector: 'app-edahelp',
     templateUrl: './edahelp.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatToolbar, MatFormField, MatLabel, MatInput, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
 })
 export class EdahelpComponent implements OnInit {
   memsrv = inject(MembsService);

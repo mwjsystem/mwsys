@@ -18,7 +18,8 @@ export class StaffService {
   public tcds: mwI.Sval[] = [];
   private stfs: StaffRow[] = [];
 
-  getStaff(): void {
+  /** 担当者一覧（tcds）を読み込む。最初の読み込みが終わると解決する */
+  getStaff(): Promise<void> {
     const GetMast = gql`
     query get_staff($id: smallint!){
       msstaff(where: {id: {_eq: $id}},order_by: {sort:asc_nulls_last}) {
@@ -28,23 +29,30 @@ export class StaffService {
         mei
       }
     }`;
-    this.apollo.watchQuery<StaffResult>({
-      query: GetMast,
-      variables: {
-        id: this.usrsrv.compid
-      },
-    })
-      .valueChanges
-      .subscribe(({ data }) => {
-        // console.log(this.stfs,data.msstaff);
-        this.tcds = [{ value: null, viewval: "" }];
-        this.stfs = (data as StaffResult).msstaff;
-        (data as StaffResult).msstaff.forEach(e => {
-          this.tcds.push({ value: e.code, viewval: e.sei + (e.mei ?? "") }); //e.meiがnull等の時は、''を結合
+    return new Promise<void>(resolve => {
+      this.apollo.watchQuery<StaffResult>({
+        query: GetMast,
+        variables: {
+          id: this.usrsrv.compid
+        },
+      })
+        .valueChanges
+        .subscribe(({ data }) => {
+          if (!data) {
+            return; // 読み込み中（データ未着）の通知は無視する
+          }
+          // console.log(this.stfs,data.msstaff);
+          this.tcds = [{ value: null, viewval: "" }];
+          this.stfs = (data as StaffResult).msstaff;
+          this.stfs.forEach(e => {
+            this.tcds.push({ value: e.code, viewval: e.sei + (e.mei ?? "") }); //e.meiがnull等の時は、''を結合
+          });
+          resolve();
+        }, (error) => {
+          console.log('error query get_staff', error);
+          resolve();
         });
-      }, (error) => {
-        console.log('error query get_staff', error);
-      });
+    });
   }
   getName(code: string): string {
     if (this.stfs.length == 0) {

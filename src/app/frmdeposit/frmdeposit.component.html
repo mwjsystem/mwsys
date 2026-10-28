@@ -1,5 +1,5 @@
 <mat-toolbar [color]="depsrv.mode==3 ? 'primary' : depsrv.mode==2 ? 'warn' : 'accent'" class="toolbar mat-elevation-z8">
-  <div class="icon-area" fxLayout="row wrap">
+  <div class="icon-area flex flex-row flex-wrap">
     @if (depsrv.mode==3) {
       <button mat-button (click)="modeToCre()">
         <mat-icon>add_box</mat-icon>新規
@@ -20,7 +20,7 @@
         <mat-icon>cancel</mat-icon>中止
       </button>
     }
-    <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
+    <mat-form-field class="frm-fld-in-bar" style="flex: 0 0 12em; align-self: end;">
       <mat-label>入金伝票番号</mat-label>
       <input matInput [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
         (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
@@ -46,20 +46,20 @@
     </a></button>
   </div>
 </mat-toolbar>
-<form [formGroup]="form" fxLayout="row wrap" fxLayoutGap="5px" (keydown.enter)="usrsrv.canEnter($event)">
+<form [formGroup]="form" class="flex flex-row flex-wrap" style="gap: 5px;" (keydown.enter)="usrsrv.canEnter($event)">
   <mat-card>
-    <mat-card-header fxLayout="row wrap" fxLayoutAlign="space-between">
+    <mat-card-header class="flex flex-row flex-wrap justify-between">
       <mat-card-title>
         {{depsrv.mode|modetxt}}【受注入金伝票】
       </mat-card-title>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>
     <mat-card-content>
-      <fieldset fxLayout="column" fxLayoutAlign="start">
+      <fieldset class="flex flex-col">
         <legend>対象伝票</legend>
-        <div fxLayout="row wrap">
-          <div fxLayout="column">
-            <div fxLayout="row wrap">
+        <div class="flex flex-row flex-wrap">
+          <div class="flex flex-col">
+            <div class="flex flex-row flex-wrap">
               <mat-form-field>
                 <mat-label>受注伝票</mat-label>
                 <input #jdennoInp matInput formControlName="jdenno" (change)="getJyuden(jdennoInp.value)">
@@ -77,7 +77,7 @@
                 }
               </mat-form-field>
             </div>
-            <div fxLayout="row wrap" fxLayoutAlign="start end">
+            <div class="flex flex-row flex-wrap items-end">
               <mat-form-field style="width: 9em;">
                 <mat-label>請求先</mat-label>
                 <input matInput [value]="form.value.scde" disabled>
@@ -90,7 +90,7 @@
               </mat-form-field>
               <span class="nmtxt">{{form.value.scde | mcdtxt}}</span>
             </div>
-            <div fxLayout="row wrap" fxLayoutAlign="start end">
+            <div class="flex flex-row flex-wrap items-end">
               <mat-form-field style="width: 9em;">
                 <mat-label>支払先</mat-label>
                 <input matInput formControlName="code" required (keydown.f4)="mcdHelp('code')">
@@ -108,8 +108,8 @@
               </mat-form-field>
               <span class="nmtxt">{{form.value.code | mcdtxt}}</span>
             </div>
-            <div fxLayout="row wrap" fxLayoutAlign="start end">
-              <mat-form-field>
+            <div class="flex flex-row flex-wrap items-end">
+              <mat-form-field style="width: 9em;">
                 <mat-label>担当者</mat-label>
                 <mat-select formControlName="tcode" [panelClass]="'my-panel-class'">
                   @for (sval of stfsrv.tcds; track sval) {
@@ -121,8 +121,8 @@
               </mat-form-field>
             </div>
           </div>
-          <div fxLayout="column">
-            <div fxLayout="row wrap" fxLayoutAlign="start end">
+          <div class="flex flex-col">
+            <div class="flex flex-row flex-wrap items-end">
               <mat-form-field style="width: 7em;">
                 <mat-label>入金予定日</mat-label>
                 <input matInput [value]="jyuden.nday | date:'yyyy/M/d'" disabled>
@@ -138,7 +138,7 @@
               <mat-label>未入金額</mat-label>
               <input matInput [value]="jyuden.nyuzan | number" class="i_num" disabled>
             </mat-form-field>
-            <div fxLayout="row wrap" fxLayoutAlign="start end">
+            <div class="flex flex-row flex-wrap items-end">
               <mat-form-field style="width: 7em;">
                 <mat-label>入金日</mat-label>
                 <input matInput [matDatepicker]="picker" formControlName="day">
@@ -159,7 +159,7 @@
     </mat-card-content>
   </mat-card>
   <mat-card>
-    <mat-card-header fxLafxLayout="row wrap" fxLayoutGap="5px">
+    <mat-card-header class="flex flex-row flex-wrap" style="gap: 5px;">
       <mat-card-title>
         入金伝票明細
       </mat-card-title>

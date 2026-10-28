@@ -1,10 +1,7 @@
 import { Pipe, PipeTransform, inject } from '@angular/core';
 import { VendsService } from './../../mstvendor/vends.service';
 
-@Pipe({
-    name: 'vcdtxt',
-    standalone: false
-})
+@Pipe({ name: 'vcdtxt' })
 export class VcdtxtPipe implements PipeTransform {
   private vensrv = inject(VendsService);
 

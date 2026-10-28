@@ -286,4 +286,8 @@ declare namespace mwI {
     mei: string;
     scode: string;
   }
+
+  interface AffectedRows {
+    affected_rows: number;
+  }
 }

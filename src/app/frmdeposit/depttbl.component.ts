@@ -1,9 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, input, inject } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray, AbstractControl } from '@angular/forms';
-import { MatTableDataSource } from '@angular/material/table';
+import { UntypedFormBuilder, UntypedFormGroup, FormControl, Validators, UntypedFormArray, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { DepositService, Nyuden, DeptInput } from './deposit.service';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatFormField, MatInput, MatPrefix } from '@angular/material/input';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { NuminputDirective } from '../core/directives/numinput.directive';
+import { rowCtl } from '../core/form-helpers';
 
 /** 明細の 1 行のフォーム項目名 */
 type RowField = 'line' | 'ptype' | 'nmoney' | 'smoney' | 'tmoney' | 'total' | 'mmemo';
@@ -13,7 +19,7 @@ type RowField = 'line' | 'ptype' | 'nmoney' | 'smoney' | 'tmoney' | 'total' | 'm
     templateUrl: './depttbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    standalone: false
+    imports: [FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatIconButton, MatIcon, MatCellDef, MatCell, MatFormField, MatInput, MatPrefix, MatSelect, MatOption, NuminputDirective, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow]
 })
 export class DepttblComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
@@ -38,10 +44,6 @@ export class DepttblComponent implements OnInit {
       // this.dataSource = new MatTableDataSource<Nyuden>(nyuden);
       this.cdRef.detectChanges();
     });
-  }
-  /** 明細の 1 行（FormGroup）の項目を名前で取り出す。項目名を型で限定し、存在しない名前はコンパイルで検出する */
-  private rowCtl(control: AbstractControl): Record<RowField, AbstractControl> {
-    return (control as UntypedFormGroup).controls as Record<RowField, AbstractControl>;
   }
   get frmArr(): UntypedFormArray {
     return this.parentForm().get('mtbl') as UntypedFormArray;
@@ -78,7 +80,7 @@ export class DepttblComponent implements OnInit {
 
   calcMei(row: number) {
     let rowData = this.frmArr.controls[row];
-    this.rowCtl(rowData).total.setValue(rowData.value.nmoney - rowData.value.smoney + rowData.value.tmoney);
+    rowCtl<RowField>(rowData).total.setValue(rowData.value.nmoney - rowData.value.smoney + rowData.value.tmoney);
     this.calcTot();
   }
 
@@ -98,7 +100,7 @@ export class DepttblComponent implements OnInit {
       nmoney: [deposit?.nmoney],
       smoney: [deposit?.smoney],
       tmoney: [deposit?.tmoney],
-      total: [deposit ? deposit.nmoney - deposit.smoney + deposit.tmoney : NaN], // 新規の行（deposit なし）は従来どおり NaN
+      total: [deposit ? deposit.nmoney - deposit.smoney + deposit.tmoney : 0],
       mmemo: [deposit?.mmemo]
     })
   }

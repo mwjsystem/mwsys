@@ -7,7 +7,6 @@ const routes: Routes = [
   { path: '', component: FrmclearComponent },
   { path: ':mode/:denno', component: FrmclearComponent, canDeactivate: [BeforeunloadGuard] },
 ];
-
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]

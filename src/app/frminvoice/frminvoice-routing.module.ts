@@ -4,7 +4,7 @@ import { FrminvoiceComponent } from './frminvoice.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 
 const routes: Routes = [
-  { path: '', component: FrminvoiceComponent },
+  { path: '', component: FrminvoiceComponent, canDeactivate: [BeforeunloadGuard] },
   { path: ':mode/:denno', component: FrminvoiceComponent, canDeactivate: [BeforeunloadGuard] },
 ];
 
