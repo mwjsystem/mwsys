@@ -16,6 +16,7 @@
 --        ・部門別の複数行は金額を合計（bcode は最小の部門）
 --        ・同一顧客・同一締め日に別番号がある場合、金額がすべて 0 の伝票は除く
 --        ・作成日時等は NULL（= 現行システムから移行）。操作記録（tropelog）は残さない
+--   3a. 受注伝票の伝票区分（返品）を jdstatus から denku に移し、ステータスを付け直す（20261028_jyuden_ship.sql を適用済みのこと）
 --   3. 受注伝票 idenno（計上先の請求伝票）
 --        ・都度請求・売上日なし → NULL
 --        ・掛売で、売上日以降に締め日のある請求伝票がある → その請求伝票番号（請求済）
@@ -89,6 +90,12 @@ CREATE TEMP TABLE mig_param ON COMMIT DROP AS
 SELECT coalesce(nullif(:'cutoff', '')::date,
                 ((SELECT max(sday) FROM trseikyu) - interval '2 months')::date) AS cutoff;
 
+-- 3a. 受注伝票の伝票区分・ステータス（jyuden.sql は jdstatus に現行の denku（0 通常 / 2 返品）を出している）
+--     出荷予定日が今日より前の伝票は 4 出荷指示出力済、それ以外は 2 受注登録にする
+UPDATE trjyuden
+   SET denku = CASE WHEN jdstatus = '2' THEN 2 ELSE 0 END,
+       jdstatus = CASE WHEN sday < current_date THEN '4' ELSE '2' END;
+
 -- 3. 受注伝票 idenno
 UPDATE trjyuden SET idenno = NULL
  WHERE idenno IS NOT NULL AND (torikbn IS NOT TRUE OR uday IS NULL);
@@ -118,7 +125,7 @@ UPDATE trnyusub SET kdenno = NULL
 INSERT INTO trseikyusub (id, denno, line, kind, refdenno, day, taxmon, tax, total, created_at, created_by)
 WITH jj AS (
   SELECT j.id, j.idenno AS denno, j.denno AS refdenno, j.uday AS day,
-         CASE WHEN j.jdstatus = '2' THEN -1 ELSE 1 END AS sign
+         CASE WHEN j.denku = 2 THEN -1 ELSE 1 END AS sign
     FROM trjyuden j
     JOIN trseikyu s ON s.id = j.id AND s.denno = j.idenno
    WHERE j.idenno > 0

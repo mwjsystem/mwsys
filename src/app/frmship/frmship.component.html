@@ -1,0 +1,156 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="icon-area flex flex-row flex-wrap items-center">
+    <span style="margin-right: 12px;">受注一覧・出荷指示</span>
+    @if (denno) {
+      <span>伝票 {{denno}} のみ表示中</span>
+      <button mat-button (click)="clearDenno()">
+        <mat-icon>list</mat-icon>一覧で探す
+      </button>
+    }
+    @if (progress) {
+      <span style="margin-left: 12px;">{{progress}}</span>
+    }
+  </div>
+</mat-toolbar>
+<mat-card>
+  <mat-card-content>
+    @if (!denno) {
+      <form [formGroup]="form" class="flex flex-row flex-wrap items-center" style="gap: 10px;" (keydown.enter)="usrsrv.canEnter($event)">
+        <mat-form-field style="width: 9em;">
+          <mat-label>出荷予定日（から）</mat-label>
+          <input matInput [matDatepicker]="picker1" formControlName="from">
+          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field style="width: 9em;">
+          <mat-label>（まで）</mat-label>
+          <input matInput [matDatepicker]="picker2" formControlName="to">
+          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-datepicker #picker2></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field style="width: 9em;">
+          <mat-label>担当者</mat-label>
+          <mat-select formControlName="tcode" [panelClass]="'my-panel-class'">
+            @for (sval of stfsrv.tcds; track sval) {
+              <mat-option [value]="sval.value">{{sval.value ? sval.viewval : '（全担当者）'}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width: 14em;">
+          <mat-label>状態</mat-label>
+          <mat-select formControlName="status" [panelClass]="'my-panel-class'">
+            <mat-option value="todo">出荷指示フォルダ未作成のみ</mat-option>
+            <mat-option value="">すべて</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-raised-button type="button" (click)="search()" [disabled]="busy">
+          <mat-icon>search</mat-icon>抽出
+        </button>
+      </form>
+    }
+    <div class="flex flex-row flex-wrap items-center" style="gap: 8px; margin: 6px 0;">
+      <span>チェックした伝票（{{selRows.length}}件・合計 {{total | number}}円）を：</span>
+      <button mat-raised-button color="accent" type="button" (click)="saveNas()" [disabled]="busy || selRows.length == 0 || !nassrv.supported"
+        matTooltip="NAS の出荷指示フォルダに、納品書・出荷指示書を保存して、受注ステータスを「出荷指示フォルダ作成済」にします" matTooltipClass="ttips">
+        <mat-icon>drive_folder_upload</mat-icon>出荷指示フォルダ作成（NAS）
+      </button>
+      <button mat-stroked-button type="button" (click)="downloadPdf()" [disabled]="busy || selRows.length == 0"
+        matTooltip="納品書・出荷指示書の PDF を確認用にダウンロードします（NAS には保存せず、状態も変わりません）" matTooltipClass="ttips">
+        <mat-icon>picture_as_pdf</mat-icon>PDFを確認
+      </button>
+      @if (!nassrv.supported) {
+        <span style="color: #c62828;">このブラウザでは NAS に保存できません（Chrome / Edge を使ってください）</span>
+      }
+    </div>
+    @if (results.length > 0) {
+      <div style="margin: 6px 0; padding: 6px 10px; background: #f5f5f5;">
+        @for (r of results; track r.denno) {
+          <div [style.color]="r.error ? '#c62828' : '#2e7d32'">
+            {{r.denno}}：
+            @if (r.error) {
+              失敗（{{r.error}}）
+            } @else {
+              {{r.sasikae ? '差替分として保存' : '保存'}}　{{r.dir}}
+            }
+          </div>
+        }
+      </div>
+    }
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="rows" aria-label="受注一覧">
+        <ng-container matColumnDef="chk">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox [checked]="allChecked" (change)="checkAll($event.checked)"></mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox [(ngModel)]="row.chk" [ngModelOptions]="{standalone: true}"></mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="denno">
+          <th mat-header-cell *matHeaderCellDef>伝票番号</th>
+          <td mat-cell *matCellDef="let row">
+            <a href="javascript:void(0)" (click)="openSales(row.denno)">{{row.denno}}</a>
+            @if (row.denku == 2) {<span style="color: #c62828;">（返品）</span>}
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="jdstatus">
+          <th mat-header-cell *matHeaderCellDef>状態</th>
+          <td mat-cell *matCellDef="let row" [style.color]="statusColor(row.jdstatus)" style="white-space: nowrap;">
+            {{statusName(row.jdstatus)}}
+            @if (row.jdstatus == JDST.FOLDER && row.ship_at) {
+              <div style="font-size: 11px;">{{row.ship_at | date:'M/d H:mm'}} 作成</div>
+            }
+            @if (row.jdstatus == JDST.PRINTED && row.print_at) {
+              <div style="font-size: 11px;">{{row.print_at | date:'M/d H:mm'}} 出力</div>
+            }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="sday">
+          <th mat-header-cell *matHeaderCellDef>出荷予定日</th>
+          <td mat-cell *matCellDef="let row">{{row.sday | date:'M/d(E)'}}</td>
+        </ng-container>
+        <ng-container matColumnDef="mcode">
+          <th mat-header-cell *matHeaderCellDef>受注先</th>
+          <td mat-cell *matCellDef="let row">{{row.mcode | mcdtxt}}</td>
+        </ng-container>
+        <ng-container matColumnDef="ncode">
+          <th mat-header-cell *matHeaderCellDef>納品先</th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.ncode && (row.ncode != row.mcode || row.nadr > 1)) {
+              {{row.ncode | mcdtxt}}@if (row.nadr) {（{{row.nadr}}）}
+            }
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="hcode">
+          <th mat-header-cell *matHeaderCellDef>配送伝票</th>
+          <td mat-cell *matCellDef="let row">{{hokuriName(row.hcode)}}</td>
+        </ng-container>
+        <ng-container matColumnDef="okurisuu">
+          <th mat-header-cell *matHeaderCellDef class="i_num">個口</th>
+          <td mat-cell *matCellDef="let row" class="i_num">{{row.okurisuu}}</td>
+        </ng-container>
+        <ng-container matColumnDef="buntype">
+          <th mat-header-cell *matHeaderCellDef>納品書タイプ</th>
+          <td mat-cell *matCellDef="let row" [style.color]="formName(row.buntype).endsWith('）') || formName(row.buntype) == '未設定' ? '#c62828' : ''">{{formName(row.buntype)}}</td>
+        </ng-container>
+        <ng-container matColumnDef="total">
+          <th mat-header-cell *matHeaderCellDef class="i_num">合計</th>
+          <td mat-cell *matCellDef="let row" class="i_num">{{row.total | number}}</td>
+        </ng-container>
+        <ng-container matColumnDef="okurino">
+          <th mat-header-cell *matHeaderCellDef>送り状番号</th>
+          <td mat-cell *matCellDef="let row">{{row.okurino}}</td>
+        </ng-container>
+        <ng-container matColumnDef="shipdir">
+          <th mat-header-cell *matHeaderCellDef>出荷指示フォルダ</th>
+          <td mat-cell *matCellDef="let row" style="font-size: 11px;">{{row.shipdir}}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+      </table>
+      @if (rows.length == 0) {
+        <p style="padding: 10px;">出荷予定日・担当者を指定して「抽出」を押してください。NAS の保存先は、設定メニューの「出荷フォルダ（NAS）の設定」で各 PC で一度選んでおきます。</p>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>

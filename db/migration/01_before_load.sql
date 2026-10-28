@@ -15,6 +15,7 @@
 --   ・各表の TRUNCATE と \copy を、これまでどおり行う。ただし次の 2 つは変える
 --       trseikyu : \copy trseikyu_load FROM '...\trseikyu.csv' with csv header;
 --       trnyusub : 下に表示される「列名つき」の \copy を使う
+--       trjyuden : 同じく下に表示される「列名つき」の \copy を使う（出荷・伝票区分の列を追加したため）
 --   ・投入が終わったら 02_after_load.sql を実行する
 -- =====================================================================
 \if :{?schema}
@@ -56,3 +57,12 @@ SELECT '\copy ' || :'schema' || '.trnyusub ('
        || ') FROM ''<CSVのパス>\trnyusub.csv'' with csv header;' AS "trnyusub の \copy コマンド"
   FROM information_schema.columns
  WHERE table_schema = :'schema' AND table_name = 'trnyusub' AND column_name <> 'kdenno';
+
+-- 3. trjyuden の \copy コマンド（新システムで追加した出荷・伝票区分の列を除く列名つき。
+--    移行用の jyuden.sql は jdstatus に現行の denku を出すので、02_after_load.sql で denku に移す）
+SELECT '\copy ' || :'schema' || '.trjyuden ('
+       || string_agg(column_name, ', ' ORDER BY ordinal_position)
+       || ') FROM ''<CSVのパス>\trjyuden.csv'' with csv header;' AS "trjyuden の \copy コマンド"
+  FROM information_schema.columns
+ WHERE table_schema = :'schema' AND table_name = 'trjyuden'
+   AND column_name NOT IN ('denku', 'shipdir', 'ship_at', 'ship_by', 'print_at', 'print_by');

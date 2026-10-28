@@ -14,7 +14,7 @@ export type TrjyumeiRow = Pick<mwI.Jyumei, 'line' | 'gcode' | 'gtext' | 'suu' | 
 /** 受注明細の在庫内訳（trjyumzai_insert_input） */
 export interface TrjmzaiRow { id: number; denno: number; line: number; eda: number; gcode: string; suu: number; spec: string | null; spdet: string | null }
 /** 保存時に受注伝票（trjyuden）へ渡す値。日付は日付文字列（未入力は null） */
-export type JyudenSet = Pick<mwI.Jyuden, 'torikbn' | 'updated_by' | 'mcode' | 'scde' | 'ncode' | 'nadr' | 'tcode' | 'scode' | 'skbn' | 'jcode' | 'pcode' | 'hcode' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'nmemo' | 'omemo' | 'smemo' | 'cusden' | 'ryoate' | 'daibiki' | 'daibzei' | 'daibunrui' | 'chubunrui' | 'shobunrui' | 'tcode1' | 'gtotalzn' | 'soryozn' | 'tesuzn' | 'nebikizn' | 'taxtotal' | 'total' | 'genka' | 'hgenka' | 'egenka' | 'iadr' | 'total8' | 'total10' | 'dokono' | 'del'> & {
+export type JyudenSet = Pick<mwI.Jyuden, 'torikbn' | 'updated_by' | 'mcode' | 'scde' | 'ncode' | 'nadr' | 'tcode' | 'scode' | 'skbn' | 'jcode' | 'pcode' | 'hcode' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'nmemo' | 'omemo' | 'smemo' | 'cusden' | 'ryoate' | 'daibiki' | 'daibzei' | 'daibunrui' | 'chubunrui' | 'shobunrui' | 'tcode1' | 'gtotalzn' | 'soryozn' | 'tesuzn' | 'nebikizn' | 'taxtotal' | 'total' | 'genka' | 'hgenka' | 'egenka' | 'iadr' | 'total8' | 'total10' | 'dokono' | 'jdstatus' | 'del'> & {
   updated_at: Date;
   buntype: string;
   eidome: string | null;

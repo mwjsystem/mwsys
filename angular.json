@@ -19,6 +19,7 @@
           "options": {
             "allowedCommonJsDependencies": [
               "zen-observable",
+              "encoding-japanese",
               "file-saver",
               "json2csv",
               "vanilla-autokana",

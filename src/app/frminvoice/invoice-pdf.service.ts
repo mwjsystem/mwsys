@@ -27,7 +27,7 @@ interface InvHead {
 /** 請求明細（trseikyusub）の 1 行 */
 interface InvSub { denno: number; kind: 'J' | 'N'; refdenno: number; day: string; nmoney: number | null; smoney: number | null; tmoney: number | null; memo: string | null }
 /** 計上した受注伝票 */
-interface InvJyuden { denno: number; ncode: string | null; nadr: number | null; jdstatus: string | null }
+interface InvJyuden { denno: number; ncode: string | null; nadr: number | null; denku: number | null }
 /** 受注明細 */
 interface InvJyumei { denno: number; line: number; gcode: string; gtext: string; suu: number; touttanka: number; toutmoney: number; taxmoney: number; taxrate: string | null; mmemo: string | null }
 /** 請求入金伝票の明細（trnyuden） */
@@ -129,7 +129,7 @@ export class InvoicePdfService {
     const GetDetail = gql`
       query get_invdetail($id: smallint!, $jdnos: [Int!]!, $ndnos: [Int!]!, $mcds: [String!]!) {
         trjyuden(where: {id: {_eq: $id}, denno: {_in: $jdnos}}) {
-          denno ncode nadr jdstatus
+          denno ncode nadr denku
         }
         trjyumei(where: {id: {_eq: $id}, denno: {_in: $jdnos}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, order_by: {denno: asc, line: asc}) {
           denno line gcode gtext suu touttanka toutmoney taxmoney taxrate mmemo
@@ -283,7 +283,7 @@ export class InvoicePdfService {
         continue;
       }
       // 移行した返品伝票は金額が正で入っているので、請求書ではマイナスにする
-      const sign = j.jdstatus == '2' ? -1 : 1;
+      const sign = j.denku == 2 ? -1 : 1;
       const nsaki = this.nsaki(j.ncode, j.nadr, d.msmember);
       let tax = 0;
       j.trjyumeis.forEach((m, i) => {

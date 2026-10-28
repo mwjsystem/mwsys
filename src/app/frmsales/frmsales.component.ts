@@ -28,6 +28,7 @@ import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
 import { SSTATUS } from './../frminvoice/invoice.service';
+import { JDST } from './../frmship/ship-forms';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -95,6 +96,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   idenno: number | null = null;
   /** 計上先の請求伝票の送付の進捗（例: 営業OK）。請求済でないときは空 */
   istatus: string = '';
+  /** 受注ステータス（分類マスタ jdstatus。出荷指示フォルダ作成済など） */
+  jdstatus: string = '';
   hktval: mwI.Sval[] = [];
   rows: FormArray = this.fb.array([]);
   getden!: number;
@@ -280,6 +283,14 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     }
   }
 
+  /** 出荷指示: 受注一覧（出荷指示）をこの伝票だけで開く（編集中なら先に保存する） */
+  async shipOne() {
+    if (this.mode == 2 && !(await this.save())) {
+      return;
+    }
+    this.usrsrv.openMst('frmship', String(this.jmisrv.denno));
+  }
+
   getRows(fldnm: JyudenField): number {
     const lines: number = (this.ctl[fldnm].value + '\n').split('\n').length - 1;
     return lines;
@@ -368,6 +379,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
           this.form.reset();
           this.jmisrv.trzaiko = [];
           this.idenno = result?.idenno ?? null;
+          this.jdstatus = result?.jdstatus ?? '';
           this.getIstatus(this.idenno);
           if (result == null) {
             this.usrsrv.toastInf("受注伝票番号" + denno + "は登録されていません");
@@ -797,6 +809,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       dokono: this.usrsrv.editFrmval(this.form, 'dokono'),
       eidome: this.usrsrv.editFrmval(this.form, 'eidome'),
       eicode: this.usrsrv.editFrmval(this.form, 'eicode'),
+      // 保存したら受注登録にする（出荷指示フォルダ作成後に直したときは、作り直し〈差替分〉の対象に戻る）
+      jdstatus: JDST.TOROKU,
       del: false
     }
     console.log('save jyuden',jyuden);

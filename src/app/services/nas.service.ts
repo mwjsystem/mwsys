@@ -8,6 +8,7 @@ type PermissionMode = { mode: 'read' | 'readwrite' };
 interface FsDirHandle extends FileSystemDirectoryHandle {
   queryPermission(desc: PermissionMode): Promise<PermissionState>;
   requestPermission(desc: PermissionMode): Promise<PermissionState>;
+  values(): AsyncIterableIterator<FileSystemDirectoryHandle | FileSystemFileHandle>;
 }
 declare global {
   interface Window {
@@ -80,6 +81,33 @@ export class NasService {
       cur = await cur.getDirectoryHandle(this.safeName(name), { create: true });
     }
     return cur;
+  }
+
+  /** dir の下の path（'/' 区切り）のフォルダを返す。無ければ undefined（作らない） */
+  async find(dir: FileSystemDirectoryHandle, path: string): Promise<FileSystemDirectoryHandle | undefined> {
+    let cur = dir;
+    try {
+      for (const name of path.split('/').filter(e => e)) {
+        cur = await cur.getDirectoryHandle(this.safeName(name));
+      }
+      return cur;
+    } catch (e) {
+      if ((e as DOMException)?.name == 'NotFoundError' || (e as DOMException)?.name == 'TypeMismatchError') {
+        return undefined;
+      }
+      throw e;
+    }
+  }
+
+  /** フォルダ dir の中のフォルダ（kind = 'directory'）またはファイルの名前の一覧 */
+  async names(dir: FileSystemDirectoryHandle, kind: FileSystemHandleKind): Promise<string[]> {
+    const ret: string[] = [];
+    for await (const h of (dir as FsDirHandle).values()) {
+      if (h.kind == kind) {
+        ret.push(h.name);
+      }
+    }
+    return ret.sort();
   }
 
   /** フォルダ dir にファイルを書く（同じ名前があれば上書き） */

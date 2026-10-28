@@ -87,8 +87,8 @@ interface JyudenRow {
   denno: number;
   scde: string;
   uday: string;
-  /** 現行システムの伝票区分（移行データのみ。'2' = 返品で、金額は正の値で入っている） */
-  jdstatus: string | null;
+  /** 伝票区分（2 = 返品。移行データの返品は金額が正の値で入っている） */
+  denku: number | null;
   trjyumeis: { taxrate: string; toutmoney: number; taxmoney: number }[];
 }
 /** 抽出クエリで受け取る請求入金伝票（未計上） */
@@ -186,7 +186,7 @@ export class InvoiceService {
   private sumJyuden(row: JyudenRow): InvJyuden & { taxmon8: number; tax8: number; taxmon10: number; tax10: number } {
     const sum = { denno: row.denno, uday: row.uday, taxmon: 0, tax: 0, total: 0, taxmon8: 0, tax8: 0, taxmon10: 0, tax10: 0 };
     // 移行した返品伝票は金額が正で入っているので、請求ではマイナスにする（現行の請求書と同じ）
-    const sign = row.jdstatus == '2' ? -1 : 1;
+    const sign = row.denku == 2 ? -1 : 1;
     for (const m of row.trjyumeis) {
       const out = sign * Number(m.toutmoney ?? 0);
       const tax = sign * Number(m.taxmoney ?? 0);
@@ -231,7 +231,7 @@ export class InvoiceService {
           denno
           scde
           uday
-          jdstatus
+          denku
           trjyumeis(where: {_or: [{del: {_is_null: true}}, {del: {_eq: false}}]}) {
             taxrate
             toutmoney

@@ -58,10 +58,10 @@
       </button>
     }
     @if (mode!=1) {
-      <button mat-flat-button (click)="makeFrmShip('BUNTY')"
-        [disabled]="!form.value.sday || !form.value.buntype || !form.value.hcode"
+      <button mat-flat-button (click)="shipOne()"
+        [disabled]="!jmisrv.denno || !form.value.sday || !form.value.buntype || !form.value.hcode"
         [color]="usrsrv.getColor(mode)">
-        <mat-icon matTooltip="出荷日、納品書ﾀｲﾌﾟ、配送伝票を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
+        <mat-icon matTooltip="受注一覧（出荷指示）でこの伝票の出荷指示フォルダを NAS に作成します。出荷日、納品書ﾀｲﾌﾟ、配送伝票を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
       </button>
     }
     <a id="csv-donwload" data-type="text/csv"></a>
@@ -118,6 +118,11 @@
       </mat-option>
     </mat-select>
   </mat-form-field> -->
+  @if (jdstatus) {
+    <span matTooltip="受注ステータス（出荷指示フォルダを作成すると「出荷指示フォルダ作成済」、倉庫で印刷すると「出荷指示出力済」。保存し直すと「受注登録」に戻ります）" matTooltipClass="ttips">
+      受注ステータス：<b>{{bunsrv.kbn['jdstatus'] ? bunsrv.getName(jdstatus, 'jdstatus') : jdstatus}}</b>
+    </span>
+  }
   <mat-checkbox formControlName="torikbn"><span class="text-black">掛請求</span></mat-checkbox>
   <!-- <inut type="checkbox" [(ngModel)]="torikbn">掛請求</inut> -->
   <app-tmstmp></app-tmstmp>

@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'frmsales', loadChildren: () => import('./frmsales/frmsales.module').then(m => m.FrmsalesModule), canActivate: [AuthGuard] },
   { path: 'frmmove', loadChildren: () => import('./frmmove/frmmove.module').then(m => m.FrmmoveModule), canActivate: [AuthGuard] },
+  { path: 'frmship', loadChildren: () => import('./frmship/frmship.module').then(m => m.FrmshipModule), canActivate: [AuthGuard] },
   { path: 'frminvoice', loadChildren: () => import('./frminvoice/frminvoice.module').then(m => m.FrminvoiceModule), canActivate: [AuthGuard] },
   { path: 'frmdeposit', loadChildren: () => import('./frmdeposit/frmdeposit.module').then(m => m.FrmdepositModule), canActivate: [AuthGuard] },
   { path: 'frmclear', loadChildren: () => import('./frmclear/frmclear.module').then(m => m.FrmclearModule), canActivate: [AuthGuard] },
