@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
@@ -56,7 +56,7 @@ export interface PrintFolder {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatFormField, MatLabel, MatInput, MatSuffix, FormsModule, MatCard, MatCardContent, MatCheckbox, MatDatepickerInput, MatDatepickerToggle, MatDatepicker]
 })
-export class ShipprintComponent implements OnInit {
+export class ShipprintComponent implements OnInit, OnDestroy {
   usrsrv = inject(UserService);
   nassrv = inject(NasService);
   private bunsrv = inject(BunruiService);
@@ -75,6 +75,8 @@ export class ShipprintComponent implements OnInit {
   reprint = false;
   busy = false;
   message = '';
+  /** 印刷後の読み直しのタイマー */
+  private timer?: ReturnType<typeof setInterval>;
 
   constructor() {
     this.title.setTitle('出荷指示 印刷(MWSystem)');
@@ -108,10 +110,16 @@ export class ShipprintComponent implements OnInit {
     return this.bunsrv.kbn['jdstatus']?.find(e => e.value == value)?.viewval ?? value ?? '';
   }
 
-  /** フォルダ一覧表示 */
-  async list() {
+  /** フォルダ一覧表示（reset = false は印刷後の読み直しで、メッセージとチェックを残す） */
+  async list(reset = true) {
+    if (reset) {
+      clearInterval(this.timer);
+    }
+    const checked = reset ? [] : this.folders.filter(e => e.chk).map(e => e.path);
     this.busy = true;
-    this.message = '';
+    if (reset) {
+      this.message = '';
+    }
     this.folders = [];
     this.cdRef.detectChanges();
     try {
@@ -148,8 +156,9 @@ export class ShipprintComponent implements OnInit {
         }
         this.markOld();
         await this.loadStatus();
-        // 未出力で印刷できるフォルダを初めからチェックする
-        this.folders.forEach(e => e.chk = !e.done && this.selectable(e));
+        await this.reflectPrinted();
+        // 未出力で印刷できるフォルダを初めからチェックする（読み直しのときは、チェックしていたものだけ）
+        this.folders.forEach(e => e.chk = (reset || checked.includes(e.path)) && !e.done && this.selectable(e));
         if (this.folders.length == 0) {
           this.message = this.dateDir + ' に出荷指示フォルダがありません';
         }
@@ -195,6 +204,46 @@ export class ShipprintComponent implements OnInit {
     }
   }
 
+  /**
+   * 印刷用スクリプトが「【済」を付けたフォルダ（＝エラーなく複合機へ送れた）の伝票を、出荷指示出力済にする。
+   * 受注伝票に記録した出荷指示フォルダ（またはその差替）で、まだ出荷指示フォルダ作成済の伝票だけ
+   */
+  private async reflectPrinted() {
+    const dennos = [...new Set(this.folders
+      .filter(e => e.done && !e.name.includes('【自動済') && !e.mismatch && e.jdstatus == JDST.FOLDER)
+      .map(e => e.denno))];
+    if (dennos.length == 0) {
+      return;
+    }
+    const updated = await this.shipsrv.setPrinted(dennos);
+    this.folders.filter(e => updated.includes(e.denno)).forEach(e => e.jdstatus = JDST.PRINTED);
+  }
+
+  /** 印刷のあと、フォルダに「【済」が付くまで一覧を読み直す（30 秒ごと、最大 20 分） */
+  private watchPrinted(paths: string[]) {
+    clearInterval(this.timer);
+    let count = 0;
+    this.timer = setInterval(async () => {
+      if (this.busy) {
+        return;
+      }
+      count++;
+      await this.list(false);
+      const left = paths.filter(p => this.folders.some(e => e.path == p));
+      if (left.length == 0 || count >= 40) {
+        clearInterval(this.timer);
+        this.message = left.length == 0
+          ? '印刷が終わりました（受注ステータスを出荷指示出力済にしました）'
+          : '「【済」が付いていないフォルダがあります。印刷用スクリプトの画面のメッセージを確認してください';
+        this.cdRef.detectChanges();
+      }
+    }, 30000);
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.timer);
+  }
+
   checkAll(chk: boolean) {
     this.folders.filter(e => this.selectable(e)).forEach(e => e.chk = chk);
   }
@@ -216,11 +265,11 @@ export class ShipprintComponent implements OnInit {
       // 印刷しない古いフォルダは「【自動済」にする（同じ担当者・伝票で、印刷するフォルダがあるもの）
       const old = this.folders.filter(e => e.old && sel.some(s => s.staff == e.staff && s.denno == e.denno));
       const job = { root: this.rootName, print: sel.map(e => e.path), old: old.map(e => e.path) };
-      const updated = await this.shipsrv.setPrinted([...new Set(sel.map(e => e.denno).filter(e => e > 0))]);
       this.launch(job);
-      this.message = sel.length + ' フォルダの印刷を指示しました（受注ステータスを出荷指示出力済にした伝票：' + updated.length + ' 件）。' +
-        '印刷が終わると、フォルダ名に「【済」が付きます。「フォルダ一覧表示」で確認してください。';
+      this.message = sel.length + ' フォルダの印刷を指示しました。印刷がエラーなく複合機へ送られると、フォルダ名に「【済」が付き、' +
+        '受注ステータスが出荷指示出力済になります（この画面を開いたままにしておくと 30 秒ごとに確認します）。';
       sel.forEach(e => e.chk = false);
+      this.watchPrinted(sel.map(e => e.path));
     } catch (e) {
       this.message = '印刷の指示でエラーが発生しました：' + (e as Error).message;
       console.log('error shipprint print', e);

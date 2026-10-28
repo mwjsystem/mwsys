@@ -22,7 +22,10 @@ exit /b 1
 #     ・Manu.txt（マニュアル名,部数）のマニュアルを両面で印刷
 #     ・*.lhd（Amazon のラベル）をラベルのフォルダへコピーして開く
 #     ・Excel のファイルを印刷
-#     ・処理ログに記録し、フォルダ名に「【済」を付ける（同名があれば「時分秒_差替【済」）
+#     ・Windows の印刷の待ち行列を見て、印刷がエラーなく複合機へ送られたことを確かめる
+#     ・確かめられたら、処理ログに記録し、フォルダ名に「【済」を付ける（同名があれば「時分秒_差替【済」）
+#       （画面は「【済」の付いたフォルダを見て、受注ステータスを出荷指示出力済にする。
+#         エラー・時間切れのときは「【済」を付けず、最後にまとめて知らせる）
 #   old のフォルダ（同じ伝票の古いフォルダ）には「【自動済」を付ける。
 #   設定（NAS の場所・プリンタ・各フォルダ）は %LOCALAPPDATA%\mwjsys\mwjprint.json。-Install で無ければ作る。
 #   -Install で、mwjprint: のリンクをこのスクリプトに結び付ける（HKEY_CURRENT_USER。管理者権限は不要）。
@@ -34,7 +37,7 @@ Add-Type -AssemblyName System.Drawing
 $ErrorActionPreference = 'Stop'
 $Title = 'MWSystem 出荷指示の印刷'
 # 版。変更したら assets/mwjprint_setup の版（ファイル名・navbar のリンク）もそろえる
-$Version = '2'
+$Version = '3'
 $ConfigPath = Join-Path $env:LOCALAPPDATA 'mwjsys\mwjprint.json'
 
 # 処理中の表示（最前面の小さな画面）
@@ -82,6 +85,7 @@ function Wait-Ms([int]$ms) {
   $end = (Get-Date).AddMilliseconds($ms)
   while ((Get-Date) -lt $end -and -not $script:cancel) {
     [System.Windows.Forms.Application]::DoEvents()
+    Poll-Queue
     Start-Sleep -Milliseconds 100
   }
 }
@@ -131,9 +135,81 @@ function Find-Acrobat {
   return $null
 }
 
+# フォルダごとに、送った印刷の数と使ったプリンタを数える（待ち行列の確認に使う）
+$script:sent = 0
+$script:printers = @{}
 function Print-Pdf([string]$acro, [string]$file, [string]$printer) {
   Start-Process -FilePath $acro -ArgumentList @('/t', ('"' + $file + '"'), ('"' + $printer + '"'))
+  $script:sent++
+  $script:printers[$printer] = $true
   Wait-Ms 1500
+}
+
+# 印刷の待ち行列の見張り。フォルダの印刷を始めるときに Start-Watch し、Wait-Ms の間も 0.3 秒ごとに見る
+# （複合機へすぐ送られて、待ち行列にいる時間が短い印刷も見逃さないため）
+$script:watch = $false
+$script:since = Get-Date
+$script:seen = @{}
+$script:qerr = ''
+$script:jobs = @()
+$script:lastPoll = Get-Date
+function Start-Watch {
+  $script:sent = 0
+  $script:printers = @{}
+  $script:seen = @{}
+  $script:qerr = ''
+  $script:jobs = @()
+  $script:since = (Get-Date).AddSeconds(-2)
+  $script:watch = $true
+}
+function Poll-Queue {
+  if (-not $script:watch -or $script:printers.Count -eq 0) { return }
+  if (((Get-Date) - $script:lastPoll).TotalMilliseconds -lt 300) { return }
+  $script:lastPoll = Get-Date
+  $jobs = @()
+  foreach ($p in @($script:printers.Keys)) {
+    try {
+      $jobs += @(Get-PrintJob -PrinterName $p -ErrorAction Stop | Where-Object { $_.SubmittedTime -ge $script:since })
+    } catch {
+      if (-not $script:qerr) { $script:qerr = 'プリンタ「' + $p + '」が見つかりません（設定ファイルのプリンタ名を確認してください）' }
+    }
+  }
+  foreach ($j in $jobs) {
+    $script:seen[[string]$j.Id + '@' + $j.PrinterName] = $true
+    if (-not $script:qerr -and [string]$j.JobStatus -match 'Error|Offline|PaperOut|Blocked|UserIntervention|Deleted') {
+      $script:qerr = 'プリンタ「' + $j.PrinterName + '」でエラー（' + $j.JobStatus + '）: ' + $j.DocumentName
+    }
+  }
+  $script:jobs = $jobs
+}
+
+# 送った印刷がエラーなくすべて複合機へ送られたら空文字、エラー・時間切れのときは理由を返す
+function Wait-Queue([string]$head, [int]$timeoutSec = 180) {
+  if ($script:sent -eq 0) { $script:watch = $false; return '' }
+  $start = Get-Date
+  try {
+    while (-not $script:cancel) {
+      $script:lastPoll = (Get-Date).AddSeconds(-1)
+      Poll-Queue
+      if ($script:qerr) { return $script:qerr }
+      $elapsed = ((Get-Date) - $start).TotalSeconds
+      if ($script:jobs.Count -eq 0) {
+        # 待ち行列が空: 送った数の印刷が入って出ていけば完了。一度も見えないまま 30 秒たったら、印刷されていない
+        if ($script:seen.Count -ge $script:sent) { return '' }
+        if ($elapsed -ge 30) {
+          if ($script:seen.Count -gt 0) { return '' }
+          return '印刷が待ち行列に入りませんでした（Acrobat で印刷できなかった可能性があります）'
+        }
+      } elseif ($elapsed -ge $timeoutSec) {
+        return ('印刷が終わりません（' + $script:jobs.Count + ' 件が待ち行列に残っています）')
+      }
+      Show-Progress ($head + "`n" + '複合機へ送っています… 残り ' + $script:jobs.Count + ' 件')
+      Wait-Ms 500
+    }
+    return '中断しました'
+  } finally {
+    $script:watch = $false
+  }
 }
 
 function Write-Log([object]$cfg, [string]$logName, [string]$msg) {
@@ -232,18 +308,23 @@ try {
 
   $ng = @()
   $done = 0
+  $failed = 0
   $all = @($job.print).Count
   foreach ($rel in @($job.print)) {
     if ($script:cancel) { break }
     $path = To-Path $rel
     $name = Split-Path $path -Leaf
-    Show-Progress ('印刷しています（' + ($done + 1) + ' / ' + $all + '）' + "`n" + $name)
+    $head = '印刷しています（' + ($done + $failed + 1) + ' / ' + $all + '）' + "`n" + $name
+    Show-Progress $head
     if (-not (Test-Path -LiteralPath $path)) {
       $ng += ($rel + '（フォルダが見つかりません）')
+      $failed++
       continue
     }
     $logName = ($rel -split '/')[0]
     Write-Log $cfg $logName $name
+    $ngBefore = $ng.Count
+    Start-Watch
     foreach ($f in Get-ChildItem -LiteralPath $path -File) {
       Write-Log $cfg $logName (' ' + $f.Name)
       $lower = $f.Name.ToLower()
@@ -277,22 +358,32 @@ try {
         $ng += ($name + ' ' + $f.Name + '（' + $_.Exception.Message + '）')
       }
     }
-    # 印刷の受け付けを待ってから「【済」を付ける（現行マクロと同じく 10 秒）
-    Wait-Ms 10000
-    try {
-      Rename-Done $path '【済' '_差替【済'
-    } catch {
-      $ng += ($name + '（フォルダ名を変えられません: ' + $_.Exception.Message + '）')
+    # 印刷がエラーなく複合機へ送られたことを確かめてから「【済」を付ける。
+    # 確かめられないとき・コピー等に失敗したときは「【済」を付けない（画面でも出荷指示出力済にならない）
+    $qerr = Wait-Queue $head
+    if ($qerr) {
+      $ng += ($name + '（' + $qerr + '）')
+      Write-Log $cfg $logName (' 印刷を確認できませんでした: ' + $qerr)
     }
-    $done++
+    if ($qerr -or $ng.Count -gt $ngBefore) {
+      $failed++
+    } else {
+      try {
+        Rename-Done $path '【済' '_差替【済'
+        $done++
+      } catch {
+        $ng += ($name + '（フォルダ名を変えられません: ' + $_.Exception.Message + '）')
+        $failed++
+      }
+    }
     # 次のフォルダまで待つ（プリンタの順番が入れ替わらないように）
-    if ($done -lt $all) { Wait-Ms ([int]$cfg.waitSec * 1000) }
+    if ($done + $failed -lt $all) { Wait-Ms ([int]$cfg.waitSec * 1000) }
   }
   Close-Progress
   if ($script:cancel) {
-    Show-Msg ('中断しました（' + $done + ' / ' + $all + ' フォルダを処理）。') 'Warning'
+    Show-Msg ('中断しました（' + $done + ' / ' + $all + ' フォルダを印刷済にしました）。') 'Warning'
   } elseif ($ng.Count -gt 0) {
-    Show-Msg ("$done / $all フォルダを処理しました。次の問題がありました。`n`n" + ($ng -join "`n")) 'Warning'
+    Show-Msg ("$all フォルダのうち $done フォルダを印刷済（【済）にしました。`n次のフォルダは【済にしていません（受注ステータスも変わりません）。確認して印刷し直してください。`n`n" + ($ng -join "`n")) 'Warning'
   }
 } catch {
   Show-Msg ("出荷指示の印刷でエラーが発生しました。`n`n" + $_.Exception.Message) 'Error'
