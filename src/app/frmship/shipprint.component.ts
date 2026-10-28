@@ -69,6 +69,8 @@ export class ShipprintComponent implements OnInit {
   folders: PrintFolder[] = [];
   /** 表示中の日付フォルダ名 */
   dateDir = '';
+  /** 画面で選んでいる保存先（NAS）のフォルダ名。印刷用スクリプトの設定と同じフォルダかを確かめるために渡す */
+  rootName = '';
   /** 出力済（済）のフォルダも選べるようにする（再出力） */
   reprint = false;
   busy = false;
@@ -114,6 +116,7 @@ export class ShipprintComponent implements OnInit {
     this.cdRef.detectChanges();
     try {
       const root = await this.nassrv.open(NAS_SHIP);
+      this.rootName = root.name;
       this.dateDir = this.usrsrv.formatDate(this.day).replace(/-/g, '') + '出荷分';
       const dateDir = await this.nassrv.find(root, this.dateDir);
       if (!dateDir) {
@@ -212,7 +215,7 @@ export class ShipprintComponent implements OnInit {
     try {
       // 印刷しない古いフォルダは「【自動済」にする（同じ担当者・伝票で、印刷するフォルダがあるもの）
       const old = this.folders.filter(e => e.old && sel.some(s => s.staff == e.staff && s.denno == e.denno));
-      const job = { print: sel.map(e => e.path), old: old.map(e => e.path) };
+      const job = { root: this.rootName, print: sel.map(e => e.path), old: old.map(e => e.path) };
       const updated = await this.shipsrv.setPrinted([...new Set(sel.map(e => e.denno).filter(e => e > 0))]);
       this.launch(job);
       this.message = sel.length + ' フォルダの印刷を指示しました（受注ステータスを出荷指示出力済にした伝票：' + updated.length + ' 件）。' +
@@ -227,7 +230,7 @@ export class ShipprintComponent implements OnInit {
   }
 
   /** 印刷用スクリプトを呼ぶ（mwjprint:print?job=JSON の base64url） */
-  private launch(job: { print: string[]; old: string[] }) {
+  private launch(job: { root: string; print: string[]; old: string[] }) {
     const bytes = new TextEncoder().encode(JSON.stringify(job));
     let bin = '';
     bytes.forEach(b => bin += String.fromCharCode(b));

@@ -15,8 +15,8 @@ exit /b 1
 # =====================================================================
 # MWSystem: 出荷指示の印刷（朝来倉庫。現行の「【朝来倉庫使用】一括印刷.xlsm」の置き換え）
 #   ブラウザの「出荷指示 印刷」画面から mwjprint:print?job=... で呼ばれる。
-#   job は {"print": [フォルダ, ...], "old": [フォルダ, ...]}（UTF-8 の JSON を base64url にしたもの。
-#   フォルダは NAS の保存先からの相対パス）。print のフォルダごとに
+#   job は {"root": 保存先のフォルダ名, "print": [フォルダ, ...], "old": [フォルダ, ...]}（UTF-8 の JSON を base64url にしたもの。
+#   フォルダは NAS の保存先からの相対パス。root が設定の保存先のフォルダ名と違うときは印刷しない）。print のフォルダごとに
 #     ・PDF を Acrobat で印刷（ファイル名の拡張子が .Pdf のものはカラー、それ以外はモノクロのプリンタ）
 #     ・*pccs.csv を佐川の取り込みフォルダ、*is2.csv を福通の取り込みフォルダへコピー
 #     ・Manu.txt（マニュアル名,部数）のマニュアルを両面で印刷
@@ -34,7 +34,7 @@ Add-Type -AssemblyName System.Drawing
 $ErrorActionPreference = 'Stop'
 $Title = 'MWSystem 出荷指示の印刷'
 # 版。変更したら assets/mwjprint_setup の版（ファイル名・navbar のリンク）もそろえる
-$Version = '1'
+$Version = '2'
 $ConfigPath = Join-Path $env:LOCALAPPDATA 'mwjsys\mwjprint.json'
 
 # 処理中の表示（最前面の小さな画面）
@@ -196,6 +196,18 @@ try {
   $job = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($b64)) | ConvertFrom-Json
 
   $cfg = Get-Config
+  # 画面（ブラウザ）で選んでいる保存先と、この設定の保存先が同じフォルダか（フォルダ名で確かめる）
+  $leaf = Split-Path ([string]$cfg.root).TrimEnd('\') -Leaf
+  if ($job.root -and $leaf -ne [string]$job.root) {
+    Close-Progress
+    $ans = [System.Windows.Forms.MessageBox]::Show(
+      ("画面で選んでいる保存先「" + $job.root + "」と、印刷用スクリプトの設定の保存先「" + $cfg.root + "」が違います。`n`n" +
+       "設定ファイルをメモ帳で開きますか？`n「root」を画面と同じフォルダ（例: \\\\192.168.30.133\\share\\" + $job.root + "）に直して保存し、もう一度印刷してください。`n" +
+       "（設定ファイルでは \ を 2 つ重ねて書きます）"),
+      $Title, 'YesNo', 'Warning')
+    if ($ans -eq 'Yes') { Start-Process notepad.exe -ArgumentList ('"' + $ConfigPath + '"') }
+    exit 1
+  }
   if (-not (Test-Path -LiteralPath $cfg.root)) {
     Show-Msg ("NAS の場所が見つかりません: " + $cfg.root + "`n`n設定ファイル: " + $ConfigPath) 'Error'
     exit 1
