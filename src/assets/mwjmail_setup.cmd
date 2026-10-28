@@ -17,6 +17,7 @@ exit /b 1
 #   ブラウザから mwjmail:open?zip=mwjmail_YYYYMMDDHHMMSS.zip で呼ばれる。
 #   ダウンロードフォルダの ZIP（請求書 PDF と mwjmail.json）を「ドキュメント\MWSystem請求書」に展開し、
 #   mwjmail.json の 1 件ごとに、宛先・差出人・件名・本文・添付を入れた Thunderbird の作成画面を開く。
+#   展開したフォルダには請求書 PDF だけを控えとして残す（ZIP と mwjmail.json は削除する）。
 #   送信は開いた画面で担当者が行う。
 #   -Install で、mwjmail: のリンクをこのスクリプトに結び付ける（HKEY_CURRENT_USER。管理者権限は不要）。
 # =====================================================================
@@ -105,7 +106,10 @@ try {
   [System.IO.Compression.ZipFile]::ExtractToDirectory($zip, $out)
   Remove-Item -LiteralPath $zip
 
-  $manifest = Get-Content -LiteralPath (Join-Path $out 'mwjmail.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+  # 送信内容（mwjmail.json）は読み込んだら削除する（控えのフォルダには請求書 PDF だけを残す）
+  $json = Join-Path $out 'mwjmail.json'
+  $manifest = Get-Content -LiteralPath $json -Raw -Encoding UTF8 | ConvertFrom-Json
+  Remove-Item -LiteralPath $json
   $tb = Find-Thunderbird
   if (-not $tb) {
     Show-Msg ("Thunderbird が見つかりません。`n請求書は次のフォルダに保存しました。`n" + $out) 'Error'
