@@ -457,7 +457,7 @@ export class JmeitblComponent implements OnInit {
       line: [{ value: i, disabled: true }],
       gcode: [jyumei?.gcode, Validators.required],
       gtext: [jyumei?.gtext],
-      suu: [jyumei?.suu],
+      suu: [jyumei?.suu, Validators.required], // 数量が未入力の明細は保存できない（キープ表・出荷指示で数量が分からないため）
       unit: [jyumei?.unit],
       tanka: [jyumei?.tanka],
       toutmoney: [{ value: jyumei?.toutmoney, disabled: true }],
