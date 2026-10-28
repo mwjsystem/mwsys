@@ -24,11 +24,57 @@ exit /b 1
 param([string]$Url = '', [switch]$Install)
 
 Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $ErrorActionPreference = 'Stop'
 $Title = 'MWSystem メール作成'
+# 版。変更したら assets/mwjmail_setup の版（ファイル名・navbar のリンク）もそろえる
+$Version = '3'
+
+# 処理中の表示（最前面の小さな画面）。処理が終わるまで出しておく
+$script:progress = $null
+$script:progressLabel = $null
+function Show-Progress([string]$text) {
+  if (-not $script:progress) {
+    $f = New-Object System.Windows.Forms.Form
+    $f.Text = $Title
+    $f.TopMost = $true
+    $f.StartPosition = 'CenterScreen'
+    $f.FormBorderStyle = 'FixedDialog'
+    $f.ControlBox = $false
+    $f.ShowInTaskbar = $true
+    $f.ClientSize = New-Object System.Drawing.Size(460, 100)
+    $l = New-Object System.Windows.Forms.Label
+    $l.Dock = 'Fill'
+    $l.TextAlign = 'MiddleCenter'
+    $l.Font = New-Object System.Drawing.Font('Meiryo UI', 11)
+    $f.Controls.Add($l)
+    $f.Show()
+    $f.Activate()
+    $script:progress = $f
+    $script:progressLabel = $l
+  }
+  $script:progressLabel.Text = $text
+  [System.Windows.Forms.Application]::DoEvents()
+}
+function Close-Progress {
+  if ($script:progress) {
+    $script:progress.Close()
+    $script:progress.Dispose()
+    $script:progress = $null
+  }
+}
+# 待つ間も処理中の画面が「応答なし」にならないようにする
+function Wait-Ms([int]$ms) {
+  $end = (Get-Date).AddMilliseconds($ms)
+  while ((Get-Date) -lt $end) {
+    [System.Windows.Forms.Application]::DoEvents()
+    Start-Sleep -Milliseconds 100
+  }
+}
 
 function Show-Msg([string]$text, [string]$icon = 'Information') {
+  Close-Progress  # メッセージが処理中の画面の裏に隠れないように先に閉じる
   [System.Windows.Forms.MessageBox]::Show($text, $Title, 'OK', $icon) | Out-Null
 }
 
@@ -67,9 +113,9 @@ try {
     Set-ItemProperty -Path "$key\shell\open\command" -Name '(default)' -Value $cmd
     $tb = Find-Thunderbird
     if ($tb) {
-      Show-Msg ("メール作成の設定が完了しました。`n`nThunderbird: " + $tb)
+      Show-Msg ("メール作成の設定が完了しました（版 " + $Version + "）。`n`nThunderbird: " + $tb)
     } else {
-      Show-Msg "メール作成の設定は完了しましたが、Thunderbird が見つかりませんでした。`nThunderbird をインストールしてから使ってください。" 'Warning'
+      Show-Msg ("メール作成の設定は完了しました（版 " + $Version + "）が、Thunderbird が見つかりませんでした。`nThunderbird をインストールしてから使ってください。") 'Warning'
     }
     exit 0
   }
@@ -90,15 +136,17 @@ try {
   }
 
   # ダウンロードの完了を待つ（最大 60 秒）
+  Show-Progress '請求書のダウンロードを待っています…'
   $dl = (New-Object -ComObject Shell.Application).Namespace('shell:Downloads').Self.Path
   $zip = Join-Path $dl $zipName
   $deadline = (Get-Date).AddSeconds(60)
-  while (-not (Test-Path -LiteralPath $zip) -and (Get-Date) -lt $deadline) { Start-Sleep -Milliseconds 500 }
+  while (-not (Test-Path -LiteralPath $zip) -and (Get-Date) -lt $deadline) { Wait-Ms 500 }
   if (-not (Test-Path -LiteralPath $zip)) {
     Show-Msg ("ダウンロードフォルダに " + $zipName + " が見つかりません。`n`nダウンロードフォルダ: " + $dl + "`n`nブラウザの設定で、ダウンロードの保存先を毎回確認する設定になっていないか確認してください。") 'Error'
     exit 1
   }
-  Start-Sleep -Milliseconds 800
+  Wait-Ms 800
+  Show-Progress '請求書を展開しています…'
 
   # ドキュメント\MWSystem請求書\mwjmail_YYYYMMDDHHMMSS に展開する（PDF は控えとして残る）
   $out = Join-Path ([Environment]::GetFolderPath('MyDocuments')) ('MWSystem請求書\' + [IO.Path]::GetFileNameWithoutExtension($zipName))
@@ -118,7 +166,9 @@ try {
 
   $ng = @()
   $cnt = 0
+  $total = @($manifest.mails).Count
   foreach ($m in $manifest.mails) {
+    Show-Progress ('Thunderbird でメールを作成しています（' + ($cnt + $ng.Count + 1) + ' / ' + $total + ' 件）…' + "`n" + 'この画面が閉じるまでお待ちください')
     $file = Join-Path $out $m.file
     # 添付の取り違え防止: ファイルが存在し、ファイル名が請求伝票番号で始まること
     if (-not (Test-Path -LiteralPath $file) -or -not ([string]$m.file).StartsWith([string]$m.denno)) {
@@ -132,8 +182,11 @@ try {
     $parts += "attachment='" + $file + "'"
     Start-Process -FilePath $tb -ArgumentList ('-compose "' + ($parts -join ',') + '"')
     $cnt++
-    Start-Sleep -Milliseconds 1500
+    Wait-Ms 1500
   }
+  # 最後の作成画面が開くまで少し待ってから、処理中の表示を閉じる
+  Wait-Ms 2000
+  Close-Progress
   if ($ng.Count -gt 0) {
     Show-Msg ("次の請求書は添付ファイルを確認できなかったため、メールを作成しませんでした。`n`n" + ($ng -join "`n") + "`n`n保存先: " + $out) 'Warning'
   }

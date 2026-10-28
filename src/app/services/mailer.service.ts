@@ -16,7 +16,8 @@ export interface MailerItem {
 /**
  * 添付ファイル付きでメーラー（Thunderbird）の作成画面を開く。
  * ブラウザだけでは添付ファイルを指定してメーラーを起動できないため、各 PC に入れた
- * 「メール作成の初期設定」（assets/mwjmail_setup.cmd。mwjmail: のリンクを PowerShell のスクリプトに結び付ける）を使う。
+ * 「メール作成の初期設定」（assets/mwjmail_setup_v3.cmd。mwjmail: のリンクを PowerShell のスクリプトに結び付ける）を使う。
+ * 初期設定のスクリプトを変えたときは、版（スクリプト内の $Version とファイル名）を上げて、古いファイルを実行する取り違えを防ぐ。
  *   1. 添付ファイルと送信内容（mwjmail.json）を ZIP（mwjmail_YYYYMMDDHHMMSS.zip）にしてダウンロードする
  *   2. mwjmail:open?zip=... を開く → PC 側のスクリプトが ZIP を展開し、1 件ずつ Thunderbird の作成画面を開く
  * 送信は、開いた作成画面で担当者が行う。
