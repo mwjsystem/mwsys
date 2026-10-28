@@ -168,7 +168,9 @@ export class StockService {
       },
     })
       .valueChanges
-      .subscribe(({ data: raw }) => {
+      .subscribe((res) => {
+          const raw = res.data;
+          this.logError(res);
         if (!raw) {
           return;
         }
@@ -214,7 +216,9 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data: raw }) => {
+        .subscribe((res) => {
+          const raw = res.data;
+          this.logError(res);
           if (!raw) {
             return;
           }
@@ -292,7 +296,9 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data: raw }) => {
+        .subscribe((res) => {
+          const raw = res.data;
+          this.logError(res);
           if (!raw) {
             return;
           }
@@ -363,7 +369,9 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data: raw }) => {
+        .subscribe((res) => {
+          const raw = res.data;
+          this.logError(res);
           if (!raw) {
             return;
           }
@@ -431,7 +439,9 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data: raw }) => {
+        .subscribe((res) => {
+          const raw = res.data;
+          this.logError(res);
           if (!raw) {
             return;
           }
@@ -450,7 +460,9 @@ export class StockService {
             },
           })
             .valueChanges
-            .subscribe(({ data: raw }) => {
+            .subscribe((res) => {
+          const raw = res.data;
+          this.logError(res);
               if (!raw) {
                 return;
               }
@@ -495,6 +507,17 @@ export class StockService {
         return resolve(lcstcs);
       });
     });
+  }
+
+  /**
+   * Apollo（v4）は問い合わせのエラーを例外ではなく結果の error で返す（data は無い）。
+   * 在庫の問い合わせは data が無いと何も表示しないので、原因が分かるようにコンソールに出す
+   */
+  private logError(res: unknown) {
+    const err = (res as { error?: unknown }).error;
+    if (err) {
+      console.log('error query stock', err);
+    }
   }
 
   async getZaiko(gcd: string, scd: string, day: Date, stc: number, tdy: Date): Promise<Stock> {
@@ -554,7 +577,9 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(async ({ data: raw }) => {
+        .subscribe(async (res) => {
+          const raw = res.data;
+          this.logError(res);
           if (!raw) {
             return;
           }
@@ -639,7 +664,9 @@ export class StockService {
         },
       })
         .valueChanges
-        .subscribe(({ data: raw }) => {
+        .subscribe((res) => {
+          const raw = res.data;
+          this.logError(res);
           if (!raw) {
             return;
           }
