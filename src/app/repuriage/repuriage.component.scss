@@ -1,0 +1,43 @@
+// 売上報告
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+}
+.err { color: #c62828; padding: 0 12px; }
+.note { margin: 6px 12px; color: #666666; font-size: 12px; }
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0 12px 6px;
+  font-size: 13px;
+}
+.scroll {
+  overflow: auto;
+  max-height: calc(100vh - 250px);
+  margin: 6px 12px;
+}
+.yearly { margin: 8px 12px; summary { cursor: pointer; } }
+table.rep {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  white-space: nowrap;
+  th, td { border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; padding: 2px 6px; }
+  thead th { position: sticky; top: 0; z-index: 2; background: #e3eaf5; text-align: center; }
+  thead tr:nth-child(2) th { top: 22px; }
+  .name { position: sticky; left: 0; z-index: 1; background: #ffffff; text-align: left; min-width: 180px; }
+  thead .name { z-index: 3; background: #e3eaf5; }
+  .num { text-align: right; }
+  .minus { color: #c62828; }
+  .tg { text-decoration: none; color: #1565c0; margin-right: 2px; }
+  tr.lv0 td { font-weight: bold; }
+  tr.lv0 .name { background: #f5f7fb; }
+  tr.lv1 .name { background: #ffffff; }
+  tr.total td { font-weight: bold; background: #fff3c4; }
+  tr.total .name { background: #fff3c4; }
+  tr.sep td { border-top: 2px solid #999999; }
+}

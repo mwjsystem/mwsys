@@ -1,0 +1,196 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>売上報告</span>
+</mat-toolbar>
+<div class="bar">
+  <mat-form-field style="width: 10em;" subscriptSizing="dynamic">
+    <mat-label>対象日</mat-label>
+    <input matInput [matDatepicker]="picker" [(ngModel)]="day">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+  <button mat-raised-button color="primary" type="button" (click)="show()" [disabled]="busy">
+    <mat-icon>search</mat-icon>集計
+  </button>
+  <mat-form-field style="width: 14em;" subscriptSizing="dynamic">
+    <mat-label>集計の切り口</mat-label>
+    <mat-select [(ngModel)]="mode" (selectionChange)="build()" [panelClass]="'my-panel-class'">
+      <mat-option value="tanto">担当 → 大分類 → 部門</mat-option>
+      <mat-option value="dai">大分類 → 部門</mat-option>
+      <mat-option value="bu">部門</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button mat-button type="button" (click)="expand(true)">すべて開く</button>
+  <button mat-button type="button" (click)="expand(false)">すべて閉じる</button>
+  @if (busy) {
+    <span>集計しています…</span>
+  }
+</div>
+@if (error) {
+  <p class="err">{{error}}</p>
+}
+@if (report) {
+  <div class="info">
+    <span>当月 {{report.monthBiz}} 営業日</span>
+    <span>経過 {{report.monthDone}} 営業日（{{report.rate | percent:'1.0-0'}}）</span>
+    <span>のこり {{report.monthBiz - report.monthDone}} 営業日</span>
+    <span>{{report.year - 1}}/12/1〜{{report.year}}/11/30 稼働 {{report.yearBiz}} 日（対象日まで {{report.yearDone}} 日）</span>
+    <span>対象日 {{shownDay | date:'yyyy/M/d'}}</span>
+  </div>
+  <mat-tab-group>
+    <mat-tab label="売上報告">
+      <div class="scroll">
+        <table class="rep">
+          <thead>
+            <tr>
+              <th rowspan="2" class="name">名称</th>
+              @for (c of columns; track c.key) {
+                <th colspan="3">{{c.label}}</th>
+              }
+            </tr>
+            <tr>
+              @for (c of columns; track c.key) {
+                <th>実績額</th><th>昨年額</th><th>昨対</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (n of rows; track n.key) {
+              <tr [class]="'lv' + n.level">
+                <td class="name" [style.padding-left.px]="6 + n.level * 16">
+                  @if (n.children.length > 0) {
+                    <a href="javascript:void(0)" class="tg" (click)="toggle(n)">{{isOpen(n) ? '▼' : '▶'}}</a>
+                  }
+                  {{n.label}}
+                </td>
+                @for (c of columns; track c.key) {
+                  <td class="num">{{val(n, c.key).jis | number:'1.0-0'}}</td>
+                  <td class="num">{{val(n, c.key).sak | number:'1.0-0'}}</td>
+                  <td class="num" [class.minus]="(ratio(val(n, c.key)) ?? 1) < 1">{{ratio(val(n, c.key)) | percent:'1.1-1'}}</td>
+                }
+              </tr>
+            }
+            @if (root) {
+              <tr class="total">
+                <td class="name">総計</td>
+                @for (c of columns; track c.key) {
+                  <td class="num">{{val(root, c.key).jis | number:'1.0-0'}}</td>
+                  <td class="num">{{val(root, c.key).sak | number:'1.0-0'}}</td>
+                  <td class="num" [class.minus]="(ratio(val(root, c.key)) ?? 1) < 1">{{ratio(val(root, c.key)) | percent:'1.1-1'}}</td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <details class="yearly">
+        <summary>年別の実績（1〜12 月）</summary>
+        <div class="scroll">
+          <table class="rep">
+            <thead>
+              <tr>
+                <th class="name">年</th><th>年間合計</th>
+                @for (m of months; track m) {
+                  <th>{{m}}月</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (y of years; track y) {
+                <tr>
+                  <td class="name">{{y}}年</td>
+                  <td class="num">{{yearTotal(y) | number:'1.0-0'}}</td>
+                  @for (m of months; track m) {
+                    <td class="num">{{ym(y, m) | number:'1.0-0'}}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </mat-tab>
+    <mat-tab label="個人集計">
+      <p class="note">※送料を除いた商品売上のみ集計。商品で判定する項目（ALMA商品・LEM・ラグビー関連）は、条件の設定待ちです。</p>
+      <div class="scroll">
+        <table class="rep">
+          <thead>
+            <tr>
+              <th class="name">担当</th><th class="name2">項目</th><th>区分</th>
+              @for (c of persCols; track c) {
+                <th>{{c}}</th>
+              }
+              <th>当日までの累計</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (b of persBlocks; track b.item.seq) {
+              @for (l of b.lines; track l.label; let first = $first) {
+                <tr [class.sep]="first">
+                  <td class="name">{{first ? b.item.tanto : ''}}</td>
+                  <td class="name2">{{first ? b.item.item : ''}}{{first && b.item.kind == 'G' ? '（条件未設定）' : ''}}</td>
+                  <td>{{l.label}}</td>
+                  @for (v of l.cells; track $index) {
+                    <td class="num" [class.minus]="!l.pct && v != null && v < 0">{{l.pct ? (v | percent:'1.1-1') : (v | number:'1.0-0')}}</td>
+                  }
+                  <td class="num" [class.minus]="!l.pct && l.total != null && l.total < 0">{{l.pct ? (l.total | percent:'1.1-1') : (l.total | number:'1.0-0')}}</td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </mat-tab>
+    <mat-tab label="累計値">
+      <p class="note">前年 12 月〜対象日までの累計。粗利は受注明細の原価（みなし原価の商品は売上 × 率）で計算しています。</p>
+      <div class="scroll">
+        <table class="rep">
+          <thead>
+            <tr>
+              <th class="name">名称</th><th>累計実績額</th><th>昨年累計額</th><th>昨対</th><th>粗利</th><th>粗利率</th>
+              @if (mode == 'tanto') {
+                <th>年間目標額</th><th>年間日割額</th><th>実績－日割目標</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (n of rows; track n.key) {
+              <tr [class]="'lv' + n.level">
+                <td class="name" [style.padding-left.px]="6 + n.level * 16">
+                  @if (n.children.length > 0) {
+                    <a href="javascript:void(0)" class="tg" (click)="toggle(n)">{{isOpen(n) ? '▼' : '▶'}}</a>
+                  }
+                  {{n.label}}
+                </td>
+                <td class="num">{{cum(n).jis | number:'1.0-0'}}</td>
+                <td class="num">{{cum(n).sak | number:'1.0-0'}}</td>
+                <td class="num" [class.minus]="(ratio(cum(n)) ?? 1) < 1">{{ratio(cum(n)) | percent:'1.1-1'}}</td>
+                <td class="num">{{cum(n).ara | number:'1.0-0'}}</td>
+                <td class="num">{{cum(n).jis ? (cum(n).ara / cum(n).jis | percent:'1.1-1') : ''}}</td>
+                @if (mode == 'tanto') {
+                  <td class="num">{{target(n) | number:'1.0-0'}}</td>
+                  <td class="num">{{daily(target(n)) | number:'1.0-0'}}</td>
+                  <td class="num" [class.minus]="target(n) != null && cum(n).jis < (daily(target(n)) ?? 0)">{{target(n) != null ? (cum(n).jis - (daily(target(n)) ?? 0) | number:'1.0-0') : ''}}</td>
+                }
+              </tr>
+            }
+            @if (root) {
+              <tr class="total">
+                <td class="name">総計</td>
+                <td class="num">{{cum(root).jis | number:'1.0-0'}}</td>
+                <td class="num">{{cum(root).sak | number:'1.0-0'}}</td>
+                <td class="num">{{ratio(cum(root)) | percent:'1.1-1'}}</td>
+                <td class="num">{{cum(root).ara | number:'1.0-0'}}</td>
+                <td class="num">{{cum(root).jis ? (cum(root).ara / cum(root).jis | percent:'1.1-1') : ''}}</td>
+                @if (mode == 'tanto') {
+                  <td class="num">{{totalTarget | number:'1.0-0'}}</td>
+                  <td class="num">{{daily(totalTarget) | number:'1.0-0'}}</td>
+                  <td class="num">{{cum(root).jis - (daily(totalTarget) ?? 0) | number:'1.0-0'}}</td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+}
