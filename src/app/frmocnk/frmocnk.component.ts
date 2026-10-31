@@ -10,7 +10,7 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { MatFormField, MatLabel } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { DecimalPipe } from '@angular/common';
 
@@ -26,7 +26,7 @@ const COL_WEBID = 51;
   templateUrl: './frmocnk.component.html',
   styleUrls: ['./frmocnk.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatToolbar, MatButton, MatIcon, MatCheckbox, MatFormField, MatLabel, MatInput, MatSelect, MatOption, FormsModule, DecimalPipe]
+  imports: [MatToolbar, MatButton, MatIcon, MatCheckbox, MatFormField, MatLabel, MatSelect, MatOption, FormsModule, DecimalPipe]
 })
 export class FrmocnkComponent implements OnInit {
   private srv = inject(OcnkService);
