@@ -1,0 +1,151 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>おちゃのこ受注取込</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+@if (error) {
+  <p class="err">{{error}}</p>
+}
+<mat-tab-group>
+  <mat-tab label="受注の取込">
+    <div class="bar">
+      <button mat-raised-button color="primary" type="button" (click)="csv.click()" [disabled]="busy || !master">
+        <mat-icon>upload_file</mat-icon>CSV を選ぶ
+      </button>
+      <input #csv type="file" accept=".csv" hidden (change)="onFile($event)">
+      <span>{{fileName}}</span>
+      <mat-form-field style="width: 11em;" subscriptSizing="dynamic">
+        <mat-label>担当者</mat-label>
+        <mat-select [(ngModel)]="tanto" (selectionChange)="parse()" [panelClass]="'my-panel-class'">
+          <mat-option value="">すべて</mat-option>
+          @for (t of tantoList; track t) {
+            <mat-option [value]="t">{{t}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <mat-checkbox [(ngModel)]="ippan" (change)="parse()">一般（未会員）の受注も取り込む</mat-checkbox>
+      <button mat-raised-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
+        <mat-icon>save</mat-icon>登録（{{targetCount}} 件）
+      </button>
+      <button mat-button type="button" (click)="excel()" [disabled]="busy || orders.length == 0">
+        <mat-icon>download</mat-icon>Excel出力
+      </button>
+      @if (progress) {
+        <span>{{progress}}</span>
+      }
+    </div>
+    @if (message) {
+      <p class="msg">{{message}}</p>
+    }
+    @if (notFound.length > 0) {
+      <details class="warn">
+        <summary>変換表に無い道場会員のため対象外にした注文：{{notFound.length}} 件</summary>
+        @for (n of notFound; track n) {
+          <div>{{n}}</div>
+        }
+      </details>
+    }
+    @if (orders.length > 0) {
+      <p class="note">受注 {{orders.length | number}} 件・明細 {{lineCount | number}} 行。会員コードが空の受注は、メールアドレスで顧客を探し、無ければ新規作成します。
+        @if (diffCount > 0) {
+          <span class="warnc">明細の合計が CSV の合計金額と合わない受注が {{diffCount}} 件あります（黄色の行）。登録後に受注伝票で明細を確認してください。</span>
+        }
+      </p>
+      <div class="scroll">
+        <table class="rep">
+          <thead>
+            <tr>
+              <th>注文番号</th><th>区分</th><th>会員ID</th><th>会員コード</th><th>取引</th><th>氏名</th><th>受注日</th>
+              <th>大分類</th><th>部門</th><th>担当</th><th>支払方法</th><th>入金</th><th>媒体管理</th><th>合計</th><th>明細との差額</th><th>処理結果</th><th>伝票番号</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (o of orders; track o.cusden) {
+              <tr [class.ng]="o.err || o.result.startsWith('エラー')" [class.dif]="diff(o) != 0">
+                <td>
+                  <a href="javascript:void(0)" class="tg" (click)="toggle(o)">{{isOpen(o) ? '▼' : '▶'}}</a>{{o.cusden}}
+                </td>
+                <td>{{o.kbn}}</td><td>{{o.webid}}</td>
+                <td><input class="mc" [(ngModel)]="o.mcode" maxlength="12" [disabled]="busy || !!o.denno"></td>
+                <td>{{o.kake ? '掛' : '都度'}}</td><td>{{o.sei}}</td><td>{{o.day}}</td>
+                <td>{{o.daibunrui}}</td><td>{{o.bumon}}</td><td>{{o.tanto}}</td><td>{{o.pay}}</td><td>{{o.nyukin}}</td><td>{{o.bkcode}}</td>
+                <td class="num">{{o.total | number:'1.0-0'}}</td>
+                <td class="num">{{diff(o) != 0 ? (diff(o) | number:'1.0-0') : ''}}</td>
+                <td>{{o.err ? 'エラー：' + o.err : o.result}}</td><td>{{o.denno}}</td>
+              </tr>
+              @if (isOpen(o)) {
+                <tr class="det">
+                  <td colspan="17">
+                    <table class="mei">
+                      <thead>
+                        <tr><th>行</th><th>商品コード</th><th>商品名</th><th>数量</th><th>単価</th><th>金額</th><th>税区分</th><th>明細備考</th></tr>
+                      </thead>
+                      <tbody>
+                        @for (l of o.lines; track l.line) {
+                          <tr>
+                            <td class="num">{{l.line}}</td><td>{{l.gcode}}</td><td>{{l.gtext}}</td>
+                            <td class="num">{{l.suu | number:'1.0-2'}}</td><td class="num">{{l.tanka | number:'1.0-2'}}</td>
+                            <td class="num">{{l.money | number:'1.0-2'}}</td><td>{{l.mtax}}</td><td>{{l.memo}}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </mat-tab>
+  <mat-tab label="道場会員の変換表">
+    <div class="bar">
+      <mat-form-field style="width: 7em;" subscriptSizing="dynamic">
+        <mat-label>会員ID</mat-label><input matInput [(ngModel)]="edit.webid">
+      </mat-form-field>
+      <mat-form-field style="width: 8em;" subscriptSizing="dynamic">
+        <mat-label>顧客コード</mat-label><input matInput [(ngModel)]="edit.mcode">
+      </mat-form-field>
+      <mat-form-field style="width: 7em;" subscriptSizing="dynamic">
+        <mat-label>担当者</mat-label><input matInput [(ngModel)]="edit.tcode">
+      </mat-form-field>
+      <mat-form-field style="width: 7em;" subscriptSizing="dynamic">
+        <mat-label>営業担当</mat-label><input matInput [(ngModel)]="edit.etanto">
+      </mat-form-field>
+      <mat-form-field style="width: 13em;" subscriptSizing="dynamic">
+        <mat-label>お名前</mat-label><input matInput [(ngModel)]="edit.name">
+      </mat-form-field>
+      <mat-form-field style="width: 14em;" subscriptSizing="dynamic">
+        <mat-label>メールアドレス</mat-label><input matInput [(ngModel)]="edit.mail">
+      </mat-form-field>
+      <mat-form-field style="width: 12em;" subscriptSizing="dynamic">
+        <mat-label>会員グループ</mat-label><input matInput [(ngModel)]="edit.mgroup">
+      </mat-form-field>
+      <mat-checkbox [(ngModel)]="edit.kake">掛け請求</mat-checkbox>
+      <button mat-raised-button color="primary" type="button" (click)="saveMember()" [disabled]="busy">保存</button>
+      <button mat-button type="button" (click)="deleteMember()" [disabled]="busy || !edit.webid">削除</button>
+      <button mat-button type="button" (click)="clear()">クリア</button>
+    </div>
+    <div class="bar">
+      <mat-form-field style="width: 18em;" subscriptSizing="dynamic">
+        <mat-label>絞り込み（ID・コード・名前・メールなど）</mat-label><input matInput [(ngModel)]="filter">
+      </mat-form-field>
+      <span class="note">{{master?.members?.length ?? 0 | number}} 件（表示は 300 件まで。行をクリックすると上で編集できます）</span>
+    </div>
+    <div class="scroll">
+      <table class="rep">
+        <thead>
+          <tr><th>会員ID</th><th>顧客コード</th><th>担当者</th><th>営業担当</th><th>お名前</th><th>メールアドレス</th><th>会員グループ</th><th>掛け請求</th></tr>
+        </thead>
+        <tbody>
+          @for (m of members; track m.webid) {
+            <tr class="row" (click)="pick(m)">
+              <td>{{m.webid}}</td><td>{{m.mcode}}</td><td>{{m.tcode}}</td><td>{{m.etanto}}</td>
+              <td>{{m.name}}</td><td>{{m.mail}}</td><td>{{m.mgroup}}</td><td>{{m.kake ? '掛' : ''}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </mat-tab>
+</mat-tab-group>
