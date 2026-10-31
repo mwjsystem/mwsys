@@ -52,7 +52,7 @@ import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
 /** get_member クエリの結果 */
 interface MemberResult { msmember_by_pk: mwI.Member | null }
 /** 受注入力フォームの項目名（明細の mtbl は除く） */
-type JyudenField = 'torikbn' | 'mcode' | 'scde' | 'ncode' | 'nsaki' | 'nadr' | 'buntype' | 'day' | 'yday' | 'sday' | 'uday' | 'nday' | 'tcode' | 'scode' | 'skbn' | 'jcode' | 'pcode' | 'hcode' | 'hday' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'nmemo' | 'smemo' | 'omemo' | 'cusden' | 'ryoate' | 'daibiki' | 'daibzei' | 'daibunrui' | 'chubunrui' | 'shobunrui' | 'tcode1' | 'gtotalzn' | 'soryozn' | 'tesuzn' | 'nebikizn' | 'taxtotal' | 'total' | 'genka' | 'hgenka' | 'egenka' | 'isaki' | 'iadr' | 'total8' | 'total10' | 'dokono' | 'eidome' | 'eicode';
+type JyudenField = 'torikbn' | 'mcode' | 'scde' | 'ncode' | 'nsaki' | 'nadr' | 'buntype' | 'day' | 'yday' | 'sday' | 'uday' | 'nday' | 'tcode' | 'scode' | 'skbn' | 'jcode' | 'pcode' | 'hcode' | 'hday' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'nmemo' | 'smemo' | 'omemo' | 'cusden' | 'ryoate' | 'daibiki' | 'daibzei' | 'daibunrui' | 'chubunrui' | 'shobunrui' | 'tcode1' | 'gtotalzn' | 'soryozn' | 'tesuzn' | 'nebikizn' | 'taxtotal' | 'total' | 'genka' | 'hgenka' | 'egenka' | 'isaki' | 'iadr' | 'total8' | 'total10' | 'dokono' | 'eidome' | 'eicode' | 'bcode' | 'bkcode';
 @Component({
     selector: 'app-frmsales',
     templateUrl: './frmsales.component.html',
@@ -104,6 +104,12 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   keepSuggest: string = '';
   keepBusy = false;
   readonly JDST = JDST;
+  /** 媒体管理の選択肢（売上報告の Web の判定に使う） */
+  readonly bkcodes = [
+    { value: '01', viewval: 'MW Web' }, { value: '02', viewval: '楽天ストロング' }, { value: '07', viewval: '楽天FSのMW' },
+    { value: '08', viewval: 'ALMAWeb' }, { value: '09', viewval: 'NiceGuyWeb' }, { value: '10', viewval: 'NAS会員Web' },
+    { value: '11', viewval: 'ANA MALL' }
+  ];
   /** 表示中の伝票番号（別の伝票を開いたら、キープ表の案内を消す） */
   private shownDenno = 0;
   hktval: mwI.Sval[] = [];
@@ -181,6 +187,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       dokono: new FormControl(''),
       eidome: new FormControl(''),
       eicode: new FormControl(''),
+      bcode: new FormControl(''),
+      bkcode: new FormControl(''),
       mtbl: this.rows
     });
     this.bnssrv.getBuntype();
@@ -851,6 +859,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       dokono: this.usrsrv.editFrmval(this.form, 'dokono'),
       eidome: this.usrsrv.editFrmval(this.form, 'eidome'),
       eicode: this.usrsrv.editFrmval(this.form, 'eicode'),
+      bcode: this.usrsrv.editFrmval(this.form, 'bcode'),
+      bkcode: this.usrsrv.editFrmval(this.form, 'bkcode'),
       // 保存したら受注登録にする（出荷指示フォルダ作成後に直したときは、作り直し〈差替分〉の対象に戻る）
       jdstatus: JDST.TOROKU,
       del: false

@@ -505,6 +505,19 @@
           }
         </mat-select>
       </mat-form-field>
+      <mat-form-field style="width:10em">
+        <mat-label>媒体</mat-label>
+        <input matInput formControlName="bcode" maxlength="6">
+      </mat-form-field>
+      <mat-form-field style="width:10em">
+        <mat-label>媒体管理</mat-label>
+        <mat-select formControlName="bkcode" [panelClass]="'my-panel-class'">
+          <mat-option [value]="null"></mat-option>
+          @for (sval of bkcodes; track sval.value) {
+            <mat-option [value]="sval.value">{{sval.value}} {{sval.viewval}}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
       <mat-checkbox formControlName="eidome" style="padding-top:12px;text-align:right">営業所止め</mat-checkbox>
     </div>
     <div class="grid-cols-1">

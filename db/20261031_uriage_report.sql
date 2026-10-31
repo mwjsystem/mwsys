@@ -22,6 +22,12 @@
 -- =====================================================================
 SET search_path TO test;  -- 本番に適用するときは public に変更
 
+-- 媒体・媒体管理（現行の jyusub.bcode / bkcode）
+ALTER TABLE trjyuden ADD COLUMN IF NOT EXISTS bcode text;
+ALTER TABLE trjyuden ADD COLUMN IF NOT EXISTS bkcode text;
+COMMENT ON COLUMN trjyuden.bcode IS '媒体（52 = 施工）';
+COMMENT ON COLUMN trjyuden.bkcode IS '媒体管理（01 MW Web / 02 楽天SS / 07 楽天FS / 08 ALMAWeb / 09 NiceGuyWeb / 10 NAS会員Web / 11 ANA MALL）';
+
 CREATE INDEX IF NOT EXISTS trjyuden_uday_idx ON trjyuden (id, uday);
 
 CREATE TABLE IF NOT EXISTS msuritanto (
@@ -58,7 +64,7 @@ CREATE TABLE IF NOT EXISTS msuripers (
   , val   text
   , PRIMARY KEY (id, seq)
 );
-COMMENT ON TABLE msuripers IS '個人集計の項目。kind: M 顧客コード（カンマ区切り）/ B 媒体管理 / F 初回売上顧客（val は担当者）/ G 商品（条件は未設定）';
+COMMENT ON TABLE msuripers IS '個人集計の項目。kind: M 顧客コード（カンマ区切り）/ B 媒体管理 / F 初回売上顧客（val は担当者）/ G 商品（val は「msggroup の列:値」。列は tcode / category / genre / subcat）';
 
 INSERT INTO msuritanto (id, tcode, name) VALUES
   (1, '310', '佐藤'), (1, '3014', '中尾'), (1, '3017', '栗田'), (1, '3065', '早稲田'), (1, '3080', '多胡'),
@@ -84,20 +90,20 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO msuripers (id, seq, tanto, item, kind, val) VALUES
   (1, 10, '江崎', '柔術大会主催', 'M', '410603'),
-  (1, 20, '江崎', 'ALMA商品', 'G', NULL),
+  (1, 20, '江崎', 'ALMA商品', 'G', 'tcode:3334'),
   (1, 30, '江崎', 'ALMA WEB', 'B', '08'),
   (1, 40, '江崎', '初回売上顧客', 'F', '3114'),
   (1, 50, '小島', 'FEMININE WORKS', 'M', '410569,410618'),
-  (1, 60, '小島', 'LEM', 'G', NULL),
+  (1, 60, '小島', 'LEM', 'G', 'category:1605'),
   (1, 70, '小島', '初回売上顧客', 'F', '3117'),
   (1, 80, '福田', '初回売上顧客', 'F', '3106'),
   (1, 90, '久保田', '初回売上顧客', 'F', '3108'),
-  (1, 100, '竹島', 'ラグビー関連', 'G', NULL),
+  (1, 100, '竹島', 'ラグビー関連', 'G', 'category:199'),
   (1, 110, '竹島', '初回売上顧客', 'F', '3107'),
   (1, 120, '樋口', '初回売上顧客', 'F', '3116'),
   (1, 130, '早稲田', '初回売上顧客', 'F', '3065'),
   (1, 140, '齋田', '初回売上顧客', 'F', '3110')
-ON CONFLICT DO NOTHING;
+ON CONFLICT (id, seq) DO UPDATE SET kind = EXCLUDED.kind, val = EXCLUDED.val;
 
 -- 関数の戻り値の型（Hasura の関数は、Track した表の行を返す必要がある。行は入らない）
 CREATE TABLE IF NOT EXISTS tsuriage (ym text, tanto text, tname text, daibunrui text, bumon text, uriage numeric, arari numeric);
@@ -209,12 +215,24 @@ RETURNS SETOF tsuriage_pers AS $$
                AND d.ncode IN (SELECT ncode FROM f))
    WHERE p.id = p_id
    GROUP BY p.seq, d.ym
+  UNION ALL
+  SELECT p.seq, to_char(j.uday, 'YYYY-MM'), sum(CASE WHEN j.denku = 2 THEN -1 ELSE 1 END * coalesce(t.toutmoney, 0))
+    FROM msuripers p
+    JOIN trjyuden j ON j.id = p.id AND j.uday BETWEEN p_from AND p_to AND j.del IS NOT TRUE
+    JOIN trjyumei t ON t.id = j.id AND t.denno = j.denno AND t.del IS NOT TRUE
+    JOIN msgoods g ON g.id = t.id AND g.gcode = t.gcode
+    JOIN msggroup r ON r.id = g.id AND r.code = g.code
+   WHERE p.id = p_id AND p.kind = 'G'
+     AND trim(CASE split_part(p.val, ':', 1) WHEN 'tcode' THEN r.tcode WHEN 'category' THEN r.category
+                                             WHEN 'genre' THEN r.genre WHEN 'subcat' THEN r.subcat END) = split_part(p.val, ':', 2)
+   GROUP BY p.seq, to_char(j.uday, 'YYYY-MM')
 $$ LANGUAGE sql STABLE
 SET search_path FROM CURRENT;
 
 -- ---------------------------------------------------------------------
 -- Hasura 側の設定
 --   ・Reload metadata
+--   ・trjyuden の select / insert / update 権限（staff）に bcode, bkcode を含める
 --   ・表 msuritanto, msurimoku, msuriminashi, msuripers, tsuriage, tsuriage_ym, tsuriage_pers を Track し、
 --     staff に select 権限（Without any checks・すべての列）を付ける
 --   ・関数 furiage, furiage_ym, furiage_pers を Track する（Data > スキーマ > Untracked custom functions）

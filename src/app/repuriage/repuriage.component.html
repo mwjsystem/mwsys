@@ -110,7 +110,7 @@
       </details>
     </mat-tab>
     <mat-tab label="個人集計">
-      <p class="note">※送料を除いた商品売上のみ集計。商品で判定する項目（ALMA商品・LEM・ラグビー関連）は、条件の設定待ちです。</p>
+      <p class="note">※送料を除いた商品売上のみ集計。</p>
       <div class="scroll">
         <table class="rep">
           <thead>
@@ -127,7 +127,7 @@
               @for (l of b.lines; track l.label; let first = $first) {
                 <tr [class.sep]="first">
                   <td class="name">{{first ? b.item.tanto : ''}}</td>
-                  <td class="name2">{{first ? b.item.item : ''}}{{first && b.item.kind == 'G' ? '（条件未設定）' : ''}}</td>
+                  <td class="name2">{{first ? b.item.item : ''}}{{first && b.item.kind == 'G' && !b.item.val ? '（条件未設定）' : ''}}</td>
                   <td>{{l.label}}</td>
                   @for (v of l.cells; track $index) {
                     <td class="num" [class.minus]="!l.pct && v != null && v < 0">{{l.pct ? (v | percent:'1.1-1') : (v | number:'1.0-0')}}</td>

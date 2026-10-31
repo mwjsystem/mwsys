@@ -7,6 +7,8 @@ declare namespace mwI {
     id: number;
     denno: number;
     jdstatus: string;
+    bcode: string | null;
+    bkcode: string | null;
     // jdshsta: string;
     torikbn: boolean;
     created_at: Date;
