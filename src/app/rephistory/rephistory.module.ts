@@ -14,6 +14,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
+registerLocaleData(localeJa);
+
 @NgModule({
     imports: [
         CommonModule,
