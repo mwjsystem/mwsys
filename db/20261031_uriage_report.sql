@@ -236,6 +236,6 @@ SET search_path FROM CURRENT;
 --   ・表 msuritanto, msurimoku, msuriminashi, msuripers, tsuriage, tsuriage_ym, tsuriage_pers を Track し、
 --     staff に select 権限（Without any checks・すべての列）を付ける
 --   ・関数 furiage, furiage_ym, furiage_pers を Track する（Data > スキーマ > Untracked custom functions）
--- 確認用（すぐ返れば OK）:
---   SELECT tname, sum(uriage) FROM furiage(1::smallint, date '2026-10-01', date '2026-10-31', false) GROUP BY 1 ORDER BY 1;
+-- 確認用（すぐ返れば OK。単独で実行するときは既定の public を見るので、スキーマ名を付ける）:
+--   SELECT tname, sum(uriage) FROM test.furiage(1::smallint, date '2026-10-01', date '2026-10-31', false) GROUP BY 1 ORDER BY 1;
 -- ---------------------------------------------------------------------
