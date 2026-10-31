@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import * as FileSaver from 'file-saver';
 import { UserService } from './../services/user.service';
-import { OcnkMaster, OcnkService, WebMember } from './ocnk.service';
+import { OcnkMaster, OcnkService } from './ocnk.service';
 import { OcnkDojo, OcnkOrder, parseCsv, parseOrders } from './ocnk-parse';
 import { fillOcnkBook } from './ocnk-excel';
 import { MatToolbar } from '@angular/material/toolbar';
@@ -12,21 +12,21 @@ import { MatIcon } from '@angular/material/icon';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
-import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { DecimalPipe } from '@angular/common';
 
-const EMPTY: WebMember = { webid: '', mail: '', mcode: '', tcode: '', name: '', mgroup: '', kake: false, etanto: '' };
+/** おちゃのこの CSV で会員ID が入っている列 */
+const COL_WEBID = 51;
 
 /**
  * おちゃのこ受注の取込（現行の BTC-MWWEB.xlsm と member.xlsx の置き換え）。
- * CSV を読み込んで一覧で確認してから登録する。道場会員の変換表もここで直す。
+ * CSV を読み込んで一覧で確認してから登録する。道場会員は顧客マスタの Web会員ID で探す。
  */
 @Component({
   selector: 'app-frmocnk',
   templateUrl: './frmocnk.component.html',
   styleUrls: ['./frmocnk.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatToolbar, MatButton, MatIcon, MatCheckbox, MatFormField, MatLabel, MatInput, MatSelect, MatOption, MatTabGroup, MatTab, FormsModule, DecimalPipe]
+  imports: [MatToolbar, MatButton, MatIcon, MatCheckbox, MatFormField, MatLabel, MatInput, MatSelect, MatOption, FormsModule, DecimalPipe]
 })
 export class FrmocnkComponent implements OnInit {
   private srv = inject(OcnkService);
@@ -35,6 +35,8 @@ export class FrmocnkComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
 
   master?: OcnkMaster;
+  /** CSV の会員ID → 顧客 */
+  private dojo: Record<string, OcnkDojo> = {};
   /** 取り込む担当者（'' はすべて） */
   tanto = '';
   ippan = false;
@@ -47,35 +49,24 @@ export class FrmocnkComponent implements OnInit {
   message = '';
   progress = '';
   private open = new Set<string>();
-  /** 道場会員の変換表 */
-  filter = '';
-  edit: WebMember = { ...EMPTY };
 
   constructor() {
     this.title.setTitle('おちゃのこ受注取込(MWSystem)');
   }
 
   async ngOnInit() {
-    await this.loadMaster();
-    const code = this.usrsrv.staff?.code ?? '';
-    if (this.tantoList.includes(code)) {
-      this.tanto = code;
-    }
-    this.cdRef.detectChanges();
-  }
-
-  private async loadMaster() {
     try {
       this.master = await this.srv.master();
     } catch (e) {
       this.error = '変換表を読み込めませんでした：' + (e as Error).message;
       console.log('error frmocnk master', e);
     }
+    this.cdRef.detectChanges();
   }
 
-  /** 担当者の選択肢 */
+  /** 担当者の選択肢（読み込んだ CSV の道場会員の担当者） */
   get tantoList(): string[] {
-    const set = new Set((this.master?.members ?? []).map(e => e.tcode ?? '').filter(e => e));
+    const set = new Set(Object.values(this.dojo).map(e => e.tcode ?? '').filter(e => e));
     set.add('3124');
     return [...set].sort();
   }
@@ -97,13 +88,6 @@ export class FrmocnkComponent implements OnInit {
     return this.orders.filter(o => this.diff(o) != 0).length;
   }
 
-  get members(): WebMember[] {
-    const list = this.master?.members ?? [];
-    const f = this.filter.trim();
-    const hit = f ? list.filter(e => [e.webid, e.mcode, e.tcode, e.name, e.mail, e.mgroup].some(v => (v ?? '').includes(f))) : list;
-    return hit.slice(0, 300);
-  }
-
   async onFile(ev: Event) {
     const input = ev.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -119,6 +103,13 @@ export class FrmocnkComponent implements OnInit {
       const bytes = new Uint8Array(await file.arrayBuffer());
       const text = Encoding.convert(bytes, { to: 'UNICODE', from: 'AUTO', type: 'string' }) as unknown as string;
       this.rows = parseCsv(text.replace(/^﻿/, ''));
+      const webids = [...new Set(this.rows.slice(1).map(r => r[COL_WEBID] ?? '').filter(e => e))];
+      this.dojo = await this.srv.dojo(webids);
+      // 最初の読み込みでは、ログイン中の担当者を初期値にする
+      const code = this.usrsrv.staff?.code ?? '';
+      if (!this.fileName && this.tantoList.includes(code)) {
+        this.tanto = code;
+      }
       this.fileName = file.name;
       await this.parse();
     } catch (e) {
@@ -140,9 +131,7 @@ export class FrmocnkComponent implements OnInit {
     const mod = await import('encoding-japanese');
     const Encoding = (mod as unknown as { default?: typeof mod }).default ?? mod;
     const narrow = (s: string) => Encoding.toHankanaCase(Encoding.toHankakuSpace(Encoding.toHankakuCase(s)));
-    const dojo: Record<string, OcnkDojo> = {};
-    this.master.members.forEach(e => dojo[e.webid] = e);
-    const res = parseOrders(this.rows, { ...this.master, dojo, tanto: this.tanto, ippan: this.ippan, narrow });
+    const res = parseOrders(this.rows, { ...this.master, dojo: this.dojo, tanto: this.tanto, ippan: this.ippan, narrow });
     this.orders = res.orders;
     this.notFound = res.notFound;
     this.open.clear();
@@ -219,47 +208,6 @@ export class FrmocnkComponent implements OnInit {
     } catch (e) {
       this.error = 'Excel を作成できませんでした：' + (e as Error).message;
       console.log('error frmocnk excel', e);
-    }
-    this.busy = false;
-    this.cdRef.detectChanges();
-  }
-
-  /** 変換表の行を編集欄に出す */
-  pick(m: WebMember) {
-    this.edit = { ...m };
-  }
-
-  clear() {
-    this.edit = { ...EMPTY };
-  }
-
-  async saveMember() {
-    if (!this.edit.webid?.trim()) {
-      this.error = '会員ID を入力してください';
-      return;
-    }
-    await this.memberOp(() => this.srv.saveMember(this.edit));
-  }
-
-  async deleteMember() {
-    const webid = this.edit.webid?.trim();
-    if (!webid || !confirm('会員ID ' + webid + ' を変換表から削除します。よろしいですか？')) {
-      return;
-    }
-    await this.memberOp(() => this.srv.deleteMember(webid));
-  }
-
-  private async memberOp(f: () => Promise<void>) {
-    this.busy = true;
-    this.error = '';
-    try {
-      await f();
-      await this.loadMaster();
-      this.clear();
-      await this.parse();
-    } catch (e) {
-      this.error = '変換表を更新できませんでした：' + (e as Error).message;
-      console.log('error frmocnk member', e);
     }
     this.busy = false;
     this.cdRef.detectChanges();

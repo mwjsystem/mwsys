@@ -5,7 +5,7 @@
 
 /** 発送方法の変換（mswebhaiso） */
 export interface OcnkHaiso { hname: string; daibunrui: string | null; bumon: string | null; tanto: string | null; mtax: string | null; bkcode: string | null }
-/** 道場会員の変換（mswebmember） */
+/** 道場会員（顧客マスタの webid で引いた結果） */
 export interface OcnkDojo { webid: string; mcode: string | null; tcode: string | null; kake: boolean; etanto: string | null }
 
 export interface OcnkConf {

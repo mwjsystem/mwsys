@@ -6,10 +6,8 @@ import { UserService } from './../services/user.service';
 import { JDST } from './../frmship/ship-forms';
 import { OcnkConf, OcnkDojo, OcnkHaiso, OcnkOrder, exTax, taxOf } from './ocnk-parse';
 
-/** 道場会員の変換表の 1 行 */
-export interface WebMember extends OcnkDojo { mail: string | null; name: string | null; mgroup: string | null }
 /** 変換表一式 */
-export type OcnkMaster = Pick<OcnkConf, 'haiso' | 'pay' | 'time'> & { members: WebMember[] };
+export type OcnkMaster = Pick<OcnkConf, 'haiso' | 'pay' | 'time'>;
 
 /** 倉庫（受注伝票・明細・在庫の scode） */
 const WEB_SCODE = '01';
@@ -58,38 +56,36 @@ export class OcnkService {
         mswebhaiso(where: {id: {_eq: $id}}) { hname daibunrui bumon tanto mtax bkcode }
         mswebpay(where: {id: {_eq: $id}}) { pname pcode }
         mswebtime(where: {id: {_eq: $id}}) { tname code }
-        mswebmember(where: {id: {_eq: $id}}, order_by: {webid: asc}) { webid mail mcode tcode name mgroup kake etanto }
       }`;
     const q = await this.query<{
       mswebhaiso: OcnkHaiso[]; mswebpay: { pname: string; pcode: string }[];
-      mswebtime: { tname: string; code: string }[]; mswebmember: WebMember[];
+      mswebtime: { tname: string; code: string }[];
     }>(Get, { id: this.usrsrv.compid });
     const pay: Record<string, string> = {};
     q.mswebpay.forEach(e => pay[e.pname] = e.pcode);
     const time: Record<string, string> = {};
     q.mswebtime.forEach(e => time[e.tname] = e.code);
-    return { haiso: q.mswebhaiso, pay, time, members: q.mswebmember };
+    return { haiso: q.mswebhaiso, pay, time };
   }
 
-  async saveMember(m: WebMember): Promise<void> {
-    const Save = gql`
-      mutation save_webmember($obj: mswebmember_insert_input!) {
-        insert_mswebmember_one(object: $obj, on_conflict: {constraint: mswebmember_pkey, update_columns: [mail, mcode, tcode, name, mgroup, kake, etanto, updated_at, updated_by]}) { webid }
+  /**
+   * 会員ID → 顧客（顧客マスタの webid で探す）。
+   * 1 人で会員IDを複数持つ顧客は webid にカンマ区切りで入っているので、カンマを含む行も読んで分解する
+   */
+  async dojo(webids: string[]): Promise<Record<string, OcnkDojo>> {
+    const Get = gql`
+      query get_ocnk_dojo($id: smallint!, $webids: [String!]!) {
+        msmember(where: {id: {_eq: $id}, del: {_eq: false}, _or: [{webid: {_in: $webids}}, {webid: {_like: "%,%"}}]}, order_by: {mcode: asc}) {
+          mcode webid tcode tcode1 torikbn
+        }
       }`;
-    await this.mutate(Save, {
-      obj: {
-        id: this.usrsrv.compid, webid: m.webid.trim(), mail: nz(m.mail), mcode: nz(m.mcode), tcode: nz(m.tcode), name: nz(m.name),
-        mgroup: nz(m.mgroup), kake: !!m.kake, etanto: nz(m.etanto), updated_at: new Date(), updated_by: this.usrsrv.staff.code
-      }
-    });
-  }
-
-  async deleteMember(webid: string): Promise<void> {
-    const Del = gql`
-      mutation del_webmember($id: smallint!, $webid: String!) {
-        delete_mswebmember_by_pk(id: $id, webid: $webid) { webid }
-      }`;
-    await this.mutate(Del, { id: this.usrsrv.compid, webid });
+    const q = await this.query<{ msmember: { mcode: string; webid: string; tcode: string | null; tcode1: string | null; torikbn: boolean | null }[] }>(
+      Get, { id: this.usrsrv.compid, webids });
+    const res: Record<string, OcnkDojo> = {};
+    q.msmember.forEach(e => e.webid.split(',').map(s => s.trim()).filter(s => s).forEach(webid => {
+      res[webid] ??= { webid, mcode: e.mcode, tcode: e.tcode, kake: !!e.torikbn, etanto: e.tcode1 };
+    }));
+    return res;
   }
 
   /** 商品の在庫区分（gskbn）とセット品の構成 */

@@ -1,38 +1,18 @@
 -- =====================================================================
 -- おちゃのこ受注取込（現行の「BTC-MWWEB.xlsm」と member.xlsx の置き換え）
 --
---   mswebmember : 道場会員の変換表（member.xlsx の「変換」シート）。おちゃのこの会員ID → 顧客コード・担当者・掛け請求
 --   mswebhaiso  : 発送方法の変換表（File シートの OCNK）。名称 → 大分類・部門・担当・税区分・媒体管理
 --   mswebpay    : 支払方法の変換表（File シートの PayType）。名称 → 入金予定コード
 --   mswebtime   : お届け時間帯の変換表（File シートの Time）。名称 → 時間コード
+--   msmember.webid : おちゃのこの会員ID。1 人で複数持つ顧客はカンマ区切りで入れる（例 12345,12346）
 --
---   mswebmember の行は個人情報を含むので、ここには入れない（別ファイルの 20261101_mswebmember_data.sql で入れる）。
+--   member.xlsx の会員ID は別ファイルの 20261101_msmember_webid_*.sql で msmember に入れる。
 --
 -- 適用方法: Hasura コンソール > Data > SQL で、search_path を test / public に切り替えて 1 回ずつ実行する。
 -- =====================================================================
 SET search_path TO test;  -- 本番に適用するときは public に変更
 
-CREATE TABLE IF NOT EXISTS mswebmember (
-    id         smallint NOT NULL
-  , webid      text     NOT NULL
-  , mail       text
-  , mcode      text
-  , tcode      text
-  , name       text
-  , mgroup     text
-  , kake       boolean  NOT NULL DEFAULT false
-  , etanto     text
-  , updated_at timestamptz
-  , updated_by text
-  , PRIMARY KEY (id, webid)
-);
-COMMENT ON TABLE mswebmember IS '道場会員の変換表（おちゃのこの会員ID → 顧客）';
-COMMENT ON COLUMN mswebmember.webid IS 'おちゃのこ会員ID';
-COMMENT ON COLUMN mswebmember.mcode IS '通販Pro顧客コード';
-COMMENT ON COLUMN mswebmember.tcode IS '通販Pro担当者コード（内勤）';
-COMMENT ON COLUMN mswebmember.mgroup IS '会員グループ';
-COMMENT ON COLUMN mswebmember.kake IS '掛け請求';
-COMMENT ON COLUMN mswebmember.etanto IS '営業担当者コード';
+COMMENT ON COLUMN msmember.webid IS 'おちゃのこ会員ID（複数はカンマ区切り）';
 
 CREATE TABLE IF NOT EXISTS mswebhaiso (
     id        smallint NOT NULL
@@ -91,13 +71,15 @@ ON CONFLICT DO NOTHING;
 
 -- 二重登録の確認を速くする
 CREATE INDEX IF NOT EXISTS trjyuden_cusden_idx ON trjyuden (id, cusden);
+-- 会員ID で顧客を探す
+CREATE INDEX IF NOT EXISTS msmember_webid_idx ON msmember (id, webid);
 
 -- ---------------------------------------------------------------------
 -- Hasura 側の設定
 --   ・Reload metadata
---   ・表 mswebmember, mswebhaiso, mswebpay, mswebtime を Track する
+--   ・表 mswebhaiso, mswebpay, mswebtime を Track する
 --   ・mswebhaiso, mswebpay, mswebtime の select 権限（staff）: すべての列
---   ・mswebmember の select / insert / update / delete 権限（staff）: すべての列
+--   ・msmember の select 権限（staff）に webid, tcode, tcode1, torikbn が含まれていること
 --   ・trzaiko の update 権限（staff）に jyut が含まれていること
 --   ・msgzai の select 権限（staff）に gcode, zcode, irisu が含まれていること
 -- ---------------------------------------------------------------------
