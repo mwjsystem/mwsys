@@ -20,6 +20,7 @@
             "allowedCommonJsDependencies": [
               "zen-observable",
               "encoding-japanese",
+              "exceljs",
               "file-saver",
               "json2csv",
               "vanilla-autokana",

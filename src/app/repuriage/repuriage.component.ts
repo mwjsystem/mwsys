@@ -1,7 +1,9 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { COL_NICHI, COL_PREV, Mode, Node, PersItem, RepuriageService, UriReport, Val, monthCol } from './repuriage.service';
+import * as FileSaver from 'file-saver';
+import { COL_NICHI, COL_PREV, Mode, Node, PersBlock, PersLine, RepuriageService, UriReport, Val, monthCol } from './repuriage.service';
+import { UriSource, fillUriBook } from './repuriage-excel';
 import { UserService } from './../services/user.service';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton } from '@angular/material/button';
@@ -11,10 +13,6 @@ import { MatSelect, MatOption } from '@angular/material/select';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { DecimalPipe, DatePipe, PercentPipe } from '@angular/common';
-
-/** 個人集計の行（実績・昨年・上昇額・上昇率） */
-interface PersLine { label: string; cells: (number | null)[]; total: number | null; pct?: boolean }
-interface PersBlock { item: PersItem; lines: PersLine[] }
 
 /**
  * 売上報告（現行の「2026年売上報告.xlsm」の置き換え）。売上報告・個人集計・累計値の 3 つのタブ。
@@ -27,7 +25,7 @@ interface PersBlock { item: PersItem; lines: PersLine[] }
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatToolbar, MatButton, MatIcon, MatFormField, MatLabel, MatInput, MatSuffix, MatSelect, MatOption, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatTabGroup, MatTab, FormsModule, DecimalPipe, DatePipe, PercentPipe]
 })
-export class RepuriageComponent implements OnInit {
+export class RepuriageComponent implements OnInit, UriSource {
   private srv = inject(RepuriageService);
   private usrsrv = inject(UserService);
   private title = inject(Title);
@@ -135,6 +133,49 @@ export class RepuriageComponent implements OnInit {
     };
     this.root?.children.forEach(walk);
     return ret;
+  }
+
+  /** 閉じている行も含めたすべての行 */
+  get allRows(): Node[] {
+    const ret: Node[] = [];
+    const walk = (n: Node) => {
+      ret.push(n);
+      n.children.forEach(walk);
+    };
+    this.root?.children.forEach(walk);
+    return ret;
+  }
+
+  /** 表示中の対象日・切り口で 3 シートの Excel をダウンロードする */
+  async excel() {
+    const r = this.report;
+    if (!r || !this.shownDay) {
+      return;
+    }
+    this.busy = true;
+    this.error = '';
+    this.cdRef.detectChanges();
+    try {
+      const day = this.shownDay;
+      const ymd = day.getFullYear() + '/' + (day.getMonth() + 1) + '/' + day.getDate();
+      const modes: Record<Mode, string> = { tanto: '担当 → 大分類 → 部門', dai: '大分類 → 部門', bu: '部門' };
+      const info = '集計の切り口: ' + modes[this.mode] + '　当月 ' + r.monthBiz + ' 営業日　経過 ' + r.monthDone + ' 営業日　'
+        + (r.year - 1) + '/12/1〜' + r.year + '/11/30 稼働 ' + r.yearBiz + ' 日（対象日まで ' + r.yearDone + ' 日）';
+      // ExcelJS は大きいので、押されたときに読み込む
+      const lib = await import('exceljs');
+      const Workbook = lib.Workbook ?? lib.default.Workbook;
+      const wb = new Workbook();
+      fillUriBook(wb, this, '売上報告（対象日 ' + ymd + '）', info);
+      const buf = await wb.xlsx.writeBuffer();
+      const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      const stamp = day.getFullYear() + ('0' + (day.getMonth() + 1)).slice(-2) + ('0' + day.getDate()).slice(-2);
+      FileSaver.saveAs(new Blob([buf], { type }), '売上報告_' + stamp + '.xlsx');
+    } catch (e) {
+      this.error = 'Excel を作成できませんでした：' + (e as Error).message;
+      console.log('error repuriage excel', e);
+    }
+    this.busy = false;
+    this.cdRef.detectChanges();
   }
 
   isOpen(n: Node): boolean {

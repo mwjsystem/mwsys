@@ -12,6 +12,10 @@ export interface PersRow { seq: number; ym: string; kingaku: number }
 /** 個人集計の項目 */
 export interface PersItem { seq: number; tanto: string; item: string; kind: string; val: string | null }
 
+/** 個人集計の行（実績・昨年・上昇額・上昇率） */
+export interface PersLine { label: string; cells: (number | null)[]; total: number | null; pct?: boolean }
+export interface PersBlock { item: PersItem; lines: PersLine[] }
+
 /** 売上報告の列（当月日割・各月・前年 12 月） */
 export const COL_NICHI = 'nichi';
 export const COL_PREV = 'prev12';

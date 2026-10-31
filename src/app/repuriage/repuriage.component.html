@@ -21,6 +21,9 @@
   </mat-form-field>
   <button mat-button type="button" (click)="expand(true)">すべて開く</button>
   <button mat-button type="button" (click)="expand(false)">すべて閉じる</button>
+  <button mat-button type="button" (click)="excel()" [disabled]="busy || !report">
+    <mat-icon>download</mat-icon>Excel出力
+  </button>
   @if (busy) {
     <span>集計しています…</span>
   }
