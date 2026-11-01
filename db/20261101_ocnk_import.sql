@@ -50,16 +50,10 @@ INSERT INTO mswebhaiso (id, hname, shop, daibunrui, bumon, tanto, mtax, bkcode) 
   , (1, 'NAS会員', 'MWJonline', '333333', '092', '3106', '1', '10')
 ON CONFLICT DO NOTHING;
 
--- 同梱：受注伝票の配送方法を 49（代引は 45）にする。大分類などは基本送料と同じ
+-- 同梱：受注伝票の配送方法を mshokuri の 49「**同梱」（代引は 45「**同梱代」）にする。大分類などは基本送料と同じ
 INSERT INTO mswebhaiso (id, hname, shop, daibunrui, bumon, tanto, mtax, bkcode, hcode, hcoded) VALUES
     (1, '同梱', 'MWJonline', '200001', '201', '3117', '1', '01', '49', '45')
 ON CONFLICT (id, hname) DO UPDATE SET hcode = EXCLUDED.hcode, hcoded = EXCLUDED.hcoded;
-
--- 現行システムの配送方法（OPL.OKURI の CODE 49, 45）。無ければ追加する
-INSERT INTO mshokuri (id, code, name, hscode, daibiki)
-SELECT v.id, v.code, v.name, v.hscode, v.daibiki
-  FROM (VALUES (1, '49', '別伝票に同梱する配送伝票', 0, false), (1, '45', '別伝票に同梱する配送伝票(代引)', 0, true)) AS v(id, code, name, hscode, daibiki)
- WHERE NOT EXISTS (SELECT 1 FROM mshokuri m WHERE m.id = v.id AND m.code = v.code);
 
 INSERT INTO mswebpay (id, pname, pcode) VALUES
     (1, '銀行振込', '5')
