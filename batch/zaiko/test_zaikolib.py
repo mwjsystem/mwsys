@@ -128,6 +128,14 @@ class Products(unittest.TestCase):
         self.assertIn('【各バリエーション入荷予定】赤：日程調整中、青 L：日程調整中</span>', rows[1][zl.C_DESC])
 
 
+class Barra(unittest.TestCase):
+    def test_rows(self):
+        m = master()
+        m.goods['B'].update({'zh_barra': True, 'zkbn': '0', 'tkbn': '0', 'gtext': 'バー'})
+        m.goods['C'].update({'zh_barra': True, 'zkbn': '0', 'tkbn': '9', 'gtext': '終売'})
+        self.assertEqual(zl.build_barra(m), [['B', 'バー', 4]])
+
+
 class Rms(unittest.TestCase):
     def test_find(self):
         m = master()

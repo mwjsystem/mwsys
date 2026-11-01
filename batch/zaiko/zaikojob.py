@@ -3,20 +3,25 @@
   python zaikojob.py list  <MW在庫一覧.xlsx>                     ①在庫表を作る
   python zaikojob.py csv   <products.csv>                        ②おちゃのこの CSV を更新する
   python zaikojob.py rms   <normal-item.xlsx> <normal-item.csv> <goods_stock.csv>   ③在庫数を更新する
+  python zaikojob.py barra                                       BARRA 在庫一覧をメールで送る
 
 環境変数
   MWSYS_HASURA_URL     省略時は本番の Hasura
   MWSYS_HASURA_SECRET  admin secret（必須）
   MWSYS_SCHEMA         test なら test スキーマを読む。省略時は public
   MWSYS_LOG            ログファイル。省略時は標準出力のみ
+  MWSYS_SMTP_USER      barra のメール送信のユーザー
+  MWSYS_SMTP_PASSWORD  barra のメール送信のパスワード
 """
 import datetime
 import json
 import os
+import smtplib
 import sys
 import tempfile
 import traceback
 import urllib.request
+from email.message import EmailMessage
 
 import openpyxl
 
@@ -24,6 +29,12 @@ import zaikolib as zl
 
 COMP_ID = 1
 DEFAULT_URL = 'https://mwjtables.herokuapp.com/v1/graphql'
+SMTP_HOST = 'mwjapan.sakura.ne.jp'
+SMTP_PORT = 587
+MAIL_FROM = 'asagosoko@mwjapan.jp'
+BARRA_TO = ['kawaguchi@mwjapan.jp', 'onoyama@mwjapan.jp']
+BARRA_CC = ['system@mwjapan.jp']
+XLSX_TYPE = ('application', 'vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 
 def write_log(job: str, par: str, msg: str) -> None:
@@ -56,7 +67,7 @@ def load_master(today: datetime.date) -> zl.Master:
     q = '''
     query zaiko($id: smallint!, $sc: String!, $day: date!, $args: %(fn_args)s!) {
       %(msgoods)s(where: {id: {_eq: $id}}) {
-        gcode gskbn zaikohyo zh_sort zh_fixed zh_kbn zh_addsc zh_addg zh_sku zh_jan zh_name zh_color zh_size zh_send zh_note
+        gcode gtext gskbn tkbn zkbn zh_barra zaikohyo zh_sort zh_fixed zh_kbn zh_addsc zh_addg zh_sku zh_jan zh_name zh_color zh_size zh_send zh_note
         msgtankas(limit: 1, where: {day: {_lte: $day}}, order_by: {day: desc}) { tanka1 }
       }
       %(msgzai)s(where: {id: {_eq: $id}}) { gcode zcode irisu }
@@ -158,8 +169,42 @@ def job_rms(xlsx: str, item_csv: str, ana_csv: str) -> None:
     write_log('zaiko_rms', '', '正常終了')
 
 
+def barra_mail(today: datetime.date, xlsx: str) -> EmailMessage:
+    msg = EmailMessage()
+    msg['From'] = MAIL_FROM
+    msg['To'] = ', '.join(BARRA_TO)
+    msg['Cc'] = ', '.join(BARRA_CC)
+    msg['Subject'] = today.strftime('%Y%m%d') + 'BARRA在庫一覧'
+    msg.set_content('掲題の件、添付の通りです')
+    with open(xlsx, 'rb') as f:
+        msg.add_attachment(f.read(), maintype=XLSX_TYPE[0], subtype=XLSX_TYPE[1], filename='BARRA在庫.xlsx')
+    return msg
+
+
+def job_barra() -> None:
+    today = datetime.date.today()
+    rows = zl.build_barra(load_master(today))
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'BARRA在庫'
+    ws.append(['商品コード', '商品名称', '受注可'])
+    for r in rows:
+        ws.append(r)
+    ws.column_dimensions['A'].width = 20
+    ws.column_dimensions['B'].width = 50
+    with tempfile.TemporaryDirectory() as d:
+        xlsx = os.path.join(d, 'BARRA在庫.xlsx')
+        wb.save(xlsx)
+        msg = barra_mail(today, xlsx)
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=60) as s:
+        s.starttls()
+        s.login(os.environ['MWSYS_SMTP_USER'], os.environ['MWSYS_SMTP_PASSWORD'])
+        s.send_message(msg)
+    write_log('zaiko_barra', '', '正常終了 ' + str(len(rows)) + ' 件')
+
+
 def main() -> int:
-    jobs = {'list': (job_list, 1), 'csv': (job_csv, 1), 'rms': (job_rms, 3)}
+    jobs = {'list': (job_list, 1), 'csv': (job_csv, 1), 'rms': (job_rms, 3), 'barra': (job_barra, 0)}
     if len(sys.argv) < 2 or sys.argv[1] not in jobs or len(sys.argv) != 2 + jobs[sys.argv[1]][1]:
         print(__doc__)
         return 2

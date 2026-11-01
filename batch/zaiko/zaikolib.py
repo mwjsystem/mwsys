@@ -117,6 +117,12 @@ def build_sheet(m: Master) -> dict:
     return {g['gcode']: calc_item(m, g) for g in rows}
 
 
+def build_barra(m: Master) -> list:
+    """BARRA 在庫一覧の行（マクロの Make_Barra）。在庫は BARRA の倉庫のみ"""
+    rows = [g for g in m.goods.values() if g.get('zh_barra') and g.get('zkbn') == '0' and g.get('tkbn') == '0']
+    return [[g['gcode'], g.get('gtext'), int(m.free(g['gcode'], SUB_SCODE))] for g in sorted(rows, key=lambda g: g['gcode'])]
+
+
 def calc_yotei(yotei, gcode: str, m: Master) -> str:
     """入荷予定の文言（上旬・中旬・下旬）"""
     if yotei == FAR_DATE or not isinstance(yotei, datetime.date):

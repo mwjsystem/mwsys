@@ -7,6 +7,7 @@
 | `list` | 在庫表 `MW在庫一覧.xlsx` を作る | `main` と `Make_zip` の一覧作成 |
 | `csv` | おちゃのこの `products.csv` を更新する | `Make_csv` |
 | `rms` | 楽天の `normal-item.xlsx`、ANA Mall の `goods_stock.csv` を更新する | `Edit_rms` |
+| `barra` | BARRA 在庫一覧をメールに添付して送る | `Make_Barra` |
 
 ## 準備
 
@@ -19,10 +20,13 @@ pip install -r requirements.txt
 - `MWSYS_HASURA_SECRET`：Hasura の admin secret
 - `MWSYS_SCHEMA`：テスト中は `test`。本番は設定しない
 - `MWSYS_LOG`：`C:\mwj\MWJAPAN\mwjapan - share\system\batch\log.txt`
+- `MWSYS_SMTP_USER`、`MWSYS_SMTP_PASSWORD`：メール送信のアカウント（`barra` のみ）
 
 ## 実行
 
-`kick_zaiko_list.bat`、`kick_zaiko_ocnk.bat`、`kick_zaiko_rms.bat` をタスクスケジューラに登録する。
+`kick_zaiko_list.bat`、`kick_zaiko_ocnk.bat`、`kick_zaiko_rms.bat`、`kick_zaiko_barra.bat` をタスクスケジューラに登録する。
+
+- `kick_zaiko_barra.bat` は月に 1 回
 
 - `kick_zaiko_ocnk.bat` は、`kick_dl_ocnk.bat` の後、`kick_up_ocnk.bat` の前に動かす
 - 土日は動かさない（Web の注文で減った在庫を更新しないため）
