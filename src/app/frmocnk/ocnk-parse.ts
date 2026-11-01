@@ -4,7 +4,7 @@
  */
 
 /** 発送方法の変換（mswebhaiso） */
-export interface OcnkHaiso { hname: string; daibunrui: string | null; bumon: string | null; tanto: string | null; mtax: string | null; bkcode: string | null }
+export interface OcnkHaiso { hname: string; daibunrui: string | null; bumon: string | null; tanto: string | null; mtax: string | null; bkcode: string | null; hcode: string | null; hcoded: string | null }
 /** 道場会員（顧客マスタの webid で引いた結果） */
 export interface OcnkDojo { webid: string; mcode: string | null; tcode: string | null; kake: boolean; etanto: string | null }
 
@@ -32,7 +32,7 @@ export interface OcnkOrder {
   day: string | null; hday: string | null; htime: string;
   daibunrui: string; bumon: string; tanto: string; etanto: string; pay: string; nyukin: string; bcode: string; bkcode: string;
   dmemo: string; nmemo: string; omemo: string;
-  gtotal: number; souryou: number; tesuu: number; nebiki: number; total: number;
+  hcode: string; gtotal: number; souryou: number; tesuu: number; nebiki: number; total: number;
   lines: OcnkLine[];
   /** 読み込み時のエラー */
   err: string;
@@ -145,6 +145,9 @@ const MALL_TAGS: [string, number, string][] = [
   ['[モール(一周)]', 770, 'モール(一周)'], ['[モール(段級位線)(一周)]', 770, 'モール(一周)']
 ];
 
+/** 代引の支払方法か */
+export const isDaibiki = (pay: string): boolean => pay.includes('代金引換') || pay.includes('代引');
+
 export function parseOrders(rows: string[][], c: OcnkConf): OcnkParsed {
   const orders: OcnkOrder[] = [];
   const notFound: string[] = [];
@@ -172,6 +175,9 @@ export function parseOrders(rows: string[][], c: OcnkConf): OcnkParsed {
     const dt = parseDay(d(12));
     const hd = parseDay(d(37));
     const haiso = kbn == '道場' ? null : webAc(ha, gr);
+    // 配送方法（同梱など。道場・NAS会員でも CSV の発送方法で決める）
+    const hrow = c.haiso.find(e => e.hname == ha);
+    const daibiki = isDaibiki(d(16));
     let dmemo = dt ? dt.stamp : d(12);
     if (d(17) != '店舗が送り主') {
       dmemo += ' 依頼主変更あり(詳細はweb受注を確認)';
@@ -192,6 +198,7 @@ export function parseOrders(rows: string[][], c: OcnkConf): OcnkParsed {
       pay: d(16), nyukin: dj?.kake ? '1' : lk(c.pay, d(16), '支払方法'),
       bcode: '01', bkcode: haiso?.bkcode ?? '01',
       dmemo, nmemo: '', omemo: normLf(d(44)).replace(/\n/g, ''),
+      hcode: (daibiki ? hrow?.hcoded : hrow?.hcode) ?? '',
       gtotal: num(d(13)), souryou: num(d(14)), tesuu: num(d(49)), nebiki: num(d(45)) + num(d(47)), total: num(d(15)),
       lines: [], err: '', result: '', denno: null
     };
@@ -456,7 +463,7 @@ function makeBlank(cusden: string, kbn: string, webid: string): OcnkOrder {
     cusden, kbn, webid, mcode: '', kake: false, sei: '', kana: '', company: '', busho: '', mail: '', zip: '', pref: '', addr: '', tel: '',
     nkbn: '1', nname: '', ncompany: '', nzip: '', npref: '', naddr: '', ntel: '', day: null, hday: null, htime: '0',
     daibunrui: '', bumon: '', tanto: '', etanto: '', pay: '', nyukin: '', bcode: '01', bkcode: '01', dmemo: '', nmemo: '', omemo: '',
-    gtotal: 0, souryou: 0, tesuu: 0, nebiki: 0, total: 0, lines: [], err: '', result: '', denno: null
+    hcode: '', gtotal: 0, souryou: 0, tesuu: 0, nebiki: 0, total: 0, lines: [], err: '', result: '', denno: null
   };
 }
 

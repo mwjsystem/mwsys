@@ -4,7 +4,7 @@ import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 import { UserService } from './../services/user.service';
 import { JDST } from './../frmship/ship-forms';
-import { OcnkConf, OcnkDojo, OcnkHaiso, OcnkOrder, exTax, taxOf } from './ocnk-parse';
+import { OcnkConf, OcnkDojo, OcnkHaiso, OcnkOrder, exTax, isDaibiki, taxOf } from './ocnk-parse';
 
 /** 変換表一式 */
 export type OcnkMaster = Pick<OcnkConf, 'haiso' | 'pay' | 'time'>;
@@ -53,7 +53,7 @@ export class OcnkService {
   async master(): Promise<OcnkMaster> {
     const Get = gql`
       query get_ocnk_master($id: smallint!) {
-        mswebhaiso(where: {id: {_eq: $id}}) { hname daibunrui bumon tanto mtax bkcode }
+        mswebhaiso(where: {id: {_eq: $id}}) { hname daibunrui bumon tanto mtax bkcode hcode hcoded }
         mswebpay(where: {id: {_eq: $id}}) { pname pcode }
         mswebtime(where: {id: {_eq: $id}}) { tname code }
       }`;
@@ -270,12 +270,12 @@ export class OcnkService {
 
     // 7. 受注伝票。金額（おちゃのこは税込。消費税は 10/110 の端数切り上げ、税抜は 税込 - 消費税）
     const total = Math.round(o.total);
-    const daibiki = o.pay.includes('代金引換') || o.pay.includes('代引');
+    const daibiki = isDaibiki(o.pay);
     const jyuden = {
       id, denno, day: o.day, hday: o.hday, htime: nz(o.htime), mcode, scde: mcode, ncode: mcode, nadr, scode: WEB_SCODE,
       tcode: nz(o.tanto), tcode1: nz(o.etanto) ?? nz(member?.tcode1),
       daibunrui: nz(o.daibunrui) ?? nz(member?.daibunrui), chubunrui: nz(o.bumon) ?? nz(member?.chubunrui),
-      jcode: WEB_JCODE, pcode: nz(o.nyukin), bcode: o.bcode, bkcode: o.bkcode,
+      jcode: WEB_JCODE, pcode: nz(o.nyukin), bcode: o.bcode, bkcode: o.bkcode, hcode: nz(o.hcode),
       dmemo: nz(o.dmemo), nmemo: nz(o.nmemo), omemo: nz(o.omemo), cusden: o.cusden,
       total, total10: total, total8: 0, taxtotal: taxOf(total),
       gtotalzn: exTax(o.gtotal), soryozn: exTax(o.souryou), tesuzn: exTax(o.tesuu), nebikizn: exTax(o.nebiki),
