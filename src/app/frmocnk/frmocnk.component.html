@@ -14,7 +14,6 @@
   <mat-form-field style="width: 11em;" subscriptSizing="dynamic">
     <mat-label>担当者</mat-label>
     <mat-select [(ngModel)]="tanto" (selectionChange)="parse()" [panelClass]="'my-panel-class'">
-      <mat-option value="">すべて</mat-option>
       @for (t of stfsrv.tcds; track t) {
         <mat-option [value]="t.value">{{t.value ? t.viewval : 'すべて'}}</mat-option>
       }
