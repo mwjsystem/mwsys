@@ -72,12 +72,13 @@ def load_master(today: datetime.date) -> zl.Master:
       }
       %(msgzai)s(where: {id: {_eq: $id}}) { gcode zcode irisu }
       %(mszaikoex)s(where: {id: {_eq: $id}}) { kbn gcode }
-      %(vhatzn)s(where: {id: {_eq: $id}, scode: {_eq: $sc}, hatzn: {_gt: 0}, inday: {_is_null: false}},
-                 order_by: [{gcode: asc}, {inday: asc}]) { gcode inday hatzn }
+      %(trhatden)s(where: {id: {_eq: $id}, scode: {_eq: $sc}, vhatzns: {hatzn: {_gt: 0}}}) {
+        vhatzns(where: {hatzn: {_gt: 0}, inday: {_is_null: false}}) { gcode inday hatzn }
+      }
       %(fzaikoall)s(args: $args) { scode gcode zaiko juzan }
     }''' % {
         'msgoods': root('msgoods'), 'msgzai': root('msgzai'), 'mszaikoex': root('mszaikoex'),
-        'vhatzn': root('vhatzn'), 'fzaikoall': root('fzaikoall'),
+        'trhatden': root('trhatden'), 'fzaikoall': root('fzaikoall'),
         'fn_args': ('test_' if os.environ.get('MWSYS_SCHEMA') == 'test' else '') + 'fzaikoall_args',
     }
     d = gql(q, {'id': COMP_ID, 'sc': zl.MAIN_SCODE, 'day': today.isoformat(), 'args': {'p_id': COMP_ID, 'p_day': today.isoformat()}})
@@ -86,8 +87,11 @@ def load_master(today: datetime.date) -> zl.Master:
         m.zai.setdefault(z['gcode'], []).append((z['zcode'], float(z['irisu'])))
     for e in d['mszaikoex']:
         m.ex.setdefault(e['kbn'], set()).add(e['gcode'])
-    for h in d['vhatzn']:
-        m.hatzn.setdefault(h['gcode'], []).append((datetime.date.fromisoformat(h['inday'][:10]), float(h['hatzn'])))
+    for den in d['trhatden']:
+        for h in den['vhatzns']:
+            m.hatzn.setdefault(h['gcode'], []).append((datetime.date.fromisoformat(h['inday'][:10]), float(h['hatzn'])))
+    for v in m.hatzn.values():
+        v.sort(key=lambda e: e[0])
     for s in d['fzaikoall']:
         m.stock[(s['scode'], s['gcode'])] = (float(s['zaiko']), float(s['juzan']))
     return m
