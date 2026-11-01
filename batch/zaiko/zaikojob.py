@@ -19,6 +19,7 @@ import os
 import smtplib
 import sys
 import tempfile
+import time
 import traceback
 import urllib.request
 from email.message import EmailMessage
@@ -63,36 +64,59 @@ def root(name: str) -> str:
     return name + ': test_' + name if os.environ.get('MWSYS_SCHEMA') == 'test' else name
 
 
+def step(name: str, query: str, variables: dict) -> dict:
+    """1 回の問い合わせ（Heroku は 30 秒で切るので、まとめずに分ける）。遅い処理が分かるように時間を出す"""
+    start = time.time()
+    try:
+        return gql(query, variables)
+    finally:
+        print(name, round(time.time() - start, 1), '秒', flush=True)
+
+
 def load_master(today: datetime.date) -> zl.Master:
-    q = '''
-    query zaiko($id: smallint!, $sc: String!, $day: date!, $args: %(fn_args)s!) {
-      %(msgoods)s(where: {id: {_eq: $id}}) {
+    id_day = {'id': COMP_ID, 'day': today.isoformat()}
+    q = step('msgoods', '''
+    query zaiko_goods($id: smallint!) {
+      %s(where: {id: {_eq: $id}}) {
         gcode gtext gskbn tkbn zkbn zh_barra zaikohyo zh_sort zh_fixed zh_kbn zh_addsc zh_addg zh_sku zh_jan zh_name zh_color zh_size zh_send zh_note
+      }
+    }''' % root('msgoods'), {'id': COMP_ID})
+    m = zl.Master(goods={g['gcode']: g for g in q['msgoods']})
+    q = step('msgtanka', '''
+    query zaiko_tanka($id: smallint!, $day: date!) {
+      %s(where: {id: {_eq: $id}, zaikohyo: {_eq: true}}) {
+        gcode
         msgtankas(limit: 1, where: {day: {_lte: $day}}, order_by: {day: desc}) { tanka1 }
       }
-      %(msgzai)s(where: {id: {_eq: $id}}) { gcode zcode irisu }
-      %(mszaikoex)s(where: {id: {_eq: $id}}) { kbn gcode }
-      %(trhatden)s(where: {id: {_eq: $id}, scode: {_eq: $sc}, vhatzns: {hatzn: {_gt: 0}}}) {
+    }''' % root('msgoods'), id_day)
+    for g in q['msgoods']:
+        m.goods[g['gcode']]['msgtankas'] = g['msgtankas']
+    q = step('msgzai', '''
+    query zaiko_zai($id: smallint!) {
+      %s(where: {id: {_eq: $id}}) { gcode zcode irisu }
+      %s(where: {id: {_eq: $id}}) { kbn gcode }
+    }''' % (root('msgzai'), root('mszaikoex')), {'id': COMP_ID})
+    for z in q['msgzai']:
+        m.zai.setdefault(z['gcode'], []).append((z['zcode'], float(z['irisu'])))
+    for e in q['mszaikoex']:
+        m.ex.setdefault(e['kbn'], set()).add(e['gcode'])
+    q = step('vhatzn', '''
+    query zaiko_hatzn($id: smallint!, $sc: String!) {
+      %s(where: {id: {_eq: $id}, scode: {_eq: $sc}, vhatzns: {hatzn: {_gt: 0}}}) {
         vhatzns(where: {hatzn: {_gt: 0}, inday: {_is_null: false}}) { gcode inday hatzn }
       }
-      %(fzaikoall)s(args: $args) { scode gcode zaiko juzan }
-    }''' % {
-        'msgoods': root('msgoods'), 'msgzai': root('msgzai'), 'mszaikoex': root('mszaikoex'),
-        'trhatden': root('trhatden'), 'fzaikoall': root('fzaikoall'),
-        'fn_args': ('test_' if os.environ.get('MWSYS_SCHEMA') == 'test' else '') + 'fzaikoall_args',
-    }
-    d = gql(q, {'id': COMP_ID, 'sc': zl.MAIN_SCODE, 'day': today.isoformat(), 'args': {'p_id': COMP_ID, 'p_day': today.isoformat()}})
-    m = zl.Master(goods={g['gcode']: g for g in d['msgoods']})
-    for z in d['msgzai']:
-        m.zai.setdefault(z['gcode'], []).append((z['zcode'], float(z['irisu'])))
-    for e in d['mszaikoex']:
-        m.ex.setdefault(e['kbn'], set()).add(e['gcode'])
-    for den in d['trhatden']:
+    }''' % root('trhatden'), {'id': COMP_ID, 'sc': zl.MAIN_SCODE})
+    for den in q['trhatden']:
         for h in den['vhatzns']:
             m.hatzn.setdefault(h['gcode'], []).append((datetime.date.fromisoformat(h['inday'][:10]), float(h['hatzn'])))
     for v in m.hatzn.values():
         v.sort(key=lambda e: e[0])
-    for s in d['fzaikoall']:
+    fn_args = ('test_' if os.environ.get('MWSYS_SCHEMA') == 'test' else '') + 'fzaikoall_args'
+    q = step('fzaikoall', '''
+    query zaiko_stock($args: %s!) {
+      %s(args: $args) { scode gcode zaiko juzan }
+    }''' % (fn_args, root('fzaikoall')), {'args': {'p_id': COMP_ID, 'p_day': today.isoformat()}})
+    for s in q['fzaikoall']:
         m.stock[(s['scode'], s['gcode'])] = (float(s['zaiko']), float(s['juzan']))
     return m
 
