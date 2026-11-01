@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import * as FileSaver from 'file-saver';
 import { UserService } from './../services/user.service';
+import { StaffService } from './../services/staff.service';
 import { OcnkMaster, OcnkService } from './ocnk.service';
 import { OcnkDojo, OcnkOrder, parseCsv, parseOrders } from './ocnk-parse';
 import { fillOcnkBook } from './ocnk-excel';
@@ -31,14 +32,15 @@ const COL_WEBID = 51;
 export class FrmocnkComponent implements OnInit {
   private srv = inject(OcnkService);
   private usrsrv = inject(UserService);
+  stfsrv = inject(StaffService);
   private title = inject(Title);
   private cdRef = inject(ChangeDetectorRef);
 
   master?: OcnkMaster;
   /** CSV の会員ID → 顧客 */
   private dojo: Record<string, OcnkDojo> = {};
-  /** 取り込む担当者（'' はすべて） */
-  tanto = '';
+  /** 取り込む担当者（null はすべて） */
+  tanto: string | null = null;
   ippan = false;
   fileName = '';
   private rows: string[][] = [];
@@ -61,14 +63,15 @@ export class FrmocnkComponent implements OnInit {
       this.error = '変換表を読み込めませんでした：' + (e as Error).message;
       console.log('error frmocnk master', e);
     }
+    if (this.stfsrv.tcds.length == 0) {
+      await this.stfsrv.getStaff();
+    }
+    // ログイン中の担当者を初期値にする
+    const code = this.usrsrv.staff?.code ?? '';
+    if (this.stfsrv.tcds.some(e => e.value == code)) {
+      this.tanto = code;
+    }
     this.cdRef.detectChanges();
-  }
-
-  /** 担当者の選択肢（読み込んだ CSV の道場会員の担当者） */
-  get tantoList(): string[] {
-    const set = new Set(Object.values(this.dojo).map(e => e.tcode ?? '').filter(e => e));
-    set.add('3124');
-    return [...set].sort();
   }
 
   get envName(): string {
@@ -105,11 +108,6 @@ export class FrmocnkComponent implements OnInit {
       this.rows = parseCsv(text.replace(/^﻿/, ''));
       const webids = [...new Set(this.rows.slice(1).map(r => r[COL_WEBID] ?? '').filter(e => e))];
       this.dojo = await this.srv.dojo(webids);
-      // 最初の読み込みでは、ログイン中の担当者を初期値にする
-      const code = this.usrsrv.staff?.code ?? '';
-      if (!this.fileName && this.tantoList.includes(code)) {
-        this.tanto = code;
-      }
       this.fileName = file.name;
       await this.parse();
     } catch (e) {
@@ -131,7 +129,7 @@ export class FrmocnkComponent implements OnInit {
     const mod = await import('encoding-japanese');
     const Encoding = (mod as unknown as { default?: typeof mod }).default ?? mod;
     const narrow = (s: string) => Encoding.toHankanaCase(Encoding.toHankakuSpace(Encoding.toHankakuCase(s)));
-    const res = parseOrders(this.rows, { ...this.master, dojo: this.dojo, tanto: this.tanto, ippan: this.ippan, narrow });
+    const res = parseOrders(this.rows, { ...this.master, dojo: this.dojo, tanto: this.tanto ?? '', ippan: this.ippan, narrow });
     this.orders = res.orders;
     this.notFound = res.notFound;
     this.open.clear();
