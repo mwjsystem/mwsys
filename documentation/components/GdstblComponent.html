@@ -1,0 +1,1712 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>mwsys documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">mwsys documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content component">
+                   <div class="content-data">
+
+
+
+
+<ol class="breadcrumb">
+  <li>Components</li>
+  <li>GdstblComponent</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+        <li >
+            <a href="#templateData" role="tab" id="templateData-tab" data-toggle="tab" data-link="template">Template</a>
+        </li>
+        <li >
+            <a href="#styleData" role="tab" id="styleData-tab" data-toggle="tab" data-link="style">Styles</a>
+        </li>
+        <li >
+            <a href="#tree" role="tab" id="tree-tab" data-toggle="tab" data-link="dom-tree">DOM Tree</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info"><p class="comment">
+    <h3>File</h3>
+</p>
+<p class="comment">
+    <code>src/app/mstgoods/gdstbl.component.ts</code>
+</p>
+
+
+
+    <p class="comment">
+        <h3>Implements</h3>
+    </p>
+    <p class="comment">
+                    <code><a href="https://angular.io/api/core/OnInit" target="_blank" >OnInit</a></code>
+    </p>
+
+
+<section>
+    <h3>Metadata</h3>
+    <table class="table table-sm table-hover">
+        <tbody>
+
+
+
+
+
+
+
+
+
+
+
+            <tr>
+                <td class="col-md-3">selector</td>
+                <td class="col-md-9"><code>app-gdstbl</code></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-3">styleUrls</td>
+                <td class="col-md-9"><code>./gdstbl.component.scss</code></td>
+            </tr>
+
+
+
+            <tr>
+                <td class="col-md-3">templateUrl</td>
+                <td class="col-md-9"><code>./gdstbl.component.html</code></td>
+            </tr>
+
+
+
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#bunsrv">bunsrv</a>
+                            </li>
+                            <li>
+                                <a href="#dataSource">dataSource</a>
+                            </li>
+                            <li>
+                                <a href="#displayedColumns">displayedColumns</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#gdssrv">gdssrv</a>
+                            </li>
+                            <li>
+                                <a href="#paginator">paginator</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#usrsrv">usrsrv</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#add_rows">add_rows</a>
+                            </li>
+                            <li>
+                                <a href="#createRow">createRow</a>
+                            </li>
+                            <li>
+                                <a href="#diaGzai">diaGzai</a>
+                            </li>
+                            <li>
+                                <a href="#frmVal">frmVal</a>
+                            </li>
+                            <li>
+                                <a href="#getGzai">getGzai</a>
+                            </li>
+                            <li>
+                                <a href="#ins_row">ins_row</a>
+                            </li>
+                            <li>
+                                <a href="#ngOnInit">ngOnInit</a>
+                            </li>
+                            <li>
+                                <a href="#refresh">refresh</a>
+                            </li>
+                            <li>
+                                <a href="#set_goods">set_goods</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Async</span>
+                                <a href="#setJan">setJan</a>
+                            </li>
+                            <li>
+                                <a href="#updateRow">updateRow</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Inputs</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#parentForm">parentForm</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Outputs</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#action">action</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+                    <tr>
+                        <td class="col-md-4">
+                            <h6><b>Accessors</b></h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <ul class="index-list">
+                                <li>
+                                    <a href="#frmArr">frmArr</a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(cdRef: <a href="https://angular.io/api/core/ChangeDetectorRef" target="_blank">ChangeDetectorRef</a>, fb: <a href="https://angular.io/api/forms/FormBuilder" target="_blank">FormBuilder</a>, usrsrv: <a href="../injectables/UserService.html">UserService</a>, gdssrv: <a href="../injectables/GoodsService.html">GoodsService</a>, bunsrv: <a href="../injectables/BunruiService.html">BunruiService</a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:19</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>cdRef</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="https://angular.io/api/core/ChangeDetectorRef" target="_blank" >ChangeDetectorRef</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>fb</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="https://angular.io/api/forms/FormBuilder" target="_blank" >FormBuilder</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>usrsrv</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/UserService.html" target="_self" >UserService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>gdssrv</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/GoodsService.html" target="_self" >GoodsService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>bunsrv</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/BunruiService.html" target="_self" >BunruiService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+    <section>
+    <h3 id="inputs">Inputs</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="parentForm"></a>
+                        <b>parentForm</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://angular.io/api/forms/FormGroup" target="_blank" >FormGroup</a></code>
+
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-2" colspan="2">
+                                    <div class="io-line">Defined in <a href="" data-line="15" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:15</a></div>
+                            </td>
+                        </tr>
+            </tbody>
+        </table>
+</section>
+    <section>
+    <h3 id="outputs">Outputs</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="action"></a>
+                        <b>action</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <i>Type : </i>        <code><a href="https://angular.io/api/core/EventEmitter" target="_blank" >EventEmitter</a></code>
+
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-2" colspan="2">
+                                    <div class="io-line">Defined in <a href="" data-line="17" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:17</a></div>
+                            </td>
+                        </tr>
+            </tbody>
+        </table>
+</section>
+
+
+    <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="add_rows"></a>
+                    <span class="name">
+                        <b>
+                            add_rows
+                        </b>
+                        <a href="#add_rows"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>add_rows(rows: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="50"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:50</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>rows</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="createRow"></a>
+                    <span class="name">
+                        <b>
+                            createRow
+                        </b>
+                        <a href="#createRow"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>createRow()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="103"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:103</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="diaGzai"></a>
+                    <span class="name">
+                        <b>
+                            diaGzai
+                        </b>
+                        <a href="#diaGzai"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>diaGzai()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="71"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:71</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="frmVal"></a>
+                    <span class="name">
+                        <b>
+                            frmVal
+                        </b>
+                        <a href="#frmVal"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>frmVal(i: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>, fld: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="79"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:79</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>i</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                                <tr>
+                                    <td>fld</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="getGzai"></a>
+                    <span class="name">
+                        <b>
+                            getGzai
+                        </b>
+                        <a href="#getGzai"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>getGzai(gcd: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="56"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:56</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>gcd</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="ins_row"></a>
+                    <span class="name">
+                        <b>
+                            ins_row
+                        </b>
+                        <a href="#ins_row"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>ins_row(row: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="34"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:34</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>row</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="ngOnInit"></a>
+                    <span class="name">
+                        <b>
+                            ngOnInit
+                        </b>
+                        <a href="#ngOnInit"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>ngOnInit()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="29"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:29</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="refresh"></a>
+                    <span class="name">
+                        <b>
+                            refresh
+                        </b>
+                        <a href="#refresh"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>refresh()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="135"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:135</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="set_goods"></a>
+                    <span class="name">
+                        <b>
+                            set_goods
+                        </b>
+                        <a href="#set_goods"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>set_goods()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="124"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:124</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="setJan"></a>
+                    <span class="name">
+                        <b>
+                            <span class="modifier">Async</span>
+                            setJan
+                        </b>
+                        <a href="#setJan"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+                    <span class="modifier-icon icon ion-ios-reset"></span>
+                    <code>setJan(i: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank">number</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="68"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:68</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>i</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/number" target="_blank" >number</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="updateRow"></a>
+                    <span class="name">
+                        <b>
+                            updateRow
+                        </b>
+                        <a href="#updateRow"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>updateRow(goods: mwI.Goods)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="83"
+                            class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:83</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>goods</td>
+                                    <td>
+                                            <code>mwI.Goods</code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >any</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+    <section>
+    
+        <h3 id="inputs">
+            Properties
+        </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="bunsrv"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            bunsrv</b>
+                            <a href="#bunsrv"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="../injectables/BunruiService.html" target="_self" >BunruiService</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="25" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:25</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="dataSource"></a>
+                        <span class="name">
+                            <b>
+                            dataSource</b>
+                            <a href="#dataSource"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>new MatTableDataSource()</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="18" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:18</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="displayedColumns"></a>
+                        <span class="name">
+                            <b>
+                            displayedColumns</b>
+                            <a href="#displayedColumns"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>[]</code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>[&#x27;action&#x27;,&#x27;gcode&#x27;,&#x27;gtext&#x27;,&#x27;size&#x27;,&#x27;color&#x27;,&#x27;irisu&#x27;,&#x27;iriunit&#x27;,&#x27;gskbn&#x27;,&#x27;jan&#x27;,&#x27;weight&#x27;,&#x27;tkbn&#x27;,&#x27;zkbn&#x27;,&#x27;max&#x27;,&#x27;send&#x27;,&#x27;ordering&#x27;,&#x27;koguchi&#x27;]</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="19" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:19</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="gdssrv"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            gdssrv</b>
+                            <a href="#gdssrv"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="../injectables/GoodsService.html" target="_self" >GoodsService</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="24" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:24</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="paginator"></a>
+                        <span class="name">
+                            <b>
+                            paginator</b>
+                            <a href="#paginator"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>MatPaginator</code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <b>Decorators : </b>
+                            <br />
+                            <code>
+                                @ViewChild(MatPaginator, {static: false})<br />
+                            </code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="16" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:16</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="usrsrv"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            usrsrv</b>
+                            <a href="#usrsrv"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="../injectables/UserService.html" target="_self" >UserService</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="23" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:23</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+</section>
+
+    <section>
+    <h3 id="accessors">
+        Accessors
+    </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="frmArr"></a>
+                        <span class="name"><b>frmArr</b><a href="#frmArr"><span class="icon ion-ios-link"></span></a></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <span class="accessor"><b>get</b><code>frmArr()</code></span>
+                    </td>
+                </tr>
+                            <tr>
+                                <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="75" class="link-to-prism">src/app/mstgoods/gdstbl.component.ts:75</a></div>
+                                </td>
+                            </tr>
+
+            </tbody>
+        </table>
+</section>
+</div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from &#x27;@angular/core&#x27;;
+import { FormBuilder, FormGroup, FormControl, Validators, FormArray } from &#x27;@angular/forms&#x27;;
+import { MatTableDataSource } from &#x27;@angular/material/table&#x27;;
+import { MatPaginator } from &#x27;@angular/material/paginator&#x27;;
+import { UserService } from &#x27;./../services/user.service&#x27;;
+import { GoodsService } from &#x27;./../services/goods.service&#x27;;
+import { BunruiService } from &#x27;./../services/bunrui.service&#x27;;
+
+@Component({
+  selector: &#x27;app-gdstbl&#x27;,
+  templateUrl: &#x27;./gdstbl.component.html&#x27;,
+  styleUrls: [&#x27;./gdstbl.component.scss&#x27;]
+})
+export class GdstblComponent implements OnInit {
+  @Input() parentForm: FormGroup;
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @Output() action &#x3D; new EventEmitter();
+  dataSource &#x3D; new MatTableDataSource();
+  displayedColumns &#x3D;[&#x27;action&#x27;,&#x27;gcode&#x27;,&#x27;gtext&#x27;,&#x27;size&#x27;,&#x27;color&#x27;,&#x27;irisu&#x27;,&#x27;iriunit&#x27;,&#x27;gskbn&#x27;,&#x27;jan&#x27;,&#x27;weight&#x27;,&#x27;tkbn&#x27;,&#x27;zkbn&#x27;,&#x27;max&#x27;,&#x27;send&#x27;,&#x27;ordering&#x27;,&#x27;koguchi&#x27;];
+  
+  constructor(private cdRef:ChangeDetectorRef,
+              private fb:     FormBuilder,
+              public usrsrv:UserService,
+              public gdssrv:GoodsService,
+              public bunsrv:BunruiService) {
+
+  }
+
+  ngOnInit(): void {
+    this.add_rows(1);
+    this.refresh();
+    // console.log(this.bunsrv.gskbn);
+  }
+  ins_row(row:number){
+    // console.log(row);
+    this.frmArr.insert(row,this.createRow());
+    this.action.emit(row);
+    // (this.parentForm.get(&#x27;mtbl2&#x27;) as FormArray).insert(row,this.gdssrv.createRow());
+    // console.log(this.frmArr);
+    // console.log((this.parentForm.get(&#x27;mtbl2&#x27;) as FormArray));
+    // this.gdssrv.subTnk.next(true);
+    // this.gdssrv.subTnk.complete();
+    this.refresh();
+  }
+
+  // ngAfterViewChecked(): void {
+  //   this.cdRef.detectChanges();
+  // }
+
+  add_rows(rows:number){
+    for (let i&#x3D;0;i&lt;rows;i++){
+      this.frmArr.push(this.createRow());
+    }
+    this.refresh();
+  }  
+  getGzai(gcd:string):string{
+    // console.log(gcd);
+    let tooltip:string&#x3D;&quot;&quot;;
+    const i:number &#x3D; this.gdssrv.goods.findIndex(obj &#x3D;&gt; obj.gcode &#x3D;&#x3D; gcd);
+    if (i&gt;-1){
+      this.gdssrv.goods[i].msgzais.forEach(e &#x3D;&gt; {
+        tooltip +&#x3D; e.zcode + &#x27;_&#x27;.repeat(25-e.zcode.length) + e.irisu + &#x27;\n&#x27;;
+      });
+    }
+    
+    return tooltip;
+  }
+  async setJan(i:number){
+    this.frmArr.controls[i].get(&#x27;jan&#x27;).setValue(this.usrsrv.addCheckDigit(await this.usrsrv.getNumber(&#x27;jan&#x27;,1)));
+  }
+  diaGzai(){
+    
+  }
+
+  get frmArr():FormArray {    
+    return this.parentForm.get(&#x27;mtbl&#x27;) as FormArray;
+  }  
+  
+  frmVal(i:number,fld:string):string {
+    return this.frmArr.getRawValue()[i][fld];
+  }
+
+  updateRow(goods:mwI.Goods){
+    return this.fb.group({
+      action:[&#x27;&#x27;],
+      gcode:[goods.gcode],
+      gtext:[goods.gtext],
+      size:[goods.size],
+      color:[goods.color],
+      irisu:[goods.irisu],
+      iriunit:[goods.iriunit],
+      gskbn:[goods.gskbn],
+      jan:[goods.jan],
+      weight:[goods.weight],
+      tkbn:[goods.tkbn],
+      zkbn:[goods.zkbn],
+      max:[goods.max],
+      send:[goods.send],
+      ordering:[goods.ordering],
+      koguchi:[goods.koguchi]
+    });
+  }
+  createRow(){
+    return this.fb.group({
+      action:[&#x27;ins&#x27;],
+      gcode:[&#x27;&#x27;],
+      gtext:[&#x27;&#x27;],
+      size:[&#x27;&#x27;],
+      color:[&#x27;&#x27;],
+      irisu:[&#x27;&#x27;],
+      iriunit:[&#x27;&#x27;],
+      gskbn:[&#x27;&#x27;],
+      jan:[&#x27;&#x27;],
+      weight:[&#x27;&#x27;],
+      tkbn:[&#x27;&#x27;],
+      zkbn:[&#x27;&#x27;],
+      max:[&#x27;&#x27;],
+      send:[&#x27;&#x27;],
+      ordering:[&#x27;&#x27;],
+      koguchi:[&#x27;&#x27;]
+    });
+  }     
+      
+  set_goods(){
+    this.frmArr.clear();
+    this.gdssrv.goods.forEach(e &#x3D;&gt; {
+      this.frmArr.push(this.updateRow(e));
+    });
+    // for(let j&#x3D;i+1;j&lt;11;j++){
+    //   this.frmArr.push(this.createRow(j));
+    // }
+    this.refresh();
+  }
+
+  refresh(): void {
+    this.dataSource.paginator &#x3D; this.paginator;
+    this.dataSource.data &#x3D;  this.frmArr.controls;
+  }
+
+}
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-templateData">
+        <pre class="line-numbers"><code class="language-html">&lt;div class&#x3D;&quot;mat-elevation-z8&quot;&gt;
+  &lt;ng-container [formGroup]&#x3D;&quot;parentForm&quot;&gt;
+    &lt;table mat-table formArrayName&#x3D;&quot;mtbl&quot; [dataSource]&#x3D;&quot;dataSource&quot; aria-label&#x3D;&quot;Elements&quot;&gt;
+      &lt;!-- &lt;table mat-table multiTemplateDataRows formArrayName&#x3D;&quot;mtbl&quot; [dataSource]&#x3D;&quot;dataSource&quot; aria-label&#x3D;&quot;Elements&quot;&gt; --&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;action&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef [style.display]&#x3D;&quot;frmArr.enabled ? &#x27;block&#x27;:&#x27;none&#x27;&quot;&gt;行追加&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [style.display]&#x3D;&quot;frmArr.enabled ? &#x27;block&#x27;:&#x27;none&#x27;&quot;&gt;
+          &lt;button mat-icon-button (click)&#x3D;&quot;ins_row(i)&quot;&gt;
+            &lt;mat-icon&gt;add_circle&lt;/mat-icon&gt;
+          &lt;/button&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;gcode&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;商品コード&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:10em;&quot;&gt;
+            &lt;input matInput formControlName&#x3D;&quot;gcode&quot;&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;gtext&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;商品名&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:20em;&quot;&gt;
+            &lt;input matInput formControlName&#x3D;&quot;gtext&quot;&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;size&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;サイズ&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:6em;&quot;&gt;
+            &lt;input matInput formControlName&#x3D;&quot;size&quot;&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;color&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;色&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:6em;&quot;&gt;
+            &lt;input matInput formControlName&#x3D;&quot;color&quot;&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;irisu&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;出荷数&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:4em;&quot;&gt;
+            &lt;input type&#x3D;&quot;number&quot; matInput formControlName&#x3D;&quot;irisu&quot; class&#x3D;&quot;i_num&quot;&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;iriunit&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;単位&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:4em;&quot;&gt;
+            &lt;input matInput formControlName&#x3D;&quot;iriunit&quot;&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;gskbn&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;数量区分&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:8em;&quot;&gt;
+            &lt;mat-select #msel01 formControlName&#x3D;&quot;gskbn&quot; required (keyup.enter)&#x3D;&quot;msel01.close()&quot;&gt;
+              &lt;mat-option *ngFor&#x3D;&quot;let sval of bunsrv.gskbn&quot; [value]&#x3D;&quot;sval.value&quot;&gt;
+                {{sval.viewval}}
+              &lt;/mat-option&gt;
+            &lt;/mat-select&gt;
+            &lt;button mat-flat-button matSuffix (click)&#x3D;&quot;diaGzai()&quot; *ngIf&#x3D;&quot;frmArr.getRawValue()[i][&#x27;gskbn&#x27;]&#x3D;&#x3D;1&quot;
+              matTooltip&#x3D;&quot;{{getGzai(frmArr.getRawValue()[i][&#x27;gcode&#x27;])}}&quot; matTooltipClass&#x3D;&quot;ttips&quot;&gt;内訳&lt;/button&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;jan&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;janコード&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:10em;&quot;&gt;
+            &lt;input #ginp01 matInput formControlName&#x3D;&quot;jan&quot;&gt;
+            &lt;button mat-flat-button matSuffix (click)&#x3D;&quot;setJan(i)&quot;
+              *ngIf&#x3D;&quot;ginp01.disabled&#x3D;&#x3D;false &amp;&amp; !frmArr.getRawValue()[i][&#x27;jan&#x27;]&quot;&gt;採番&lt;/button&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;weight&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;重量&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot; class&#x3D;&quot;i_num&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:6em;&quot;&gt;
+            &lt;input matInput formControlName&#x3D;&quot;weight&quot;&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;tkbn&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;中止区分&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:5em;&quot;&gt;
+            &lt;mat-select #msel02 formControlName&#x3D;&quot;tkbn&quot; required (keyup.enter)&#x3D;&quot;msel02.close()&quot;&gt;
+              &lt;mat-option *ngFor&#x3D;&quot;let sval of bunsrv.tkbn&quot; [value]&#x3D;&quot;sval.value&quot;&gt;
+                {{sval.viewval}}
+              &lt;/mat-option&gt;
+            &lt;/mat-select&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;zkbn&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;在庫管理&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:5em;&quot;&gt;
+            &lt;mat-select #msel03 formControlName&#x3D;&quot;zkbn&quot; required (keyup.enter)&#x3D;&quot;msel03.close()&quot;&gt;
+              &lt;mat-option *ngFor&#x3D;&quot;let sval of bunsrv.zkbn&quot; [value]&#x3D;&quot;sval.value&quot;&gt;
+                {{sval.viewval}}
+              &lt;/mat-option&gt;
+            &lt;/mat-select&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;max&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;１個口最大&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:4em;&quot;&gt;
+            &lt;input type&#x3D;&quot;number&quot; matInput formControlName&#x3D;&quot;max&quot; class&#x3D;&quot;i_num&quot;&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;send&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;送料区分&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:4em;&quot;&gt;
+            &lt;mat-select #msel04 formControlName&#x3D;&quot;send&quot; required (keyup.enter)&#x3D;&quot;msel04.close()&quot;&gt;
+              &lt;mat-option value&#x3D;&quot;A&quot;&gt;A&lt;/mat-option&gt;
+              &lt;mat-option value&#x3D;&quot;B&quot;&gt;B&lt;/mat-option&gt;
+              &lt;mat-option value&#x3D;&quot;C&quot;&gt;C&lt;/mat-option&gt;
+            &lt;/mat-select&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;ordering&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;受発注品&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot;&gt;
+          &lt;!-- &lt;mat-form-field&gt; --&gt;
+          &lt;mat-checkbox formControlName&#x3D;&quot;ordering&quot; style&#x3D;&quot;width:4em;&quot;&gt;&lt;/mat-checkbox&gt;
+          &lt;!-- &lt;/mat-form-field&gt;                 --&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;ng-container matColumnDef&#x3D;&quot;koguchi&quot;&gt;
+        &lt;th mat-header-cell *matHeaderCellDef&gt;個口数&lt;/th&gt;
+        &lt;td mat-cell *matCellDef&#x3D;&quot;let row; let i &#x3D; index&quot; [formGroupName]&#x3D;&quot;i&quot; class&#x3D;&quot;i_num&quot;&gt;
+          &lt;mat-form-field style&#x3D;&quot;width:4em;&quot;&gt;
+            &lt;input type&#x3D;&quot;number&quot; matInput formControlName&#x3D;&quot;koguchi&quot;&gt;
+          &lt;/mat-form-field&gt;
+        &lt;/td&gt;
+      &lt;/ng-container&gt;
+      &lt;tr mat-header-row *matHeaderRowDef&#x3D;&quot;displayedColumns;&quot;&gt;&lt;/tr&gt;
+      &lt;tr mat-row *matRowDef&#x3D;&quot;let row; columns: displayedColumns;&quot;&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/ng-container&gt;
+  &lt;mat-paginator [pageSizeOptions]&#x3D;&quot;[10,20,50,100]&quot; showFirstLastButtons&gt;&lt;/mat-paginator&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-styleData">
+                <p class="comment">
+                    <code>./gdstbl.component.scss</code>
+                </p>
+                <pre class="line-numbers"><code class="language-scss">.mat-elevation-z8 {
+    margin-bottom: 10px;
+}
+button {
+    min-width: 40px;
+    padding: 0px;
+    height:30px;
+}
+.i_num {
+    text-align: right;
+    margin:0px;
+}
+.mat-cell, .mat-footer-cell, .mat-header-cell{
+    padding: 5px;
+}
+.mat-table {
+    overflow-x: scroll;
+    display: table;
+}
+::ng-deep.mat-form-field {
+    padding-top: 0;
+    .mat-form-field-wrapper {
+        padding-bottom: 0;
+    }
+    .mat-form-field-underline {
+        bottom: 0;
+    }
+}
+::ng-deep td .mat-form-field-infix {
+    border: none;
+}
+::ng-deep.mat-form-field input:disabled {
+    color: black;
+}
+::ng-deep.mat-form-field select:disabled {
+    color: black;
+}
+::ng-deep.mat-form-field textarea:disabled {
+    color: black;
+}
+// Add in style.scss as we are overriding css of global mat-select class which is part of other module.
+::ng-deep.mat-form-field .mat-select-disabled .mat-select-value {
+    color: black;
+}
+td .mat-form-field {
+    height:20px;
+  }
+tr.mat-row{
+    height:20px;
+}
+tr.mat-header-row{
+    height:20px;
+}
+::ng-deep .mat-tooltip  {
+    white-space: pre-line    !important;
+}</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-tree">
+        <div id="tree-container"></div>
+        <div class="tree-legend">
+            <div class="title">
+                <b>Legend</b>
+            </div>
+            <div>
+                <div class="color htmlelement"></div><span>Html element</span>
+            </div>
+            <div>
+                <div class="color component"></div><span>Component</span>
+            </div>
+            <div>
+                <div class="color directive"></div><span>Html element with directive</span>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+<script src="../js/libs/vis.min.js"></script>
+<script src="../js/libs/htmlparser.js"></script>
+<script src="../js/libs/deep-iterator.js"></script>
+<script>
+        var COMPONENT_TEMPLATE = '<div><div class="mat-elevation-z8">  <ng-container [formGroup]="parentForm">    <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">      <!-- <table mat-table multiTemplateDataRows formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements"> -->      <ng-container matColumnDef="action">        <th mat-header-cell *matHeaderCellDef [style.display]="frmArr.enabled ? \'block\':\'none\'">行追加</th>        <td mat-cell *matCellDef="let row; let i = index" [style.display]="frmArr.enabled ? \'block\':\'none\'">          <button mat-icon-button (click)="ins_row(i)">            <mat-icon>add_circle</mat-icon>          </button>        </td>      </ng-container>      <ng-container matColumnDef="gcode">        <th mat-header-cell *matHeaderCellDef>商品コード</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:10em;">            <input matInput formControlName="gcode">          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="gtext">        <th mat-header-cell *matHeaderCellDef>商品名</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:20em;">            <input matInput formControlName="gtext">          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="size">        <th mat-header-cell *matHeaderCellDef>サイズ</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:6em;">            <input matInput formControlName="size">          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="color">        <th mat-header-cell *matHeaderCellDef>色</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:6em;">            <input matInput formControlName="color">          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="irisu">        <th mat-header-cell *matHeaderCellDef>出荷数</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:4em;">            <input type="number" matInput formControlName="irisu" class="i_num">          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="iriunit">        <th mat-header-cell *matHeaderCellDef>単位</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:4em;">            <input matInput formControlName="iriunit">          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="gskbn">        <th mat-header-cell *matHeaderCellDef>数量区分</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:8em;">            <mat-select #msel01 formControlName="gskbn" required (keyup.enter)="msel01.close()">              <mat-option *ngFor="let sval of bunsrv.gskbn" [value]="sval.value">                {{sval.viewval}}              </mat-option>            </mat-select>            <button mat-flat-button matSuffix (click)="diaGzai()" *ngIf="frmArr.getRawValue()[i][\'gskbn\']==1"              matTooltip="{{getGzai(frmArr.getRawValue()[i][\'gcode\'])}}" matTooltipClass="ttips">内訳</button>          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="jan">        <th mat-header-cell *matHeaderCellDef>janコード</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:10em;">            <input #ginp01 matInput formControlName="jan">            <button mat-flat-button matSuffix (click)="setJan(i)"              *ngIf="ginp01.disabled==false && !frmArr.getRawValue()[i][\'jan\']">採番</button>          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="weight">        <th mat-header-cell *matHeaderCellDef>重量</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i" class="i_num">          <mat-form-field style="width:6em;">            <input matInput formControlName="weight">          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="tkbn">        <th mat-header-cell *matHeaderCellDef>中止区分</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:5em;">            <mat-select #msel02 formControlName="tkbn" required (keyup.enter)="msel02.close()">              <mat-option *ngFor="let sval of bunsrv.tkbn" [value]="sval.value">                {{sval.viewval}}              </mat-option>            </mat-select>          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="zkbn">        <th mat-header-cell *matHeaderCellDef>在庫管理</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:5em;">            <mat-select #msel03 formControlName="zkbn" required (keyup.enter)="msel03.close()">              <mat-option *ngFor="let sval of bunsrv.zkbn" [value]="sval.value">                {{sval.viewval}}              </mat-option>            </mat-select>          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="max">        <th mat-header-cell *matHeaderCellDef>１個口最大</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:4em;">            <input type="number" matInput formControlName="max" class="i_num">          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="send">        <th mat-header-cell *matHeaderCellDef>送料区分</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <mat-form-field style="width:4em;">            <mat-select #msel04 formControlName="send" required (keyup.enter)="msel04.close()">              <mat-option value="A">A</mat-option>              <mat-option value="B">B</mat-option>              <mat-option value="C">C</mat-option>            </mat-select>          </mat-form-field>        </td>      </ng-container>      <ng-container matColumnDef="ordering">        <th mat-header-cell *matHeaderCellDef>受発注品</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i">          <!-- <mat-form-field> -->          <mat-checkbox formControlName="ordering" style="width:4em;"></mat-checkbox>          <!-- </mat-form-field>                 -->        </td>      </ng-container>      <ng-container matColumnDef="koguchi">        <th mat-header-cell *matHeaderCellDef>個口数</th>        <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="i" class="i_num">          <mat-form-field style="width:4em;">            <input type="number" matInput formControlName="koguchi">          </mat-form-field>        </td>      </ng-container>      <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>    </table>  </ng-container>  <mat-paginator [pageSizeOptions]="[10,20,50,100]" showFirstLastButtons></mat-paginator></div></div>'
+    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmkeepComponent', 'selector': 'app-frmkeep'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'FrmsupplyComponent', 'selector': 'app-frmsupply'},{'name': 'FrmtreatComponent', 'selector': 'app-frmtreat'},{'name': 'GcdhelpComponent', 'selector': 'app-gcdhelp'},{'name': 'GdsimageComponent', 'selector': 'app-gdsimage'},{'name': 'GdstblComponent', 'selector': 'app-gdstbl'},{'name': 'GrpcdhelpComponent', 'selector': 'app-grpcdhelp'},{'name': 'GtnktblComponent', 'selector': 'app-gtnktbl'},{'name': 'HmeitblComponent', 'selector': 'app-hmeitbl'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JdnohelpComponent', 'selector': 'app-jdnohelp'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstgoodsComponent', 'selector': 'app-mstgoods'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'MstvendorComponent', 'selector': 'app-mstvendor'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'RepstockComponent', 'selector': 'app-repstock'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'},{'name': 'TrtdetailComponent', 'selector': 'app-trtdetail'},{'name': 'VcdhelpComponent', 'selector': 'app-vcdhelp'}];
+    var DIRECTIVES = [{'name': 'NuminputDirective', 'selector': '[numInput]'},{'name': 'TabDirective', 'selector': '[tabIndex]'}];
+    var ACTUAL_COMPONENT = {'name': 'GdstblComponent'};
+</script>
+<script src="../js/tree.js"></script>
+
+
+
+
+
+
+
+
+
+
+                   
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'component';
+            var COMPODOC_CURRENT_PAGE_URL = 'GdstblComponent.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>

@@ -1,0 +1,1049 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>mwsys documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+	      <link rel="stylesheet" href="../styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="../" class="navbar-brand">mwsys documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content component">
+                   <div class="content-data">
+
+
+
+
+<ol class="breadcrumb">
+  <li>Components</li>
+  <li>VcdhelpComponent</li>
+</ol>
+
+<ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#info" role="tab" id="info-tab" data-toggle="tab" data-link="info">Info</a>
+        </li>
+        <li >
+            <a href="#source" role="tab" id="source-tab" data-toggle="tab" data-link="source">Source</a>
+        </li>
+        <li >
+            <a href="#templateData" role="tab" id="templateData-tab" data-toggle="tab" data-link="template">Template</a>
+        </li>
+        <li >
+            <a href="#styleData" role="tab" id="styleData-tab" data-toggle="tab" data-link="style">Styles</a>
+        </li>
+        <li >
+            <a href="#tree" role="tab" id="tree-tab" data-toggle="tab" data-link="dom-tree">DOM Tree</a>
+        </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade active in" id="c-info"><p class="comment">
+    <h3>File</h3>
+</p>
+<p class="comment">
+    <code>src/app/share/vcdhelp/vcdhelp.component.ts</code>
+</p>
+
+
+
+    <p class="comment">
+        <h3>Implements</h3>
+    </p>
+    <p class="comment">
+                    <code><a href="https://angular.io/api/core/OnInit" target="_blank" >OnInit</a></code>
+    </p>
+
+
+<section>
+    <h3>Metadata</h3>
+    <table class="table table-sm table-hover">
+        <tbody>
+
+
+
+
+
+
+
+
+
+
+
+            <tr>
+                <td class="col-md-3">selector</td>
+                <td class="col-md-9"><code>app-vcdhelp</code></td>
+            </tr>
+
+            <tr>
+                <td class="col-md-3">styleUrls</td>
+                <td class="col-md-9"><code>./vcdhelp.component.scss</code></td>
+            </tr>
+
+
+
+            <tr>
+                <td class="col-md-3">templateUrl</td>
+                <td class="col-md-9"><code>./vcdhelp.component.html</code></td>
+            </tr>
+
+
+
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="index">Index</h3>
+    <table class="table table-sm table-bordered index-table">
+        <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Properties</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#dataSource">dataSource</a>
+                            </li>
+                            <li>
+                                <a href="#displayedColumns">displayedColumns</a>
+                            </li>
+                            <li>
+                                <a href="#filter">filter</a>
+                            </li>
+                            <li>
+                                <a href="#paginator">paginator</a>
+                            </li>
+                            <li>
+                                    <span class="modifier">Public</span>
+                                <a href="#usrsrv">usrsrv</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                        <h6><b>Methods</b></h6>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-md-4">
+                        <ul class="index-list">
+                            <li>
+                                <a href="#applyFilter">applyFilter</a>
+                            </li>
+                            <li>
+                                <a href="#close">close</a>
+                            </li>
+                            <li>
+                                <a href="#ngOnInit">ngOnInit</a>
+                            </li>
+                            <li>
+                                <a href="#sel_vcd">sel_vcd</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+</section>
+
+    <section>
+    <h3 id="constructor">Constructor</h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+<code>constructor(usrsrv: <a href="../injectables/UserService.html">UserService</a>, vensrv: <a href="../injectables/VendsService.html">VendsService</a>, apollo: Apollo, dialogRef: <a href="../components/VcdhelpComponent.html">MatDialogRef<VcdhelpComponent></a>)</code>
+                    </td>
+                </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                <div class="io-line">Defined in <a href="" data-line="44" class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:44</a></div>
+                            </td>
+                        </tr>
+
+                <tr>
+                    <td class="col-md-4">
+                            <div>
+                                    <b>Parameters :</b>
+                                    <table class="params">
+                                        <thead>
+                                            <tr>
+                                                <td>Name</td>
+                                                    <td>Type</td>
+                                                <td>Optional</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                <tr>
+                                                        <td>usrsrv</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/UserService.html" target="_self" >UserService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>vensrv</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../injectables/VendsService.html" target="_self" >VendsService</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>apollo</td>
+                                                  
+                                                        <td>
+                                                                    <code>Apollo</code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <tr>
+                                                        <td>dialogRef</td>
+                                                  
+                                                        <td>
+                                                                        <code><a href="../components/VcdhelpComponent.html" target="_self" >MatDialogRef&lt;VcdhelpComponent&gt;</a></code>
+                                                        </td>
+                                                  
+                                                    <td>
+                                                            No
+                                                    </td>
+                                                    
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+</section>
+
+
+
+
+
+    <section>
+    
+    <h3 id="methods">
+        Methods
+    </h3>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="applyFilter"></a>
+                    <span class="name">
+                        <b>
+                            applyFilter
+                        </b>
+                        <a href="#applyFilter"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>applyFilter(value: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank">string</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="64"
+                            class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:64</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>value</td>
+                                    <td>
+                                                <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="close"></a>
+                    <span class="name">
+                        <b>
+                            close
+                        </b>
+                        <a href="#close"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>close()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="140"
+                            class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:140</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="ngOnInit"></a>
+                    <span class="name">
+                        <b>
+                            ngOnInit
+                        </b>
+                        <a href="#ngOnInit"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>ngOnInit()</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="57"
+                            class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:57</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td class="col-md-4">
+                    <a name="sel_vcd"></a>
+                    <span class="name">
+                        <b>
+                            sel_vcd
+                        </b>
+                        <a href="#sel_vcd"><span class="icon ion-ios-link"></span></a>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="col-md-4">
+<code>sel_vcd(selected: <a href="../interfaces/Vendor.html">Vendor</a>)</code>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+                    <div class="io-line">Defined in <a href="" data-line="134"
+                            class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:134</a></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td class="col-md-4">
+
+                    <div class="io-description">
+                        <b>Parameters :</b>
+                        <table class="params">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Type</td>
+                                    <td>Optional</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>selected</td>
+                                    <td>
+                                                <code><a href="../interfaces/Vendor.html" target="_self" >Vendor</a></code>
+                                    </td>
+
+                                    <td>
+                                        No
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                    </div>
+                    <div class="io-description">
+                        <b>Returns : </b>        <code><a href="https://www.typescriptlang.org/docs/handbook/basic-types.html" target="_blank" >void</a></code>
+
+                    </div>
+                    <div class="io-description">
+                        
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+    <section>
+    
+        <h3 id="inputs">
+            Properties
+        </h3>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="dataSource"></a>
+                        <span class="name">
+                            <b>
+                            dataSource</b>
+                            <a href="#dataSource"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="../interfaces/Vendor.html" target="_self" >MatTableDataSource&lt;mwI.Vendor&gt;</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="42" class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:42</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="displayedColumns"></a>
+                        <span class="name">
+                            <b>
+                            displayedColumns</b>
+                            <a href="#displayedColumns"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>[]</code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>[&#x27;code&#x27;,&#x27;adrname&#x27;,&#x27;kana&#x27;,&#x27;tanto&#x27;,&#x27;tel&#x27;,&#x27;tel2&#x27;,&#x27;tel3&#x27;,&#x27;fax&#x27;,&#x27;mail1&#x27;,&#x27;mail2&#x27;,&#x27;mail3&#x27;,&#x27;mail4&#x27;,&#x27;mail5&#x27;,&#x27;zip&#x27;,&#x27;region&#x27;,&#x27;local&#x27;,&#x27;url&#x27;]</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="43" class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:43</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="filter"></a>
+                        <span class="name">
+                            <b>
+                            filter</b>
+                            <a href="#filter"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string" target="_blank" >string</a></code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Default value : </i><code>&quot;&quot;</code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="44" class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:44</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="paginator"></a>
+                        <span class="name">
+                            <b>
+                            paginator</b>
+                            <a href="#paginator"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>    <code>MatPaginator</code>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <b>Decorators : </b>
+                            <br />
+                            <code>
+                                @ViewChild(MatPaginator, {static: false})<br />
+                            </code>
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="41" class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:41</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+        <table class="table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td class="col-md-4">
+                        <a name="usrsrv"></a>
+                        <span class="name">
+                            <b>
+                                <span class="modifier">Public</span>
+                            usrsrv</b>
+                            <a href="#usrsrv"><span class="icon ion-ios-link"></span></a>
+                        </span>
+                    </td>
+                </tr>
+                    <tr>
+                        <td class="col-md-4">
+                            <i>Type : </i>        <code><a href="../injectables/UserService.html" target="_self" >UserService</a></code>
+
+                        </td>
+                    </tr>
+                        <tr>
+                            <td class="col-md-4">
+                                    <div class="io-line">Defined in <a href="" data-line="50" class="link-to-prism">src/app/share/vcdhelp/vcdhelp.component.ts:50</a></div>
+                            </td>
+                        </tr>
+
+
+            </tbody>
+        </table>
+</section>
+
+</div>
+
+
+    <div class="tab-pane fade  tab-source-code" id="c-source">
+        <pre class="line-numbers compodoc-sourcecode"><code class="language-typescript">import { Component, OnInit, ViewChild, ElementRef } from &#x27;@angular/core&#x27;;
+import { MatTableDataSource } from &#x27;@angular/material/table&#x27;;
+import { MatPaginator } from &#x27;@angular/material/paginator&#x27;;
+import { MatDialogRef } from &quot;@angular/material/dialog&quot;;
+import { Observable } from &#x27;rxjs&#x27;;
+import { Apollo } from &#x27;apollo-angular&#x27;;
+import gql from &#x27;graphql-tag&#x27;;
+import { UserService } from &#x27;./../../services/user.service&#x27;;
+import { VendsService } from &#x27;./../../services/vends.service&#x27;;
+// import { Ggrp,GoodsService } from &#x27;./../../services/goods.service&#x27;;
+
+interface Vendor {
+  code:string;
+  adrname:string;
+  kana:string;
+  tel:string;
+  tel2:string;
+  tel3:string;
+  fax:string;
+  mail1:string;
+  mail2:string;
+  mail3:string;
+  mail4:string;
+  mail5:string;
+  tanto:string;
+  url:string;
+  del:string;
+  ftel:string;
+  zip:string;
+  region:string;
+  local:string;
+} 
+
+@Component({
+  selector: &#x27;app-vcdhelp&#x27;,
+  templateUrl: &#x27;./vcdhelp.component.html&#x27;,
+  styleUrls: [&#x27;./vcdhelp.component.scss&#x27;]
+})
+export class VcdhelpComponent implements OnInit {
+  // public vcds: Vendor[]&#x3D;[];
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  dataSource:MatTableDataSource&lt;mwI.Vendor&gt;;
+  displayedColumns &#x3D; [&#x27;code&#x27;,&#x27;adrname&#x27;,&#x27;kana&#x27;,&#x27;tanto&#x27;,&#x27;tel&#x27;,&#x27;tel2&#x27;,&#x27;tel3&#x27;,&#x27;fax&#x27;,&#x27;mail1&#x27;,&#x27;mail2&#x27;,&#x27;mail3&#x27;,&#x27;mail4&#x27;,&#x27;mail5&#x27;,&#x27;zip&#x27;,&#x27;region&#x27;,&#x27;local&#x27;,&#x27;url&#x27;]; 
+  filter:string&#x3D;&quot;&quot;;
+  // fkana:string&#x3D;&quot;&quot;;
+  // fmail:string&#x3D;&quot;&quot;;
+  // ftel:string&#x3D;&quot;&quot;;
+  
+  
+  constructor(public usrsrv: UserService,
+              private vensrv: VendsService,
+              private apollo: Apollo,
+              private dialogRef: MatDialogRef&lt;VcdhelpComponent&gt;) {
+                this.dataSource&#x3D; new MatTableDataSource&lt;mwI.Vendor&gt;();
+               }
+
+  ngOnInit(): void {    
+    // this.vensrv.observe.subscribe(value &#x3D;&gt; {
+      this.dataSource&#x3D; new MatTableDataSource&lt;mwI.Vendor&gt;(this.vensrv.vends);
+      this.dataSource.paginator &#x3D; this.paginator;
+    // });
+  }
+  
+  applyFilter(value:string) {
+    const filterValue &#x3D; (event.target as HTMLInputElement).value;
+    this.dataSource.filter &#x3D; filterValue.trim().toLowerCase();
+  }
+  // get_vendors():Observable&lt;Vendor[]&gt;{
+  //   let varWh: {[k: string]: any}&#x3D;{&quot;where&quot; : {&quot;_and&quot;:[{&quot;id&quot;: {&quot;_eq&quot;: this.usrsrv.compid}}]}};
+  //   // console.log(varWh,varWh.where);
+  //   if (this.fadrnm!&#x3D;&#x3D;&quot;&quot;){
+  //     varWh.where._and.push({&quot;adrname&quot; :{&quot;_like&quot;:&quot;%&quot; + this.fadrnm + &quot;%&quot;}});
+  //   }
+  //   if (this.fkana!&#x3D;&#x3D;&quot;&quot;){
+  //     varWh.where._and.push({&quot;kana&quot; : {&quot;_like&quot;:&quot;%&quot; + this.fkana + &quot;%&quot;}});
+  //   }
+  //   if (this.fmail!&#x3D;&#x3D;&quot;&quot;){
+  //     varWh.where._and.push({&quot;_or&quot; : [ {&quot;mail&quot;:{&quot;_like&quot;:&quot;%&quot; + this.fmail + &quot;%&quot;}},
+  //                                       {&quot;mail2&quot;:{&quot;_like&quot;:&quot;%&quot; + this.fmail + &quot;%&quot;}},
+  //                                       {&quot;mail3&quot;:{&quot;_like&quot;:&quot;%&quot; + this.fmail + &quot;%&quot;}},
+  //                                       {&quot;mail4&quot;:{&quot;_like&quot;:&quot;%&quot; + this.fmail + &quot;%&quot;}},
+  //                                       {&quot;mail5&quot;:{&quot;_like&quot;:&quot;%&quot; + this.fmail + &quot;%&quot;}}
+  //                                     ]});
+  //   }
+  //   if (this.ftel!&#x3D;&#x3D;&quot;&quot;){
+  //     // console.log(varWh,varWh.where2 !&#x3D; null);
+  //     if (varWh.where2 !&#x3D; null){
+  //         varWh.where2._and.push({&quot;ftel&quot; : {&quot;_like&quot;:&quot;%&quot; + this.ftel + &quot;%&quot;}});
+  //     } else {
+  //       varWh.where2 &#x3D; {&quot;ftel&quot; : {&quot;_like&quot;:&quot;%&quot; + this.ftel + &quot;%&quot;}};
+  //     }
+  //   }
+  //   // console.log(varWh);
+  //   const GetMast &#x3D; gql&#x60;
+  //   query get_vendors($where:msvendor_bool_exp!) {
+  //     msvendor(where:$where, order_by:{code: asc}) {
+  //       code
+  //       adrname
+  //       kana
+  //       tel
+  //       tel2
+  //       tel3
+  //       fax
+  //       mail1
+  //       mail2
+  //       mail3
+  //       mail4
+  //       mail5
+  //       tanto
+  //       url
+  //       del
+  //       ftel
+  //       zip
+  //       region
+  //       local
+  //     }
+  //   }&#x60;;
+  //   let observable:Observable&lt;Vendor[]&gt; &#x3D; new Observable&lt;Vendor[]&gt;(observer &#x3D;&gt; {
+  //     this.apollo.watchQuery&lt;any&gt;({
+  //         query: GetMast, 
+  //         variables: varWh
+  //     })
+  //     .valueChanges
+  //     .subscribe(({ data }) &#x3D;&gt; {
+  //       observer.next(data.msvendor);
+  //       observer.complete();
+  //     },(error) &#x3D;&gt; {
+  //       console.log(&#x27;error query get_vendors&#x27;, error);
+  //     });
+  //   });
+  //   return observable;
+  // }
+
+  sel_vcd(selected:Vendor) {
+    // console.log(&quot;select&quot;,selected);
+    // this.vcds&#x3D;[];
+    this.dialogRef.close(selected);
+  }
+
+  close() {
+    // this.vcds&#x3D;[];
+    this.dialogRef.close();
+  }
+
+
+}
+</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-templateData">
+        <pre class="line-numbers"><code class="language-html">&lt;h1 mat-dialog-title cdkDrag cdkDragRootElement&#x3D;&quot;.cdk-overlay-pane&quot; cdkDragHandle style&#x3D;&quot;cursor: move;&quot;&gt;顧客検索&lt;/h1&gt;
+&lt;mat-dialog-content&gt;
+    &lt;div class&#x3D;&quot;mat-elevation-z8&quot;&gt;
+        &lt;mat-toolbar fxLayoutGap&#x3D;&quot;5px&quot; style&#x3D;&quot;font-size: 12px;&quot;&gt;
+            &lt;mat-form-field&gt;
+                &lt;mat-label&gt;絞込条件(全項目共通)&lt;/mat-label&gt;
+                &lt;input matInput (keyup)&#x3D;&quot;applyFilter($event)&quot;&gt;
+            &lt;/mat-form-field&gt;
+            &lt;!-- &lt;button class&#x3D;&quot;mat-raised-button&quot;(click)&#x3D;&quot;get_vendors()&quot;&gt;検索&lt;/button&gt; --&gt;
+            &lt;!-- &lt;mat-form-field&gt;
+                &lt;mat-label&gt;仕入先名&lt;/mat-label&gt;
+                &lt;input matInput (input)&#x3D;&quot;fadrnm&#x3D;$event.target.value&quot;&gt;
+            &lt;/mat-form-field&gt;
+            &lt;mat-form-field&gt;
+                &lt;mat-label&gt;ﾌﾘｶﾞﾅ 半角ｶﾀｶﾅのみく&lt;/mat-label&gt;
+                &lt;input matInput (input)&#x3D;&quot;fkana&#x3D;$event.target.value&quot;&gt;
+            &lt;/mat-form-field&gt;
+            &lt;mat-form-field&gt;
+                &lt;mat-label&gt;メール1～5&lt;/mat-label&gt;
+                &lt;input matInput type&#x3D;&quot;url&quot; (input)&#x3D;&quot;fmail&#x3D;$event.target.value&quot;&gt;
+            &lt;/mat-form-field&gt;
+            &lt;mat-form-field&gt;
+                &lt;mat-label&gt;電話番号 or FAX ハイフン(-)なし&lt;/mat-label&gt;
+                &lt;input matInput type&#x3D;&quot;number&quot; (input)&#x3D;&quot;ftel&#x3D;$event.target.value&quot;&gt;
+            &lt;/mat-form-field&gt; --&gt;
+        &lt;/mat-toolbar&gt;
+        &lt;table mat-table [dataSource]&#x3D;&quot;dataSource&quot; aria-label&#x3D;&quot;Elements&quot;&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;code&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;仕入れ先コード&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.code}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;adrname&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;宛名&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.adrname}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;kana&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;カナ&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.kana}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;tel&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;電話番号&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.tel}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;tel2&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;電話番号2&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.tel2}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;tel3&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;電話番号3&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.tel3}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;fax&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;FAX番号&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.fax}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;mail1&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;Mail&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.mail1}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;mail2&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;Mail&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.mail1}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;mail3&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;Mail&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.mail1}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;mail4&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;Mail&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.mail1}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;mail5&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;Mail&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.mail1}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;tanto&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;担当者&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.tanto}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;zip&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;郵便番号&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.zip}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;region&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;都道府県&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.region}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;local&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;市区町村&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.local}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;ng-container matColumnDef&#x3D;&quot;url&quot;&gt;
+                &lt;th mat-header-cell *matHeaderCellDef&gt;URL&lt;/th&gt;
+                &lt;td mat-cell *matCellDef&#x3D;&quot;let row&quot;&gt;{{row.url}}&lt;/td&gt;
+            &lt;/ng-container&gt;
+            &lt;tr mat-header-row *matHeaderRowDef&#x3D;&quot;displayedColumns;&quot;&gt;&lt;/tr&gt;
+            &lt;tr mat-row *matRowDef&#x3D;&quot;let row; columns: displayedColumns;&quot; (click)&#x3D;&quot;sel_vcd(row)&quot;&gt;&lt;/tr&gt;
+        &lt;/table&gt;
+        &lt;mat-paginator #paginators [length]&#x3D;&quot;dataSource?.data.length&quot; [pageIndex]&#x3D;&quot;0&quot;
+            [pageSizeOptions]&#x3D;&quot;[20, 50, 100, 250, 1000]&quot;&gt;
+        &lt;/mat-paginator&gt;
+    &lt;/div&gt;
+&lt;/mat-dialog-content&gt;
+&lt;mat-dialog-actions&gt;
+    &lt;button class&#x3D;&quot;mat-raised-button&quot; (click)&#x3D;&quot;close()&quot;&gt;閉じる&lt;/button&gt;
+&lt;/mat-dialog-actions&gt;</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-styleData">
+                <p class="comment">
+                    <code>./vcdhelp.component.scss</code>
+                </p>
+                <pre class="line-numbers"><code class="language-scss">mat-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding-top: 20px;
+}
+
+.mat-cell, .mat-footer-cell, .mat-header-cell{
+    padding: 5px;
+}
+
+.mat-table {
+    overflow-x: scroll;
+    display: table;
+    padding-top: 0px;
+}
+
+td .mat-form-field {
+    height:20px;
+}
+
+tr.mat-row {
+    height:20px;
+}
+tr.mat-header-row {
+    height:20px;
+}</code></pre>
+    </div>
+
+    <div class="tab-pane fade " id="c-tree">
+        <div id="tree-container"></div>
+        <div class="tree-legend">
+            <div class="title">
+                <b>Legend</b>
+            </div>
+            <div>
+                <div class="color htmlelement"></div><span>Html element</span>
+            </div>
+            <div>
+                <div class="color component"></div><span>Component</span>
+            </div>
+            <div>
+                <div class="color directive"></div><span>Html element with directive</span>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+
+<script src="../js/libs/vis.min.js"></script>
+<script src="../js/libs/htmlparser.js"></script>
+<script src="../js/libs/deep-iterator.js"></script>
+<script>
+        var COMPONENT_TEMPLATE = '<div><h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">顧客検索</h1><mat-dialog-content>    <div class="mat-elevation-z8">        <mat-toolbar fxLayoutGap="5px" style="font-size: 12px;">            <mat-form-field>                <mat-label>絞込条件(全項目共通)</mat-label>                <input matInput (keyup)="applyFilter($event)">            </mat-form-field>            <!-- <button class="mat-raised-button"(click)="get_vendors()">検索</button> -->            <!-- <mat-form-field>                <mat-label>仕入先名</mat-label>                <input matInput (input)="fadrnm=$event.target.value">            </mat-form-field>            <mat-form-field>                <mat-label>ﾌﾘｶﾞﾅ 半角ｶﾀｶﾅのみく</mat-label>                <input matInput (input)="fkana=$event.target.value">            </mat-form-field>            <mat-form-field>                <mat-label>メール1～5</mat-label>                <input matInput type="url" (input)="fmail=$event.target.value">            </mat-form-field>            <mat-form-field>                <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>                <input matInput type="number" (input)="ftel=$event.target.value">            </mat-form-field> -->        </mat-toolbar>        <table mat-table [dataSource]="dataSource" aria-label="Elements">            <ng-container matColumnDef="code">                <th mat-header-cell *matHeaderCellDef>仕入れ先コード</th>                <td mat-cell *matCellDef="let row">{{row.code}}</td>            </ng-container>            <ng-container matColumnDef="adrname">                <th mat-header-cell *matHeaderCellDef>宛名</th>                <td mat-cell *matCellDef="let row">{{row.adrname}}</td>            </ng-container>            <ng-container matColumnDef="kana">                <th mat-header-cell *matHeaderCellDef>カナ</th>                <td mat-cell *matCellDef="let row">{{row.kana}}</td>            </ng-container>            <ng-container matColumnDef="tel">                <th mat-header-cell *matHeaderCellDef>電話番号</th>                <td mat-cell *matCellDef="let row">{{row.tel}}</td>            </ng-container>            <ng-container matColumnDef="tel2">                <th mat-header-cell *matHeaderCellDef>電話番号2</th>                <td mat-cell *matCellDef="let row">{{row.tel2}}</td>            </ng-container>            <ng-container matColumnDef="tel3">                <th mat-header-cell *matHeaderCellDef>電話番号3</th>                <td mat-cell *matCellDef="let row">{{row.tel3}}</td>            </ng-container>            <ng-container matColumnDef="fax">                <th mat-header-cell *matHeaderCellDef>FAX番号</th>                <td mat-cell *matCellDef="let row">{{row.fax}}</td>            </ng-container>            <ng-container matColumnDef="mail1">                <th mat-header-cell *matHeaderCellDef>Mail</th>                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>            </ng-container>            <ng-container matColumnDef="mail2">                <th mat-header-cell *matHeaderCellDef>Mail</th>                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>            </ng-container>            <ng-container matColumnDef="mail3">                <th mat-header-cell *matHeaderCellDef>Mail</th>                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>            </ng-container>            <ng-container matColumnDef="mail4">                <th mat-header-cell *matHeaderCellDef>Mail</th>                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>            </ng-container>            <ng-container matColumnDef="mail5">                <th mat-header-cell *matHeaderCellDef>Mail</th>                <td mat-cell *matCellDef="let row">{{row.mail1}}</td>            </ng-container>            <ng-container matColumnDef="tanto">                <th mat-header-cell *matHeaderCellDef>担当者</th>                <td mat-cell *matCellDef="let row">{{row.tanto}}</td>            </ng-container>            <ng-container matColumnDef="zip">                <th mat-header-cell *matHeaderCellDef>郵便番号</th>                <td mat-cell *matCellDef="let row">{{row.zip}}</td>            </ng-container>            <ng-container matColumnDef="region">                <th mat-header-cell *matHeaderCellDef>都道府県</th>                <td mat-cell *matCellDef="let row">{{row.region}}</td>            </ng-container>            <ng-container matColumnDef="local">                <th mat-header-cell *matHeaderCellDef>市区町村</th>                <td mat-cell *matCellDef="let row">{{row.local}}</td>            </ng-container>            <ng-container matColumnDef="url">                <th mat-header-cell *matHeaderCellDef>URL</th>                <td mat-cell *matCellDef="let row">{{row.url}}</td>            </ng-container>            <tr mat-header-row *matHeaderRowDef="displayedColumns;"></tr>            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="sel_vcd(row)"></tr>        </table>        <mat-paginator #paginators [length]="dataSource?.data.length" [pageIndex]="0"            [pageSizeOptions]="[20, 50, 100, 250, 1000]">        </mat-paginator>    </div></mat-dialog-content><mat-dialog-actions>    <button class="mat-raised-button" (click)="close()">閉じる</button></mat-dialog-actions></div>'
+    var COMPONENTS = [{'name': 'AddressComponent', 'selector': 'app-address'},{'name': 'AdredaComponent', 'selector': 'app-adreda'},{'name': 'AppComponent', 'selector': 'app-root'},{'name': 'EdahelpComponent', 'selector': 'app-edahelp'},{'name': 'EdatblComponent', 'selector': 'app-edatbl'},{'name': 'FrmkeepComponent', 'selector': 'app-frmkeep'},{'name': 'FrmsalesComponent', 'selector': 'app-frmsales'},{'name': 'FrmsupplyComponent', 'selector': 'app-frmsupply'},{'name': 'FrmtreatComponent', 'selector': 'app-frmtreat'},{'name': 'GcdhelpComponent', 'selector': 'app-gcdhelp'},{'name': 'GdsimageComponent', 'selector': 'app-gdsimage'},{'name': 'GdstblComponent', 'selector': 'app-gdstbl'},{'name': 'GrpcdhelpComponent', 'selector': 'app-grpcdhelp'},{'name': 'GtnktblComponent', 'selector': 'app-gtnktbl'},{'name': 'HmeitblComponent', 'selector': 'app-hmeitbl'},{'name': 'HomeComponent', 'selector': 'app-home'},{'name': 'JdnohelpComponent', 'selector': 'app-jdnohelp'},{'name': 'JmeitblComponent', 'selector': 'app-jmeitbl'},{'name': 'LoginComponent', 'selector': 'app-login'},{'name': 'McdhelpComponent', 'selector': 'app-mcdhelp'},{'name': 'McdtblComponent', 'selector': 'app-mcdtbl'},{'name': 'MstgoodsComponent', 'selector': 'app-mstgoods'},{'name': 'MstmemberComponent', 'selector': 'app-mstmember'},{'name': 'MstvendorComponent', 'selector': 'app-mstvendor'},{'name': 'NavbarComponent', 'selector': 'app-navbar'},{'name': 'RepstockComponent', 'selector': 'app-repstock'},{'name': 'TmstmpComponent', 'selector': 'app-tmstmp'},{'name': 'TrtdetailComponent', 'selector': 'app-trtdetail'},{'name': 'VcdhelpComponent', 'selector': 'app-vcdhelp'}];
+    var DIRECTIVES = [{'name': 'NuminputDirective', 'selector': '[numInput]'},{'name': 'TabDirective', 'selector': '[tabIndex]'}];
+    var ACTUAL_COMPONENT = {'name': 'VcdhelpComponent'};
+</script>
+<script src="../js/tree.js"></script>
+
+
+
+
+
+
+
+
+
+
+                   
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 1;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'component';
+            var COMPODOC_CURRENT_PAGE_URL = 'VcdhelpComponent.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="../js/libs/custom-elements.min.js"></script>
+       <script src="../js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="../js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="../js/menu-wc.js" defer></script>
+
+       <script src="../js/libs/bootstrap-native.js"></script>
+
+       <script src="../js/libs/es6-shim.min.js"></script>
+       <script src="../js/libs/EventDispatcher.js"></script>
+       <script src="../js/libs/promise.min.js"></script>
+       <script src="../js/libs/zepto.min.js"></script>
+
+       <script src="../js/compodoc.js"></script>
+
+       <script src="../js/tabs.js"></script>
+       <script src="../js/menu.js"></script>
+       <script src="../js/libs/clipboard.min.js"></script>
+       <script src="../js/libs/prism.js"></script>
+       <script src="../js/sourceCode.js"></script>
+          <script src="../js/search/search.js"></script>
+          <script src="../js/search/lunr.min.js"></script>
+          <script src="../js/search/search-lunr.js"></script>
+          <script src="../js/search/search_index.js"></script>
+       <script src="../js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>
