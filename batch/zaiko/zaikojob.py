@@ -100,22 +100,17 @@ def load_master(today: datetime.date) -> zl.Master:
         m.zai.setdefault(z['gcode'], []).append((z['zcode'], float(z['irisu'])))
     for e in q['mszaikoex']:
         m.ex.setdefault(e['kbn'], set()).add(e['gcode'])
-    q = step('vhatzn', '''
-    query zaiko_hatzn($id: smallint!, $sc: String!) {
-      %s(where: {id: {_eq: $id}, scode: {_eq: $sc}, vhatzns: {hatzn: {_gt: 0}}}) {
-        vhatzns(where: {hatzn: {_gt: 0}, inday: {_is_null: false}}) { gcode inday hatzn }
-      }
-    }''' % root('trhatden'), {'id': COMP_ID, 'sc': zl.MAIN_SCODE})
-    for den in q['trhatden']:
-        for h in den['vhatzns']:
-            m.hatzn.setdefault(h['gcode'], []).append((datetime.date.fromisoformat(h['inday'][:10]), float(h['hatzn'])))
-    for v in m.hatzn.values():
-        v.sort(key=lambda e: e[0])
-    fn_args = ('test_' if os.environ.get('MWSYS_SCHEMA') == 'test' else '') + 'fzaikoall_args'
+    prefix = 'test_' if os.environ.get('MWSYS_SCHEMA') == 'test' else ''
+    q = step('fhatzan', '''
+    query zaiko_hatzn($args: %sfhatzan_args!) {
+      %s(args: $args, order_by: {yday: asc}) { gcode yday hatzn }
+    }''' % (prefix, root('fhatzan')), {'args': {'p_id': COMP_ID, 'p_scode': zl.MAIN_SCODE}})
+    for h in q['fhatzan']:
+        m.hatzn.setdefault(h['gcode'], []).append((datetime.date.fromisoformat(h['yday'][:10]), float(h['hatzn'])))
     q = step('fzaikoall', '''
-    query zaiko_stock($args: %s!) {
+    query zaiko_stock($args: %sfzaikoall_args!) {
       %s(args: $args) { scode gcode zaiko juzan }
-    }''' % (fn_args, root('fzaikoall')), {'args': {'p_id': COMP_ID, 'p_day': today.isoformat()}})
+    }''' % (prefix, root('fzaikoall')), {'args': {'p_id': COMP_ID, 'p_day': today.isoformat()}})
     for s in q['fzaikoall']:
         m.stock[(s['scode'], s['gcode'])] = (float(s['zaiko']), float(s['juzan']))
     return m

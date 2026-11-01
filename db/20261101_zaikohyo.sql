@@ -84,10 +84,38 @@ RETURNS SETOF tzaikoall AS $$
     FULL JOIN lt l ON l.scode = m.scode AND l.gcode = m.gcode;
 $$ LANGUAGE sql STABLE;
 
+-- 関数の戻り値の型
+CREATE TABLE IF NOT EXISTS thatzan (
+    gcode text
+  , yday  date
+  , hatzn numeric
+);
+
+-- 倉庫の入荷予定（発注残）。全件を読むと vhatzn では 30 秒を超えるので、まとめて集計する
+CREATE OR REPLACE FUNCTION fhatzan(p_id smallint, p_scode text)
+RETURNS SETOF thatzan AS $$
+  SELECT x.gcode, x.yday, x.hatzn
+    FROM (
+      SELECT h.gcode::text AS gcode,
+             COALESCE(NULLIF(h.yday::text, ''), NULLIF(h.inday::text, ''))::date AS yday,
+             (h.suu - COALESCE(a.siire, 0) - COALESCE(a.tsuu, 0))::numeric AS hatzn
+        FROM trhatmei h
+        JOIN trhatden d ON d.id = h.id AND d.denno = h.denno
+        LEFT JOIN (
+          SELECT s.hdenno, s.hline, SUM(s.suu) AS siire, SUM(s.tsuu) AS tsuu
+            FROM trsiimei s
+           WHERE s.id = p_id
+           GROUP BY s.hdenno, s.hline
+        ) a ON a.hdenno = h.denno AND a.hline = h.line
+       WHERE h.id = p_id AND d.scode = p_scode
+    ) x
+   WHERE x.hatzn > 0 AND x.yday IS NOT NULL;
+$$ LANGUAGE sql STABLE;
+
 -- ---------------------------------------------------------------------
 -- Hasura 側の設定
 --   ・Reload metadata
---   ・表 mszaikoex, tzaikoall を Track する
---   ・関数 fzaikoall を Track する（Add As Root Field）
+--   ・表 mszaikoex, tzaikoall, thatzan を Track する
+--   ・関数 fzaikoall, fhatzan を Track する（Add As Root Field）
 --   ・バッチは admin secret で接続するので、権限の設定は不要
 -- ---------------------------------------------------------------------
