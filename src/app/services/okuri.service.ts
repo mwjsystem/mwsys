@@ -147,40 +147,26 @@ export class OkuriService {
 
   async setOkurino(hcode: string): Promise<string> {
     const type: string = 'sagawa_' + this.getHinfo(hcode).code;
-    let okrno: number[] = await this.getNumber(type, 1);
-    // console.log(type,okrno);
-    return new Promise(resolve => {
-      if (okrno.length == 1) {
-        return resolve("採番エラー");
-      } else if (okrno[0] <= okrno[2]) {
-        return resolve(this.usrsrv.addCheckDigit7(okrno[0]));
-      } else {
-        const UpdateCurnum = gql`
-          mutation setCurnum($id: smallint!, $typ: String!, $set: bigint!) {
-            update_trnumber(where: {id: {_eq: $id}, type: {_eq: $typ}}, _set: {curnum: $set}) {
-              returning {
-                type
-                curnum
-                minnum
-                maxnum
-              }
-            }
-          }`;
-        this.apollo.mutate<TrnumberResult>({
-          mutation: UpdateCurnum,
-          variables: {
-            id: this.usrsrv.compid,
-            typ: type,
-            set: okrno[1]
-          },
-        }).subscribe(({ data }) => {
-          console.log(data);
-        }, (error) => {
-          console.log('error mutation setCurnum', error);
-        });
-        return resolve(this.usrsrv.addCheckDigit7(okrno[1]));
-      }
-    });
+    const okrno: number[] = await this.getNumber(type, 1);
+    if (okrno.length == 1) {
+      return '採番エラー';
+    }
+    if (okrno[0] <= okrno[2]) {
+      return this.usrsrv.addCheckDigit7(okrno[0]);
+    }
+    // 上限を超えたら下限に戻す。戻し終わるのを待つ（待たずに次を採番すると、上限超えのままで同じ番号〈下限〉が続く）
+    const UpdateCurnum = gql`
+      mutation setCurnum($id: smallint!, $typ: String!, $set: bigint!) {
+        update_trnumber(where: {id: {_eq: $id}, type: {_eq: $typ}}, _set: {curnum: $set}) { affected_rows }
+      }`;
+    const res = await firstValueFrom(this.apollo.mutate({
+      mutation: UpdateCurnum, variables: { id: this.usrsrv.compid, typ: type, set: okrno[1] }
+    }));
+    if (res.error) {
+      console.log('error mutation setCurnum', res.error);
+      return '採番エラー';
+    }
+    return this.usrsrv.addCheckDigit7(okrno[1]);
   }
 
   /**
@@ -193,27 +179,31 @@ export class OkuriService {
     if (this.usrsrv.compid != 1 || !isAmazon(mcode)) {
       return no;
     }
+    // Amazon の伝票で使った送り状番号を一度に読む（現行と同じ。番号ごとに問い合わせると遅い）
     const Used = gql`
-      query get_amzokuri($id: smallint!, $mcode: String!, $okr: String!, $dno: Int!) {
-        trjyuden(where: {id: {_eq: $id}, mcode: {_eq: $mcode}, okurino: {_eq: $okr}, denno: {_neq: $dno}}, limit: 1) { denno }
+      query get_amzokuri($id: smallint!, $mcode: String!, $dno: Int!) {
+        trjyuden(where: {id: {_eq: $id}, mcode: {_eq: $mcode}, okurino: {_is_null: false}, denno: {_neq: $dno}}) { okurino }
       }`;
-    for (let i = 0; i < 100; i++) {
-      if (no == '採番エラー') {
+    const res = await firstValueFrom(this.apollo.query<{ trjyuden: { okurino: string }[] }>({
+      query: Used, fetchPolicy: 'network-only',
+      variables: { id: this.usrsrv.compid, mcode: AMAZON_MCODE, dno: denno ?? 0 }
+    }));
+    if (res.error || !res.data) {
+      throw new Error('Amazon の使用済み送り状番号を確認できませんでした');
+    }
+    const used = new Set(res.data.trjyuden.map(e => (e.okurino ?? '').trim()));
+    const tried = new Set<string>();
+    for (let i = 0; i < 2000; i++) {
+      if (no == '採番エラー' || !used.has(no)) {
         return no;
       }
-      const res = await firstValueFrom(this.apollo.query<{ trjyuden: { denno: number }[] }>({
-        query: Used, fetchPolicy: 'network-only',
-        variables: { id: this.usrsrv.compid, mcode: AMAZON_MCODE, okr: no, dno: denno ?? 0 }
-      }));
-      if (res.error || !res.data) {
-        throw new Error('Amazon の使用済み送り状番号を確認できませんでした');
+      if (tried.has(no)) {
+        throw new Error('送り状番号 ' + no + ' に戻りました。採番の範囲の番号がすべて Amazon で使用済みです');
       }
-      if (res.data.trjyuden.length == 0) {
-        return no;
-      }
+      tried.add(no);
       no = await this.setOkurino(hcode);
     }
-    throw new Error('Amazon で使っていない送り状番号が見つかりません');
+    throw new Error('Amazon で使っていない送り状番号が見つかりません（' + [...tried][0] + ' から ' + no + ' まで使用済み）');
   }
 
   async getNumber(type: string, inc: number): Promise<number[]> {
