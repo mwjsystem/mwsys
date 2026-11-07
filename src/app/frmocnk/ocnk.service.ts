@@ -4,6 +4,7 @@ import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 import { UserService } from './../services/user.service';
 import { JyuStockService } from './../services/jyustock.service';
+import { JyuDefaultService, SKBN_URIAGE } from './../services/jyudefault.service';
 import { JDST } from './../frmship/ship-forms';
 import { OcnkConf, OcnkDojo, OcnkHaiso, OcnkOrder, exTax, isDaibiki, taxOf } from './ocnk-parse';
 
@@ -14,6 +15,10 @@ export type OcnkMaster = Pick<OcnkConf, 'haiso' | 'pay' | 'time'>;
 const WEB_SCODE = '01';
 /** 受注方法（9：WEB） */
 const WEB_JCODE = '9';
+/** 配送方法（25：MWJWeb元、26：MWJWeb代）・納品書タイプ（1：納品書のみ） */
+const WEB_HCODE = '25';
+const WEB_HCODE_DAIBIKI = '26';
+const WEB_BUNTYPE = 1;
 /** 採番キー */
 const KEY_DENNO = 'jdenno';
 const KEY_MCODE = 'mcode';
@@ -35,6 +40,7 @@ const nzs = (s: string | null | undefined): string => (s ?? '').trim();
 export class OcnkService {
   private usrsrv = inject(UserService);
   private stksrv = inject(JyuStockService);
+  private defsrv = inject(JyuDefaultService);
   private apollo = inject(Apollo);
 
   private async query<T>(query: ReturnType<typeof gql>, variables: object): Promise<T> {
@@ -193,11 +199,15 @@ export class OcnkService {
     // 7. 受注伝票。金額（おちゃのこは税込。消費税は 10/110 の端数切り上げ、税抜は 税込 - 消費税）
     const total = Math.round(o.total);
     const daibiki = isDaibiki(o.pay);
+    const buntype = await this.defsrv.buntype(WEB_BUNTYPE);
     const jyuden = {
       id, denno, day: o.day, hday: o.hday, htime: nz(o.htime), mcode, scde: mcode, ncode: mcode, nadr, scode: WEB_SCODE,
       tcode: nz(o.tanto), tcode1: nz(o.etanto) ?? nz(member?.tcode1),
       daibunrui: nz(o.daibunrui) ?? nz(member?.daibunrui), chubunrui: nz(o.bumon) ?? nz(member?.chubunrui),
-      jcode: WEB_JCODE, pcode: nz(o.nyukin), bcode: o.bcode, bkcode: o.bkcode, hcode: nz(o.hcode),
+      jcode: WEB_JCODE, pcode: nz(o.nyukin), bcode: o.bcode, bkcode: o.bkcode,
+      // 配送方法: 発送方法の変換表にあればそれ（同梱など）、無ければ MWJWeb 元払い・代引
+      hcode: nz(o.hcode) ?? (daibiki ? WEB_HCODE_DAIBIKI : WEB_HCODE),
+      skbn: SKBN_URIAGE, yday: this.defsrv.yday(), buntype,
       dmemo: nz(o.dmemo), nmemo: nz(o.nmemo), omemo: nz(o.omemo), cusden: o.cusden,
       total, total10: total, total8: 0, taxtotal: taxOf(total),
       gtotalzn: exTax(o.gtotal), soryozn: exTax(o.souryou), tesuzn: exTax(o.tesuu), nebikizn: exTax(o.nebiki),

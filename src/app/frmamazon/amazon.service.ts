@@ -4,13 +4,17 @@ import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 import { UserService } from './../services/user.service';
 import { JyuStockService } from './../services/jyustock.service';
+import { JyuDefaultService, SKBN_URIAGE } from './../services/jyudefault.service';
 import { JDST } from './../frmship/ship-forms';
 import { AMAZON_MCODE } from './../share/amazon';
 import { AmzOrder, lineMoney } from './amazon-parse';
 /** 倉庫（受注伝票・明細・在庫の scode） */
 const AMZ_SCODE = '01';
-/** 受注方法（9：WEB）・媒体 */
-const AMZ_JCODE = '9';
+/** 受注方法（10：代理店）・媒体 */
+const AMZ_JCODE = '10';
+/** 配送方法（7：元シ佐）・納品書タイプ（10：amazon） */
+const AMZ_HCODE = '7';
+const AMZ_BUNTYPE = 10;
 const AMZ_BCODE = '01';
 /** 明細の税区分（0：外税） */
 const AMZ_MTAX = '0';
@@ -32,6 +36,7 @@ const nz = (s: string | null | undefined): string | null => {
 export class AmazonService {
   private usrsrv = inject(UserService);
   private stksrv = inject(JyuStockService);
+  private defsrv = inject(JyuDefaultService);
   private apollo = inject(Apollo);
 
   private member: MemberRow | null = null;
@@ -133,6 +138,7 @@ export class AmazonService {
     }
 
     const st = await this.stksrv.check([...new Set(o.lines.map(l => l.gcode))]);
+    const buntype = await this.defsrv.buntype(AMZ_BUNTYPE);
     const denno = await this.usrsrv.getNumber(KEY_DENNO, 1);
     if (!denno) {
       throw new Error('伝票番号を採番できませんでした');
@@ -163,6 +169,7 @@ export class AmazonService {
       id, denno, day: today, hday: o.from, mcode: AMAZON_MCODE, scde: AMAZON_MCODE, ncode: AMAZON_MCODE, nadr: o.nadr, scode: AMZ_SCODE,
       tcode: nz(m.tcode), tcode1: nz(m.tcode1), daibunrui: nz(m.daibunrui), chubunrui: nz(m.chubunrui),
       jcode: AMZ_JCODE, pcode: nz(m.pcode), bcode: AMZ_BCODE, bkcode: AMZ_BCODE, cusden: o.po,
+      skbn: SKBN_URIAGE, yday: this.defsrv.yday(), hcode: AMZ_HCODE, buntype,
       dmemo: nz(['Amazon PO ' + o.po, o.centerName, window].filter(e => e).join(' ')),
       gtotalzn: gtotal, soryozn: 0, tesuzn: 0, nebikizn: 0, taxtotal, total: gtotal + taxtotal, total8, total10, genka,
       torikbn: !!m.torikbn, jdstatus: JDST.TOROKU, del: false,
