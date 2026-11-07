@@ -3,6 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 import { UserService } from './../services/user.service';
+import { JyuStockService } from './../services/jyustock.service';
 import { JDST } from './../frmship/ship-forms';
 import { OcnkConf, OcnkDojo, OcnkHaiso, OcnkOrder, exTax, isDaibiki, taxOf } from './ocnk-parse';
 
@@ -33,6 +34,7 @@ const nzs = (s: string | null | undefined): string => (s ?? '').trim();
 })
 export class OcnkService {
   private usrsrv = inject(UserService);
+  private stksrv = inject(JyuStockService);
   private apollo = inject(Apollo);
 
   private async query<T>(query: ReturnType<typeof gql>, variables: object): Promise<T> {
@@ -88,23 +90,6 @@ export class OcnkService {
     return res;
   }
 
-  /** 商品の在庫区分（gskbn）とセット品の構成 */
-  private async goods(codes: string[], gsk: Map<string, string>, gz: Map<string, { zcode: string; irisu: number }[]>) {
-    const Get = gql`
-      query get_ocnk_goods($id: smallint!, $gcodes: [String!]!) {
-        msgoods(where: {id: {_eq: $id}, gcode: {_in: $gcodes}}) { gcode gskbn }
-        msgzai(where: {id: {_eq: $id}, gcode: {_in: $gcodes}}, order_by: [{gcode: asc}, {zcode: asc}]) { gcode zcode irisu }
-      }`;
-    const q = await this.query<{ msgoods: { gcode: string; gskbn: string | null }[]; msgzai: { gcode: string; zcode: string; irisu: number }[] }>(
-      Get, { id: this.usrsrv.compid, gcodes: codes });
-    q.msgoods.forEach(e => gsk.set(e.gcode, nzs(e.gskbn)));
-    q.msgzai.forEach(e => {
-      const list = gz.get(e.gcode) ?? [];
-      list.push({ zcode: e.zcode, irisu: Number(e.irisu) });
-      gz.set(e.gcode, list);
-    });
-  }
-
   private madr(mcode: string, zip: string, pref: string, addr: string, tel: string, adrname: string, extend2: string): MadrInput {
     const ln = addr.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
     return {
@@ -138,40 +123,8 @@ export class OcnkService {
       return 'スキップ(既存 伝票番号 ' + chk.trjyuden[0].denno + ')';
     }
 
-    // 2. 商品マスタで在庫対象を判定（採番より前にチェック）。0:在庫対象 2:在庫対象外 1:セット品（構成品で判定）
-    const codes = [...new Set(o.lines.map(l => l.gcode))];
-    const gsk = new Map<string, string>();
-    const gz = new Map<string, { zcode: string; irisu: number }[]>();
-    await this.goods(codes, gsk, gz);
-    const missing = codes.filter(c => !gsk.has(c));
-    if (missing.length > 0) {
-      throw new Error('商品マスタに無い商品コード：' + missing.join(', '));
-    }
-    const zcodes = new Set<string>();
-    gsk.forEach((v, k) => {
-      if (v == '1') {
-        const list = gz.get(k);
-        if (!list) {
-          throw new Error('セット品の構成(msgzai)がありません：' + k);
-        }
-        list.forEach(e => zcodes.add(e.zcode));
-      } else if (v != '0' && v != '2') {
-        throw new Error('商品 ' + k + ' の在庫区分(gskbn)が不正です：' + v);
-      }
-    });
-    const zgsk = new Map<string, string>();
-    if (zcodes.size > 0) {
-      await this.goods([...zcodes], zgsk, new Map());
-      const zmiss = [...zcodes].filter(c => !zgsk.has(c));
-      if (zmiss.length > 0) {
-        throw new Error('セット品の構成品が商品マスタにありません：' + zmiss.join(', '));
-      }
-      zgsk.forEach((v, k) => {
-        if (v != '0' && v != '2') {
-          throw new Error('構成品 ' + k + ' の在庫区分(gskbn)が不正です：' + v);
-        }
-      });
-    }
+    // 2. 商品マスタで在庫対象を判定（採番より前にチェック）
+    const st = await this.stksrv.check([...new Set(o.lines.map(l => l.gcode))]);
 
     // 3. 会員（会員コード → メールアドレスの順に検索、無ければ新規作成）
     let mcode = nzs(o.mcode);
@@ -230,43 +183,12 @@ export class OcnkService {
     // 5. 伝票番号採番
     const denno = await this.getNext(KEY_DENNO);
 
-    // 6. 明細・明細在庫・在庫
-    const zai = new Map<string, number>();
-    const addQty = (g: string, n: number) => zai.set(g, (zai.get(g) ?? 0) + n);
-    const mzai: object[] = [];
-    const mei = o.lines.map((l, i) => {
-      const line = i + 1;
-      const suu = Math.round(l.suu);
-      const kbn = gsk.get(l.gcode);
-      if (kbn == '0') { // 在庫対象：商品自身
-        mzai.push({ id, denno, line, eda: 1, gcode: l.gcode, suu });
-        addQty(l.gcode, suu);
-      } else if (kbn == '1') { // セット品：在庫対象の構成品のみ
-        let eda = 0;
-        for (const c of gz.get(l.gcode) ?? []) {
-          if (zgsk.get(c.zcode) == '0') {
-            const n = Math.round(suu * c.irisu);
-            eda++;
-            mzai.push({ id, denno, line, eda, gcode: c.zcode, suu: n });
-            addQty(c.zcode, n);
-          }
-        }
-      }
-      return {
-        id, denno, line, scode: WEB_SCODE, gcode: l.gcode, gtext: nz(l.gtext), suu, tanka: l.tanka, money: l.money,
-        mtax: nz(l.mtax), mmemo: nz(l.memo), gskbn: kbn, del: false
-      };
-    });
-    // 在庫：行が無ければ作成（何もしない）→ 受注数(jyut)を加算
-    const zinit: object[] = [];
-    const zinc: object[] = [];
-    zai.forEach((qty, gcode) => {
-      zinit.push({ id, scode: WEB_SCODE, gcode, day: o.day });
-      zinc.push({
-        where: { id: { _eq: id }, scode: { _eq: WEB_SCODE }, gcode: { _eq: gcode }, day: { _eq: o.day } },
-        _inc: { jyut: qty }
-      });
-    });
+    // 6. 明細・明細在庫・在庫（在庫は行が無ければ作成 → 受注数(jyut)を加算）
+    const mei = o.lines.map((l, i) => ({
+      id, denno, line: i + 1, scode: WEB_SCODE, gcode: l.gcode, gtext: nz(l.gtext), suu: Math.round(l.suu), tanka: l.tanka, money: l.money,
+      mtax: nz(l.mtax), mmemo: nz(l.memo), gskbn: st.gsk.get(l.gcode), del: false
+    }));
+    const { mzai, zinit, zinc } = this.stksrv.rows(st, denno, WEB_SCODE, o.day, mei);
 
     // 7. 受注伝票。金額（おちゃのこは税込。消費税は 10/110 の端数切り上げ、税抜は 税込 - 消費税）
     const total = Math.round(o.total);

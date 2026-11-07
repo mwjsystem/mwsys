@@ -1,0 +1,72 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>Amazon受注取込</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+@if (error) {
+  <p class="err">{{error}}</p>
+}
+<div class="bar">
+  <button mat-raised-button color="primary" type="button" (click)="csv.click()" [disabled]="busy">
+    <mat-icon>upload_file</mat-icon>CSV を選ぶ
+  </button>
+  <input #csv type="file" accept=".csv" hidden (change)="onFile($event)">
+  <span>{{fileName}}</span>
+  <button mat-raised-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
+    <mat-icon>save</mat-icon>登録（{{targetCount}} 件）
+  </button>
+  @if (progress) {
+    <span>{{progress}}</span>
+  }
+</div>
+@if (message) {
+  <p class="msg">{{message}}</p>
+}
+@if (orders.length > 0) {
+  <p class="note">PO {{orders.length | number}} 件・明細 {{lineCount | number}} 行。単価は CSV の仕入価格、数量は受領予定の数量で登録します。
+    @if (diffOrders > 0) {
+      <span class="warnc">仕入価格が代理店単価と違う明細がある PO が {{diffOrders}} 件あります（黄色の行）。</span>
+    }
+  </p>
+  <div class="scroll">
+    <table class="rep">
+      <thead>
+        <tr>
+          <th>PO</th><th>センター</th><th>納品先</th><th>着荷ウィンドウ</th><th>明細</th><th>金額（税抜）</th><th>単価の違い</th><th>処理結果</th><th>伝票番号</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (o of orders; track o.po) {
+          <tr [class.ng]="o.err || o.result.startsWith('エラー')" [class.dif]="!o.err && diffCount(o) > 0">
+            <td><a href="javascript:void(0)" class="tg" (click)="toggle(o)">{{isOpen(o) ? '▼' : '▶'}}</a>{{o.po}}</td>
+            <td>{{o.centerName}}</td><td>{{o.nname}}</td>
+            <td>{{o.from}}{{o.to && o.to != o.from ? ' ～ ' + o.to : ''}}</td>
+            <td class="num">{{o.lines.length}}{{o.zero ? '（0 個 ' + o.zero + '）' : ''}}</td>
+            <td class="num">{{amount(o) | number:'1.0-0'}}</td>
+            <td class="num">{{diffCount(o) || ''}}</td>
+            <td>{{o.err ? 'エラー：' + o.err : o.result}}</td><td>{{o.denno}}</td>
+          </tr>
+          @if (isOpen(o)) {
+            <tr class="det">
+              <td colspan="9">
+                <table class="mei">
+                  <thead>
+                    <tr><th>JAN</th><th>商品コード</th><th>商品名</th><th>依頼数量</th><th>受領予定</th><th>仕入価格</th><th>代理店単価</th><th>Amazon の商品名</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (l of o.lines; track $index) {
+                      <tr [class.dif]="priceDiff(l)">
+                        <td>{{l.jan}}</td><td>{{l.gcode}}</td><td>{{l.gtext}}</td>
+                        <td class="num">{{l.irai | number}}</td><td class="num">{{l.qty | number}}</td>
+                        <td class="num">{{l.price | number}}</td><td class="num">{{l.tanka3 | number}}</td><td>{{l.name}}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+}

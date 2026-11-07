@@ -4,7 +4,11 @@
   </a>
   <a mat-button routerLink="/frmsales">受注伝票</a>
   <a mat-button routerLink="/rephistory">受注履歴</a>
-  <a mat-button routerLink="/frmocnk">受注取込</a>
+  <button mat-button [matMenuTriggerFor]="tori">受注取込</button>
+  <mat-menu #tori="matMenu">
+    <a mat-menu-item routerLink="/frmocnk">おちゃのこ</a>
+    <a mat-menu-item routerLink="/frmamazon">Amazon</a>
+  </mat-menu>
   <button mat-button [matMenuTriggerFor]="ship">出荷</button>
   <mat-menu #ship="matMenu">
     <a mat-menu-item routerLink="/frmship">受注一覧・出荷指示</a>

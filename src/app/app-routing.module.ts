@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: 'frmmove', loadChildren: () => import('./frmmove/frmmove.module').then(m => m.FrmmoveModule), canActivate: [AuthGuard] },
   { path: 'repuriage', loadChildren: () => import('./repuriage/repuriage.module').then(m => m.RepuriageModule), canActivate: [AuthGuard] },
   { path: 'frmocnk', loadChildren: () => import('./frmocnk/frmocnk.module').then(m => m.FrmocnkModule), canActivate: [AuthGuard] },
+  { path: 'frmamazon', loadChildren: () => import('./frmamazon/frmamazon.module').then(m => m.FrmamazonModule), canActivate: [AuthGuard] },
   { path: 'frmship', loadChildren: () => import('./frmship/frmship.module').then(m => m.FrmshipModule), canActivate: [AuthGuard] },
   { path: 'frminvoice', loadChildren: () => import('./frminvoice/frminvoice.module').then(m => m.FrminvoiceModule), canActivate: [AuthGuard] },
   { path: 'frmdeposit', loadChildren: () => import('./frmdeposit/frmdeposit.module').then(m => m.FrmdepositModule), canActivate: [AuthGuard] },
