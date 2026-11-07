@@ -6,10 +6,14 @@ import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
 import { OkuriService } from './../services/okuri.service';
 import { NasService } from './../services/nas.service';
-import { NAS_SHIP, NAS_FAX } from './../share/nasfolder/nasfolder.component';
+import { NAS_SHIP, NAS_FAX, LOCAL_HIKAE, LOCAL_OKURICSV } from './../share/nasfolder/nasfolder.component';
 import { ShipPdfService, ShipAdr, ShipDoc, ShipLine, ShipSystem } from './ship-pdf.service';
-import { JDST, denForm, isKeepStage, shipNote } from './ship-forms';
+import { JDST, BuntypeRow, BunshoRow, DenForm, buildForms, findForm, isKeepStage, shipNote } from './ship-forms';
 import { HCODE_DOKON, isAmazon } from './../share/amazon';
+import {
+  CSV_KINDS, CSVIMP_FOLDER, CSVIMP_HONSHA, CsvDoc, CsvKind, HktimeCsv, HokuriCsv,
+  csvKind, csvLine, folderCsvName, isOfficeCsv, officeCsvDenno, officeCsvName
+} from './ship-csv';
 
 /** 受注一覧の 1 行 */
 export interface ShipRow {
@@ -58,6 +62,19 @@ export interface ShipResult {
   sasikae: boolean;
   /** 失敗の理由 */
   error: string;
+  /** e飛伝Ⅱ・CLOUD の送り状 CSV の行（事務の PC に保存する） */
+  csv?: { kind: CsvKind; sday: string; line: string };
+}
+
+/** 出荷指示フォルダの保存の結果 */
+export interface ShipSave {
+  results: ShipResult[];
+  /** 納品書控・送り状 CSV の保存で気をつけること */
+  notes: string[];
+  /** 送り状CSVフォルダに保存したファイル */
+  csvSaved: string[];
+  /** 送り状CSVフォルダが無い（または保存できなかった）ので、ダウンロードするファイル */
+  downloads: { name: string; blob: Blob }[];
 }
 
 interface JyudenQ {
@@ -66,6 +83,8 @@ interface JyudenQ {
   tcode: string | null; pcode: string | null; dmemo: string | null; nmemo: string | null; keep: string | null; cusden: string | null;
   total: number | null; taxtotal: number | null; gtotalzn: number | null; soryozn: number | null; tesuzn: number | null; nebikizn: number | null;
   total8: number | null; total10: number | null; denku: number | null; jdstatus: string | null; shipdir: string | null;
+  hday: string | null; htime: string | number | null; omemo: string | null; daibiki: number | null; daibzei: number | null;
+  eidome: string | boolean | null; eicode: string | null;
 }
 interface LoadResult {
   trjyuden: JyudenQ[];
@@ -161,6 +180,7 @@ export class ShipService {
         trjyuden(where: {id: {_eq: $id}, denno: {_in: $dnos}}) {
           denno mcode ncode nadr iadr buntype yday sday uday hcode okurisuu okurino tcode pcode dmemo nmemo keep cusden
           total taxtotal gtotalzn soryozn tesuzn nebikizn total8 total10 denku jdstatus shipdir
+          hday htime omemo daibiki daibzei eidome eicode
         }
         trjyumei(where: {id: {_eq: $id}, denno: {_in: $dnos}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, order_by: [{denno: asc}, {line: asc}]) {
           denno line gcode gtext suu touttanka toutmoney taxrate mmemo spec scode
@@ -173,7 +193,7 @@ export class ShipService {
     const GetRef = gql`
       query get_shipref($id: smallint!, $mcds: [String!]!, $gcds: [String!]!) {
         msmember(where: {id: {_eq: $id}, mcode: {_in: $mcds}}) { mcode sei mei }
-        msmadr(where: {id: {_eq: $id}, mcode: {_in: $mcds}}) { mcode eda zip region local street extend extend2 adrname }
+        msmadr(where: {id: {_eq: $id}, mcode: {_in: $mcds}}) { mcode eda zip region local street extend extend2 adrname tel }
         msgoods(where: {id: {_eq: $id}, gcode: {_in: $gcds}}) { gcode unit tanano jan }
       }`;
     const [doc] = await Promise.all([
@@ -245,6 +265,10 @@ export class ShipService {
         system: q.mssystem[0] ?? { kname: null, invno: null, zip: null, adr: null, tel: null, fax: null },
         pickUrl: this.pickUrl(j.denno),
         cusden: j.cusden,
+        okuri: {
+          hday: j.hday, htime: j.htime == null ? null : String(j.htime), omemo: j.omemo, daibiki: j.daibiki, daibzei: j.daibzei,
+          eidome: j.eidome, eicode: j.eicode
+        },
         // 以下は保存処理で使う（ShipDoc の外）
         staffSei: staff?.sei ?? '',
         buntype: j.buntype,
@@ -384,23 +408,59 @@ export class ShipService {
   /** 納品書・出荷指示書の PDF（確認用。保存はしない） */
   async pdfs(dennos: number[]): Promise<{ name: string; blob: Blob }[]> {
     const ret: { name: string; blob: Blob }[] = [];
+    const forms = await this.loadForms();
     for (const d of await this.load(dennos)) {
-      if (isAmazon(d.mcode)) {
+      const form = findForm(forms, (d as ShipDoc & { buntype: string | null }).buntype);
+      if (isAmazon(d.mcode) || form?.amazon) {
         ret.push({ name: d.denno + '.pdf', blob: await this.spdfsrv.amazon(d) });
         ret.push({ name: 's_' + d.denno + '.pdf', blob: await this.spdfsrv.shiji(d, undefined) });
         continue;
       }
-      const form = denForm((d as ShipDoc & { buntype: string | null }).buntype);
       if (form) {
         ret.push({ name: d.denno + '.pdf', blob: await this.spdfsrv.nohin(d, form) });
-        const f2 = typeof form.second == 'number' ? denForm(form.second) : undefined;
-        if (f2) {
-          ret.push({ name: d.denno + '_2.pdf', blob: await this.spdfsrv.nohin(d, f2) });
+        if (form.second) {
+          ret.push({ name: d.denno + '_2.pdf', blob: await this.spdfsrv.nohin(d, form.second) });
         }
       }
       ret.push({ name: 's_' + d.denno + '.pdf', blob: await this.spdfsrv.shiji(d, form) });
     }
     return ret;
+  }
+
+  private forms?: Promise<DenForm[]>;
+
+  /** 帳票タイプの様式（納品書タイプマスタ・文書マスタ）。一度読んだら使い回す（読めなかったときは次に読み直す） */
+  loadForms(): Promise<DenForm[]> {
+    if (!this.forms) {
+      const Get = gql`
+        query get_shipforms($id: smallint!) {
+          msbuntype(where: {id: {_eq: $id}}) { code name first saki second sksec }
+          msbunsho(where: {id: {_eq: $id}}) { code name title gakutxt stamp atesaki message hmoto }
+        }`;
+      this.forms = firstValueFrom(this.apollo.query<{ msbuntype: BuntypeRow[]; msbunsho: BunshoRow[] }>({
+        query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid }
+      })).then(res => {
+        if (res.error || !res.data) {
+          throw new Error('納品書タイプマスタ・文書マスタを読めませんでした');
+        }
+        return buildForms(res.data.msbuntype, res.data.msbunsho);
+      });
+      this.forms.catch(() => this.forms = undefined);
+    }
+    return this.forms;
+  }
+
+  /** この PC のフォルダ（送り状CSV・納品書控）。設定していなければ undefined。許可されなかったときは notes に書いて undefined */
+  private async openLocal(key: string, notes: string[]): Promise<FileSystemDirectoryHandle | undefined> {
+    if (!this.nassrv.supported || !(await this.nassrv.get(key))) {
+      return undefined;
+    }
+    try {
+      return await this.nassrv.open(key);
+    } catch (e) {
+      notes.push((e as Error).message);
+      return undefined;
+    }
   }
 
   /**
@@ -410,8 +470,13 @@ export class ShipService {
    *   ・倉庫で出力済（フォルダ名に【済、またはステータスが出荷指示出力済）、または出荷予定日の前営業日以降 → 「…_差替分」の別フォルダ
    *   ・それ以外 → 同じフォルダに上書き（前の納品書等は消す）
    */
-  async saveToNas(dennos: number[], progress?: (done: number, all: number) => void): Promise<ShipResult[]> {
+  async saveToNas(dennos: number[], progress?: (done: number, all: number) => void): Promise<ShipSave> {
     const root = await this.nassrv.open(NAS_SHIP);
+    // この PC のフォルダの許可も、ボタンを押した直後のうちに求める
+    const notes: string[] = [];
+    const csvDir = await this.openLocal(LOCAL_OKURICSV, notes);
+    const hikaeDir = await this.openLocal(LOCAL_HIKAE, notes);
+    const forms = await this.loadForms();
     if (this.okrsrv.hokuri.length == 0) {
       this.okrsrv.getHokuri();
     }
@@ -423,13 +488,15 @@ export class ShipService {
     const parentOf = amazonDokon(loaded);
     const docs = [...loaded.filter(d => !parentOf.has(d.denno)), ...loaded.filter(d => parentOf.has(d.denno))];
     const saved = new Map<number, ShipDoc>();
+    const masters = await this.csvMasters();
+    const today = this.usrsrv.formatDate(new Date());
     const results: ShipResult[] = [];
     let done = 0;
     for (const d of docs) {
       const r: ShipResult = { denno: d.denno, dir: '', sasikae: false, error: '' };
       try {
-        const amazon = isAmazon(d.mcode);
-        const form = denForm(d.buntype);
+        const form = findForm(forms, d.buntype);
+        const amazon = isAmazon(d.mcode) || !!form?.amazon;
         if (!form && !amazon) {
           throw new Error('納品書タイプが未設定です');
         }
@@ -478,30 +545,63 @@ export class ShipService {
         }
         const dir = await this.nassrv.folder(parent, name);
         if (!r.sasikae) {
-          for (const old of [d.denno + '.pdf', d.denno + '_2.pdf', 's_' + d.denno + '.pdf', 'zmemo.txt']) {
+          for (const old of [d.denno + '.pdf', d.denno + '_2.pdf', 's_' + d.denno + '.pdf', 'zmemo.txt',
+            ...CSV_KINDS.map(k => folderCsvName(k, d.denno))]) {
             await this.nassrv.remove(dir, old);
           }
         }
-        if (amazon) {
-          // Amazon は帳票タイプによらず Amazon 用の納品書を入れる
-          await this.nassrv.write(dir, d.denno + '.pdf', await this.spdfsrv.amazon(d));
-        } else if (form) {
-          if (form.dokon == 'する') {
-            await this.nassrv.write(dir, d.denno + '.pdf', await this.spdfsrv.nohin(d, form));
-          }
-          const f2 = typeof form.second == 'number' ? denForm(form.second) : undefined;
-          if (f2?.dokon == 'する') {
-            await this.nassrv.write(dir, d.denno + '_2.pdf', await this.spdfsrv.nohin(d, f2));
-          }
+        // 納品書（第一・第二帳票）。同梱する（shuk）ものだけ出荷指示フォルダに入れ、控えにはすべて保存する（現行と同じ）
+        const nohin1 = amazon ? await this.spdfsrv.amazon(d) : form ? await this.spdfsrv.nohin(d, form) : undefined;
+        const nohin2 = !amazon && form?.second ? await this.spdfsrv.nohin(d, form.second) : undefined;
+        if (nohin1 && (amazon || form?.dokon == 'する')) {
+          await this.nassrv.write(dir, d.denno + '.pdf', nohin1);
+        }
+        if (nohin2 && form?.second?.dokon == 'する') {
+          await this.nassrv.write(dir, d.denno + '_2.pdf', nohin2);
         }
         await this.nassrv.write(dir, 's_' + d.denno + '.pdf', await this.spdfsrv.shiji(d, amazon ? undefined : form));
         const memo = this.zmemo(d, form?.code ?? 0);
+        // 送り状 CSV（配送方法マスタのタイプ・CSV 取込場で、伝票ごとのファイルか本社の日ごとのファイル）
+        const hk = masters.hokuri.find(e => e.code == d.hcode);
+        const kind = csvKind(hk);
+        if (hk && kind) {
+          const imp = (hk.csvimp ?? '').trim();
+          if (imp == CSVIMP_FOLDER || imp == CSVIMP_HONSHA) {
+            const line = csvLine(kind, this.csvDoc(d), hk, masters.hktime, today);
+            if (isOfficeCsv(kind)) {
+              // e飛伝Ⅱ・CLOUD は出荷指示フォルダに入れず、事務の PC に保存して取り込む
+              r.csv = { kind, sday: d.sday, line };
+            } else if (imp == CSVIMP_FOLDER) {
+              await this.nassrv.write(dir, folderCsvName(kind, d.denno), await this.sjis(line + '\r\n'));
+            }
+          }
+          if (kind == 'e飛伝Ⅱ' && (hk.mtchaku ?? '').trim() == '2') {
+            memo.push('e飛伝Ⅱ着払い！！（発送当日に送り状出力 取扱注意シール必要）');
+          } else if (kind == 'CLOUD') {
+            memo.push('Biz-Logi Cloud！！');
+          }
+        } else if ((hk?.htype ?? '').trim() == '複写式') {
+          memo.push(d.hname + '！！');
+        }
         if (memo.length > 0) {
           await this.nassrv.write(dir, 'zmemo.txt', await this.sjis(memo.join('\r\n') + '\r\n'));
         }
         r.dir = parentPath + '/' + name;
         await this.setShipped(d.denno, r.dir);
         saved.set(d.denno, d);
+        // 納品書の控え（この PC の納品書控\{yyyymmdd}出荷日\{伝票番号}{受注先}.pdf・_2.pdf）
+        if (hikaeDir && nohin1) {
+          try {
+            const hdir = await this.nassrv.folder(hikaeDir, d.sday.replace(/-/g, '') + '出荷日');
+            const hname = d.denno + this.nassrv.safeName(condense(d.orderer.name));
+            await this.nassrv.write(hdir, hname + '.pdf', nohin1);
+            if (nohin2) {
+              await this.nassrv.write(hdir, hname + '_2.pdf', nohin2);
+            }
+          } catch (e) {
+            notes.push('伝票 ' + d.denno + ' の納品書控を保存できませんでした：' + (e as Error).message);
+          }
+        }
       } catch (e) {
         r.error = (e as Error).message;
         console.log('error saveToNas', d.denno, e);
@@ -509,7 +609,76 @@ export class ShipService {
       results.push(r);
       progress?.(++done, docs.length);
     }
-    return results.sort((a, b) => dennos.indexOf(a.denno) - dennos.indexOf(b.denno));
+    results.sort((a, b) => dennos.indexOf(a.denno) - dennos.indexOf(b.denno));
+    const csv = await this.saveOfficeCsv(results, csvDir, notes);
+    return { results, notes, ...csv };
+  }
+
+  /**
+   * e飛伝Ⅱ・CLOUD の送り状 CSV（保存できた伝票の分）。出荷日・種類ごとに 1 ファイル（{yyyymmdd}hiden.csv・{yyyymmdd}CLOUD.csv）。
+   * この PC の送り状CSVフォルダがあれば、そのファイルに追記する（同じ伝票の前の行は入れ替える）。無ければダウンロード用に返す
+   */
+  private async saveOfficeCsv(results: ShipResult[], csvDir: FileSystemDirectoryHandle | undefined, notes: string[]):
+    Promise<{ csvSaved: string[]; downloads: { name: string; blob: Blob }[] }> {
+    const groups = new Map<string, { kind: CsvKind; lines: string[] }>();
+    for (const r of results.filter(e => !e.error && e.csv)) {
+      const name = officeCsvName(r.csv!.kind, r.csv!.sday);
+      const g = groups.get(name) ?? { kind: r.csv!.kind, lines: [] };
+      g.lines.push(r.csv!.line);
+      groups.set(name, g);
+    }
+    const csvSaved: string[] = [];
+    const downloads: { name: string; blob: Blob }[] = [];
+    for (const [name, g] of groups) {
+      if (csvDir) {
+        try {
+          const nos = new Set(g.lines.map(l => officeCsvDenno(g.kind, l)));
+          const old = await this.nassrv.read(csvDir, name);
+          const keep = old
+            ? new TextDecoder('shift_jis').decode(await old.arrayBuffer()).split(/\r?\n/)
+              .filter(l => l.trim() && !nos.has(officeCsvDenno(g.kind, l)))
+            : [];
+          await this.nassrv.write(csvDir, name, await this.sjis([...keep, ...g.lines].join('\r\n') + '\r\n'));
+          csvSaved.push(csvDir.name + '\\' + name);
+          continue;
+        } catch (e) {
+          notes.push('送り状 CSV（' + name + '）を送り状CSVフォルダに保存できなかったので、ダウンロードします：' + (e as Error).message);
+        }
+      }
+      downloads.push({ name, blob: await this.sjis(g.lines.join('\r\n') + '\r\n') });
+    }
+    return { csvSaved, downloads };
+  }
+
+  /** 送り状 CSV に使う配送方法・配送時間帯のマスタ */
+  private async csvMasters(): Promise<{ hokuri: HokuriCsv[]; hktime: HktimeCsv[] }> {
+    const Get = gql`
+      query get_shipcsvmast($id: smallint!) {
+        mshokuri(where: {id: {_eq: $id}}) { code name htype binshu mtchaku daibiki csvimp cuscode hscode }
+        mshktime(where: {id: {_eq: $id}}) { hscode code bunrui }
+      }`;
+    const res = await firstValueFrom(this.apollo.query<{ mshokuri: HokuriCsv[]; mshktime: HktimeCsv[] }>({
+      query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid }
+    }));
+    if (res.error || !res.data) {
+      throw new Error('配送方法マスタを読めませんでした');
+    }
+    return {
+      hokuri: res.data.mshokuri.map(e => ({ ...e, code: String(e.code).trim() })),
+      hktime: res.data.mshktime.map(e => ({ ...e, code: String(e.code).trim() }))
+    };
+  }
+
+  /** 送り状 CSV にする伝票の値 */
+  private csvDoc(d: ShipDoc): CsvDoc {
+    const o = d.okuri;
+    const first = d.lines.find(l => l.gcode);
+    return {
+      denno: d.denno, to: d.nsaki, irai: d.irai, okurino: d.okurino, okurisuu: d.okurisuu, sday: d.sday,
+      hday: o?.hday ?? null, htime: o?.htime ?? null, omemo: o?.omemo ?? null, daibiki: o?.daibiki ?? null, daibzei: o?.daibzei ?? null,
+      eidome: o?.eidome ?? null, eicode: o?.eicode ?? null,
+      first: first ? { gtext: first.gtext ?? '', suu: first.suu } : undefined
+    };
   }
 
   /** zmemo.txt（倉庫への注意）の行 */

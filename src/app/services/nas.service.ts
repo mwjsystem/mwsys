@@ -65,8 +65,9 @@ export class NasService {
   async open(key: string): Promise<FileSystemDirectoryHandle> {
     const dir = await this.get(key) as FsDirHandle | undefined;
     if (!dir) {
-      throw new Error('保存先のフォルダが設定されていません（設定メニューの「' +
-        (key == 'fax' ? '倉庫宛FAXフォルダ' : '出荷フォルダ') + '（NAS）の設定」で選んでください）');
+      const name = key == 'fax' ? '倉庫宛FAXフォルダ（NAS）' : key == 'okuricsv' ? '送り状CSVフォルダ（この PC）'
+        : key == 'hikae' ? '納品書控フォルダ（この PC）' : '出荷フォルダ（NAS）';
+      throw new Error('保存先のフォルダが設定されていません（設定メニューの「' + name + 'の設定」で選んでください）');
     }
     const mode: PermissionMode = { mode: 'readwrite' };
     if (await dir.queryPermission(mode) != 'granted' && await dir.requestPermission(mode) != 'granted') {

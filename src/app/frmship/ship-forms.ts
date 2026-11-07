@@ -1,6 +1,7 @@
 /**
  * 出荷指示（納品書・出荷指示書）の様式の設定。
- * 現行の Excel マクロ「伝票一括処理.xlsm」の master シート（帳票タイプ）と、出荷指示書の商品コードごとの注記を移したもの。
+ * 帳票タイプは納品書タイプマスタ・文書マスタから作る（現行の Excel マクロ「伝票一括処理.xlsm」の master シートの置き換え）。
+ * 出荷指示書の商品コードごとの注記は、現行マクロの規則を移したもの。
  * （品番の一覧で決まる注記〈事務所同梱・芦原・手塚・品番注意〉と並び順〈sort.xlsx〉は、後の段階でマスタにする）
  */
 
@@ -31,67 +32,91 @@ export const JDST = {
 export const isKeepStage = (s: string | null | undefined): boolean =>
   s == JDST.KEEP_FAX || s == JDST.KEEP_CHANGED || s == JDST.KEEP_OK || s == JDST.KEEP_SHORT;
 
-/** 帳票タイプ（受注伝票の buntype） */
+/**
+ * 帳票（1 枚分）の様式。納品書タイプマスタ（msbuntype）の第一・第二帳票が指す、文書マスタ（msbunsho）の 1 行から作る
+ * （現行の master シートの「文章指定」の置き換え）
+ */
 export interface DenForm {
+  /** 納品書タイプのコード（数値） */
   code: number;
+  /** 納品書タイプの名前（第二帳票は文書の名前） */
   name: string;
   /** 帳票のタイトル */
   title: string;
   /** 文言（例: 下記の通り、納品致します。） */
   msg: string;
-  /** 金額の見出し。'表示なし' は金額を出さない */
-  kingaku: '税込金額' | '御請求額' | '表示なし';
-  /** 納品書を荷物に同梱するか（'する' のときだけ NAS の出荷指示フォルダに入れる） */
+  /** 金額の見出し（税込金額・御請求額 など）。'表示なし' は金額を出さない */
+  kingaku: string;
+  /**
+   * 荷物に同梱するか（msbuntype の saki / sksec）。'する'（shuk）だけ出荷指示フォルダに入れる。
+   * 'しない'（hkan）・'受注先書式'（hkae）は入れない。控え（納品書控フォルダ）にはどれも保存する
+   */
   dokon: 'する' | 'しない' | '受注先書式';
   /** 角印 */
   stamp: boolean;
-  /** 宛先 */
+  /** 宛先（atesaki: mcode = 受注先、ncode = 納品先） */
   ate: '受注先' | '納品先';
-  /** 発行元（MWJ = 自社。受注先・依頼主 = その住所を発行元に出す） */
+  /** 発行元（hmoto: 空 = 自社、mcode = 受注先、iadr = 依頼主） */
   issuer: 'MWJ' | '受注先' | '依頼主';
-  /** 第二帳票（帳票タイプのコード。'MWJ_A5' は受注先宛の控えで、NAS には入れない） */
-  second: number | 'MWJ_A5' | null;
-  /** 日付の見出し */
+  /** 第二帳票（無ければ null） */
+  second: DenForm | null;
+  /** 日付の見出し（領収書は発行日、それ以外は売上日） */
   dayText: string;
+  /** Amazon 納品書（文書 24。様式は Amazon 用の納品書） */
+  amazon: boolean;
 }
 
-const f = (code: number, name: string, title: string, msg: string, kingaku: DenForm['kingaku'], dokon: DenForm['dokon'],
-  stamp: boolean, ate: DenForm['ate'], issuer: DenForm['issuer'], second: DenForm['second'], dayText: string): DenForm =>
-  ({ code, name, title, msg, kingaku, dokon, stamp, ate, issuer, second, dayText });
+/** 納品書タイプマスタ（msbuntype）の行 */
+export interface BuntypeRow { code: string; name: string; first: string | null; saki: string | null; second: string | null; sksec: string | null }
+/** 文書マスタ（msbunsho）の行 */
+export interface BunshoRow {
+  code: string; name: string; title: string | null; gakutxt: string | null; stamp: boolean | number | string | null;
+  atesaki: string | null; message: string | null; hmoto: string | null;
+}
 
-const NOHIN = '下記の通り、納品致します。';
-const SEIKYU = '下記の通り、ご請求申し上げます。';
-const RYOSHU = '下記の通り、領収致しました。';
+/** Amazon 納品書の文書コード */
+const BUNSHO_AMAZON = '24';
 
-export const DEN_FORMS: DenForm[] = [
-  f(1, '納品書のみ', '納品書', NOHIN, '税込金額', 'する', false, '受注先', 'MWJ', null, '売上日:'),
-  f(2, '請求書兼納品書', '請求書（兼納品書）', SEIKYU, '御請求額', 'する', true, '受注先', 'MWJ', null, '売上日:'),
-  f(3, '領収書兼納品書', '領収書（兼納品書）', RYOSHU, '税込金額', 'する', true, '受注先', 'MWJ', null, '発行日:'),
-  f(4, '納品書なし', '納品書', NOHIN, '税込金額', 'しない', false, '受注先', 'MWJ', null, '売上日:'),
-  f(5, '受注先⇒納品先(￥無)', '納品書', NOHIN, '表示なし', 'する', false, '納品先', '受注先', 'MWJ_A5', '売上日:'),
-  f(6, '請求書と納品書', '請求書', SEIKYU, '御請求額', 'する', true, '受注先', 'MWJ', 1, '売上日:'),
-  f(7, '請求兼納品書(同梱無)', '請求書（兼納品書）', SEIKYU, '御請求額', 'しない', true, '受注先', 'MWJ', null, '売上日:'),
-  f(8, '客先指定納品書', '納品書', NOHIN, '税込金額', '受注先書式', false, '受注先', 'MWJ', null, '売上日:'),
-  f(9, '現金回収用納品書', '領収書（兼納品書）', RYOSHU, '税込金額', 'しない', true, '受注先', 'MWJ', 10, '発行日:'),
-  f(10, '受領書', '受領書', '下記の通り、受領しました。', '税込金額', 'しない', false, '受注先', 'MWJ', null, '売上日:'),
-  f(11, '納品書(依頼主発行)', '納品書', NOHIN, '税込金額', 'する', false, '受注先', '依頼主', null, '売上日:'),
-  f(12, '請求書兼納品書(依)', '請求書（兼納品書）', SEIKYU, '御請求額', 'する', false, '受注先', '依頼主', null, '売上日:'),
-  f(13, '領収書兼納品書(依)', '領収書（兼納品書）', RYOSHU, '税込金額', 'する', false, '受注先', '依頼主', null, '発行日:'),
-  f(14, '出荷票', '納品書', NOHIN, '表示なし', 'する', false, '受注先', 'MWJ', null, '売上日:'),
-  f(15, '出荷票と請求書', '請求書', SEIKYU, '御請求額', '受注先書式', true, '受注先', 'MWJ', 14, '売上日:'),
-  f(16, '納品書なし', '納品書', NOHIN, '税込金額', 'しない', false, '受注先', 'MWJ', null, '売上日:'),
-  f(17, '領収兼納品書(同梱無)', '領収書（兼納品書）', RYOSHU, '税込金額', 'しない', true, '受注先', 'MWJ', null, '発行日:'),
-  f(18, '領収書と納品書', '領収書', RYOSHU, '税込金額', 'する', true, '受注先', 'MWJ', 1, '発行日:'),
-  f(19, '納品書と同梱無請求書', '請求書', SEIKYU, '御請求額', 'しない', true, '受注先', 'MWJ', 1, '発行日:'),
-  f(20, '納品書と同梱無領収書', '領収書', RYOSHU, '税込金額', 'しない', true, '受注先', 'MWJ', 1, '発行日:'),
-  f(21, '受注先⇒納品先(￥有)', '納品書', NOHIN, '税込金額', 'する', false, '納品先', '受注先', null, '発行日:'),
-  f(22, '(再発行)領収書', '領収書（再発行）', RYOSHU, '税込金額', 'する', true, '受注先', 'MWJ', null, '発行日:')
-];
+const dokonOf = (saki: string | null): DenForm['dokon'] => {
+  const s = (saki ?? '').trim();
+  return s == 'shuk' ? 'する' : s == 'hkae' ? '受注先書式' : 'しない';
+};
 
-/** 帳票タイプ（buntype。'01' でも '1' でもよい）の設定。無ければ undefined */
-export function denForm(buntype: string | number | null | undefined): DenForm | undefined {
+function bunshoForm(code: number, name: string, b: BunshoRow, dokon: DenForm['dokon'], second: DenForm | null): DenForm {
+  const title = (b.title ?? b.name ?? '').trim();
+  const hmoto = (b.hmoto ?? '').trim();
+  return {
+    code, name, title, msg: (b.message ?? '').trim(), kingaku: (b.gakutxt ?? '').trim() || '表示なし', dokon,
+    stamp: b.stamp === true || Number(b.stamp) == 1 || String(b.stamp).toLowerCase() == 'true',
+    ate: (b.atesaki ?? '').trim() == 'ncode' ? '納品先' : '受注先',
+    issuer: hmoto == 'mcode' ? '受注先' : hmoto == 'iadr' ? '依頼主' : 'MWJ',
+    second, dayText: title.startsWith('領収書') ? '発行日:' : '売上日:', amazon: b.code.trim() == BUNSHO_AMAZON
+  };
+}
+
+/** 納品書タイプマスタ・文書マスタから、納品書タイプごとの様式を作る（文書が見つからないタイプは入れない） */
+export function buildForms(types: BuntypeRow[], bunshos: BunshoRow[]): DenForm[] {
+  const bs = (code: string | null) => bunshos.find(b => b.code.trim() == (code ?? '').trim());
+  const ret: DenForm[] = [];
+  for (const t of types) {
+    const b1 = bs(t.first);
+    if (!b1) {
+      continue;
+    }
+    const b2 = bs(t.second);
+    const second = b2 ? bunshoForm(Number(t.code), b2.name, b2, dokonOf(t.sksec), null) : null;
+    ret.push(bunshoForm(Number(t.code), t.name, b1, dokonOf(t.saki), second));
+  }
+  return ret;
+}
+
+/** 帳票タイプ（buntype。'01' でも '1' でもよい）の様式。無ければ undefined */
+export function findForm(forms: DenForm[], buntype: string | number | null | undefined): DenForm | undefined {
+  if (buntype == null || String(buntype).trim() == '') {
+    return undefined;
+  }
   const code = Number(buntype);
-  return DEN_FORMS.find(e => e.code == code);
+  return forms.find(e => e.code == code);
 }
 
 /** 出荷指示書の検品欄（現行の様式 form3 の左上。倉庫の担当者名） */

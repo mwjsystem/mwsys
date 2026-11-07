@@ -8,7 +8,7 @@ import { RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
-import { NasfolderComponent, NASFOLDER_FAX, NASFOLDER_SHIP } from './../share/nasfolder/nasfolder.component';
+import { NasfolderComponent, NasfolderParam, NASFOLDER_FAX, NASFOLDER_SHIP, FOLDER_OKURICSV, FOLDER_HIKAE } from './../share/nasfolder/nasfolder.component';
 
 @Component({
     selector: 'app-navbar',
@@ -50,7 +50,13 @@ export class NavbarComponent implements OnInit {
   // }
   /** 出荷フォルダ・倉庫宛 FAX フォルダ（NAS）の設定（各 PC で保存先のフォルダを選ぶ） */
   openNasfolder(fax: boolean) {
-    this.dialog.open(NasfolderComponent, { width: '640px', maxWidth: '95vw', data: fax ? NASFOLDER_FAX : NASFOLDER_SHIP });
+    this.openFolder(fax ? NASFOLDER_FAX : NASFOLDER_SHIP);
+  }
+  /** 送り状 CSV・納品書控の保存先（この PC のフォルダ）の設定 */
+  readonly folderOkuriCsv = FOLDER_OKURICSV;
+  readonly folderHikae = FOLDER_HIKAE;
+  openFolder(param: NasfolderParam) {
+    this.dialog.open(NasfolderComponent, { width: '640px', maxWidth: '95vw', data: param });
   }
 
   setDB(flg: boolean) {

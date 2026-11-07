@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, FormControl, FormsModule, ReactiveFormsModule }
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { ShipService, ShipRow, ShipResult } from './ship.service';
-import { JDST, denForm } from './ship-forms';
+import { JDST, DenForm, findForm } from './ship-forms';
 import { PdfService } from './../services/pdf.service';
 import { UserService } from './../services/user.service';
 import { BunruiService } from './../services/bunrui.service';
@@ -60,6 +60,8 @@ export class FrmshipComponent implements OnInit, AfterViewInit {
     /** 伝票番号を指定して開いたときの伝票番号 */
     denno = 0;
     readonly JDST = JDST;
+    /** 納品書タイプの様式（一覧の名前の表示用） */
+    forms: DenForm[] = [];
     columns = ['chk', 'denno', 'jdstatus', 'sday', 'mcode', 'ncode', 'hcode', 'okurisuu', 'buntype', 'total', 'okurino', 'shipdir'];
 
     constructor() {
@@ -83,6 +85,10 @@ export class FrmshipComponent implements OnInit, AfterViewInit {
             this.okrsrv.getHaisou();
         }
         this.bunsrv.qryBunrui().then(() => this.cdRef.detectChanges());
+        this.shipsrv.loadForms().then(f => {
+            this.forms = f;
+            this.cdRef.detectChanges();
+        }).catch(e => this.usrsrv.toastErr('納品書タイプを読めませんでした', (e as Error).message));
     }
 
     ngAfterViewInit(): void {
@@ -170,10 +176,20 @@ export class FrmshipComponent implements OnInit, AfterViewInit {
         this.progress = 'NAS に保存しています…';
         this.cdRef.detectChanges();
         try {
-            this.results = await this.shipsrv.saveToNas(sel.map(e => e.denno), (done, all) => {
+            const save = await this.shipsrv.saveToNas(sel.map(e => e.denno), (done, all) => {
                 this.progress = 'NAS に保存しています…（' + done + ' / ' + all + '）';
                 this.cdRef.detectChanges();
             });
+            this.results = save.results;
+            // e飛伝Ⅱ・CLOUD の送り状 CSV（送り状CSVフォルダに保存、フォルダを設定していない PC はダウンロード）
+            save.downloads.forEach(f => this.pdfsrv.download(f.blob, f.name));
+            const csvs = [...save.csvSaved, ...save.downloads.map(f => f.name + '（ダウンロード）')];
+            if (csvs.length > 0) {
+                this.usrsrv.toastSuc('送り状 CSV を保存しました：' + csvs.join('、') + '（e飛伝Ⅱ・BizLogi Cloud にアップロードしてください）');
+            }
+            if (save.notes.length > 0) {
+                this.usrsrv.toastErr('納品書控・送り状 CSV', save.notes.join('\n'));
+            }
             const ng = this.results.filter(e => e.error);
             if (ng.length == 0) {
                 this.usrsrv.toastSuc(this.results.length + ' 件の出荷指示フォルダを作成しました');
@@ -230,7 +246,7 @@ export class FrmshipComponent implements OnInit, AfterViewInit {
     }
 
     formName(buntype: string | null): string {
-        return denForm(buntype)?.name ?? (buntype ? buntype + '（未登録）' : '未設定');
+        return findForm(this.forms, buntype)?.name ?? (buntype ? buntype + '（未登録）' : '未設定');
     }
 
     hokuriName(hcode: string | null): string {

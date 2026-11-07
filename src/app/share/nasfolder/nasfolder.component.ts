@@ -18,6 +18,8 @@ export interface NasfolderParam {
   usage: string;
   /** 例（フォルダの場所） */
   example: string;
+  /** NAS ではなく、この PC のフォルダ */
+  local?: boolean;
 }
 export const NASFOLDER_SHIP: NasfolderParam = {
   key: NAS_SHIP, title: '出荷フォルダ（NAS）の設定',
@@ -27,7 +29,20 @@ export const NASFOLDER_FAX: NasfolderParam = {
   key: NAS_FAX, title: '倉庫宛FAXフォルダ（NAS）の設定',
   usage: 'キープ表を保存する（倉庫のマクロが印刷する）', example: '\\\\192.168.30.133\\share\\asago宛FAX'
 };
-
+/** 送り状 CSV（e飛伝Ⅱ・BizLogi Cloud。出荷指示をした事務の PC）の用途名 */
+export const LOCAL_OKURICSV = 'okuricsv';
+/** 納品書控（出荷指示をした事務の PC）の用途名 */
+export const LOCAL_HIKAE = 'hikae';
+export const FOLDER_OKURICSV: NasfolderParam = {
+  key: LOCAL_OKURICSV, title: '送り状CSVフォルダ（この PC）の設定',
+  usage: 'e飛伝Ⅱ・BizLogi Cloud の送り状 CSV（出荷日ごとの {yyyymmdd}hiden.csv・CLOUD.csv）を保存する。未設定の PC ではダウンロードになる',
+  example: 'ドキュメント\\送り状CSV', local: true
+};
+export const FOLDER_HIKAE: NasfolderParam = {
+  key: LOCAL_HIKAE, title: '納品書控フォルダ（この PC）の設定',
+  usage: '出荷指示フォルダを作るときに、納品書の控え（{yyyymmdd}出荷日\\{伝票番号}{受注先}.pdf）を保存する。未設定の PC では保存しない',
+  example: 'ドキュメント\\納品書控', local: true
+};
 /**
  * 出荷フォルダ（NAS）の設定。各 PC で最初に一度、保存先のフォルダ（例: \\192.168.30.133\share\asago出荷）を選ぶ。
  * 「書き込みテスト」で、選んだフォルダに MWSys書込テスト\テスト_日時.txt を書いて読み戻せるかを確認する。

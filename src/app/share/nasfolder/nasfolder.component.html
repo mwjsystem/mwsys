@@ -9,8 +9,13 @@
     }
     <p style="color: #666; font-size: 12px;">ブラウザの情報：{{agent}}</p>
   } @else {
-    <p>{{param.usage}}、NAS のフォルダを選んでください（この PC で最初に一度だけ）。</p>
-    <p style="color: #666;">例：{{param.example}}（「ネットワーク」から NAS を開くか、割り当てたドライブから選びます）</p>
+    @if (param.local) {
+      <p>{{param.usage}}。この PC のフォルダを選んでください（この PC で最初に一度だけ）。</p>
+      <p style="color: #666;">例：{{param.example}}（フォルダが無ければ、選ぶ画面の「新しいフォルダー」で作ってから選びます）</p>
+    } @else {
+      <p>{{param.usage}}、NAS のフォルダを選んでください（この PC で最初に一度だけ）。</p>
+      <p style="color: #666;">例：{{param.example}}（「ネットワーク」から NAS を開くか、割り当てたドライブから選びます）</p>
+    }
     <p>現在の保存先：<b>{{folderName || '（未設定）'}}</b></p>
     @if (result) {
       <p [style.color]="result.startsWith('成功') ? '#2e7d32' : '#c62828'" style="white-space: pre-wrap;">{{result}}</p>

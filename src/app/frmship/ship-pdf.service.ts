@@ -7,7 +7,7 @@ import { barcodeCanvas, code39 } from './../services/barcode';
 import { AmazonLabel, LabelOption, amazonLabelDoc } from './amazon-label';
 
 /** 住所（msmadr） */
-export interface ShipAdr { mcode: string; eda: number; zip: string | null; region: string | null; local: string | null; street: string | null; extend: string | null; extend2: string | null; adrname: string | null }
+export interface ShipAdr { mcode: string; eda: number; zip: string | null; region: string | null; local: string | null; street: string | null; extend: string | null; extend2: string | null; adrname: string | null; tel?: string | null }
 /** 受注明細（trjyumei + 商品マスタの単位・棚番） */
 export interface ShipLine { line: number; gcode: string; gtext: string; suu: number; touttanka: number; toutmoney: number; taxrate: string | null; mmemo: string | null; unit: string | null; tanano: string | null; jan?: string | null; spec?: string | null; scode?: string | null }
 /** 会社情報（mssystem） */
@@ -59,6 +59,8 @@ export interface ShipDoc {
   cusden?: string | null;
   /** 同梱の注意（「123 を同梱」「123 に同梱」）。出荷指示書の注意書きに出す */
   dokon?: string;
+  /** 送り状 CSV に使う値（配達指定日・時間帯・送り状備考・代引・営業所止め） */
+  okuri?: { hday: string | null; htime: string | null; omemo: string | null; daibiki: number | null; daibzei: number | null; eidome: string | boolean | null; eicode: string | null };
 }
 
 const yen = (v: number | null | undefined): string => Number(v ?? 0).toLocaleString('ja-JP');
@@ -367,7 +369,7 @@ export class ShipPdfService {
     if (form.issuer != '受注先') {
       right.push({ text: 'お支払方法：' + d.payName });
     }
-    if (form.dokon == 'しない' && d.okurino) {
+    if (form.dokon != 'する' && d.okurino) {
       right.push({ text: '送り状№：' + d.okurino });
     }
     if (form.title == '受領書') {
