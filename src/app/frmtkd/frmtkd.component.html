@@ -1,5 +1,5 @@
 <mat-toolbar color="primary" class="toolbar mat-elevation-z8">
-  <span>TKD請求取込（東海堂 Ｙ）</span>
+  <span>{{kind.title}}（{{kind.name}}）</span>
   <span class="env">接続先：{{envName}}</span>
 </mat-toolbar>
 @if (error) {
@@ -23,7 +23,7 @@
 }
 @if (orders.length > 0) {
   <p class="note">伝票 {{orders.length | number}} 件・明細 {{lineCount | number}} 行・税抜合計 {{grand | number:'1.0-0'}} 円。
-    受注先 {{mcode}}、日付ごとに 1 伝票。出荷区分は売上のみ、受注日は Excel の日付、売上日は {{udays}}（月末）。
+    受注先 {{kind.mcode}}、日付ごとに 1 伝票。出荷区分は売上のみ、受注日は Excel の日付、売上日は {{udays}}（月末）。
     品名・単価（税抜）・備考は Excel のまま登録します。</p>
   <div class="scroll">
     <table class="rep">

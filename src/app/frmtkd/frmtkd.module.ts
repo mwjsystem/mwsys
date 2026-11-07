@@ -8,7 +8,8 @@ import { FrmtkdComponent } from './frmtkd.component';
 registerLocaleData(localeJa);
 
 const routes: Routes = [
-  { path: '', component: FrmtkdComponent }
+  { path: '', component: FrmtkdComponent, data: { kind: 'tkd' } },
+  { path: 'th', component: FrmtkdComponent, data: { kind: 'th' } }
 ];
 
 @NgModule({

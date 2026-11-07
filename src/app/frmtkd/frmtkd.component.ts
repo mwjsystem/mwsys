@@ -1,7 +1,8 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { TkdService, TKD_MCODE } from './tkd.service';
-import { TkdLine, TkdOrder, cellText, parseTkd, monthEnd, totalDiff } from './tkd-parse';
+import { ActivatedRoute } from '@angular/router';
+import { TkdService, SEIKYU_KINDS, SeikyuKind } from './tkd.service';
+import { TkdLine, TkdOrder, cellDay, headerRow, parseTkd, monthEnd, totalDiff } from './tkd-parse';
 import { lineMoney } from './../frmamazon/amazon-parse';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton } from '@angular/material/button';
@@ -10,8 +11,9 @@ import { DecimalPipe } from '@angular/common';
 import { DenlinkComponent } from './../share/denlink/denlink.component';
 
 /**
- * TKD（東海堂 Ｙ）請求の取込（現行の TH_TKD伝票登録03.xlsm の置き換え）。
- * 請求の Excel（TKD請求yyyymm.xlsx）をそのまま読み込み、日付ごとに確認してから受注伝票（売上のみ）に登録する。
+ * 加工先の請求の取込（TKD：東海堂 Ｙ = /frmtkd、TH：豊岡縫製 = /frmtkd/th）。
+ * 現行の TH_TKD伝票登録03.xlsm・TH_伝票登録03.xlsm の置き換え。
+ * 請求の Excel をそのまま読み込み、日付ごとに確認してから受注伝票（売上のみ）に登録する。
  */
 @Component({
   selector: 'app-frmtkd',
@@ -24,8 +26,10 @@ export class FrmtkdComponent {
   private srv = inject(TkdService);
   private title = inject(Title);
   private cdRef = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
 
-  readonly mcode = TKD_MCODE;
+  /** 取込先（ルートの data.kind。無ければ TKD） */
+  readonly kind: SeikyuKind = SEIKYU_KINDS[this.route.snapshot.data['kind'] ?? 'tkd'] ?? SEIKYU_KINDS['tkd'];
   fileName = '';
   orders: TkdOrder[] = [];
   busy = false;
@@ -35,7 +39,7 @@ export class FrmtkdComponent {
   private open = new Set<string>();
 
   constructor() {
-    this.title.setTitle('TKD請求取込(MWSystem)');
+    this.title.setTitle(this.kind.title + '(MWSystem)');
   }
 
   get envName(): string {
@@ -86,7 +90,7 @@ export class FrmtkdComponent {
       const ExcelJS = (lib as unknown as { default?: typeof lib }).default ?? lib;
       const wb = new ExcelJS.Workbook();
       await wb.xlsx.load(await file.arrayBuffer());
-      // 見出し（品番・数量）のあるシートを使う（ふつうは 1 枚目）
+      // 見出し（品番・数量）か、A 列に日付のあるシートを使う（ふつうは 1 枚目）
       const sheets = wb.worksheets.map(ws => {
         const rows: unknown[][] = [];
         ws.eachRow({ includeEmpty: true }, (row, no) => {
@@ -95,12 +99,13 @@ export class FrmtkdComponent {
         });
         return rows;
       });
-      const rows = sheets.find(rs => rs.some(r => (r ?? []).some(c => cellText(c) == '品番'))) ?? sheets[0] ?? [];
+      const rows = sheets.find(rs => headerRow(rs) >= 0)
+        ?? sheets.find(rs => rs.some(r => cellDay((r ?? [])[0]) != null)) ?? sheets[0] ?? [];
       const orders = parseTkd(rows);
       if (orders.length == 0) {
         throw new Error('Excel に明細がありません');
       }
-      await this.srv.resolve(orders);
+      await this.srv.resolve(orders, this.kind);
       this.orders = orders;
       this.fileName = file.name;
     } catch (e) {
@@ -133,7 +138,7 @@ export class FrmtkdComponent {
 
   async register() {
     const list = this.orders.filter(o => this.target(o));
-    if (list.length == 0 || !confirm('接続先：' + this.envName + '\n\n東海堂 Ｙ の請求 ' + list.length + ' 件（売上日 ' + this.udays + '）を登録します。よろしいですか？')) {
+    if (list.length == 0 || !confirm('接続先：' + this.envName + '\n\n' + this.kind.name + ' の請求 ' + list.length + ' 件（売上日 ' + this.udays + '）を登録します。よろしいですか？')) {
       return;
     }
     this.busy = true;

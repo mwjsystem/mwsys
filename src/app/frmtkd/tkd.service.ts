@@ -8,15 +8,27 @@ import { JDST } from './../frmship/ship-forms';
 import { lineMoney } from './../frmamazon/amazon-parse';
 import { TkdOrder, monthEnd } from './tkd-parse';
 
-/** 受注先（株式会社東海堂 Ｙ） */
-export const TKD_MCODE = '409535';
+/** 請求の取込先（画面のルートの data.kind で選ぶ） */
+export interface SeikyuKind {
+  /** 画面の見出し・メニューの名前 */
+  title: string;
+  /** 受注先 */
+  mcode: string;
+  name: string;
+  /** Excel のファイル名の例 */
+  file: string;
+}
+export const SEIKYU_KINDS: Record<string, SeikyuKind> = {
+  tkd: { title: 'TKD請求取込', mcode: '409535', name: '株式会社東海堂 Ｙ', file: 'TKD請求yyyymm.xlsx' },
+  th: { title: 'TH請求取込', mcode: '401080', name: '豊岡縫製株式会社', file: 'TYHyyyymm.xlsx' }
+};
 /** 出荷対象区分（分類マスタ kubun = 'skbn'）の売上のみ。在庫・出荷の対象にしない */
 const SKBN_URIONLY = '1';
 /** 明細の税区分（0：外税。Excel の単価は税抜） */
 const TKD_MTAX = '0';
 const KEY_DENNO = 'jdenno';
 
-/** 東海堂 Ｙ の直近の受注伝票（伝票の区分・担当者などをこれに合わせる） */
+/** 受注先の直近の受注伝票（伝票の区分・担当者などをこれに合わせる） */
 interface LastJyuden {
   scde: string | null; ncode: string | null; nadr: number | null; iadr: number | null; scode: string | null;
   tcode: string | null; tcode1: string | null; daibunrui: string | null; chubunrui: string | null; shobunrui: string | null;
@@ -26,7 +38,7 @@ interface LastJyuden {
 interface GoodsRow { gcode: string; msgtankas: { genka: number | null; taxrate: string | null }[] }
 
 /**
- * TKD（東海堂 Ｙ）の請求 Excel の取込（現行の TH_TKD伝票登録03.xlsm の置き換え）。
+ * 加工先（TKD：東海堂 Ｙ、TH：豊岡縫製）の請求 Excel の取込（現行の TH_TKD伝票登録03.xlsm・TH_伝票登録03.xlsm の置き換え）。
  * 日付ごとに 1 伝票・1 トランザクションで登録する。出荷区分は売上のみ（在庫は動かさない・出荷指示の対象にしない）、
  * 受注日は Excel の日付、売上日はその月の月末（月初に前月分を処理するので、処理日から見て前月末）。
  */
@@ -39,6 +51,7 @@ export class TkdService {
   private apollo = inject(Apollo);
 
   private last: LastJyuden | null = null;
+  private kind: SeikyuKind = SEIKYU_KINDS['tkd'];
 
   private async query<T>(query: ReturnType<typeof gql>, variables: object): Promise<T> {
     const res = await firstValueFrom(this.apollo.query<T>({ query, variables, fetchPolicy: 'network-only' }));
@@ -49,7 +62,10 @@ export class TkdService {
   }
 
   /** 伝票の設定（直近の受注伝票）・商品・登録済みを DB で解決する */
-  async resolve(orders: TkdOrder[]): Promise<void> {
+  async resolve(orders: TkdOrder[], kind: SeikyuKind): Promise<void> {
+    this.kind = kind;
+    this.last = null;
+    const MCODE = kind.mcode;
     const Get = gql`
       query get_tkd_master($id: smallint!, $mcode: String!, $gcodes: [String!]!, $day: date!, $memos: [String!]!) {
         last: trjyuden(where: {id: {_eq: $id}, mcode: {_eq: $mcode}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, order_by: {denno: desc}, limit: 1) {
@@ -64,10 +80,10 @@ export class TkdService {
     const gcodes = [...new Set(orders.flatMap(o => o.lines.map(l => l.gcode)))];
     const day = orders.map(o => o.day).sort().slice(-1)[0];
     const q = await this.query<{ last: LastJyuden[]; msgoods: GoodsRow[]; done: { dmemo: string; denno: number }[] }>(
-      Get, { id: this.usrsrv.compid, mcode: TKD_MCODE, gcodes, day, memos: orders.map(o => o.dmemo) });
+      Get, { id: this.usrsrv.compid, mcode: MCODE, gcodes, day, memos: orders.map(o => o.dmemo) });
     this.last = q.last[0] ?? null;
     if (!this.last) {
-      throw new Error('東海堂 Ｙ（' + TKD_MCODE + '）の受注伝票がありません（伝票の区分・担当者などを合わせる元がありません）');
+      throw new Error(kind.name + '（' + MCODE + '）の受注伝票がありません（伝票の区分・担当者などを合わせる元がありません）');
     }
     const goods = new Map(q.msgoods.map(g => [g.gcode, g]));
     for (const o of orders) {
@@ -96,6 +112,7 @@ export class TkdService {
   /** 1 件（1 日分）を登録する。結果の文字列を返す */
   async register(o: TkdOrder): Promise<string> {
     const m = this.last;
+    const MCODE = this.kind.mcode;
     if (!m || o.err) {
       throw new Error(o.err || '伝票の設定が読めていません');
     }
@@ -108,7 +125,7 @@ export class TkdService {
       query get_tkd_check($id: smallint!, $mcode: String!, $memo: String!) {
         trjyuden(where: {id: {_eq: $id}, mcode: {_eq: $mcode}, dmemo: {_eq: $memo}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, limit: 1) { denno }
       }`;
-    const chk = await this.query<{ trjyuden: { denno: number }[] }>(Check, { id, mcode: TKD_MCODE, memo: o.dmemo });
+    const chk = await this.query<{ trjyuden: { denno: number }[] }>(Check, { id, mcode: MCODE, memo: o.dmemo });
     if (chk.trjyuden.length > 0) {
       o.denno = chk.trjyuden[0].denno;
       return 'スキップ（既存 伝票番号 ' + o.denno + '）';
@@ -143,7 +160,7 @@ export class TkdService {
     const { mzai } = this.stksrv.rows(st, denno, scode, o.day, mei);
 
     const jyuden = {
-      id, denno, day: o.day, uday: monthEnd(o.day), mcode: TKD_MCODE, scde: m.scde ?? TKD_MCODE, ncode: m.ncode ?? TKD_MCODE,
+      id, denno, day: o.day, uday: monthEnd(o.day), mcode: MCODE, scde: m.scde ?? MCODE, ncode: m.ncode ?? MCODE,
       nadr: m.nadr ?? 0, iadr: m.iadr, scode, tcode: m.tcode, tcode1: m.tcode1, daibunrui: m.daibunrui, chubunrui: m.chubunrui,
       shobunrui: m.shobunrui, jcode: m.jcode, pcode: m.pcode, bcode: m.bcode, bkcode: m.bkcode, hcode: m.hcode, buntype: m.buntype,
       skbn: SKBN_URIONLY, dmemo: o.dmemo,

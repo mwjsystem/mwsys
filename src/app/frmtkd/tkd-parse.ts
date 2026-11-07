@@ -1,7 +1,7 @@
 /**
- * TKD（東海堂 Ｙ）の請求 Excel（TKD請求yyyymm.xlsx）の解析。DB に触らない。
- * 現行の「TH_TKD伝票登録03.xlsm」（通販Pro の伝票登録 CSV を作るマクロ）の置き換え。
- * 見出しの行（日付・品番・品名・数量・単価・合計・備考）の次から読み、日付ごとに 1 伝票にする。
+ * 加工先の請求 Excel（TKD：TKD請求yyyymm.xlsx、TH：TYHyyyymm.xlsx）の解析。DB に触らない。
+ * 現行の「TH_TKD伝票登録03.xlsm」「TH_伝票登録03.xlsm」（通販Pro の伝票登録 CSV を作るマクロ）の置き換え。
+ * 列は 日付・品番・品名・数量・単価・合計・備考 で、日付ごとに 1 伝票にする。
  * 日付はその日の最初の行にだけ入っているので、空の行は前の行の日付を引き継ぐ。単価は税抜。
  */
 
@@ -99,28 +99,46 @@ export function monthEnd(day: string): string {
   return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate());
 }
 
-/** シートの行（各行はセルの値の配列。0 番目が A 列）を、日付ごとの伝票にする */
+/** 見出しの行が無いときの列（現行マクロと同じ A〜G 列） */
+const FIXED: Record<keyof typeof COLS, number> = { day: 0, gcode: 1, gtext: 2, qty: 3, price: 4, total: 5, memo: 6 };
+
+/** 見出し（品番・数量）のある行。無ければ -1 */
+export function headerRow(rows: unknown[][]): number {
+  return rows.findIndex(r => (r ?? []).some(c => cellText(c) == COLS.gcode) && (r ?? []).some(c => cellText(c) == COLS.qty));
+}
+
+/**
+ * シートの行（各行はセルの値の配列。0 番目が A 列）を、日付ごとの伝票にする。
+ * 見出しの行（TKD）があればその次から列名で読み、無ければ（TH）A 列に最初に日付がある行から A〜G 列で読む
+ */
 export function parseTkd(rows: unknown[][]): TkdOrder[] {
-  const hi = rows.findIndex(r => (r ?? []).some(c => cellText(c) == COLS.gcode) && (r ?? []).some(c => cellText(c) == COLS.qty));
-  if (hi < 0) {
-    throw new Error('見出しの行（日付・品番・品名・数量・単価・合計・備考）が見つかりません');
-  }
-  const head = rows[hi].map(c => cellText(c));
-  const idx = {} as Record<keyof typeof COLS, number>;
-  const missing: string[] = [];
-  (Object.keys(COLS) as (keyof typeof COLS)[]).forEach(k => {
-    idx[k] = head.indexOf(COLS[k]);
-    if (idx[k] < 0) {
-      missing.push(COLS[k]);
+  const hi = headerRow(rows);
+  let idx = FIXED;
+  let start: number;
+  if (hi >= 0) {
+    const head = rows[hi].map(c => cellText(c));
+    idx = {} as Record<keyof typeof COLS, number>;
+    const missing: string[] = [];
+    (Object.keys(COLS) as (keyof typeof COLS)[]).forEach(k => {
+      idx[k] = head.indexOf(COLS[k]);
+      if (idx[k] < 0) {
+        missing.push(COLS[k]);
+      }
+    });
+    if (missing.length > 0) {
+      throw new Error('Excel に次の列がありません：' + missing.join('、'));
     }
-  });
-  if (missing.length > 0) {
-    throw new Error('Excel に次の列がありません：' + missing.join('、'));
+    start = hi + 1;
+  } else {
+    start = rows.findIndex(r => cellDay((r ?? [])[FIXED.day]) != null);
+    if (start < 0) {
+      throw new Error('A 列に日付のある行が見つかりません（A：日付・B：品番・C：品名・D：数量・E：単価・F：合計・G：備考）');
+    }
   }
   const orders: TkdOrder[] = [];
   let cur: TkdOrder | null = null;
   const errs: string[] = [];
-  for (let i = hi + 1; i < rows.length; i++) {
+  for (let i = start; i < rows.length; i++) {
     const r = rows[i] ?? [];
     const rowNo = i + 1;
     const gcode = cellText(r[idx.gcode]);
