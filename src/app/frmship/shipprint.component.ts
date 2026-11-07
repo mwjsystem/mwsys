@@ -86,8 +86,8 @@ export class ShipprintComponent implements OnInit, OnDestroy {
   message = '';
   /** 印刷後の読み直しのタイマー */
   private timer?: ReturnType<typeof setInterval>;
-  /** 「【済」が付くのを待っているフォルダ */
-  private watching: string[] = [];
+  /** 「【済」が付くのを待っているフォルダ（印刷を指示した） */
+  watching: string[] = [];
   /** Amazon のシールの開始位置（1〜65。倉庫から戻った使いかけのシートを見て入れる）と、プリンタのずれの補正（mm。PC に覚える） */
   label: LabelOption = { start: 1, dx: 0, dy: 0 };
   readonly labelCount = LABEL_COUNT;
@@ -353,6 +353,20 @@ export class ShipprintComponent implements OnInit, OnDestroy {
   /** チェックしたフォルダをまとめて印刷 */
   print() {
     this.doPrint(this.selFolders);
+  }
+
+  /** 一覧の上から見て、まだ印刷していない（未出力で、この画面から印刷を指示していない）最初のフォルダ */
+  get firstFolder(): PrintFolder | undefined {
+    return this.staffs.flatMap(s => this.inStaff(s))
+      .find(f => !f.done && this.selectable(f) && !this.watching.includes(f.path));
+  }
+
+  /** ヘッダの「先頭を印刷する」 */
+  printFirst() {
+    const f = this.firstFolder;
+    if (f) {
+      this.printOne(f);
+    }
   }
 
   /** 1 伝票（行の先頭の印刷ボタン）。Amazon の伝票は、続けてシール印刷のポップアップを開く */

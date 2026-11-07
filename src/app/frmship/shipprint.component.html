@@ -18,6 +18,10 @@
       <button mat-raised-button type="button" (click)="list()" [disabled]="busy || !nassrv.supported">
         <mat-icon>folder_open</mat-icon>フォルダ一覧表示
       </button>
+      <button mat-raised-button color="primary" type="button" (click)="printFirst()" [disabled]="busy || !firstFolder"
+        [matTooltip]="firstFolder ? '一覧のいちばん上の、まだ印刷していないフォルダ（' + firstFolder.name + '）を 1 伝票印刷します。Amazon の伝票は続けてシール印刷の画面を開きます' : '印刷していないフォルダがありません'" matTooltipClass="ttips">
+        <mat-icon>vertical_align_top</mat-icon>先頭を印刷する{{firstFolder ? '（' + firstFolder.denno + (firstFolder.amazon ? '・Amazon' : '') + '）' : ''}}
+      </button>
       <button mat-raised-button color="accent" type="button" (click)="print()" [disabled]="busy || selFolders.length == 0"
         matTooltip="チェックしたフォルダの PDF を印刷し、送り状 CSV を取り込み用フォルダへコピーして、フォルダ名に「【済」を付けます。受注ステータスは出荷指示出力済になります" matTooltipClass="ttips">
         <mat-icon>print</mat-icon>印刷（{{selFolders.length}}フォルダ）
@@ -75,7 +79,7 @@
       @for (f of inStaff(staff); track f.path) {
         <div class="flex flex-row flex-wrap items-center" style="gap: 8px; padding: 2px 0 2px 16px; border-bottom: 1px solid #eeeeee;"
           [style.color]="f.done || f.old ? '#9e9e9e' : ''">
-          <button mat-raised-button color="accent" type="button" (click)="printOne(f)" [disabled]="busy || !selectable(f)" style="height: 28px; line-height: 28px;"
+          <button mat-raised-button [color]="watching.includes(f.path) ? '' : 'accent'" type="button" (click)="printOne(f)" [disabled]="busy || !selectable(f)" style="height: 28px; line-height: 28px;"
             [matTooltip]="f.amazon ? 'この伝票の出荷指示を印刷し、続けて Amazon シール印刷の画面を開きます' : 'この伝票の出荷指示を印刷します'" matTooltipClass="ttips">
             <mat-icon>print</mat-icon>印刷
           </button>
