@@ -8,6 +8,7 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { DecimalPipe } from '@angular/common';
+import { DenlinkComponent } from './../share/denlink/denlink.component';
 
 /**
  * Amazon 受注の取込（現行の amazon受注テキスト変換.xlsm の置き換え）。
@@ -18,7 +19,7 @@ import { DecimalPipe } from '@angular/common';
   templateUrl: './frmamazon.component.html',
   styleUrls: ['./../frmocnk/frmocnk.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatToolbar, MatButton, MatIcon, DecimalPipe]
+  imports: [MatToolbar, MatButton, MatIcon, DecimalPipe, DenlinkComponent]
 })
 export class FrmamazonComponent {
   private srv = inject(AmazonService);

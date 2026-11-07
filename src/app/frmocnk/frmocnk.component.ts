@@ -14,6 +14,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { DecimalPipe } from '@angular/common';
+import { DenlinkComponent } from './../share/denlink/denlink.component';
 
 /** おちゃのこの CSV で会員ID が入っている列 */
 const COL_WEBID = 51;
@@ -27,7 +28,7 @@ const COL_WEBID = 51;
   templateUrl: './frmocnk.component.html',
   styleUrls: ['./frmocnk.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatToolbar, MatButton, MatIcon, MatCheckbox, MatFormField, MatLabel, MatSelect, MatOption, FormsModule, DecimalPipe]
+  imports: [MatToolbar, MatButton, MatIcon, MatCheckbox, MatFormField, MatLabel, MatSelect, MatOption, FormsModule, DecimalPipe, DenlinkComponent]
 })
 export class FrmocnkComponent implements OnInit {
   private srv = inject(OcnkService);

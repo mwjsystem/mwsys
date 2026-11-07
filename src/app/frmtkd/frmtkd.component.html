@@ -40,7 +40,7 @@
             <td class="num">{{o.lines.length}}</td>
             <td class="num">{{amount(o) | number:'1.0-0'}}</td>
             <td class="num">{{diffCount(o) || ''}}</td>
-            <td>{{o.err ? 'エラー：' + o.err : o.result}}</td><td>{{o.denno}}</td>
+            <td>{{o.err ? 'エラー：' + o.err : o.result}}</td><td><app-denlink [denno]="o.denno" /></td>
           </tr>
           @if (isOpen(o)) {
             <tr class="det">
