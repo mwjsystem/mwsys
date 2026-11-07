@@ -1,0 +1,69 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>TKD請求取込（東海堂 Ｙ）</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+@if (error) {
+  <p class="err" style="white-space: pre-line;">{{error}}</p>
+}
+<div class="bar">
+  <button mat-raised-button color="primary" type="button" (click)="xlsx.click()" [disabled]="busy">
+    <mat-icon>upload_file</mat-icon>Excel を選ぶ
+  </button>
+  <input #xlsx type="file" accept=".xlsx" hidden (change)="onFile($event)">
+  <span>{{fileName}}</span>
+  <button mat-raised-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
+    <mat-icon>save</mat-icon>登録（{{targetCount}} 件）
+  </button>
+  @if (progress) {
+    <span>{{progress}}</span>
+  }
+</div>
+@if (message) {
+  <p class="msg">{{message}}</p>
+}
+@if (orders.length > 0) {
+  <p class="note">伝票 {{orders.length | number}} 件・明細 {{lineCount | number}} 行・税抜合計 {{grand | number:'1.0-0'}} 円。
+    受注先 {{mcode}}、日付ごとに 1 伝票。出荷区分は売上のみ、受注日は Excel の日付、売上日は {{udays}}（月末）。
+    品名・単価（税抜）・備考は Excel のまま登録します。</p>
+  <div class="scroll">
+    <table class="rep">
+      <thead>
+        <tr>
+          <th>受注日</th><th>伝票備考</th><th>明細</th><th>金額（税抜）</th><th>合計の違い</th><th>処理結果</th><th>伝票番号</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (o of orders; track o.day) {
+          <tr [class.ng]="o.err || o.result.startsWith('エラー')" [class.dif]="!o.err && diffCount(o) > 0">
+            <td><a href="javascript:void(0)" class="tg" (click)="toggle(o)">{{isOpen(o) ? '▼' : '▶'}}</a>{{o.day}}</td>
+            <td>{{o.dmemo}}</td>
+            <td class="num">{{o.lines.length}}</td>
+            <td class="num">{{amount(o) | number:'1.0-0'}}</td>
+            <td class="num">{{diffCount(o) || ''}}</td>
+            <td>{{o.err ? 'エラー：' + o.err : o.result}}</td><td>{{o.denno}}</td>
+          </tr>
+          @if (isOpen(o)) {
+            <tr class="det">
+              <td colspan="7">
+                <table class="mei">
+                  <thead>
+                    <tr><th>行</th><th>品番</th><th>品名</th><th>数量</th><th>単価</th><th>Excel の合計</th><th>備考</th><th>税率</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (l of o.lines; track $index) {
+                      <tr [class.dif]="diff(l)">
+                        <td class="num">{{l.row}}</td><td>{{l.gcode}}</td><td>{{l.gtext}}</td>
+                        <td class="num">{{l.qty | number}}</td><td class="num">{{l.price | number}}</td>
+                        <td class="num">{{l.total | number}}</td><td>{{l.memo}}</td><td class="num">{{l.taxrate}}%</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+}
