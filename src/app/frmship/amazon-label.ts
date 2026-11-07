@@ -5,7 +5,7 @@ import type { ShipDoc } from './ship-pdf.service';
 /**
  * Amazon 納品の商品に貼る JAN のシール（エーワン 65 面: A4、1 片 38.1 × 21.2 mm、5 列 × 13 段）。
  * 現行の「ラベル屋さん」で JAN の CSV を読み込んで印刷していたものの置き換え。
- * 伝票ごとに、PO 番号のシール 1 枚と、明細の JAN を数量の枚数分並べる。開始位置（1〜65）から詰めて印刷する
+ * 伝票ごとに、PO 番号のシール 1 枚と、明細の JAN（商品コード・商品名付き）を数量の枚数分並べる。開始位置（1〜65）から詰めて印刷する
  */
 export const LABEL_COLS = 5;
 export const LABEL_ROWS = 13;
@@ -17,7 +17,7 @@ const SHEET = { top: 10.7, left: 4.75, w: 38.1, h: 21.2, gapX: 2.5, gapY: 0 };
 
 export type AmazonLabel =
   | { kind: 'po'; denno: number; po: string }
-  | { kind: 'jan'; denno: number; jan: string; gcode: string };
+  | { kind: 'jan'; denno: number; jan: string; gcode: string; gname: string };
 
 /** 印刷の位置合わせ */
 export interface LabelOption {
@@ -53,7 +53,7 @@ export function amazonLabels(docs: ShipDoc[]): AmazonLabel[] {
         continue;
       }
       for (let i = 0; i < Math.round(Number(l.suu)); i++) {
-        labels.push({ kind: 'jan', denno: d.denno, jan, gcode: l.gcode });
+        labels.push({ kind: 'jan', denno: d.denno, jan, gcode: (l.gcode ?? '').trim(), gname: (l.gtext ?? '').trim() });
       }
     }
   }
@@ -96,14 +96,31 @@ function text(t: string, x: number, y: number, size: number, bold = false): Cont
   return { columns: [{ width: W, text: t, alignment: 'center', fontSize: size, bold, lineHeight: 1 }], absolutePosition: { x, y } } as Content;
 }
 
+/** 幅 width（pt）の 1 行に収まるように切る（全角は fontSize、半角は 0.55 倍の幅とみなす） */
+export function fitText(t: string, size: number, width: number): string {
+  let w = 0;
+  let ret = '';
+  for (const ch of t) {
+    w += (/[\x20-\x7e｡-ﾟ]/.test(ch) ? 0.55 : 1) * size;
+    if (w > width) {
+      return ret;
+    }
+    ret += ch;
+  }
+  return ret;
+}
+
 function labelContent(l: AmazonLabel, x: number, y: number): Content[] {
   if (l.kind == 'jan') {
+    // 上から 商品コード・商品名（1 行に収まる分）・JAN のバーコード・JAN の数字。
     // モジュール幅 0.275 mm（標準の 83%）。EAN-13 は 95 モジュールで約 26 mm、前後の余白も入る
     const b = ean(l.jan);
     const bw = b.width * 0.275 * MM;
     return [
-      bars(b, x + (W - bw) / 2, y + 8, bw, 34),
-      text(eanText(l.jan), x, y + 43, 7.5)
+      text(fitText(l.gcode, 7, W - 6), x, y + 3, 7, true),
+      text(fitText(l.gname, 5.5, W - 6), x, y + 11, 5.5),
+      bars(b, x + (W - bw) / 2, y + 18, bw, 26),
+      text(eanText(l.jan), x, y + 45, 7.5)
     ];
   }
   const b = code39(l.po);
