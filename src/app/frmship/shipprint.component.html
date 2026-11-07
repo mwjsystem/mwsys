@@ -27,28 +27,40 @@
     @if (message) {
       <p style="margin: 6px 0; padding: 6px 10px; background: #f5f5f5; white-space: pre-line;">{{message}}</p>
     }
-    @if (amazonFolders.length > 0) {
-      <div class="flex flex-row flex-wrap items-center" style="gap: 10px; margin: 6px 0; padding: 6px 10px; border: 1px solid #ffcc80; background: #fff8e1;">
-        <b>Amazon シール（エーワン 65 面・1 伝票ごとに新しいシート）</b>
-        @for (f of amazonFolders; track f.denno) {
-          <button mat-raised-button type="button" (click)="printLabel(f)" [disabled]="busy"
-            [color]="labelOpened.has(f.denno) ? '' : 'accent'"
-            matTooltip="この伝票のシール（PO 番号 1 枚と、JAN を数量の枚数分）をシートの 1 番目から開きます。手差しトレイに新しいシートをセットしてから印刷してください" matTooltipClass="ttips">
-            <mat-icon>{{labelOpened.has(f.denno) ? 'check' : 'qr_code_2'}}</mat-icon>{{f.denno}}
-          </button>
-        }
-        <mat-form-field style="width: 6.5em;" subscriptSizing="dynamic">
-          <mat-label>補正 右(mm)</mat-label>
-          <input matInput type="number" step="0.1" [(ngModel)]="label.dx" (change)="saveLabel()">
-        </mat-form-field>
-        <mat-form-field style="width: 6.5em;" subscriptSizing="dynamic">
-          <mat-label>補正 下(mm)</mat-label>
-          <input matInput type="number" step="0.1" [(ngModel)]="label.dy" (change)="saveLabel()">
-        </mat-form-field>
-        <button mat-button type="button" (click)="printLabel()" [disabled]="busy"
-          matTooltip="65 枚の枠と番号だけを開きます。普通紙に印刷してシールのシートと重ね、ずれていれば補正を入れてください（この PC に覚えます）" matTooltipClass="ttips">
-          位置合わせ用の枠
-        </button>
+    @if (labelFolder) {
+      <!-- Amazon シール印刷のポップアップ（1 伝票の印刷のあとに開く） -->
+      <div style="position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 1000;" class="flex items-center justify-center">
+        <div style="background: #fff; padding: 16px 20px; border-radius: 6px; max-width: 480px; width: calc(100% - 32px); box-shadow: 0 4px 16px rgba(0,0,0,.3);">
+          <div style="font-weight: bold; margin-bottom: 4px;">Amazon シール印刷（エーワン 65 面）</div>
+          <div style="font-size: 13px; margin-bottom: 10px;">{{labelFolder.name}}<br>
+            手差しトレイにシールのシートをセットしてから「印刷」を押してください（PO 番号 1 枚と、JAN を数量の枚数分）。</div>
+          <div class="flex flex-row flex-wrap items-center" style="gap: 10px;">
+            <mat-form-field style="width: 7em;" subscriptSizing="dynamic">
+              <mat-label>開始位置</mat-label>
+              <input matInput type="number" min="1" [max]="labelCount" [(ngModel)]="label.start">
+            </mat-form-field>
+            <mat-form-field style="width: 6.5em;" subscriptSizing="dynamic">
+              <mat-label>補正 右(mm)</mat-label>
+              <input matInput type="number" step="0.1" [(ngModel)]="label.dx" (change)="saveLabel()">
+            </mat-form-field>
+            <mat-form-field style="width: 6.5em;" subscriptSizing="dynamic">
+              <mat-label>補正 下(mm)</mat-label>
+              <input matInput type="number" step="0.1" [(ngModel)]="label.dy" (change)="saveLabel()">
+            </mat-form-field>
+          </div>
+          <div style="font-size: 12px; color: #666; margin: 4px 0 10px;">開始位置は、セットするシートの最初の空き（左上を 1 として右へ数える。1 段 5 枚）を入れてください。</div>
+          <div class="flex flex-row flex-wrap items-center" style="gap: 10px;">
+            <button mat-raised-button color="accent" type="button" (click)="printLabel(labelFolder)" [disabled]="busy">
+              <mat-icon>print</mat-icon>印刷
+            </button>
+            <button mat-button type="button" (click)="printLabel()" [disabled]="busy"
+              matTooltip="65 枚の枠と番号だけを開きます。普通紙に印刷してシールのシートと重ね、ずれていれば補正を入れてください（この PC に覚えます）" matTooltipClass="ttips">
+              位置合わせ用の枠
+            </button>
+            <span style="flex: 1;"></span>
+            <button mat-button type="button" (click)="closeLabel()" [disabled]="busy">閉じる</button>
+          </div>
+        </div>
       </div>
     }
     @if (folders.length > 0) {
@@ -63,11 +75,15 @@
       @for (f of inStaff(staff); track f.path) {
         <div class="flex flex-row flex-wrap items-center" style="gap: 8px; padding: 2px 0 2px 16px; border-bottom: 1px solid #eeeeee;"
           [style.color]="f.done || f.old ? '#9e9e9e' : ''">
+          <button mat-raised-button color="accent" type="button" (click)="printOne(f)" [disabled]="busy || !selectable(f)" style="height: 28px; line-height: 28px;"
+            [matTooltip]="f.amazon ? 'この伝票の出荷指示を印刷し、続けて Amazon シール印刷の画面を開きます' : 'この伝票の出荷指示を印刷します'" matTooltipClass="ttips">
+            <mat-icon>print</mat-icon>印刷
+          </button>
           <mat-checkbox [(ngModel)]="f.chk" [disabled]="!selectable(f)">{{f.name}}</mat-checkbox>
           <span style="font-size: 12px;">ファイル {{f.files.length}}{{hasCsv(f) ? '（送り状CSVあり）' : ''}}</span>
           @if (f.amazon && !f.old) {
-            <button mat-stroked-button type="button" (click)="printLabel(f)" [disabled]="busy" style="height: 26px; line-height: 26px;"
-              matTooltip="この伝票の Amazon シールを開きます（新しいシートの 1 番目から）" matTooltipClass="ttips">シール{{labelOpened.has(f.denno) ? '（開いた）' : ''}}</button>
+            <button mat-stroked-button type="button" (click)="openLabel(f)" [disabled]="busy" style="height: 26px; line-height: 26px;"
+              matTooltip="この伝票の Amazon シールだけを印刷します（刷り直し）" matTooltipClass="ttips">シール{{labelOpened.has(f.denno) ? '（印刷済）' : ''}}</button>
           }
           @if (f.old) {
             <span style="font-size: 12px;">古いフォルダ（印刷時に【自動済】）</span>

@@ -1,12 +1,12 @@
 import type { Content, TDocumentDefinitions } from 'pdfmake/interfaces';
-import { code39, ean, eanText, Bars } from './../services/barcode';
+import { code128, ean, eanText, Bars } from './../services/barcode';
 import type { ShipDoc } from './ship-pdf.service';
 
 /**
  * Amazon 納品の商品に貼る JAN のシール（エーワン 65 面: A4、1 片 38.1 × 21.2 mm、5 列 × 13 段）。
  * 現行の「ラベル屋さん」で JAN の CSV を読み込んで印刷していたものの置き換え。
  * 伝票ごとに、PO 番号のシール 1 枚と、明細の JAN（商品コード・商品名付き）を数量の枚数分並べる。
- * 倉庫では 1 伝票ごとに新しいシートを手差しトレイにセットして印刷するので、画面からは開始位置 1 で作る
+ * 倉庫では 1 伝票ずつ、出荷指示の印刷のあとに開く画面で開始位置を入れて、手差しトレイにセットしたシートに印刷する
  */
 export const LABEL_COLS = 5;
 export const LABEL_ROWS = 13;
@@ -39,7 +39,7 @@ export function amazonLabels(docs: ShipDoc[]): AmazonLabel[] {
       errs.push('伝票 ' + d.denno + '：PO 番号（客先伝票番号）がありません');
     } else {
       try {
-        code39(po);
+        code128(po);
         labels.push({ kind: 'po', denno: d.denno, po });
       } catch (e) {
         errs.push('伝票 ' + d.denno + '：' + (e as Error).message);
@@ -86,13 +86,10 @@ const H = SHEET.h * MM;
 
 /** レーザーでシールに印刷すると線が太るので、バーを両側から少し細くする（mm。バーの幅の補正） */
 const BAR_REDUCE = 0.03 * MM;
-/** 前後の余白（クワイエットゾーン）の最小（mm） */
-const QUIET = 3 * MM;
-
-function bars(b: Bars, x: number, y: number, width: number, height: number): Content {
+function bars(b: Bars, x: number, y: number, width: number, height: number, reduce = BAR_REDUCE): Content {
   const u = width / b.width;
   return {
-    canvas: b.bars.map(e => ({ type: 'rect', x: e.x * u + BAR_REDUCE / 2, y: 0, w: e.w * u - BAR_REDUCE, h: height, color: '#000000' })),
+    canvas: b.bars.map(e => ({ type: 'rect', x: e.x * u + reduce / 2, y: 0, w: e.w * u - reduce, h: height, color: '#000000' })),
     absolutePosition: { x, y }
   } as Content;
 }
@@ -129,11 +126,13 @@ function labelContent(l: AmazonLabel, x: number, y: number): Content[] {
       text(eanText(l.jan), x, y + 48, 7)
     ];
   }
-  // PO 番号（Code39、太細比 2.5）。左右の余白 3 mm を残して幅いっぱいにする
-  const b = code39(l.po, 2.5);
-  const bw = Math.min(W - QUIET * 2, b.width * 0.5 * MM);
+  // PO 番号（Code128。Code39 では 38.1 mm の幅に収めると線が細すぎて読めなかった）。
+  // 左右にモジュール 10 本分の余白を残して幅いっぱいにする（8 文字でモジュール約 0.26 mm）。バーは細めに補正しない
+  const b = code128(l.po);
+  const m = Math.min(0.4 * MM, W / (b.width + 20));
+  const bw = b.width * m;
   return [
-    bars(b, x + (W - bw) / 2, y + 5, bw, 39),
+    bars(b, x + (W - bw) / 2, y + 5, bw, 39, 0),
     text(l.po, x, y + 46, 8, true)
   ];
 }
