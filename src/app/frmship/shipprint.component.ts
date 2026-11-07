@@ -12,7 +12,7 @@ import { NasService } from './../services/nas.service';
 import { NAS_SHIP } from './../share/nasfolder/nasfolder.component';
 import { isAmazon } from './../share/amazon';
 import { ShipPdfService } from './ship-pdf.service';
-import { LABEL_COUNT, LabelOption, amazonLabels, nextStart } from './amazon-label';
+import { LABEL_COUNT, LabelOption, amazonLabels } from './amazon-label';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -86,15 +86,16 @@ export class ShipprintComponent implements OnInit, OnDestroy {
   message = '';
   /** 印刷後の読み直しのタイマー */
   private timer?: ReturnType<typeof setInterval>;
-  /** Amazon のシールの開始位置（1〜65）と、プリンタのずれの補正（mm） */
+  /** Amazon のシールのプリンタのずれの補正（mm）。開始位置はいつも 1（1 伝票ごとに新しいシート） */
   label: LabelOption = { start: 1, dx: 0, dy: 0 };
-  readonly labelCount = LABEL_COUNT;
+  /** この画面でシールを開いた伝票（印刷の済み・未の目安） */
+  labelOpened = new Set<number>();
 
   constructor() {
     this.title.setTitle('出荷指示 印刷(MWSystem)');
     try {
       const v = JSON.parse(localStorage.getItem(KEY_LABEL) ?? '{}');
-      this.label = { start: Number(v.start) || 1, dx: Number(v.dx) || 0, dy: Number(v.dy) || 0 };
+      this.label = { start: 1, dx: Number(v.dx) || 0, dy: Number(v.dy) || 0 };
     } catch {
       // 読めなければ初期値のまま
     }
@@ -108,42 +109,35 @@ export class ShipprintComponent implements OnInit, OnDestroy {
 
   saveLabel() {
     try {
-      localStorage.setItem(KEY_LABEL, JSON.stringify(this.label));
+      localStorage.setItem(KEY_LABEL, JSON.stringify({ dx: this.label.dx, dy: this.label.dy }));
     } catch {
       // 保存できなくても印刷はできる
     }
   }
 
   /**
-   * Amazon の JAN シールの PDF を開く（出荷指示の印刷とは別に、手差しトレイにシールをセットしてから印刷する）。
-   * fs を省略すると位置合わせ用の枠だけ。印刷したら、次の開始位置を続きにする
+   * Amazon の JAN シールの PDF を開く（出荷指示の印刷とは別に、1 伝票ごとに手差しトレイに新しいシートをセットしてから印刷する）。
+   * f を省略すると位置合わせ用の枠だけ
    */
-  async printLabel(fs?: PrintFolder[]) {
-    const start = Math.floor(Number(this.label.start));
-    if (!(start >= 1 && start <= LABEL_COUNT)) {
-      this.message = 'シールの開始位置は 1〜' + LABEL_COUNT + ' にしてください';
-      this.cdRef.detectChanges();
-      return;
-    }
+  async printLabel(f?: PrintFolder) {
     // 先に窓を開いておく（PDF を作ったあとに開くと、ポップアップとして止められる）
     const win = window.open('', '_blank');
     this.busy = true;
     this.cdRef.detectChanges();
+    const opt: LabelOption = { start: 1, dx: Number(this.label.dx) || 0, dy: Number(this.label.dy) || 0 };
     try {
-      if (!fs) {
-        const blob = await this.spdfsrv.amazonLabel([], this.label, true);
+      if (!f) {
+        const blob = await this.spdfsrv.amazonLabel([], opt, true);
         this.openBlob(win, blob);
         this.message = '位置合わせ用の枠を開きました。普通紙に「実際のサイズ（100%）」で印刷し、シールのシートと重ねて確かめてください';
       } else {
-        const docs = await this.shipsrv.load(fs.map(e => e.denno));
-        const labels = amazonLabels(docs);
-        const blob = await this.spdfsrv.amazonLabel(labels, this.label);
+        const labels = amazonLabels(await this.shipsrv.load([f.denno]));
+        const blob = await this.spdfsrv.amazonLabel(labels, opt);
         this.openBlob(win, blob);
-        const next = nextStart(start, labels.length);
-        this.message = 'シール ' + labels.length + ' 枚（' + fs.map(e => e.denno).join('・') + '、開始位置 ' + start + '）を開きました。' +
-          '手差しトレイにシールをセットし、「実際のサイズ（100%）」で印刷してください。次の開始位置は ' + next + ' にしました';
-        this.label.start = next;
-        this.saveLabel();
+        this.labelOpened.add(f.denno);
+        const sheets = Math.ceil(labels.length / LABEL_COUNT);
+        this.message = '伝票 ' + f.denno + ' のシール ' + labels.length + ' 枚' + (sheets > 1 ? '（シート ' + sheets + ' 枚）' : '') + 'を開きました。' +
+          '手差しトレイに新しいシートを' + (sheets > 1 ? ' ' + sheets + ' 枚' : '') + 'セットし、「実際のサイズ（100%）」で印刷してください';
       }
     } catch (e) {
       win?.close();

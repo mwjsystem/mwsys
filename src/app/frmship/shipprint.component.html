@@ -29,15 +29,14 @@
     }
     @if (amazonFolders.length > 0) {
       <div class="flex flex-row flex-wrap items-center" style="gap: 10px; margin: 6px 0; padding: 6px 10px; border: 1px solid #ffcc80; background: #fff8e1;">
-        <b>Amazon シール（エーワン 65 面）</b>
-        <mat-form-field style="width: 7em;" subscriptSizing="dynamic">
-          <mat-label>開始位置</mat-label>
-          <input matInput type="number" min="1" [max]="labelCount" [(ngModel)]="label.start" (change)="saveLabel()">
-        </mat-form-field>
-        <button mat-raised-button type="button" (click)="printLabel(amazonFolders)" [disabled]="busy"
-          matTooltip="この出荷日の Amazon の伝票すべてのシール（伝票ごとに PO 番号 1 枚と、JAN を数量の枚数分）を開きます。出荷指示とは別に、手差しトレイにシールをセットしてから印刷してください" matTooltipClass="ttips">
-          <mat-icon>qr_code_2</mat-icon>シール印刷（{{amazonFolders.length}}伝票）
-        </button>
+        <b>Amazon シール（エーワン 65 面・1 伝票ごとに新しいシート）</b>
+        @for (f of amazonFolders; track f.denno) {
+          <button mat-raised-button type="button" (click)="printLabel(f)" [disabled]="busy"
+            [color]="labelOpened.has(f.denno) ? '' : 'accent'"
+            matTooltip="この伝票のシール（PO 番号 1 枚と、JAN を数量の枚数分）をシートの 1 番目から開きます。手差しトレイに新しいシートをセットしてから印刷してください" matTooltipClass="ttips">
+            <mat-icon>{{labelOpened.has(f.denno) ? 'check' : 'qr_code_2'}}</mat-icon>{{f.denno}}
+          </button>
+        }
         <mat-form-field style="width: 6.5em;" subscriptSizing="dynamic">
           <mat-label>補正 右(mm)</mat-label>
           <input matInput type="number" step="0.1" [(ngModel)]="label.dx" (change)="saveLabel()">
@@ -67,8 +66,8 @@
           <mat-checkbox [(ngModel)]="f.chk" [disabled]="!selectable(f)">{{f.name}}</mat-checkbox>
           <span style="font-size: 12px;">ファイル {{f.files.length}}{{hasCsv(f) ? '（送り状CSVあり）' : ''}}</span>
           @if (f.amazon && !f.old) {
-            <button mat-stroked-button type="button" (click)="printLabel([f])" [disabled]="busy" style="height: 26px; line-height: 26px;"
-              matTooltip="この伝票の Amazon シールを、開始位置から開きます" matTooltipClass="ttips">シール</button>
+            <button mat-stroked-button type="button" (click)="printLabel(f)" [disabled]="busy" style="height: 26px; line-height: 26px;"
+              matTooltip="この伝票の Amazon シールを開きます（新しいシートの 1 番目から）" matTooltipClass="ttips">シール{{labelOpened.has(f.denno) ? '（開いた）' : ''}}</button>
           }
           @if (f.old) {
             <span style="font-size: 12px;">古いフォルダ（印刷時に【自動済】）</span>

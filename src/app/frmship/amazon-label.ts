@@ -5,7 +5,8 @@ import type { ShipDoc } from './ship-pdf.service';
 /**
  * Amazon 納品の商品に貼る JAN のシール（エーワン 65 面: A4、1 片 38.1 × 21.2 mm、5 列 × 13 段）。
  * 現行の「ラベル屋さん」で JAN の CSV を読み込んで印刷していたものの置き換え。
- * 伝票ごとに、PO 番号のシール 1 枚と、明細の JAN（商品コード・商品名付き）を数量の枚数分並べる。開始位置（1〜65）から詰めて印刷する
+ * 伝票ごとに、PO 番号のシール 1 枚と、明細の JAN（商品コード・商品名付き）を数量の枚数分並べる。
+ * 倉庫では 1 伝票ごとに新しいシートを手差しトレイにセットして印刷するので、画面からは開始位置 1 で作る
  */
 export const LABEL_COLS = 5;
 export const LABEL_ROWS = 13;
@@ -83,10 +84,15 @@ function origin(pos: number, opt: LabelOption): { page: number; x: number; y: nu
 const W = SHEET.w * MM;
 const H = SHEET.h * MM;
 
+/** レーザーでシールに印刷すると線が太るので、バーを両側から少し細くする（mm。バーの幅の補正） */
+const BAR_REDUCE = 0.03 * MM;
+/** 前後の余白（クワイエットゾーン）の最小（mm） */
+const QUIET = 3 * MM;
+
 function bars(b: Bars, x: number, y: number, width: number, height: number): Content {
   const u = width / b.width;
   return {
-    canvas: b.bars.map(e => ({ type: 'rect', x: e.x * u, y: 0, w: e.w * u, h: height, color: '#000000' })),
+    canvas: b.bars.map(e => ({ type: 'rect', x: e.x * u + BAR_REDUCE / 2, y: 0, w: e.w * u - BAR_REDUCE, h: height, color: '#000000' })),
     absolutePosition: { x, y }
   } as Content;
 }
@@ -113,22 +119,22 @@ export function fitText(t: string, size: number, width: number): string {
 function labelContent(l: AmazonLabel, x: number, y: number): Content[] {
   if (l.kind == 'jan') {
     // 上から 商品コード・商品名（1 行に収まる分）・JAN のバーコード・JAN の数字。
-    // モジュール幅 0.275 mm（標準の 83%）。EAN-13 は 95 モジュールで約 26 mm、前後の余白も入る
+    // モジュール幅 0.30 mm（標準の 90%）。EAN-13 は 95 モジュールで 28.5 mm、左右に約 4.8 mm の余白が入る
     const b = ean(l.jan);
-    const bw = b.width * 0.275 * MM;
+    const bw = b.width * 0.30 * MM;
     return [
-      text(fitText(l.gcode, 7, W - 6), x, y + 3, 7, true),
-      text(fitText(l.gname, 5.5, W - 6), x, y + 11, 5.5),
-      bars(b, x + (W - bw) / 2, y + 18, bw, 26),
-      text(eanText(l.jan), x, y + 45, 7.5)
+      text(fitText(l.gcode, 6.5, W - 6), x, y + 2.5, 6.5, true),
+      text(fitText(l.gname, 5, W - 6), x, y + 9.5, 5),
+      bars(b, x + (W - bw) / 2, y + 16, bw, 31),
+      text(eanText(l.jan), x, y + 48, 7)
     ];
   }
-  const b = code39(l.po);
-  const bw = Math.min(W - 12, b.width * 0.75);
+  // PO 番号（Code39、太細比 2.5）。左右の余白 3 mm を残して幅いっぱいにする
+  const b = code39(l.po, 2.5);
+  const bw = Math.min(W - QUIET * 2, b.width * 0.5 * MM);
   return [
-    text('PO', x, y + 3, 6),
-    bars(b, x + (W - bw) / 2, y + 12, bw, 28),
-    text(l.po, x, y + 42, 8, true)
+    bars(b, x + (W - bw) / 2, y + 5, bw, 39),
+    text(l.po, x, y + 46, 8, true)
   ];
 }
 
