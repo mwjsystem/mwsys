@@ -2,7 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 // import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
-import { OkuriService } from './../services/okuri.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
@@ -34,13 +33,11 @@ interface ZaikoInsertResult { insert_trzaiko: mwI.AffectedRows }
 export interface JyudenUpdateResult { update_trjyuden: mwI.AffectedRows; delete_trjyumei: mwI.AffectedRows; insert_trjyumei: mwI.AffectedRows; delete_trjyumzai: mwI.AffectedRows; insert_trjyumzai: mwI.AffectedRows }
 export interface JyudenInsertResult { insert_trjyuden: mwI.AffectedRows; insert_trjyumei: mwI.AffectedRows; insert_trjyumzai: mwI.AffectedRows }
 interface JyudenDeleteResult { update_trjyuden: mwI.AffectedRows }
-interface CheckOkrnoResult { trjyuden: { denno: number }[] }
 @Injectable({
   providedIn: 'root'
 })
 export class JyumeiService {
   private usrsrv = inject(UserService);
-  private okrsrv = inject(OkuriService);
   private apollo = inject(Apollo);
 
   // public jyumei: mwI.Jyumei[] = []; //frmsales⇒jmeitblコンポーネントへ渡すときのみ使用
@@ -373,34 +370,5 @@ export class JyumeiService {
     let ret: string = "";
 
     return ret;
-  }
-
-  async checkAmazon(hcode: string, pOkrno: string): Promise<string> {
-    const CheckOkrno = gql`
-      query get_jyuden($okrno: String!) {
-        trjyuden(where: {id: {_eq: 1}, mcode: {_eq: "408223"}, okurino: {_eq: $okrno}}) {
-          denno
-        }
-      }`;
-    return new Promise(resolve => {
-      this.apollo.watchQuery<CheckOkrnoResult>({
-        query: CheckOkrno,
-        variables: {
-          okrno: pOkrno
-        },
-      })
-        .valueChanges
-        .subscribe(({ data }) => {
-          // console.log(pOkrno,data);
-          if (!data) {
-            return;
-          }
-          if ((data as CheckOkrnoResult).trjyuden.length == 0) {
-            return resolve(pOkrno);
-          } else {
-            this.okrsrv.setOkurino(hcode).then(value => this.checkAmazon(hcode, value));
-          }
-        });
-    });
   }
 }

@@ -2,6 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import type { Content, TableCell, TDocumentDefinitions } from 'pdfmake/interfaces';
 import { PdfService } from './../services/pdf.service';
 import { CHECKERS, DenForm, isObi, shipNote } from './ship-forms';
+import { AMAZON_BILL, AMAZON_VENDOR, amazonWindow, isAmazon } from './../share/amazon';
+import { barcodeCanvas, code39 } from './../services/barcode';
 
 /** 住所（msmadr） */
 export interface ShipAdr { mcode: string; eda: number; zip: string | null; region: string | null; local: string | null; street: string | null; extend: string | null; extend2: string | null; adrname: string | null }
@@ -52,6 +54,10 @@ export interface ShipDoc {
   system: ShipSystem;
   /** 出荷指示書の QR コード（倉庫のスマホでピッキングの画面を開く URL）。空なら出さない */
   pickUrl?: string;
+  /** 客先伝票番号（Amazon は PO 番号） */
+  cusden?: string | null;
+  /** 同梱の注意（「123 を同梱」「123 に同梱」）。出荷指示書の注意書きに出す */
+  dokon?: string;
 }
 
 const yen = (v: number | null | undefined): string => Number(v ?? 0).toLocaleString('ja-JP');
@@ -94,6 +100,125 @@ export class ShipPdfService {
   /** 出荷指示書 */
   async shiji(d: ShipDoc, form: DenForm | undefined): Promise<Blob> {
     return this.pdfsrv.createPdf(this.shijiDoc(d, form));
+  }
+
+  /** Amazon 用の納品書（A4 縦。現行の「amazon納品書作成バーコードフォントバージョン.xlsm」の様式） */
+  async amazon(d: ShipDoc): Promise<Blob> {
+    return this.pdfsrv.createPdf(this.amazonDoc(d));
+  }
+
+  /**
+   * Amazon 用の納品書。上の点線の枠は箱に貼るラベル（梱包商品の種類・納品先・PO 番号のバーコード）。
+   * 明細の SKU・モデル番号は JAN（取込で JAN から商品を探しているので、発注 CSV の製品コード・モデル番号と同じ）
+   */
+  private amazonDoc(d: ShipDoc): TDocumentDefinitions {
+    const po = (d.cusden ?? '').trim();
+    if (!po) {
+      throw new Error('PO 番号（客先伝票番号）がありません');
+    }
+    const bar = code39(po);
+    const adr = d.nsaki.adr;
+    // pdfmake は描いた要素を書き換えるので、2 か所に出す住所は毎回作る
+    const shipTo = (): Content[] => [
+      { text: adr?.zip ? adr.zip.replace(/^(\d{3})(\d{4})$/, '$1-$2') : '' },
+      ...adrLines(adr).map(t => ({ text: t }))
+    ];
+    const box = (t: string): Content => ({ text: '□ ' + t, margin: [0, 1, 0, 1] });
+    const blank = (w: number): Content => ({ canvas: [{ type: 'line', x1: 0, y1: 10, x2: w, y2: 10, lineWidth: 0.6 }] });
+    const field = (label: string): Content => ({
+      columns: [{ text: label, width: 50, alignment: 'right', margin: [0, 2, 4, 0] }, { width: 80, stack: [blank(80)] },
+        { text: '発売日', width: 34, alignment: 'right', margin: [0, 2, 4, 0] }, { width: 70, stack: [blank(70)] }]
+    });
+    const items = d.lines.filter(l => Number(l.suu ?? 0) > 0);
+    const total = items.reduce((s, l) => s + Number(l.suu ?? 0), 0);
+    const head: TableCell[] = ['SKU', 'モデル番号', '商品名', '確認済み']
+      .map((t, i) => ({ text: t, bold: true, alignment: i == 3 ? 'right' : 'left' }));
+    const body: TableCell[][] = items.map(l => [
+      l.jan ?? l.gcode, l.jan ?? l.gcode, l.gtext ?? '', { text: yen(l.suu), alignment: 'right' }
+    ]);
+    body.push([{ text: 'Total', bold: true }, '', '', { text: yen(total), bold: true, alignment: 'right' }]);
+    const dot = { hLineWidth: () => 0.6, vLineWidth: () => 0.6, hLineColor: '#5577aa', vLineColor: '#5577aa',
+      hLineStyle: () => ({ dash: { length: 1, space: 2 } }), vLineStyle: () => ({ dash: { length: 1, space: 2 } }),
+      paddingLeft: () => 12, paddingRight: () => 12, paddingTop: () => 10, paddingBottom: () => 10 };
+
+    return {
+      pageSize: 'A4',
+      pageMargins: [36, 30, 36, 30],
+      info: { title: 'Amazon 納品書 ' + po },
+      defaultStyle: { fontSize: 9, lineHeight: 1.15 },
+      header: (page: number, pages: number) => ({ text: 'page ' + page + ' of ' + pages, alignment: 'right', fontSize: 8, margin: [0, 10, 20, 0] }),
+      content: [
+        {
+          table: {
+            widths: ['*'],
+            body: [[{
+              stack: [
+                {
+                  columns: [
+                    { width: 150, stack: [{ text: '【梱包商品】', margin: [0, 0, 0, 4] }, { columns: [
+                      { width: 70, stack: ['書籍', 'ミュージック', 'DVD/VHS', 'ソフトウェア', 'TVゲーム'].map(box) },
+                      { width: 70, stack: ['家電', 'キッチン', 'おもちゃ', 'スポーツ', 'ビューティー', '時計', 'ベビー', 'アパレル'].map(box) }
+                    ] }] },
+                    { width: '*', stack: [
+                      { text: '【発売日前商品を含む場合】', margin: [0, 0, 0, 4] },
+                      { columns: [{ width: 130, stack: [box('すべて')] }, { text: '発売日', width: 34, alignment: 'right', margin: [0, 2, 4, 0] }, { width: 70, stack: [blank(70)] }] },
+                      box('一部含む'),
+                      field('ISBN/JAN'), field('ISBN/JAN'), field('ISBN/JAN'),
+                      { stack: shipTo(), margin: [0, 18, 0, 0], fontSize: 10 }
+                    ] }
+                  ]
+                },
+                {
+                  margin: [0, 10, 0, 0],
+                  columns: [
+                    { width: 230, stack: [barcodeCanvas(bar, 210, 34)] },
+                    { width: '*', text: d.nsaki.name, bold: true, fontSize: 12 }
+                  ]
+                },
+                { text: [{ text: 'PO番号　　　', bold: true }, { text: po, bold: true }], fontSize: 11, margin: [0, 12, 0, 0] }
+              ]
+            }]]
+          },
+          layout: dot
+        },
+        {
+          margin: [40, 14, 0, 6],
+          columns: [
+            { width: 160, text: [{ text: 'PO番号　　', bold: true }, { text: po, bold: true }], fontSize: 12, margin: [0, 10, 0, 0] },
+            { width: '*', stack: [barcodeCanvas(bar, 260, 34)] }
+          ]
+        },
+        { text: 'POの詳細：', margin: [0, 4, 0, 2] },
+        {
+          margin: [20, 0, 0, 8],
+          table: {
+            widths: [80, '*'],
+            body: [
+              ['PO番号', po],
+              ['着荷ウィンドウ：', amazonWindow(d.dmemo)],
+              ['出荷日：', jday(d.sday)]
+            ]
+          },
+          layout: 'noBorders'
+        },
+        { text: [{ text: '送信者：　　', bold: true, fontSize: 11 }, (d.system.kname ?? '') + ' (' + AMAZON_VENDOR + ')'], margin: [40, 0, 0, 10] },
+        {
+          columns: [
+            { width: '*', stack: [{ text: '配送先住所：', margin: [20, 0, 0, 6] }, ...shipTo(),{ text: d.nsaki.name, margin: [0, 10, 0, 0] }] },
+            { width: '*', stack: [{ text: '請求先住所：', margin: [20, 0, 0, 6] }, { text: AMAZON_BILL.zip },
+              ...AMAZON_BILL.lines.map(t => ({ text: t })), { text: AMAZON_BILL.name, margin: [0, 10, 0, 0] }] }
+          ],
+          margin: [0, 0, 0, 20]
+        },
+        {
+          table: { headerRows: 1, dontBreakRows: true, widths: [100, 100, '*', 40], body: [head, ...body] },
+          layout: {
+            hLineWidth: (i: number, node: { table: { body: unknown[] } }) => i == 1 || i == node.table.body.length - 1 ? 0.6 : 0,
+            vLineWidth: () => 0, paddingTop: () => 4, paddingBottom: () => 4
+          }
+        }
+      ]
+    };
   }
 
   /** キープ表（A4 縦。倉庫へ FAX して在庫を確保してもらう。実物の商品だけを載せる） */
@@ -304,6 +429,9 @@ export class ShipPdfService {
     const checker: TableCell[][] = CHECKERS.map(r => [r[0], '□ □', r[1], '□ □']);
     // 箱の中の注意書き（現行マクロと同じ条件）
     const notes: string[] = [...lines(d.nmemo)];
+    if (d.dokon) {
+      notes.push(d.dokon);
+    }
     if (d.hcode == '67' || d.hcode == '68') {
       notes.push('梱包の際下面に段ボールを敷いてください！');
     }
@@ -311,7 +439,7 @@ export class ShipPdfService {
       if (d.hcode == '5') {
         notes.push('納入先要確認(福山代引き)！！');
       }
-      if (d.mcode != '408223') {
+      if (!isAmazon(d.mcode)) {
         notes.push('チラシ同梱なし');
       }
     }

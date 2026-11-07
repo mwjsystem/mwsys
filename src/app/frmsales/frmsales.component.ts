@@ -585,11 +585,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     }
   }
   async setOkrno() {
-    let okrno: string = await this.okrsrv.setOkurino(this.form.value.hcode);
-    // console.log(okrno);
-    if (this.usrsrv.compid == 1 && this.form.value.mcode == 408223) {
-      okrno = await this.jmisrv.checkAmazon(this.form.value.hcode, okrno);
-    }
+    // Amazon は過去に使った送り状番号を飛ばす
+    const okrno: string = await this.okrsrv.nextOkurino(this.form.value.hcode, this.form.value.mcode, this.jmisrv.denno);
     this.ctl.okurino.setValue(okrno);
   }
 

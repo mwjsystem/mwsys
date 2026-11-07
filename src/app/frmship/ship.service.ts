@@ -9,6 +9,7 @@ import { NasService } from './../services/nas.service';
 import { NAS_SHIP, NAS_FAX } from './../share/nasfolder/nasfolder.component';
 import { ShipPdfService, ShipAdr, ShipDoc, ShipLine, ShipSystem } from './ship-pdf.service';
 import { JDST, denForm, isKeepStage, shipNote } from './ship-forms';
+import { HCODE_DOKON, isAmazon } from './../share/amazon';
 
 /** 受注一覧の 1 行 */
 export interface ShipRow {
@@ -62,7 +63,7 @@ export interface ShipResult {
 interface JyudenQ {
   denno: number; mcode: string; ncode: string | null; nadr: number | null; iadr: number | null; buntype: string | null;
   yday: string | null; sday: string | null; uday: string | null; hcode: string | null; okurisuu: number | null; okurino: string | null;
-  tcode: string | null; pcode: string | null; dmemo: string | null; nmemo: string | null; keep: string | null;
+  tcode: string | null; pcode: string | null; dmemo: string | null; nmemo: string | null; keep: string | null; cusden: string | null;
   total: number | null; taxtotal: number | null; gtotalzn: number | null; soryozn: number | null; tesuzn: number | null; nebikizn: number | null;
   total8: number | null; total10: number | null; denku: number | null; jdstatus: string | null; shipdir: string | null;
 }
@@ -80,6 +81,28 @@ interface GoodsResult { msgoods: { gcode: string; unit: string | null; tanano: s
 /** 空白（全角・半角）を詰める（現行マクロの Condese_Sp と同じ。フォルダ名に使う） */
 const condense = (s: string): string => s.replace(/[\s　]/g, '');
 const pad2 = (n: number): string => ('0' + n).slice(-2);
+
+/**
+ * Amazon の同梱（現行の伝票一括処理.xlsm と同じ）: 一緒に出荷指示フォルダを作る Amazon の伝票のうち、
+ * 出荷日・納品先（顧客と住所の枝番）が同じものは 1 つの荷物にまとめる。伝票番号の一番小さい伝票を親とし、
+ * ほかの伝票（子）→ 親の伝票番号 の対応を返す
+ */
+export function amazonDokon(docs: { denno: number; mcode: string; ncode: string; sday: string; nsaki: { adr?: { eda: number } } }[]): Map<number, number> {
+  const groups = new Map<string, number[]>();
+  for (const d of docs) {
+    if (!isAmazon(d.mcode) || !d.sday || !d.nsaki.adr) {
+      continue;
+    }
+    const key = d.sday + '|' + d.ncode + '|' + d.nsaki.adr.eda;
+    groups.set(key, [...(groups.get(key) ?? []), d.denno]);
+  }
+  const ret = new Map<number, number>();
+  for (const dnos of groups.values()) {
+    const sorted = [...dnos].sort((a, b) => a - b);
+    sorted.slice(1).forEach(c => ret.set(c, sorted[0]));
+  }
+  return ret;
+}
 
 /**
  * 出荷指示: 受注一覧の取得、帳票（納品書・出荷指示書）の作成、NAS の出荷指示フォルダへの保存と受注ステータスの更新。
@@ -136,7 +159,7 @@ export class ShipService {
     const GetDoc = gql`
       query get_shipdoc($id: smallint!, $dnos: [Int!]!) {
         trjyuden(where: {id: {_eq: $id}, denno: {_in: $dnos}}) {
-          denno mcode ncode nadr iadr buntype yday sday uday hcode okurisuu okurino tcode pcode dmemo nmemo keep
+          denno mcode ncode nadr iadr buntype yday sday uday hcode okurisuu okurino tcode pcode dmemo nmemo keep cusden
           total taxtotal gtotalzn soryozn tesuzn nebikizn total8 total10 denku jdstatus shipdir
         }
         trjyumei(where: {id: {_eq: $id}, denno: {_in: $dnos}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, order_by: [{denno: asc}, {line: asc}]) {
@@ -188,7 +211,8 @@ export class ShipService {
         denno: j.denno,
         mcode: j.mcode,
         ncode: j.ncode ?? j.mcode,
-        betsuno: (j.ncode ?? j.mcode) != j.mcode || Number(j.nadr ?? 0) > 1,
+        // Amazon は納品先が必ず倉庫（センター）なので、フォルダ名・出荷指示書の納入先に倉庫の名前を出す
+        betsuno: (j.ncode ?? j.mcode) != j.mcode || Number(j.nadr ?? 0) > 1 || isAmazon(j.mcode),
         orderer: { name: memberName(j.mcode), adr: oAdr },
         nsaki: { name: nAdr?.adrname || memberName(j.ncode ?? j.mcode), adr: nAdr },
         irai: j.iadr != null ? { name: adr(j.mcode, j.iadr)?.adrname || memberName(j.mcode), adr: adr(j.mcode, j.iadr) } : undefined,
@@ -220,6 +244,7 @@ export class ShipService {
         }),
         system: q.mssystem[0] ?? { kname: null, invno: null, zip: null, adr: null, tel: null, fax: null },
         pickUrl: this.pickUrl(j.denno),
+        cusden: j.cusden,
         // 以下は保存処理で使う（ShipDoc の外）
         staffSei: staff?.sei ?? '',
         buntype: j.buntype,
@@ -360,6 +385,11 @@ export class ShipService {
   async pdfs(dennos: number[]): Promise<{ name: string; blob: Blob }[]> {
     const ret: { name: string; blob: Blob }[] = [];
     for (const d of await this.load(dennos)) {
+      if (isAmazon(d.mcode)) {
+        ret.push({ name: d.denno + '.pdf', blob: await this.spdfsrv.amazon(d) });
+        ret.push({ name: 's_' + d.denno + '.pdf', blob: await this.spdfsrv.shiji(d, undefined) });
+        continue;
+      }
       const form = denForm((d as ShipDoc & { buntype: string | null }).buntype);
       if (form) {
         ret.push({ name: d.denno + '.pdf', blob: await this.spdfsrv.nohin(d, form) });
@@ -388,14 +418,19 @@ export class ShipService {
     if (this.okrsrv.haisou.length == 0) {
       this.okrsrv.getHaisou();
     }
-    const docs = await this.load(dennos) as (ShipDoc & { staffSei: string; buntype: string | null; jdstatus: string | null })[];
+    const loaded = await this.load(dennos) as (ShipDoc & { staffSei: string; buntype: string | null; jdstatus: string | null })[];
+    // Amazon の同梱: まとめる側（親）を先に保存し、その送り状番号をまとめられる側（子）に使う
+    const parentOf = amazonDokon(loaded);
+    const docs = [...loaded.filter(d => !parentOf.has(d.denno)), ...loaded.filter(d => parentOf.has(d.denno))];
+    const saved = new Map<number, ShipDoc>();
     const results: ShipResult[] = [];
     let done = 0;
     for (const d of docs) {
       const r: ShipResult = { denno: d.denno, dir: '', sasikae: false, error: '' };
       try {
+        const amazon = isAmazon(d.mcode);
         const form = denForm(d.buntype);
-        if (!form) {
+        if (!form && !amazon) {
           throw new Error('納品書タイプが未設定です');
         }
         if (!d.sday) {
@@ -404,10 +439,26 @@ export class ShipService {
         if (!d.staffSei) {
           throw new Error('担当者が未設定です');
         }
-        // 送り状番号を採番する配送（佐川など）で未採番なら、ここで採番する
-        if (!d.okurino && this.okrsrv.getHinfo(d.hcode).numbering) {
-          d.okurino = await this.okrsrv.setOkurino(d.hcode);
+        const children = [...parentOf].filter(([, p]) => p == d.denno).map(([c]) => c);
+        const parentNo = parentOf.get(d.denno);
+        if (parentNo != null) {
+          // 同梱される側: 配送を「同梱」にし、送り状番号は親と同じにする
+          const parent = saved.get(parentNo);
+          if (!parent) {
+            throw new Error('同梱先の伝票 ' + parentNo + ' を保存できなかったため、保存しませんでした');
+          }
+          d.hcode = HCODE_DOKON;
+          d.hname = '同梱';
+          d.okurino = parent.okurino;
+          d.dokon = '伝票 ' + parentNo + ' に同梱（送り状は伝票 ' + parentNo + ' と共通）';
+          await this.setOkurino(d.denno, d.okurino ?? '', HCODE_DOKON);
+        } else if (!d.okurino && this.okrsrv.getHinfo(d.hcode).numbering) {
+          // 送り状番号を採番する配送（佐川など）で未採番なら、ここで採番する（Amazon は過去に使った番号を飛ばす）
+          d.okurino = await this.okrsrv.nextOkurino(d.hcode, d.mcode, d.denno);
           await this.setOkurino(d.denno, d.okurino);
+        }
+        if (children.length > 0) {
+          d.dokon = '伝票 ' + children.join('・') + ' を同梱';
         }
         const parentPath = d.sday.replace(/-/g, '') + '出荷分/' + d.staffSei + '担当分';
         const parent = await this.nassrv.folder(root, parentPath);
@@ -431,20 +482,26 @@ export class ShipService {
             await this.nassrv.remove(dir, old);
           }
         }
-        if (form.dokon == 'する') {
-          await this.nassrv.write(dir, d.denno + '.pdf', await this.spdfsrv.nohin(d, form));
+        if (amazon) {
+          // Amazon は帳票タイプによらず Amazon 用の納品書を入れる
+          await this.nassrv.write(dir, d.denno + '.pdf', await this.spdfsrv.amazon(d));
+        } else if (form) {
+          if (form.dokon == 'する') {
+            await this.nassrv.write(dir, d.denno + '.pdf', await this.spdfsrv.nohin(d, form));
+          }
+          const f2 = typeof form.second == 'number' ? denForm(form.second) : undefined;
+          if (f2?.dokon == 'する') {
+            await this.nassrv.write(dir, d.denno + '_2.pdf', await this.spdfsrv.nohin(d, f2));
+          }
         }
-        const f2 = typeof form.second == 'number' ? denForm(form.second) : undefined;
-        if (f2?.dokon == 'する') {
-          await this.nassrv.write(dir, d.denno + '_2.pdf', await this.spdfsrv.nohin(d, f2));
-        }
-        await this.nassrv.write(dir, 's_' + d.denno + '.pdf', await this.spdfsrv.shiji(d, form));
-        const memo = this.zmemo(d, form.code);
+        await this.nassrv.write(dir, 's_' + d.denno + '.pdf', await this.spdfsrv.shiji(d, amazon ? undefined : form));
+        const memo = this.zmemo(d, form?.code ?? 0);
         if (memo.length > 0) {
           await this.nassrv.write(dir, 'zmemo.txt', await this.sjis(memo.join('\r\n') + '\r\n'));
         }
         r.dir = parentPath + '/' + name;
         await this.setShipped(d.denno, r.dir);
+        saved.set(d.denno, d);
       } catch (e) {
         r.error = (e as Error).message;
         console.log('error saveToNas', d.denno, e);
@@ -452,7 +509,7 @@ export class ShipService {
       results.push(r);
       progress?.(++done, docs.length);
     }
-    return results;
+    return results.sort((a, b) => dennos.indexOf(a.denno) - dennos.indexOf(b.denno));
   }
 
   /** zmemo.txt（倉庫への注意）の行 */
@@ -483,12 +540,20 @@ export class ShipService {
     return new Date(y, m - 1, d);
   }
 
-  private async setOkurino(denno: number, okurino: string): Promise<void> {
+  /** 送り状番号（と配送コード）を受注伝票に書く */
+  private async setOkurino(denno: number, okurino: string, hcode?: string): Promise<void> {
     const Upd = gql`
-      mutation upd_shipokuri($id: smallint!, $dno: Int!, $okr: String!) {
-        update_trjyuden(where: {id: {_eq: $id}, denno: {_eq: $dno}}, _set: {okurino: $okr}) { affected_rows }
+      mutation upd_shipokuri($id: smallint!, $dno: Int!, $set: trjyuden_set_input!) {
+        update_trjyuden(where: {id: {_eq: $id}, denno: {_eq: $dno}}, _set: $set) { affected_rows }
       }`;
-    await firstValueFrom(this.apollo.mutate({ mutation: Upd, variables: { id: this.usrsrv.compid, dno: denno, okr: okurino } }));
+    const set: Record<string, string> = { okurino };
+    if (hcode) {
+      set['hcode'] = hcode;
+    }
+    const res = await firstValueFrom(this.apollo.mutate({ mutation: Upd, variables: { id: this.usrsrv.compid, dno: denno, set } }));
+    if (res.error) {
+      throw new Error('送り状番号を保存できませんでした：' + res.error.message);
+    }
   }
 
   /** 受注ステータスを「出荷指示フォルダ作成済」にする */

@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
+import { firstValueFrom } from 'rxjs';
 import { UserService } from './user.service';
+import { AMAZON_MCODE, isAmazon } from './../share/amazon';
 
 /** get_okuri クエリの結果行（Hokuri の ordering は、クエリ上のフィールド名が order） */
 interface HokuriRow extends Omit<mwI.Hokuri, 'ordering'> { order: string }
@@ -179,6 +181,39 @@ export class OkuriService {
         return resolve(this.usrsrv.addCheckDigit7(okrno[1]));
       }
     });
+  }
+
+  /**
+   * 送り状番号を採番する。Amazon の受注は、過去に Amazon の伝票で使った番号を飛ばして採番し直す
+   * （送り状番号は一巡すると同じ番号に戻るが、Amazon は同じ番号を受け付けない。現行の set_amazon_okuno と同じ）。
+   * denno は採番する伝票（自分の伝票の番号は使用済みと見なさない）
+   */
+  async nextOkurino(hcode: string, mcode: string | null, denno?: number | null): Promise<string> {
+    let no = await this.setOkurino(hcode);
+    if (this.usrsrv.compid != 1 || !isAmazon(mcode)) {
+      return no;
+    }
+    const Used = gql`
+      query get_amzokuri($id: smallint!, $mcode: String!, $okr: String!, $dno: Int!) {
+        trjyuden(where: {id: {_eq: $id}, mcode: {_eq: $mcode}, okurino: {_eq: $okr}, denno: {_neq: $dno}}, limit: 1) { denno }
+      }`;
+    for (let i = 0; i < 100; i++) {
+      if (no == '採番エラー') {
+        return no;
+      }
+      const res = await firstValueFrom(this.apollo.query<{ trjyuden: { denno: number }[] }>({
+        query: Used, fetchPolicy: 'network-only',
+        variables: { id: this.usrsrv.compid, mcode: AMAZON_MCODE, okr: no, dno: denno ?? 0 }
+      }));
+      if (res.error || !res.data) {
+        throw new Error('Amazon の使用済み送り状番号を確認できませんでした');
+      }
+      if (res.data.trjyuden.length == 0) {
+        return no;
+      }
+      no = await this.setOkurino(hcode);
+    }
+    throw new Error('Amazon で使っていない送り状番号が見つかりません');
   }
 
   async getNumber(type: string, inc: number): Promise<number[]> {

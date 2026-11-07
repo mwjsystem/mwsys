@@ -5,10 +5,8 @@ import { Apollo } from 'apollo-angular';
 import { UserService } from './../services/user.service';
 import { JyuStockService } from './../services/jyustock.service';
 import { JDST } from './../frmship/ship-forms';
+import { AMAZON_MCODE } from './../share/amazon';
 import { AmzOrder, lineMoney } from './amazon-parse';
-
-/** Amazon の顧客コード */
-export const AMAZON_MCODE = '408223';
 /** 倉庫（受注伝票・明細・在庫の scode） */
 const AMZ_SCODE = '01';
 /** 受注方法（9：WEB）・媒体 */
