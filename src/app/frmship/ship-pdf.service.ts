@@ -4,6 +4,7 @@ import { PdfService } from './../services/pdf.service';
 import { CHECKERS, DenForm, isObi, shipNote } from './ship-forms';
 import { AMAZON_BILL, AMAZON_VENDOR, amazonWindow, isAmazon } from './../share/amazon';
 import { barcodeCanvas, code39 } from './../services/barcode';
+import { AmazonLabel, LabelOption, amazonLabelDoc } from './amazon-label';
 
 /** 住所（msmadr） */
 export interface ShipAdr { mcode: string; eda: number; zip: string | null; region: string | null; local: string | null; street: string | null; extend: string | null; extend2: string | null; adrname: string | null }
@@ -105,6 +106,11 @@ export class ShipPdfService {
   /** Amazon 用の納品書（A4 縦。現行の「amazon納品書作成バーコードフォントバージョン.xlsm」の様式） */
   async amazon(d: ShipDoc): Promise<Blob> {
     return this.pdfsrv.createPdf(this.amazonDoc(d));
+  }
+
+  /** Amazon 納品の JAN シール（エーワン 65 面）。frame = true は位置合わせ用の枠だけ */
+  async amazonLabel(labels: AmazonLabel[], opt: LabelOption, frame = false): Promise<Blob> {
+    return this.pdfsrv.createPdf(amazonLabelDoc(labels, opt, frame));
   }
 
   /**
