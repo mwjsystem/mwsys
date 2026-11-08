@@ -6,7 +6,7 @@
   日付を押すと、休日と稼働日が切り替わります（赤が休日）。土日はもともと休みとして扱うので、祝日・年末年始・夏季休業など、土日以外の休みを入れてください。
   出荷予定日の計算や、日付の選択で休日を飛ばすのに使います。最後に「保存」を押してください。
   「国民の祝日を入れる」で、その年の祝日・振替休日・国民の休日をまとめて入れられます（春分の日・秋分の日は計算で出すので、官報の発表と念のため見比べてください）。
-  祝日なのに休日になっていない日は、赤い下線で示します。
+  祝日なのに休日になっていない日は、赤い下線で示します。休日の名前は右の一覧で変えられます（変えたら「保存」）。
 </p>
 <div class="bar">
   <button mat-icon-button type="button" (click)="move(-1)" [disabled]="busy" title="前の年">
@@ -26,8 +26,24 @@
   <button mat-raised-button type="button" (click)="undo()" [disabled]="busy || !dirty">
     <mat-icon>undo</mat-icon>変更を取り消す
   </button>
+  <button mat-raised-button type="button" (click)="excel()" [disabled]="busy"
+    title="現行の「最新カレンダー.xlsx」と同じ並びの Excel（12 か月・出勤日数・年間休日・休日の一覧・翌年 1 月）を出します">
+    <mat-icon>download</mat-icon>Excel 出力
+  </button>
+  <label style="font-size: 13px;" title="カレンダーを押して休日にする日に付ける名前です（国民の祝日の日は祝日の名前になります）。あとから右の一覧で変えられます">
+    押して入れる日の名前
+    <input style="width: 9em;" [value]="newName" (input)="newName = $any($event.target).value" maxlength="20">
+  </label>
   @if (dirty) {
-    <span class="warnc">未保存：休日の追加 {{added.length}} 日・削除 {{removed.length}} 日</span>
+    <span class="warnc">未保存：休日の追加 {{added.length}} 日・削除 {{removed.length}} 日・名前の変更 {{renamed.length}} 日</span>
+  }
+</div>
+@let yc = yearCount;
+<div class="bar summary">
+  <span>{{year}} 年　年間出勤日数 <b>{{yc.work}}</b> 日</span>
+  <span>年間休日 <b>{{yc.off}}</b> 日（土日 {{yc.weekend}} 日・土日以外の休日 {{yc.other}} 日）</span>
+  @if (dirty) {
+    <span class="note" style="margin: 0;">※保存していない変更を含めて数えています</span>
   }
 </div>
 @if (error) {
@@ -40,7 +56,8 @@
   <div class="months">
     @for (mo of months; track mo.m) {
       <div class="month">
-        <div class="mtitle">{{mo.m}} 月</div>
+        @let mc = monthCount(mo.m);
+        <div class="mtitle">{{mo.m}} 月<span class="mcount">出勤 <b>{{mc.work}}</b> 日・休日 {{mc.off}} 日</span></div>
         <div class="grid">
           @for (w of week; track $index) {
             <div class="wh" [class.sun]="$index == 0" [class.sat]="$index == 6">{{w}}</div>
@@ -60,7 +77,11 @@
   <div class="list">
     <div class="mtitle">{{year}} 年の休日（{{list.length}} 日）</div>
     @for (d of list; track d) {
-      <div [class.chg]="!saved.has(d)">{{label(d)}}</div>
+      <div class="hrow" [class.chg]="!saved.has(d) || renamed.includes(d)">
+        <span class="hdate">{{dateLabel(d)}}</span>
+        <input class="hname" [value]="edits.get(d) ?? ''" (input)="setName(d, $any($event.target).value)" maxlength="20"
+          [disabled]="busy" [class.blank]="!(edits.get(d) ?? '').trim()" title="休日の名前（例：年末年始、夏季休業）">
+      </div>
     } @empty {
       <div class="note">登録されていません</div>
     }
