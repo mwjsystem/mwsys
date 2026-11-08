@@ -1,0 +1,105 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>大会リスト</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+@if (error) {
+  <p class="err" style="white-space: pre-line;">{{error}}</p>
+}
+<div class="bar">
+  <button mat-raised-button color="primary" type="button" (click)="xls.click()" [disabled]="busy">
+    <mat-icon>upload_file</mat-icon>大会リスト（Excel）を選ぶ
+  </button>
+  <input #xls type="file" accept=".xlsx,.xlsm" hidden (change)="onFile($event)">
+  <span>{{fileName}}</span>
+  @if (sheetNames.length > 1) {
+    <label style="font-size: 13px;">シート
+      <select [(ngModel)]="sheet" (ngModelChange)="load()" [disabled]="busy">
+        @for (s of sheetNames; track s) {
+          <option [value]="s">{{s}}</option>
+        }
+      </select>
+    </label>
+  }
+  <label style="font-size: 13px;">大会倉庫
+    <select [(ngModel)]="scode" [disabled]="busy">
+      <option value="">（選んでください）</option>
+      @for (s of stores; track s.code) {
+        <option [value]="s.code">{{s.code}} {{s.name}}</option>
+      }
+    </select>
+  </label>
+</div>
+@if (message) {
+  <p class="msg">{{message}}</p>
+}
+<p class="note">
+  大会リストの Excel を読み込み、出荷時は移動伝票（{{home}} 朝来倉庫 → 大会倉庫。準備数）を、売上時は受注伝票（大会倉庫から出荷済。売上数 = 準備数 − 在庫数、販売価格・内税）と
+  戻りの移動伝票（大会倉庫 → {{home}} 朝来倉庫。在庫数）を登録します。準備数が空白または 0 の品番は対象外です。
+  受注伝票は受注方法 電話・入金方法 現金受取・配送方法 元シ佐、伝票備考は大会名、納品先は別納品の枝番（無ければ送先の住所）です。
+</p>
+@if (t) {
+  <div style="display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; margin: 6px 12px;">
+    <span><b>{{t.name}}</b></span>
+    <span>出荷日 {{t.shipDay}}</span>
+    <span>到着 {{t.arriveDay}} {{t.arriveTime}}</span>
+    <span>大分類 {{t.daibunName}}（{{t.daibunrui}}）</span>
+    <span>営業担当 {{t.tantoName}}（{{t.tcode1}}）</span>
+    <span>送先 〒{{t.zip}} {{t.addr}}{{t.eda != null ? '（別納品枝番 ' + t.eda + '）' : ''}}</span>
+    <span>会場 {{t.venue}}　宛名 {{t.atena}}　TEL {{t.tel}}</span>
+    <span>送り状備考 {{t.okuriMemo}}</span>
+    <label>受注先
+      <input class="mc" style="width: 7em;" [(ngModel)]="t.mcode" (change)="changeMcode()" maxlength="12" [disabled]="busy">
+      {{t.mname}}{{mname ? '（' + mname + '）' : t.mcode ? '（顧客マスタにありません）' : ''}}
+    </label>
+  </div>
+  @if (t.err) {
+    <p class="err">エラー：{{t.err}}</p>
+  }
+  @if (amountDiff.length > 0) {
+    <p class="warnc" style="margin: 4px 12px;">Excel の金額が販売価格 × 売上数と違う行があります（黄色の行：{{amountDiff.join('、')}}）。受注伝票は販売価格 × 売上数で登録するので、違う場合は Excel の販売価格を直すか、登録後に受注伝票で直してください。</p>
+  }
+  @if (missing > 0) {
+    <p class="err">商品マスタに無い品番が {{missing}} 件あります（赤の行）。直してから読み込み直してください。</p>
+  }
+  <div class="bar">
+    <button mat-raised-button color="primary" type="button" (click)="ship()" [disabled]="!canShip">
+      <mat-icon>local_shipping</mat-icon>出荷：移動伝票を登録（{{home}} → {{scode || '5xx'}}）
+    </button>
+    @if (shipDenno) {
+      <span>出荷の移動伝票 <a class="denlink" [href]="'/frmmove/3/' + shipDenno" target="_blank" rel="noopener">{{shipDenno}}</a></span>
+    }
+    <label style="font-size: 13px; margin-left: 24px;">売上の日付
+      <input type="date" [(ngModel)]="saleDay" [disabled]="busy">
+    </label>
+    <button mat-raised-button color="accent" type="button" (click)="sale()" [disabled]="!canSale">
+      <mat-icon>point_of_sale</mat-icon>売上：受注伝票と戻りの移動伝票を登録
+    </button>
+    @if (saleDenno) {
+      <span>受注伝票 <app-denlink [denno]="saleDenno" /></span>
+    }
+    @if (backDenno) {
+      <span>戻りの移動伝票 <a class="denlink" [href]="'/frmmove/3/' + backDenno" target="_blank" rel="noopener">{{backDenno}}</a></span>
+    }
+  </div>
+  <div class="scroll">
+    <table class="rep">
+      <thead>
+        <tr><th>行</th><th>品番</th><th>商品名（Excel）</th><th>商品名（商品マスタ）</th><th>準備数</th><th>在庫数</th><th>売上数</th><th>販売価格</th><th>金額</th><th>備考</th></tr>
+      </thead>
+      <tbody>
+        @for (i of t.items; track i.row) {
+          <tr [class.ng]="!i.found || i.sales < 0" [class.dif]="i.found && i.amount != null && i.amount != i.sales * i.price">
+            <td class="num">{{i.row}}</td><td>{{i.gcode}}</td><td>{{i.name}}</td><td>{{i.gtext}}</td>
+            <td class="num">{{i.prep | number}}</td><td class="num">{{i.stock | number}}</td><td class="num">{{i.sales | number}}</td>
+            <td class="num">{{i.price | number}}</td><td class="num">{{i.sales * i.price | number}}</td><td>{{i.memo}}</td>
+          </tr>
+        }
+        <tr>
+          <td colspan="4" style="text-align: right;">合計</td>
+          <td class="num">{{sum('prep') | number}}</td><td class="num">{{sum('stock') | number}}</td><td class="num">{{sum('sales') | number}}</td>
+          <td></td><td class="num">{{amount | number}}</td><td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+}
