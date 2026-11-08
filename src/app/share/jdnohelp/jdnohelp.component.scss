@@ -1,8 +1,12 @@
 // 受注伝票検索ダイアログ（jdnohelp）の見た目。Material 3 のシステムトークン（--mat-sys-*）を使う。
+// ダイアログ全体はスクロールさせず、検索結果（.jdh-content）だけをスクロールさせる。
+// 両方がスクロールすると、外側を動かしたときに見出しの行（sticky）が表と一緒に動き、ずれて見える
 :host {
   display: flex;
   flex-direction: column;
+  height: 100%;
   max-height: 100%;
+  overflow: hidden;
 }
 
 .jdh-title {
@@ -51,6 +55,9 @@
 .jdh-content {
   flex: 1 1 auto;
   min-height: 0;
+  // Material の既定（高さ 65vh まで）をやめ、ダイアログの残りの高さいっぱいを使う
+  max-height: none;
+  overflow: auto;
 }
 
 .jdh-summary {
@@ -73,10 +80,20 @@
 .jdh-table {
   width: 100%;
 
+  // 見出しの行はスクロールしても上に残す。下の行（入金予定の選択欄など）が透けたり上に重なったりしないよう、不透明にして前に出す
   th.mat-mdc-header-cell {
+    position: sticky;
+    top: 0;
+    z-index: 3;
     background: var(--mat-sys-surface-container, #f3edf7);
+    background-clip: padding-box;
     font-weight: 600;
     white-space: nowrap;
+  }
+
+  td.mat-mdc-cell {
+    position: relative;
+    z-index: 0;
   }
 
   td.mat-mdc-cell {
