@@ -5,7 +5,7 @@ import { UserService } from './../services/user.service';
 import { StoreService } from './../services/store.service';
 import { lineMoney } from './../frmrakuten/rakuten-parse';
 import { ObiService } from './obi.service';
-import { ObiLine, ObiOrder, OBI_KINDS, MALL_GCODE, parseObiSheet, sheetRows } from './obi-parse';
+import { ObiLine, ObiOrder, OBI_KINDS, BLACK_KINDS, buildObiLines, parseObiSheet, sheetRows } from './obi-parse';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -31,15 +31,13 @@ export class FrmobiComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
 
   readonly kinds = OBI_KINDS;
-  readonly mallCode = MALL_GCODE;
+  readonly blackKinds = BLACK_KINDS;
   orders: ObiOrder[] = [];
   busy = false;
   error = '';
   message = '';
   progress = '';
   private today = '';
-  /** 用紙のセル（種類を変えたときに読み直す） */
-  private rows = new WeakMap<ObiOrder, string[][]>();
 
   constructor() {
     this.title.setTitle('帯注文取込(MWSystem)');
@@ -61,11 +59,16 @@ export class FrmobiComponent implements OnInit {
     return o.lines.reduce((s, l) => s + this.money(o, l), 0);
   }
 
-  /** 銀線（MALL）の単価を画面で変えたとき（顧客コードを直して読み直しても残す） */
-  setMall(l: ObiLine, v: number | string | null) {
-    const n = Math.max(0, Math.round(Number(v) || 0));
-    l.tanka = n;
-    l.fixed = n;
+  /** 用紙ごとの設定（帯の種類・モールの単価・単価に含む金モール・織マーク）を変えたとき。明細を作り直して単価を引き直す */
+  async changeSetting(o: ObiOrder) {
+    o.mallTanka = Math.max(0, Math.round(Number(o.mallTanka) || 0));
+    o.goldTanka = Math.max(0, Math.round(Number(o.goldTanka) || 0));
+    o.oriTanka = Math.max(0, Math.round(Number(o.oriTanka) || 0));
+    o.goldIncl = Math.max(0, Math.round(Number(o.goldIncl) || 0));
+    const scodes = new Map(o.lines.map(l => [l.gcode + '|' + l.label, l.scode]));
+    buildObiLines(o);
+    o.lines.forEach(l => l.scode = scodes.get(l.gcode + '|' + l.label) ?? l.scode);
+    await this.changeMcode(o);
   }
 
   taxName(o: ObiOrder): string {
@@ -102,16 +105,14 @@ export class FrmobiComponent implements OnInit {
           if (ws.state != 'visible') {
             return;
           }
-          const rows = sheetRows(ws);
-          const o = parseObiSheet(rows, f.name, ws.name);
+          const o = parseObiSheet(sheetRows(ws), f.name, ws.name);
           if (o) {
-            this.rows.set(o, rows);
             this.orders.push(o);
             found++;
           }
         });
         if (found == 0) {
-          errs.push(f.name + '：色帯の表（0号〜8号）が見つかりません（黒帯・名前刺繍の用紙はまだ取り込めません）');
+          errs.push(f.name + '：色帯・黒帯の表（号の見出しと、色・金モールの本数の行）が見つかりません（名前の一覧の用紙はまだ取り込めません）');
         }
       }
       for (const o of this.orders) {
@@ -136,19 +137,6 @@ export class FrmobiComponent implements OnInit {
     }
     this.busy = false;
     this.cdRef.detectChanges();
-  }
-
-  /** 帯の種類を変えたとき（用紙を読み直す。顧客コードは画面の値のまま） */
-  async changeKind(o: ObiOrder, kind: string) {
-    const rows = this.rows.get(o);
-    const n = rows ? parseObiSheet(rows, o.fileName, o.sheet, kind) : null;
-    if (!n || !rows) {
-      return;
-    }
-    n.mcode = o.mcode;
-    this.rows.set(n, rows);
-    this.orders = this.orders.map(e => e == o ? n : e);
-    await this.changeMcode(n);
   }
 
   private target(o: ObiOrder): boolean {

@@ -21,9 +21,10 @@
   <p class="msg">{{message}}</p>
 }
 <p class="note">
-  色帯の注文用紙（「0号〜8号」の表。CB19・CB-K・CBKK1・CB19-H）を読み込みます。複数のファイルを選べます。用紙 1 枚 = 受注伝票 1 枚です。
-  色は行名の先頭の文字で決めます。銀線入りの帯は銀線（MALL）代を足します（品番が SV 付きの帯は銀線の代金を含むので数えません。MALL の単価は画面で変えられます。初期値 350 円）。CB-K の赤帯は極真会刺繍代（Z05 600 円）と織マーク代（Z14 100 円）を足します。
-  単価は受注伝票と同じく顧客の単価区分（特別単価があればそれ）です。受注方法はメール、受注日は今日、納品先は顧客の住所です。
+  帯の注文用紙を読み込みます。複数のファイルを選べます。用紙 1 枚 = 受注伝票 1 枚です。
+  色帯は「0号〜8号」の表（CB19・CB-K・CBKK1・CB19-H）、色は行名の先頭の文字で決めます。線入りの色帯はモール代（半周）を足します（品番が SV 付きの帯は線の代金を含むので数えません）。CB-K の赤帯は極真会刺繍代（Z05 600 円）と織マーク代（Z14 100 円）を足します。
+  黒帯は「金モールN本」の行の表（品番 BBY1・BB）、金モールは「単価に含む本数」を超えた分を金モール代（一周）にします。織マーク代は用紙ごとに付けられます。
+  単価は受注伝票と同じく顧客の単価区分（特別単価があればそれ）、モール代・織マーク代は画面の単価です。受注方法はメール、受注日は今日、納品先は顧客の住所です。
   用紙に送り先・備考の記入があるときは、登録後に受注伝票で直してください。倉庫は明細ごとに選べます（初期値 01）。
 </p>
 @for (o of orders; track $index) {
@@ -31,24 +32,68 @@
     [style.background]="o.err || o.result.startsWith('エラー') ? '#fde7e7' : ''">
     <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 13px;">
       <b>{{o.fileName}}</b><span>（シート {{o.sheet}}）</span>
-      <label>帯の種類
-        <select [ngModel]="o.kind" (ngModelChange)="changeKind(o, $event)" [disabled]="busy || !!o.denno">
-          @for (k of kinds; track k.key) {
-            <option [value]="k.key">{{k.name}}</option>
-          }
-        </select>
-      </label>
-      @if (o.title) {
-        <span style="font-size: 11px; color: #666666;">用紙の見出し：{{o.title}}</span>
-      }
       <label>顧客コード
         <input class="mc" style="width: 7em;" [(ngModel)]="o.mcode" (change)="changeMcode(o)" maxlength="12" [disabled]="busy || !!o.denno">
       </label>
       <span>{{o.mname}}</span>
-      <span>帯 {{o.belts | number}} 本{{o.sv ? '（銀線入り ' + o.sv + ' 本）' : ''}}</span>
+      @if (o.belts) {
+        <span>色帯 {{o.belts | number}} 本{{o.sv ? '（線入り ' + o.sv + ' 本）' : ''}}</span>
+      }
+      @if (o.blackBelts) {
+        <span>黒帯 {{o.blackBelts | number}} 本</span>
+      }
       <span>金額（{{taxName(o)}}）{{amount(o) | number:'1.0-0'}} 円</span>
       <span>{{o.err ? 'エラー：' + o.err : o.result}}</span>
       <app-denlink [denno]="o.denno" />
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 12px; margin-top: 4px;">
+      @if (o.colorCells.length > 0) {
+        <label>色帯の種類
+          <select [(ngModel)]="o.kind" (ngModelChange)="changeSetting(o)" [disabled]="busy || !!o.denno">
+            @for (k of kinds; track k.key) {
+              <option [value]="k.key">{{k.name}}</option>
+            }
+          </select>
+        </label>
+        @if (o.title) {
+          <span style="color: #666666;">（用紙の見出し：{{o.title}}）</span>
+        }
+        <label>色帯のモール単価
+          <input type="number" min="0" step="1" style="width: 5em; text-align: right;" [(ngModel)]="o.mallTanka" (change)="changeSetting(o)" [disabled]="busy || !!o.denno">円
+        </label>
+      }
+      @if (o.blackCells.length > 0) {
+        <label>黒帯の品番
+          <select [(ngModel)]="o.black" (ngModelChange)="changeSetting(o)" [disabled]="busy || !!o.denno">
+            @for (b of blackKinds; track b) {
+              <option [value]="b">{{b}}</option>
+            }
+          </select>
+        </label>
+        <label>金モール単価
+          <input type="number" min="0" step="1" style="width: 5em; text-align: right;" [(ngModel)]="o.goldTanka" (change)="changeSetting(o)" [disabled]="busy || !!o.denno">円
+        </label>
+        <label>単価に含む金モール
+          <select [(ngModel)]="o.goldIncl" (ngModelChange)="changeSetting(o)" [disabled]="busy || !!o.denno">
+            <option [ngValue]="0">なし（全部モール代）</option>
+            <option [ngValue]="1">1 本（2 本目から）</option>
+          </select>
+        </label>
+        @if (o.goldOnForm != null) {
+          <span style="color: #666666;">（用紙の金モール数 {{o.goldOnForm}} 本）</span>
+        }
+      }
+      <label>
+        <input type="checkbox" [(ngModel)]="o.ori" (ngModelChange)="changeSetting(o)" [disabled]="busy || !!o.denno">織マーク代（Z14）を帯の本数分
+      </label>
+      @if (o.ori) {
+        <label>単価
+          <input type="number" min="0" step="1" style="width: 5em; text-align: right;" [(ngModel)]="o.oriTanka" (change)="changeSetting(o)" [disabled]="busy || !!o.denno">円
+        </label>
+        <label>明細備考（織マーク番号など）
+          <input style="width: 8em;" [(ngModel)]="o.oriMemo" (change)="changeSetting(o)" maxlength="40" [disabled]="busy || !!o.denno">
+        </label>
+      }
     </div>
     @if (o.warn) {
       <p class="warnc" style="margin: 4px 0;">{{o.warn}}</p>
@@ -71,15 +116,7 @@
         @for (l of o.lines; track $index) {
           <tr [class.ng]="!l.gtext">
             <td>{{l.label}}</td><td>{{l.gcode}}</td><td>{{l.gtext}}</td>
-            <td class="num">{{l.qty | number}}</td>
-            <td class="num">
-              @if (l.gcode == mallCode) {
-                <input type="number" min="0" step="1" style="width: 6em; text-align: right;" title="銀線（MALL）の単価"
-                  [ngModel]="l.tanka" (ngModelChange)="setMall(l, $event)" [disabled]="busy || !!o.denno">
-              } @else {
-                {{l.tanka | number}}
-              }
-            </td>
+            <td class="num">{{l.qty | number}}</td><td class="num">{{l.tanka | number}}</td>
             <td class="num">{{money(o, l) | number}}</td><td>{{l.memo}}</td>
             <td>
               <select [(ngModel)]="l.scode" [disabled]="busy || !!o.denno">
