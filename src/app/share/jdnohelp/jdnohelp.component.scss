@@ -14,12 +14,15 @@
 }
 
 // ---- 検索条件 ----
+// 条件のグループ（伝票・日付・顧客）は横に並べ、検索結果の高さを広く取る（入りきらない幅のときだけ折り返す）
 .jdh-filters {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin: 0 1.5rem 0.75rem;
-  padding: 0.75rem 1rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 1.5rem;
+  margin: 0 1.5rem 0.5rem;
+  padding: 0.5rem 1rem;
   background: var(--mat-sys-surface-container-low, #f7f2fa);
   border: 1px solid var(--mat-sys-outline-variant, #cac4d0);
   border-radius: 12px;
@@ -49,6 +52,7 @@
 .jdh-actions {
   display: flex;
   justify-content: flex-end;
+  margin-left: auto;
 }
 
 // ---- 検索結果 ----

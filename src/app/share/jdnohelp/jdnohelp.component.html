@@ -22,10 +22,11 @@
           }
         </mat-select>
       </mat-form-field>
-      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48"
+        matTooltip="部分一致で探します。入れたときは日付・担当者の条件を使いません" matTooltipClass="ttips">
         <mat-label>受注先伝票番号（CUSDEN）</mat-label>
-        <input matInput [(ngModel)]="fcusden" [ngModelOptions]="{standalone: true}" (keyup.enter)="getJyuden()">
-        <mat-hint>部分一致。入れたときは日付・担当者の条件を使いません</mat-hint>
+        <input matInput [(ngModel)]="fcusden" [ngModelOptions]="{standalone: true}" (keyup.enter)="getJyuden()"
+          placeholder="部分一致（日付・担当者は無視）">
       </mat-form-field>
     </div>
   </div>
