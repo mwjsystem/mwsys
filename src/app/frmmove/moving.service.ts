@@ -51,7 +51,10 @@ export class Movsub {
   incode!: string;
   outcode!: string;
   tcode!: string;
+  /** 伝票備考・出荷指示書備考（保存はしていたが、読込で取っていなかった） */
+  dmemo!: string;
   omemo!: string;
+  smemo!: string;
   hday!: Date;
   htime!: string;
   hcode!: string;
@@ -108,7 +111,9 @@ export class MovingService {
         incode
         outcode
         tcode
+        dmemo
         omemo
+        smemo
         hday
         htime
         hcode

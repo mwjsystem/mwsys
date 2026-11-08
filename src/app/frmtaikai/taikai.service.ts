@@ -11,10 +11,11 @@ import { Taikai, TaikaiItem } from './taikai-parse';
 
 /** 朝来倉庫 */
 export const HOME_SCODE = '01';
-/** 受注伝票の固定値（現行の make_csv.xlsm と同じ。受注方法 1：電話、入金方法 15：現金受取、配送方法 07：元シ佐、明細は内税） */
+/** 受注伝票の固定値（現行の make_csv.xlsm と同じ。受注方法 1：電話、入金方法 15：現金受取、配送方法 7：元シ佐、明細は内税） */
 const TK_JCODE = '1';
 const TK_PCODE = '15';
-const TK_HCODE = '07';
+/** 配送方法（送り状マスタのコード。'7' か '07' かはマスタの書き方に合わせる） */
+const TK_HCODE_NO = 7;
 const TK_MTAX = '1';
 const TK_BUNTYPE = 1;
 const KEY_JDENNO = 'jdenno';
@@ -96,6 +97,16 @@ export class TaikaiService {
     return n;
   }
 
+  /** 配送方法（元シ佐）のコード。送り状マスタの書き方（'7' / '07'）に合わせる。無ければ null */
+  private async hcode(): Promise<string | null> {
+    const Get = gql`
+      query get_taikai_hokuri($id: smallint!) {
+        mshokuri(where: {id: {_eq: $id}}) { code }
+      }`;
+    const q = await this.query<{ mshokuri: { code: string }[] }>(Get, { id: this.usrsrv.compid });
+    return q.mshokuri.find(e => Number(e.code) == TK_HCODE_NO)?.code ?? null;
+  }
+
   /** 大会倉庫（倉庫コードが 5 で始まる倉庫と、名前に「大会」がある倉庫。削除フラグが空の倉庫も含める） */
   async stores(): Promise<{ code: string; name: string }[]> {
     const Get = gql`
@@ -139,12 +150,12 @@ export class TaikaiService {
   }
 
   /** 移動伝票（ヘッダ・明細）の登録データ */
-  private movden(denno: number, day: string, incode: string, outcode: string, t: Taikai, kind: '出荷' | '戻り', lines: TaikaiItem[], suu: (i: TaikaiItem) => number) {
+  private movden(denno: number, day: string, incode: string, outcode: string, t: Taikai, kind: '出荷' | '戻り', lines: TaikaiItem[], suu: (i: TaikaiItem) => number, hcode: string | null) {
     const id = this.usrsrv.compid;
     const by = this.usrsrv.staff.code;
     const now = new Date();
     const sub = {
-      id, denno, day, incode, outcode, tcode: by, hcode: kind == '出荷' ? TK_HCODE : null, hday: kind == '出荷' ? t.arriveDay : null,
+      id, denno, day, incode, outcode, tcode: by, hcode: kind == '出荷' ? hcode : null, hday: kind == '出荷' ? t.arriveDay : null,
       htime: null, dmemo: this.memo(t, kind),
       omemo: nz(kind == '出荷' ? [t.venue, t.atena, t.okuriMemo].filter(e => e).join(' ') : null),
       smemo: nz(kind == '出荷' ? ['営業担当:' + t.tantoName, '出荷日:' + (t.shipDay ?? ''), t.arriveTime ? '到着:' + t.arriveTime : ''].filter(e => e).join(' ') : null),
@@ -162,8 +173,9 @@ export class TaikaiService {
     }
     const lines = t.items.filter(i => i.prep > 0);
     const st = await this.stksrv.check([...new Set(lines.map(i => i.gcode))]);
+    const hcode = await this.hcode();
     const denno = await this.next(KEY_MDENNO);
-    const { sub, mei } = this.movden(denno, day, scode, HOME_SCODE, t, '出荷', lines, i => i.prep);
+    const { sub, mei } = this.movden(denno, day, scode, HOME_SCODE, t, '出荷', lines, i => i.prep, hcode);
     const { zinit, zinc } = moveZaiko(st, this.usrsrv.compid, day, scode, HOME_SCODE, mei);
     const Insert = gql`
       mutation taikai_ship($sub: trmovsub_insert_input!, $mei: [trmovden_insert_input!]!, $zinit: [trzaiko_insert_input!]!, $zinc: [trzaiko_updates!]!) {
@@ -284,7 +296,7 @@ export class TaikaiService {
         id, denno: jdenno, day, uday: day, sday: day, yday: day, mcode: m.mcode, scde: nz(m.scde) ?? m.mcode, ncode: m.mcode, nadr, scode,
         tcode: nz(m.tcode), tcode1: nz(t.tcode1) ?? nz(m.tcode1), daibunrui: nz(t.daibunrui) ?? nz(m.daibunrui),
         chubunrui: nz(m.chubunrui), shobunrui: nz(m.shobunrui),
-        jcode: TK_JCODE, pcode: TK_PCODE, hcode: TK_HCODE, buntype, skbn: '0', torikbn: false,
+        jcode: TK_JCODE, pcode: TK_PCODE, hcode: await this.hcode(), buntype, skbn: '0', torikbn: false,
         dmemo: this.memo(t, '売上'), omemo: nz(['配達前要連絡', t.okuriMemo].filter(e => e).join(' ')),
         gtotalzn, soryozn, tesuzn, nebikizn, taxtotal, total: gtotalzn + soryozn + tesuzn + nebikizn + taxtotal, total8, total10, genka,
         jdstatus: JDST.KANRYO, del: false, created_at: now, created_by: by, updated_at: now, updated_by: by
@@ -293,7 +305,7 @@ export class TaikaiService {
 
     if (back.length > 0) {
       mdenno = await this.next(KEY_MDENNO);
-      const { sub, mei } = this.movden(mdenno, day, HOME_SCODE, scode, t, '戻り', back, i => i.stock);
+      const { sub, mei } = this.movden(mdenno, day, HOME_SCODE, scode, t, '戻り', back, i => i.stock, null);
       const z = moveZaiko(st, id, day, HOME_SCODE, scode, mei);
       zinit.push(...z.zinit);
       zinc.push(...z.zinc);

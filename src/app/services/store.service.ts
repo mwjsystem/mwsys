@@ -23,7 +23,7 @@ export class StoreService {
     if (this.scds.length == 0) {
       const GetMast = gql`
       query get_souko($id: smallint!) {
-        msstore(where: {id: {_eq: $id}, del: {_eq: false}},order_by: {sort: asc}) {
+        msstore(where: {id: {_eq: $id}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]},order_by: {sort: asc}) {
           code
           subname
         }
