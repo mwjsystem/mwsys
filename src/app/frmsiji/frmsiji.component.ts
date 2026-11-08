@@ -8,7 +8,9 @@ import { Apollo } from 'apollo-angular';
 import { UserService } from './../services/user.service';
 import { SijiLine, SijiCount, sijiCells, sijiCount, sijiFill, sijiOf, sijiSheets, sijiStartRow } from './siji';
 import { MatToolbar } from '@angular/material/toolbar';
-import { MatButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
 import { MatIcon } from '@angular/material/icon';
 import { DecimalPipe } from '@angular/common';
 import { DenlinkComponent } from './../share/denlink/denlink.component';
@@ -25,7 +27,7 @@ let template: { name: string; buf: ArrayBuffer; sheets: { name: string; path: st
   templateUrl: './frmsiji.component.html',
   styleUrls: ['./../frmocnk/frmocnk.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatToolbar, MatButton, MatIcon, FormsModule, DecimalPipe, DenlinkComponent]
+  imports: [MatToolbar, MatButton, MatIconButton, MatIcon, FormsModule, DecimalPipe, DenlinkComponent]
 })
 export class FrmsijiComponent implements OnInit {
   private usrsrv = inject(UserService);
@@ -33,6 +35,7 @@ export class FrmsijiComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private title = inject(Title);
   private cdRef = inject(ChangeDetectorRef);
+  private dialog = inject(MatDialog);
 
   denno: number | null = null;
   /** 読み込んだ伝票 */
@@ -87,6 +90,20 @@ export class FrmsijiComponent implements OnInit {
   colorOf(l: SijiLine): string {
     const m = sijiOf(l.gcode);
     return m ? (/-KS$/.test(l.gcode.trim()) ? 'ﾚｯﾄﾞ・青' : m.color.replace(/\n/g, '')) + ' ' + m.size + '号' : '';
+  }
+
+  /** 受注伝票の検索（受注伝票画面と同じ検索の画面）。選んだ伝票を読む */
+  dennoHelp() {
+    const cfg = new MatDialogConfig();
+    cfg.width = '100vw';
+    cfg.height = '98%';
+    cfg.panelClass = 'full-screen-modal';
+    this.dialog.open(JdnohelpComponent, cfg).afterClosed().subscribe(data => {
+      if (data?.denno) {
+        this.denno = Number(data.denno);
+        this.load();
+      }
+    });
   }
 
   setAll(v: boolean) {

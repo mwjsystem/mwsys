@@ -203,13 +203,19 @@ export class JdnohelpComponent implements OnInit, OnDestroy {
     if (this.feda && this.fmcdfld == 'ncode') {
       varWh.where._and.push({ "nadr": { "_eq": this.feda } });
     }
-    if (this.fday) {
-      let fldobj: HasuraCond = {};
-      fldobj[this.fdayfld] = { "_gt": this.usrsrv.formatDate(this.fday) };
-      varWh.where._and.push(fldobj);
-    }
-    if (this.ftcd) {
-      varWh.where._and.push({ "tcode": { "_eq": this.ftcd } });
+    const cusden = (this.fcusden ?? '').trim();
+    if (cusden) {
+      // 受注先伝票番号（CUSDEN。Amazon の PO など）は部分一致。入れたときは日付・担当者の条件を使わない（古い伝票・ほかの担当者の伝票も探せるように）
+      varWh.where._and.push({ "cusden": { "_ilike": '%' + cusden.replace(/[%_\\]/g, '\\$&') + '%' } });
+    } else {
+      if (this.fday) {
+        let fldobj: HasuraCond = {};
+        fldobj[this.fdayfld] = { "_gt": this.usrsrv.formatDate(this.fday) };
+        varWh.where._and.push(fldobj);
+      }
+      if (this.ftcd) {
+        varWh.where._and.push({ "tcode": { "_eq": this.ftcd } });
+      }
     }
 
     // console.log(varWh);
@@ -270,7 +276,7 @@ export class JdnohelpComponent implements OnInit, OnDestroy {
           result.trjyuden.forEach(element => {
             let { trjyumeis, ...rest } = element;
             // console.log(element.denno, trjyumeis);
-            let gcd = { gcode: trjyumeis[0].gcode };
+            let gcd = { gcode: trjyumeis[0]?.gcode ?? '' };
             srcdata.push({ ...rest, ...gcd });
           });
           this.dataSource = new MatTableDataSource<Jyuden>(srcdata);

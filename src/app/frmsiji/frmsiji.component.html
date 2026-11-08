@@ -7,8 +7,11 @@
 }
 <div class="bar">
   <label style="font-size: 13px;">受注伝票番号
-    <input class="mc" style="width: 8em;" type="number" [(ngModel)]="denno" (keyup.enter)="load()" [disabled]="busy">
+    <input class="mc" style="width: 8em;" type="number" [(ngModel)]="denno" (keyup.enter)="load()" (keydown.f4)="dennoHelp()" [disabled]="busy">
   </label>
+  <button mat-icon-button type="button" (click)="dennoHelp()" [disabled]="busy" title="受注伝票を検索して選ぶ（F4）">
+    <mat-icon>find_replace</mat-icon>
+  </button>
   <button mat-raised-button color="primary" type="button" (click)="load()" [disabled]="busy || !denno">
     <mat-icon>search</mat-icon>読込
   </button>
