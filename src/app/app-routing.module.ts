@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: 'repuriage', loadChildren: () => import('./repuriage/repuriage.module').then(m => m.RepuriageModule), canActivate: [AuthGuard] },
   { path: 'frmocnk', loadChildren: () => import('./frmocnk/frmocnk.module').then(m => m.FrmocnkModule), canActivate: [AuthGuard] },
   { path: 'frmamazon', loadChildren: () => import('./frmamazon/frmamazon.module').then(m => m.FrmamazonModule), canActivate: [AuthGuard] },
+  { path: 'frmrakuten', loadChildren: () => import('./frmrakuten/frmrakuten.module').then(m => m.FrmrakutenModule), canActivate: [AuthGuard] },
   { path: 'frmtkd', loadChildren: () => import('./frmtkd/frmtkd.module').then(m => m.FrmtkdModule), canActivate: [AuthGuard] },
   { path: 'frmship', loadChildren: () => import('./frmship/frmship.module').then(m => m.FrmshipModule), canActivate: [AuthGuard] },
   { path: 'frminvoice', loadChildren: () => import('./frminvoice/frminvoice.module').then(m => m.FrminvoiceModule), canActivate: [AuthGuard] },

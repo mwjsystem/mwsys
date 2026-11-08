@@ -1,0 +1,103 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>楽天受注取込</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+@if (error) {
+  <p class="err" style="white-space: pre-line;">{{error}}</p>
+}
+<div class="bar">
+  <button mat-raised-button color="primary" type="button" (click)="csv.click()" [disabled]="busy">
+    <mat-icon>upload_file</mat-icon>CSV を選ぶ
+  </button>
+  <input #csv type="file" accept=".csv" hidden (change)="onFile($event)">
+  <span>{{fileName}}</span>
+  <mat-form-field style="width: 11em;" subscriptSizing="dynamic">
+    <mat-label>担当者</mat-label>
+    <mat-select [(ngModel)]="tanto" [panelClass]="'my-panel-class'">
+      @for (t of stfsrv.tcds; track t) {
+        @if (t.value) {
+          <mat-option [value]="t.value">{{t.viewval}}</mat-option>
+        }
+      }
+    </mat-select>
+  </mat-form-field>
+  <button mat-raised-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
+    <mat-icon>save</mat-icon>登録（{{targetCount}} 件）
+  </button>
+  @if (progress) {
+    <span>{{progress}}</span>
+  }
+</div>
+@if (message) {
+  <p class="msg">{{message}}</p>
+}
+@if (orders.length > 0) {
+  <p class="note">受注 {{orders.length | number}} 件・明細 {{lineCount | number}} 行（送料・代引手数料・ポイント利用を含む）。
+    注文者は電話番号で顧客を探し、見つからない {{newCount}} 件は新規に作ります（顧客コードを入れれば、その顧客にします）。
+    送付先が注文者と違うときは納品先の住所にします。倉庫は ▶ で明細を開いて選べます。
+    @if (diffCount > 0) {
+      <span class="warnc">明細の合計が CSV の請求金額と合わない受注が {{diffCount}} 件あります（黄色の行）。</span>
+    }
+  </p>
+  <div class="scroll">
+    <table class="rep">
+      <thead>
+        <tr>
+          <th>注文番号</th><th>受注日</th><th>注文者</th><th>電話番号</th><th>顧客コード</th><th>送付先</th>
+          <th>支払方法</th><th>入金</th><th>置き配</th><th>請求金額</th><th>明細との差額</th><th>処理結果</th><th>伝票番号</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (o of orders; track o.cusden) {
+          <tr [class.ng]="o.err || o.result.startsWith('エラー')" [class.dif]="diff(o) != 0">
+            <td><a href="javascript:void(0)" class="tg" (click)="toggle(o)">{{isOpen(o) ? '▼' : '▶'}}</a>{{o.cusden}}</td>
+            <td>{{o.day}} {{o.time}}</td><td>{{o.sei}}</td><td>{{o.tel}}</td>
+            <td>
+              <input class="mc" [(ngModel)]="o.mcode" maxlength="12" [disabled]="busy || !!o.denno" placeholder="新規">
+              @if (o.found && !o.denno) {
+                <span style="font-size: 11px;">（電話番号で一致）</span>
+              }
+            </td>
+            <td>{{o.nsei == o.sei && o.nzip == o.zip ? '同じ' : o.nsei + ' ' + o.nzip}}</td>
+            <td>{{o.pay}}</td><td>{{o.pcode}}</td><td>{{o.okihai}}</td>
+            <td class="num">{{o.seikyu | number:'1.0-0'}}</td>
+            <td class="num">{{diff(o) != 0 ? (diff(o) | number:'1.0-0') : ''}}</td>
+            <td>{{o.err ? 'エラー：' + o.err : o.result}}</td><td><app-denlink [denno]="o.denno" /></td>
+          </tr>
+          @if (isOpen(o)) {
+            <tr class="det">
+              <td colspan="13">
+                <div style="margin: 2px 0 4px;">
+                  注文者：{{o.sei}}（{{o.kana}}）〒{{o.zip}} {{o.pref}}{{o.city}}{{o.addr}} {{o.tel}}<br>
+                  送付先：{{o.nsei}}（{{o.nkana}}）〒{{o.nzip}} {{o.npref}}{{o.ncity}}{{o.naddr}} {{o.ntel}}
+                </div>
+                <table class="mei">
+                  <thead>
+                    <tr><th>商品コード</th><th>商品名（商品マスタ）</th><th>数量</th><th>単価</th><th>金額（税込）</th><th>税</th><th>倉庫</th><th>楽天の商品名・選択肢</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (l of o.lines; track $index) {
+                      <tr>
+                        <td>{{l.gcode}}</td><td>{{l.gtext}}</td>
+                        <td class="num">{{l.suu | number}}</td><td class="num">{{l.tanka | number}}</td>
+                        <td class="num">{{money(l) | number}}</td><td>{{l.mtax == '0' ? '外' : '内'}}{{l.taxrate}}%</td>
+                        <td>
+                          <select [(ngModel)]="l.scode" [disabled]="busy || !!o.denno">
+                            @for (s of strsrv.scds; track s.value) {
+                              <option [value]="s.value">{{s.viewval}}</option>
+                            }
+                          </select>
+                        </td>
+                        <td style="font-size: 11px;">{{l.name}}{{l.option ? ' ／ ' + l.option : ''}}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+}
