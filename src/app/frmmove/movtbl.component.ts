@@ -17,6 +17,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatPrefix, MatFormField, MatInput, MatSuffix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { GridNavDirective } from '../core/directives/gridnav.directive';
 import { DecimalPipe } from '@angular/common';
 import { rowCtl, objectToArray } from '../core/form-helpers';
 
@@ -32,7 +33,7 @@ type ParentField = 'outcode' | 'incode' | 'day';
     templateUrl: './movtbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, MatFormField, MatInput, TabDirective, MatSuffix, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
+    imports: [MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, MatFormField, MatInput, TabDirective, GridNavDirective, MatSuffix, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
 })
 export class MovtblComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
@@ -366,6 +367,14 @@ export class MovtblComponent implements OnInit {
     const lcday = day instanceof Date ? this.usrsrv.formatDate(day) : day ? String(day).slice(0, 10) : null;
     this.setTrzaikoFrom(this.getZaikoNew(lcday, this.parentCtl().incode.value, this.parentCtl().outcode.value));
     this.refresh();
+  }
+
+  /** 最後の明細の最後の欄で Enter（No.9）。品番が入っていれば新しい行を足し、その品番の欄へ進む */
+  addLastRow() {
+    const last = this.frmArr.length - 1;
+    if (this.frmArr.enabled && last >= 0 && String(this.frmArr.getRawValue()[last]?.gcode ?? '').trim() !== '') {
+      this.addNewrow(last);
+    }
   }
 
   addNewrow(i: number) {

@@ -28,6 +28,8 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { TabDirective } from '../core/directives/tabidx/tab.directive';
 import { NuminputDirective } from '../core/directives/numinput.directive';
+import { GridNavDirective } from '../core/directives/gridnav.directive';
+import { sijiOf } from '../frmsiji/siji';
 import { rowCtl, objectToArray } from '../core/form-helpers';
 import { DecimalPipe, PercentPipe } from '@angular/common';
 
@@ -63,7 +65,7 @@ type ParentField = 'okurisuu' | 'scode';
     templateUrl: './jmeitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MatToolbar, MatButton, MatFormField, MatLabel, MatSelect, FormsModule, MatOption, MatTooltip, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatIcon, MatInput, TabDirective, MatSuffix, NuminputDirective, MatPrefix, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe, PercentPipe]
+    imports: [MatToolbar, MatButton, MatFormField, MatLabel, MatSelect, FormsModule, MatOption, MatTooltip, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatIcon, MatInput, TabDirective, GridNavDirective, MatSuffix, NuminputDirective, MatPrefix, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe, PercentPipe]
 })
 export class JmeitblComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
@@ -184,7 +186,39 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
     // console.log(this.frmArr, this.parentForm);
   }
+  /** 代引手数料（Z02・Z02-2）の行か */
+  private isDaibiki(gcode: string | null | undefined): boolean {
+    return /^Z02(-2)?$/.test(String(gcode ?? '').trim().toUpperCase());
+  }
+
+  /**
+   * 代引手数料の単価（No.14）。商品代金＋送料（税抜）が 100,000 円未満なら 300 円、以上なら 600 円。
+   * 以前は「個口計算」ボタンのときだけ判定していて、手で Z02 を入れるとマスタの単価（300 円）のままだった
+   */
+  private daibikiTanka(): number {
+    const base = this.frmArr.getRawValue()
+      .filter(r => (r.gkbn == '0' || r.gkbn == '1') && !this.isDaibiki(r.gcode))
+      .reduce((s, r) => s + (Number(r.toutmoney) || 0), 0);
+    return base < 100000 ? 300 : 600;
+  }
+
+  /** 商品・送料の金額が変わったとき、代引手数料の行の単価を合わせる */
+  private fixDaibiki(): void {
+    const tanka = this.daibikiTanka();
+    this.frmArr.controls.forEach((c, k) => {
+      if (this.isDaibiki(c.value.gcode) && Number(c.value.tanka) !== tanka) {
+        this.calcMei(k);
+      }
+    });
+  }
+
   calcMei(i: number): void {
+    if (this.isDaibiki(this.frmArr.controls[i].value.gcode)) {
+      const t = this.daibikiTanka();
+      if (Number(this.frmArr.controls[i].value.tanka) !== t) {
+        this.frmArr.controls[i].patchValue({ tanka: t });
+      }
+    }
     const ctrl = this.frmArr.controls[i].value;
     // 単価・数量が空でも計算できるように 0 とみなす。税率が無い商品（単価未登録など）は 10%、税区分が無ければ顧客の税区分（無ければ外税）
     const tanka = Number(ctrl.tanka) || 0;
@@ -233,6 +267,9 @@ export class JmeitblComponent implements OnInit {
       this.frmArr.controls[i].patchValue({ spec: '0' });
     }
 
+    if (!this.isDaibiki(this.frmArr.controls[i].value.gcode)) {
+      this.fixDaibiki();
+    }
     this.calcTot();
   }
   setAll(chked: boolean) {
@@ -252,7 +289,6 @@ export class JmeitblComponent implements OnInit {
     let kogu: number = 0;
     let mall: number = 0;
     let obi: number = 0;
-    let shohin: number = 0;
     this.frmArr.controls.forEach(control => {
       // console.log('setKoguchi',control.value,control.value.gcode.indexOf('CB'));
       if (!control.value.gcode.indexOf('Z01') || !control.value.gcode.indexOf('Z02') || control.value.gcode == 'MALL') {
@@ -317,19 +353,9 @@ export class JmeitblComponent implements OnInit {
         this.insRows([lcgcd + "\t" + sour[kbn]], false);
       }
 	// 代引き手数料計算	  
-      if (parentForm.value.pcode == '9') {		  
- 	    const arr = this.frmArr.getRawValue();
-		
-		for (let i = 0; i < arr.length; i++) {
-		  if (arr[i]['gkbn'] == '0' || arr[i]['gkbn'] == '1' ) {
-		    shohin += arr[i]['toutmoney'];
-		  }
-	    }
-		if (shohin < 100000){
-		  this.insRows(["Z02" + "\t" + "1"], false);	
-		} else { 
-		  this.insRows(["Z02-2" + "\t" + "1"], false);	
-	    }
+      // 単価（300／600 円）は calcMei で商品＋送料（税抜）から決める。送料の行は後から金額が入るので、そのときにも合わせ直す
+      if (parentForm.value.pcode == '9') {
+        this.insRows([(this.daibikiTanka() < 600 ? "Z02" : "Z02-2") + "\t" + "1"], false);
       }
 	  
       if (mall > 0) {
@@ -900,6 +926,38 @@ export class JmeitblComponent implements OnInit {
       }
     });
     this.refresh();
+  }
+
+  /**
+   * 帯（CB19）と織マーク（Z14）の数（No.10。受注伝票ですぐ分かるように）。
+   * 内訳は刺繍指示書と同じ色・号の表（SIJI_MST）で、色 × 号ごとの本数を出す
+   */
+  obiInfo(): { cb19: number; ori: number; tip: string } {
+    let cb19 = 0;
+    let ori = 0;
+    const by = new Map<string, number>();
+    for (const r of this.frmArr.getRawValue()) {
+      const g = String(r.gcode ?? '').trim().toUpperCase();
+      const n = Number(r.suu) || 0;
+      if (/^CB19/.test(g)) {
+        cb19 += n;
+        const s = sijiOf(g);
+        const key = s ? s.color + ' ' + s.size + '号' : g;
+        by.set(key, (by.get(key) ?? 0) + n);
+      } else if (/^Z14/.test(g)) {
+        ori += n;
+      }
+    }
+    const tip = [...by].map(([k, n]) => k + '：' + n + '本').join('、');
+    return { cb19, ori, tip };
+  }
+
+  /** 最後の明細の最後の欄で Enter（No.9）。品番が入っていれば新しい行を足し、その品番の欄へ進む */
+  addLastRow() {
+    const last = this.frmArr.length - 1;
+    if (this.frmArr.enabled && last >= 0 && String(this.frmArr.getRawValue()[last]?.gcode ?? '').trim() !== '') {
+      this.addNewrow(last);
+    }
   }
 
   addNewrow(i: number) {

@@ -14,7 +14,7 @@
 </div>
 <div class="mat-elevation-z8">
   <ng-container [formGroup]="parentForm()">
-    <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
+    <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements" gridNav (gridNavEnd)="addLastRow()">
       <ng-container matColumnDef="chk">
         <th mat-header-cell *matHeaderCellDef class="i_num">
           @if (frmArr.enabled) {

@@ -20,6 +20,7 @@ import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { TabDirective } from '../core/directives/tabidx/tab.directive';
+import { GridNavDirective } from '../core/directives/gridnav.directive';
 import { NuminputDirective } from '../core/directives/numinput.directive';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { rowCtl, objectToArray } from '../core/form-helpers';
@@ -43,7 +44,7 @@ type ParentField = 'day' | 'mtax';
     templateUrl: './hmeitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatFormField, MatLabel, MatInput, FormsModule, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, TabDirective, NuminputDirective, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
+    imports: [MatFormField, MatLabel, MatInput, FormsModule, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, TabDirective, GridNavDirective, NuminputDirective, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
 })
 export class HmeitblComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
@@ -391,6 +392,14 @@ export class HmeitblComponent implements OnInit {
       i += 1;
     });
     this.refresh();
+  }
+
+  /** 最後の明細の最後の欄で Enter（No.9）。品番が入っていれば新しい行を足し、その品番の欄へ進む */
+  addLastRow() {
+    const last = this.frmArr.length - 1;
+    if (this.frmArr.enabled && last >= 0 && String(this.frmArr.getRawValue()[last]?.gcode ?? '').trim() !== '') {
+      this.addNewrow(last);
+    }
   }
 
   addNewrow(i: number) {

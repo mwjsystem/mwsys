@@ -220,6 +220,29 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     });
 	console.log('納品書タイプ',this.bnssrv.buntype);
   }
+  /** 納品書タイプの番号（No.30。現行と同じく番号で入力できるように、選択欄の横に番号の欄を置く） */
+  buntypeNo(): string {
+    const c = this.form?.value?.buntype;
+    return c == null || c === '' ? '' : String(Number(c));
+  }
+  setBuntypeNo(input: HTMLInputElement) {
+    const v = input.value.trim().replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+    const ctl = this.form.get('buntype')!;
+    if (v === '') {
+      ctl.setValue(null);
+      ctl.markAsDirty();
+      return;
+    }
+    const hit = this.bnssrv.buntype.find(e => Number(e.code) === Number(v));
+    if (hit) {
+      ctl.setValue(hit.code);
+      ctl.markAsDirty();
+    } else {
+      this.usrsrv.toastWar('納品書タイプ ' + v + ' はありません');
+      input.value = this.buntypeNo();
+    }
+  }
+
   selHcd(value: string) {
     const i: number = this.okrsrv.hokuri.findIndex(obj => obj.code == value);
     if (i > -1) {

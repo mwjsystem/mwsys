@@ -220,6 +220,7 @@
         </button>
       }
     </div>
+    <div class="flex items-center gap-1">
     <mat-form-field style="width:12em">
       <mat-label>納品書タイプ</mat-label>
       <mat-select #msel02 tabIndex="5" formControlName="buntype" (keydown.enter)="msel02.close()" [panelClass]="'my-panel-class'">
@@ -231,6 +232,13 @@
         }
       </mat-select>
     </mat-form-field>
+    <!-- 番号の欄（No.30）。選択欄と同じ tabIndex で後ろに置き、前の欄で Enter を押すとこちらに入る（TabDirective は後の要素にフォーカスする） -->
+    <mat-form-field style="width:4.5em" matTooltip="納品書タイプを番号で入力できます" matTooltipClass="ttips">
+      <mat-label>番号</mat-label>
+      <input #bntno matInput tabIndex="5" inputmode="numeric" maxlength="3" class="i_num"
+        [value]="buntypeNo()" (change)="setBuntypeNo(bntno)" (keydown.enter)="setBuntypeNo(bntno)">
+    </mat-form-field>
+    </div>
   </div>
   <div class="grid grid-cols-1 gap-2">
     <div class="flex flex-wrap items-end">

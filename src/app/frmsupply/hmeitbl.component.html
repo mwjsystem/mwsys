@@ -28,7 +28,7 @@
 </div>
 <div class="mat-elevation-z8">
   <ng-container [formGroup]="parentForm()">
-    <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements">
+    <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements" gridNav (gridNavEnd)="addLastRow()">
       <ng-container matColumnDef="chk">
         <th mat-header-cell *matHeaderCellDef class="i_num">
           @if (frmArr.enabled) {
@@ -74,7 +74,7 @@
         <th mat-header-cell *matHeaderCellDef>商品コード</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field>
-            <input #gcdInputs tabIndex="3 + i * 4" matInput formControlName="gcode"
+            <input #gcdInputs [tabIndex]="3 + i * 4" matInput formControlName="gcode"
               (change)="updGds(i,$event.target.value)" maxlength="20" (keydown.f4)="gcdHelp(getIdx(i))">
             @if (frmArr.enabled) {
               <button mat-icon-button matSuffix (click)="gcdHelp(getIdx(i))">
@@ -102,7 +102,7 @@
         <th mat-header-cell *matHeaderCellDef>数量</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:4em;">
-            <input tabIndex="4 + i * 4" type="number" matInput formControlName="suu" class="i_num"
+            <input [tabIndex]="4 + i * 4" type="number" matInput formControlName="suu" class="i_num"
               (change)="calcTot()">
           </mat-form-field>
         </td>
@@ -119,7 +119,7 @@
         <th mat-header-cell *matHeaderCellDef>単価</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field style="width:6em;">
-            <input tabIndex="5 + i * 4" matInput formControlName="genka" numInput class="i_num"
+            <input [tabIndex]="5 + i * 4" matInput formControlName="genka" numInput class="i_num"
               (change)="calcTot()">
           </mat-form-field>
         </td>
@@ -152,7 +152,7 @@
         <th mat-header-cell *matHeaderCellDef>明細備考</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
           <mat-form-field>
-            <input tabIndex="6 + i * 4" matInput formControlName="mmemo"
+            <input [tabIndex]="6 + i * 4" matInput formControlName="mmemo"
               (keydown.control)="addNewrow(getIdx(i))">
           </mat-form-field>
         </td>
