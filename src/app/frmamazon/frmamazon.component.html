@@ -22,7 +22,7 @@
   <p class="msg">{{message}}</p>
 }
 @if (orders.length > 0) {
-  <p class="note">PO {{orders.length | number}} 件・明細 {{lineCount | number}} 行。単価は CSV の仕入価格、数量は受領予定の数量で登録します。
+  <p class="note">PO {{orders.length | number}} 件・明細 {{lineCount | number}} 行。単価は CSV の仕入価格、数量は受領予定の数量で登録します。倉庫は ▶ で明細を開いて選べます（初期値 01）。
     @if (diffOrders > 0) {
       <span class="warnc">仕入価格が代理店単価と違う明細がある PO が {{diffOrders}} 件あります（黄色の行）。</span>
     }

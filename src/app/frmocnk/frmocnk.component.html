@@ -42,7 +42,7 @@
   </details>
 }
 @if (orders.length > 0) {
-  <p class="note">受注 {{orders.length | number}} 件・明細 {{lineCount | number}} 行。会員コードが空の受注は、メールアドレスで顧客を探し、無ければ新規作成します。
+  <p class="note">受注 {{orders.length | number}} 件・明細 {{lineCount | number}} 行。会員コードが空の受注は、メールアドレスで顧客を探し、無ければ新規作成します。倉庫は ▶ で明細を開いて選べます（初期値 01）。
     @if (diffCount > 0) {
       <span class="warnc">明細の合計が CSV の合計金額と合わない受注が {{diffCount}} 件あります（黄色の行）。登録後に受注伝票で明細を確認してください。</span>
     }
