@@ -13,6 +13,7 @@ const routes: Routes = [
   { path: 'frmocnk', loadChildren: () => import('./frmocnk/frmocnk.module').then(m => m.FrmocnkModule), canActivate: [AuthGuard] },
   { path: 'frmamazon', loadChildren: () => import('./frmamazon/frmamazon.module').then(m => m.FrmamazonModule), canActivate: [AuthGuard] },
   { path: 'frmrakuten', loadChildren: () => import('./frmrakuten/frmrakuten.module').then(m => m.FrmrakutenModule), canActivate: [AuthGuard] },
+  { path: 'frmsiji', loadChildren: () => import('./frmsiji/frmsiji.module').then(m => m.FrmsijiModule), canActivate: [AuthGuard] },
   { path: 'frmtaikai', loadChildren: () => import('./frmtaikai/frmtaikai.module').then(m => m.FrmtaikaiModule), canActivate: [AuthGuard] },
   { path: 'frmobi', loadChildren: () => import('./frmobi/frmobi.module').then(m => m.FrmobiModule), canActivate: [AuthGuard] },
   { path: 'frmit', loadChildren: () => import('./frmit/frmit.module').then(m => m.FrmitModule), canActivate: [AuthGuard] },

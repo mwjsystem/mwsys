@@ -1,0 +1,79 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>刺繍指示書</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+@if (error) {
+  <p class="err" style="white-space: pre-line;">{{error}}</p>
+}
+<div class="bar">
+  <label style="font-size: 13px;">受注伝票番号
+    <input class="mc" style="width: 8em;" type="number" [(ngModel)]="denno" (keyup.enter)="load()" [disabled]="busy">
+  </label>
+  <button mat-raised-button color="primary" type="button" (click)="load()" [disabled]="busy || !denno">
+    <mat-icon>search</mat-icon>読込
+  </button>
+  @if (loaded) {
+    <span><app-denlink [denno]="loaded" />　{{customer}} 様　担当 {{staff}}</span>
+  }
+</div>
+<div class="bar">
+  <button mat-raised-button type="button" (click)="xls.click()" [disabled]="busy">
+    <mat-icon>upload_file</mat-icon>指示書の Excel を選ぶ
+  </button>
+  <input #xls type="file" accept=".xlsx" hidden (change)="onTemplate($event)">
+  @if (tmpl) {
+    <span style="font-size: 13px;">{{tmpl.name}}</span>
+    <label style="font-size: 13px;">シート
+      <select [(ngModel)]="sheet" [disabled]="busy">
+        @for (s of tmpl.sheets; track s.path) {
+          <option [value]="s.name">{{s.name}}</option>
+        }
+      </select>
+    </label>
+  }
+  <button mat-raised-button color="accent" type="button" (click)="make()" [disabled]="!canMake">
+    <mat-icon>download</mat-icon>本数をセットしてダウンロード
+  </button>
+</div>
+@if (message) {
+  <p class="msg">{{message}}</p>
+}
+<p class="note">
+  受注伝票の帯の明細（現行の set_siji.xlsm の商品の一覧にある商品コード）を色 × 号に集計し、指示書の Excel（帯刺繍指示書.xlsx）の選んだシートの表・合計・担当者・受注先・伝票番号に入れてダウンロードします。
+  ダウンロードした Excel は選んだシートだけが表示されます（ほかのシートは非表示）。CB19-n-KS は赤と青に 1 本ずつ数えます。
+</p>
+@if (loaded) {
+  <div style="display: flex; flex-wrap: wrap; gap: 16px; margin: 6px 12px; align-items: flex-start;">
+    <div>
+      <div style="font-size: 12px; margin-bottom: 4px;">
+        <a href="javascript:void(0)" (click)="setAll(true)">全選択</a>　<a href="javascript:void(0)" (click)="setAll(false)">全解除</a>
+      </div>
+      <table class="rep">
+        <thead><tr><th></th><th>行</th><th>商品コード</th><th>数量</th><th>色・号</th><th>明細備考</th></tr></thead>
+        <tbody>
+          @for (l of lines; track l.line) {
+            <tr [style.color]="l.target ? '' : '#999999'">
+              <td><input type="checkbox" [(ngModel)]="l.chk" [disabled]="!l.target || busy"></td>
+              <td class="num">{{l.line}}</td><td>{{l.gcode}}</td><td class="num">{{l.suu | number}}</td>
+              <td>{{l.target ? colorOf(l) : '対象外'}}</td><td>{{l.mmemo}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div style="font-size: 12px; margin-bottom: 4px;">指示書に入る本数（合計 {{total}} 本）</div>
+      <table class="rep">
+        <thead><tr><th>色</th>@for (s of sizes; track s) {<th>{{s}}号</th>}</tr></thead>
+        <tbody>
+          @for (r of countRows; track r[0]) {
+            <tr>
+              <td style="white-space: pre-line;">{{r[0]}}</td>
+              @for (s of sizes; track s) {<td class="num">{{r[1][sizeIdx(s)] || ''}}</td>}
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
