@@ -62,6 +62,13 @@
   // Material の既定（高さ 65vh まで）をやめ、ダイアログの残りの高さいっぱいを使う
   max-height: none;
   overflow: auto;
+  // 見出しの行（sticky）はスクロール領域の上の余白の分だけ下で止まり、その隙間に明細の行が見えてしまうので、上の余白を無くす
+  padding-top: 0 !important;
+}
+
+// 件数の行も、スクロールしたときに見出しの行の上に残らないよう余白を詰める
+.jdh-summary {
+  padding-top: 0.5rem;
 }
 
 .jdh-summary {
