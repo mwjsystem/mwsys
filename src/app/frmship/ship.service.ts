@@ -615,6 +615,170 @@ export class ShipService {
   }
 
   /**
+   * 移動伝票の出荷指示フォルダを NAS に作る（現行の伝票一括処理.xlsm の移動伝票と同じ）。
+   * 保存先は受注伝票と同じ {移動日}出荷分/{担当者}担当分/{伝票番号}_{送り先}様/ に、出荷指示書（s_{伝票番号}.pdf）と送り状 CSV。
+   *  - 送り先は移動伝票の送り先（大会倉庫など。入っていれば）、無ければ入庫倉庫の倉庫マスタの住所
+   *  - 納品書は作らない。佐川（PCCS）・iSⅡ の CSV は「_ido」を付けた名前にする（倉庫の印刷で自動で出ないように。現行と同じ）
+   *  - 送り状番号を採番する配送で未採番なら採番して移動伝票に書く
+   * ボタンを押した処理の中で呼ぶこと（最初に NAS への書き込みの許可を求めるため）
+   */
+  async saveMoveToNas(denno: number): Promise<ShipSave> {
+    const root = await this.nassrv.open(NAS_SHIP);
+    const notes: string[] = [];
+    const csvDir = await this.openLocal(LOCAL_OKURICSV, notes);
+    if (this.okrsrv.hokuri.length == 0) {
+      this.okrsrv.getHokuri();
+    }
+    if (this.okrsrv.haisou.length == 0) {
+      this.okrsrv.getHaisou();
+    }
+    const id = this.usrsrv.compid;
+    const Get = gql`
+      query get_shipmove($id: smallint!, $dno: Int!) {
+        trmovsub_by_pk(id: $id, denno: $dno) {
+          denno day incode outcode tcode hcode hday htime okurino okurisuu dmemo omemo smemo szip sadr sname stel
+          trmovdens(order_by: {line: asc}) { line gcode suu memo msgood { gtext unit tanano jan } }
+        }
+        msstaff(where: {id: {_eq: $id}}) { code sei mei }
+        mshokuri(where: {id: {_eq: $id}}) { code name }
+        mssystem(where: {id: {_eq: $id}}) { kname invno zip adr tel fax }
+        msstore(where: {id: {_eq: $id}}) { code name subname zip region local street extend tel }
+      }`;
+    type MoveQ = {
+      trmovsub_by_pk: {
+        denno: number; day: string | null; incode: string; outcode: string; tcode: string | null; hcode: string | null;
+        hday: string | null; htime: string | number | null; okurino: string | number | null; okurisuu: number | null;
+        dmemo: string | null; omemo: string | null; smemo: string | null;
+        szip: string | null; sadr: string | null; sname: string | null; stel: string | null;
+        trmovdens: { line: number; gcode: string; suu: number; memo: string | null; msgood: { gtext: string | null; unit: string | null; tanano: string | null; jan: string | null } | null }[];
+      } | null;
+      msstaff: { code: string; sei: string; mei: string | null }[];
+      mshokuri: { code: string; name: string }[];
+      mssystem: ShipSystem[];
+      msstore: { code: string; name: string | null; subname: string | null; zip: string | null; region: string | null; local: string | null; street: string | null; extend: string | null; tel: string | null }[];
+    };
+    const res = await firstValueFrom(this.apollo.query<MoveQ>({ query: Get, fetchPolicy: 'network-only', variables: { id, dno: denno } }));
+    if (res.error || !res.data) {
+      throw new Error('移動伝票を読めませんでした：' + (res.error?.message ?? ''));
+    }
+    const q = res.data;
+    const m = q.trmovsub_by_pk;
+    if (!m) {
+      throw new Error('移動伝票 ' + denno + ' がありません');
+    }
+    if (!m.day) {
+      throw new Error('移動日が未入力です');
+    }
+    const hcode = (m.hcode ?? '').trim();
+    if (!hcode) {
+      throw new Error('配送方法が未入力です');
+    }
+    const staff = q.msstaff.find(e => e.code == m.tcode);
+    if (!staff?.sei) {
+      throw new Error('担当者が未設定です');
+    }
+    const store = (code: string) => q.msstore.find(e => e.code == code);
+    const sin = store(m.incode);
+    const sout = store(m.outcode);
+    // 送り先: 移動伝票の送り先があればそれ、無ければ入庫倉庫の住所
+    const own = !!(m.sadr ?? '').trim();
+    const toAdr: ShipAdr = own
+      ? { mcode: '', eda: 0, zip: m.szip, region: null, local: null, street: m.sadr, extend: null, extend2: null, adrname: m.sname, tel: m.stel }
+      : { mcode: '', eda: 0, zip: sin?.zip ?? null, region: sin?.region ?? null, local: sin?.local ?? null, street: sin?.street ?? null,
+        extend: sin?.extend ?? null, extend2: null, adrname: sin?.name ?? null, tel: sin?.tel ?? null };
+    const toName = (own ? m.sname : sin?.name) || sin?.subname || m.incode;
+    if (!toAdr.street && !toAdr.local) {
+      throw new Error('送り先の住所がありません（移動伝票の送り先か、倉庫マスタの入庫倉庫 ' + m.incode + ' の住所を入れてください）');
+    }
+    const d: ShipDoc = {
+      denno: m.denno, mcode: '', ncode: '', betsuno: true,
+      orderer: { name: sout?.name ?? m.outcode },
+      nsaki: { name: toName, adr: toAdr },
+      sday: m.day, yday: m.day, uday: null,
+      okurino: m.okurino == null ? null : String(m.okurino), okurisuu: m.okurisuu,
+      hcode, hname: q.mshokuri.find(e => e.code == hcode)?.name ?? '',
+      staffName: staff.sei + (staff.mei ? '　' + staff.mei : ''), payName: '', keep: '',
+      dmemo: ['移動伝票（' + (sout?.subname ?? m.outcode) + ' → ' + (sin?.subname ?? m.incode) + '）', m.dmemo ?? ''].filter(e => e).join(' '),
+      nmemo: m.smemo ?? '',
+      total: 0, taxtotal: 0, zeinuki: 0, total8: 0, total10: 0,
+      lines: m.trmovdens.map(l => ({
+        line: l.line, gcode: l.gcode, gtext: l.msgood?.gtext ?? '', suu: Number(l.suu ?? 0), touttanka: 0, toutmoney: 0,
+        taxrate: null, mmemo: l.memo, unit: l.msgood?.unit ?? null, tanano: l.msgood?.tanano ?? null, jan: l.msgood?.jan ?? null,
+        scode: m.outcode
+      })),
+      system: q.mssystem[0] ?? { kname: null, invno: null, zip: null, adr: null, tel: null, fax: null },
+      okuri: { hday: m.hday, htime: m.htime == null ? null : String(m.htime), omemo: m.omemo, daibiki: null, daibzei: null, eidome: null, eicode: null }
+    };
+    // 送り状番号を採番する配送（佐川など）で未採番なら、ここで採番して移動伝票に書く
+    if (!d.okurino && this.okrsrv.getHinfo(hcode).numbering) {
+      d.okurino = await this.okrsrv.nextOkurino(hcode, null, denno);
+      const Upd = gql`
+        mutation upd_moveokuri($id: smallint!, $dno: Int!, $set: trmovsub_set_input!) {
+          update_trmovsub(where: {id: {_eq: $id}, denno: {_eq: $dno}}, _set: $set) { affected_rows }
+        }`;
+      const u = await firstValueFrom(this.apollo.mutate({ mutation: Upd, variables: { id, dno: denno, set: { okurino: d.okurino } } }));
+      if (u.error) {
+        throw new Error('送り状番号を保存できませんでした：' + u.error.message);
+      }
+    }
+    const r: ShipResult = { denno, dir: '', sasikae: false, error: '' };
+    const parentPath = m.day.replace(/-/g, '') + '出荷分/' + staff.sei + '担当分';
+    const parent = await this.nassrv.folder(root, parentPath);
+    const base = denno + '_' + this.nassrv.safeName(condense(toName + '様'));
+    const exists = (await this.nassrv.names(parent, 'directory')).filter(e => e.startsWith(denno + '_'));
+    let name = base;
+    if (exists.length > 0) {
+      // 倉庫で出力済（【済）なら差し替えの別フォルダ、それ以外は同じフォルダに上書き
+      if (exists.some(e => e.includes('【済'))) {
+        const now = new Date();
+        name = base + pad2(now.getMonth() + 1) + pad2(now.getDate()) + pad2(now.getHours()) + pad2(now.getMinutes()) + pad2(now.getSeconds()) + '_差替分';
+        r.sasikae = true;
+      } else {
+        name = exists[exists.length - 1];
+      }
+    }
+    const dir = await this.nassrv.folder(parent, name);
+    const moveCsv = (kind: CsvKind) => folderCsvName(kind, denno).replace(/(pccs|iS2)\.csv$/, '$1_ido.csv');
+    if (!r.sasikae) {
+      for (const old of ['s_' + denno + '.pdf', 'zmemo.txt', ...CSV_KINDS.map(k => moveCsv(k))]) {
+        await this.nassrv.remove(dir, old);
+      }
+    }
+    await this.nassrv.write(dir, 's_' + denno + '.pdf', await this.spdfsrv.shiji(d, undefined));
+    const memo: string[] = ['移動伝票（' + (sout?.subname ?? m.outcode) + ' → ' + (sin?.subname ?? m.incode) + '）'];
+    const masters = await this.csvMasters();
+    const hk = masters.hokuri.find(e => e.code == hcode);
+    const kind = csvKind(hk);
+    if (hk && kind) {
+      const imp = (hk.csvimp ?? '').trim();
+      if (imp == CSVIMP_FOLDER || imp == CSVIMP_HONSHA) {
+        const line = csvLine(kind, this.csvDoc(d), hk, masters.hktime, this.usrsrv.formatDate(new Date()));
+        if (isOfficeCsv(kind)) {
+          r.csv = { kind, sday: d.sday, line };
+        } else if (imp == CSVIMP_FOLDER) {
+          await this.nassrv.write(dir, moveCsv(kind), await this.sjis(line + '\r\n'));
+        }
+      }
+      if (kind == 'CLOUD') {
+        memo.push('Biz-Logi Cloud！！');
+      }
+    } else if ((hk?.htype ?? '').trim() == '複写式') {
+      memo.push(d.hname + '！！');
+    }
+    await this.nassrv.write(dir, 'zmemo.txt', await this.sjis(memo.join('\r\n') + '\r\n'));
+    r.dir = parentPath + '/' + name;
+    const Done = gql`
+      mutation upd_moveship($id: smallint!, $dno: Int!, $set: trmovsub_set_input!) {
+        update_trmovsub(where: {id: {_eq: $id}, denno: {_eq: $dno}}, _set: $set) { affected_rows }
+      }`;
+    await firstValueFrom(this.apollo.mutate({
+      mutation: Done, variables: { id, dno: denno, set: { shipdir: r.dir, ship_at: new Date(), ship_by: this.usrsrv.staff.code } }
+    }));
+    const csv = await this.saveOfficeCsv([r], csvDir, notes);
+    return { results: [r], notes, ...csv };
+  }
+
+  /**
    * e飛伝Ⅱ・CLOUD の送り状 CSV（保存できた伝票の分）。出荷日・種類ごとに 1 ファイル（{yyyymmdd}hiden.csv・{yyyymmdd}CLOUD.csv）。
    * この PC の送り状CSVフォルダがあれば、そのファイルに追記する（同じ伝票の前の行は入れ替える）。無ければダウンロード用に返す
    */

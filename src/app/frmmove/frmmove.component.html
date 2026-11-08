@@ -9,6 +9,9 @@
       <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)">
         <mat-icon>edit</mat-icon>編集
       </button>
+      <button mat-flat-button (click)="shipMove()" [disabled]="shipBusy || !form.value.hcode" [color]="usrsrv.getColor(mode)">
+        <mat-icon matTooltip="この移動伝票の出荷指示フォルダ（出荷指示書・送り状 CSV）を NAS に作成します。配送方法を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
+      </button>
     }
     @if (mode!=3) {
       <button mat-flat-button (click)="save()" [disabled]="form.invalid"
@@ -149,6 +152,24 @@
               <mat-icon>calculate</mat-icon>
             </button>
           }
+        </mat-form-field>
+      </div>
+      <div class="flex flex-row flex-wrap" matTooltip="出荷指示の送り先。空なら入庫倉庫の倉庫マスタの住所に送ります（大会倉庫は大会リストの登録で会場の住所が入ります）" matTooltipClass="ttips">
+        <mat-form-field style="width: 7em;">
+          <mat-label>送り先〒</mat-label>
+          <input matInput formControlName="szip" maxlength="8">
+        </mat-form-field>
+        <mat-form-field style="width: 26em;">
+          <mat-label>送り先住所（空なら入庫倉庫の住所）</mat-label>
+          <input matInput formControlName="sadr" maxlength="100">
+        </mat-form-field>
+        <mat-form-field style="width: 14em;">
+          <mat-label>送り先宛名</mat-label>
+          <input matInput formControlName="sname" maxlength="60">
+        </mat-form-field>
+        <mat-form-field style="width: 9em;">
+          <mat-label>送り先電話</mat-label>
+          <input matInput formControlName="stel" maxlength="20">
         </mat-form-field>
       </div>
       <div class="flex flex-row flex-wrap" style="gap: 5px;">

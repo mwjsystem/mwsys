@@ -157,7 +157,12 @@ export class TaikaiService {
     const sub = {
       id, denno, day, incode, outcode, tcode: by, hcode: kind == '出荷' ? hcode : null, hday: kind == '出荷' ? t.arriveDay : null,
       htime: null, dmemo: this.memo(t, kind),
-      omemo: nz(kind == '出荷' ? [t.venue, t.atena, t.okuriMemo].filter(e => e).join(' ') : null),
+      omemo: nz(kind == '出荷' ? t.okuriMemo : null),
+      // 出荷指示の送り先（会場）。戻りは空（入庫倉庫＝朝来倉庫の住所）
+      szip: kind == '出荷' ? nz(t.zip) : null,
+      sadr: kind == '出荷' ? nz(t.addr) : null,
+      sname: kind == '出荷' ? nz([t.venue, t.atena].filter(e => e).join(' ')) : null,
+      stel: kind == '出荷' ? nz(t.tel) : null,
       smemo: nz(kind == '出荷' ? ['営業担当:' + t.tantoName, '出荷日:' + (t.shipDay ?? ''), t.arriveTime ? '到着:' + t.arriveTime : ''].filter(e => e).join(' ') : null),
       created_at: now, created_by: by, updated_at: now, updated_by: by
     };

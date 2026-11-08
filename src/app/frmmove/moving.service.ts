@@ -56,6 +56,11 @@ export class Movsub {
   dmemo!: string;
   omemo!: string;
   smemo!: string;
+  /** 出荷指示の送り先（〒・住所・宛名・電話）。空なら入庫倉庫の住所 */
+  szip!: string;
+  sadr!: string;
+  sname!: string;
+  stel!: string;
   hday!: Date;
   htime!: string;
   hcode!: string;
@@ -77,6 +82,10 @@ export type MovsubSet = Pick<Movsub, 'outcode' | 'incode' | 'tcode' | 'hcode' | 
   hday: string | null;
   dmemo: string;
   smemo: string;
+  szip: string;
+  sadr: string;
+  sname: string;
+  stel: string;
   updated_at: Date;
   updated_by: string;
 };
@@ -115,6 +124,10 @@ export class MovingService {
         dmemo
         omemo
         smemo
+        szip
+        sadr
+        sname
+        stel
         hday
         htime
         hcode

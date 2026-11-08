@@ -12,6 +12,7 @@ import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
 import { OkuriService } from './../services/okuri.service';
+import { ShipService } from './../frmship/ship.service';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { MdnohelpComponent } from './../share/mdnohelp/mdnohelp.component';
 import { MovtblComponent } from './movtbl.component';
@@ -31,7 +32,7 @@ import { JdatePipe } from '../core/pipes/jdate.pipe';
 import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
 
 /** 移動入力フォーム の項目名（明細の mtbl は除く） */
-type MoveField = 'day' | 'incode' | 'outcode' | 'tcode' | 'hcode' | 'hday' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'smemo' | 'omemo';
+type MoveField = 'day' | 'incode' | 'outcode' | 'tcode' | 'hcode' | 'hday' | 'htime' | 'okurisuu' | 'okurino' | 'dmemo' | 'smemo' | 'omemo' | 'szip' | 'sadr' | 'sname' | 'stel';
 
 @Component({
     selector: 'app-frmmove',
@@ -56,6 +57,9 @@ export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private title = inject(Title);
+
+  private shipsrv = inject(ShipService);
+  shipBusy = false;
 
   readonly movtbl = viewChild.required(MovtblComponent);
   form!: FormGroup;
@@ -93,6 +97,10 @@ export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
       dmemo: new FormControl(),
       smemo: new FormControl(),
       omemo: new FormControl(),
+      szip: new FormControl(),
+      sadr: new FormControl(),
+      sname: new FormControl(),
+      stel: new FormControl(),
       mtbl: this.rows
     });
     this.okrsrv.getHaisou();
@@ -235,6 +243,40 @@ export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
     this.cdRef.detectChanges();
   }
 
+  /**
+   * 出荷指示: この移動伝票の出荷指示フォルダ（出荷指示書・送り状 CSV）を NAS に作る（受注伝票の出荷指示と同じ保存先）。
+   * e飛伝Ⅱ・CLOUD の送り状 CSV は、この PC の送り状CSVフォルダ（無ければダウンロード）
+   */
+  async shipMove() {
+    if (!this.denno) {
+      return;
+    }
+    this.shipBusy = true;
+    this.cdRef.detectChanges();
+    try {
+      const s = await this.shipsrv.saveMoveToNas(this.denno);
+      const r = s.results[0];
+      if (r.error) {
+        throw new Error(r.error);
+      }
+      for (const f of s.downloads) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(f.blob);
+        a.download = f.name;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+      this.usrsrv.toastSuc('出荷指示フォルダを作成しました（' + r.dir + (r.sasikae ? '・差替分' : '') + '）' +
+        [...s.csvSaved.map(e => ' 送り状CSV：' + e), ...s.notes.map(e => ' ' + e)].join(''));
+      this.getMovden(this.denno);
+    } catch (e) {
+      this.usrsrv.toastErr('出荷指示フォルダを作成できませんでした', (e as Error).message);
+      console.log('error shipMove', e);
+    }
+    this.shipBusy = false;
+    this.cdRef.detectChanges();
+  }
+
   async save() {
     let movsub: MovsubSet = {
       day: this.usrsrv.editFrmday(this.form, 'day'),
@@ -249,6 +291,10 @@ export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
       dmemo: this.usrsrv.editFrmval(this.form, 'dmemo'),
       omemo: this.usrsrv.editFrmval(this.form, 'omemo'),
       smemo: this.usrsrv.editFrmval(this.form, 'smemo'),
+      szip: this.usrsrv.editFrmval(this.form, 'szip'),
+      sadr: this.usrsrv.editFrmval(this.form, 'sadr'),
+      sname: this.usrsrv.editFrmval(this.form, 'sname'),
+      stel: this.usrsrv.editFrmval(this.form, 'stel'),
       updated_at: new Date(),
       updated_by: this.usrsrv.staff?.code,
     }
