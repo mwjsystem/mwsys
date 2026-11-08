@@ -1,4 +1,6 @@
 // 売上報告
+// 受注伝票などを開いたあとに効く「mat-toolbar { position: fixed }」（app.component.scss）で、ボタンの行が隠れないようにする
+.toolbar { position: relative; z-index: auto; }
 .bar {
   display: flex;
   flex-wrap: wrap;

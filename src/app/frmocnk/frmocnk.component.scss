@@ -1,4 +1,8 @@
-// おちゃのこ受注取込
+// おちゃのこ受注取込（Amazon・楽天・TKD 請求の取込でも使う）
+// 受注伝票などは app.component.scss を ViewEncapsulation.None で読み込むため、一度その画面を開くと
+// 「mat-toolbar { position: fixed }」がアプリ全体に効き、この画面のボタンの行がツールバーの下に隠れる。
+// この画面のツールバーは常に通常の配置にする
+.toolbar { position: relative; z-index: auto; }
 .env { margin-left: 16px; font-size: 13px; }
 .bar {
   display: flex;
