@@ -91,11 +91,22 @@ export const OBI_KINDS: ObiKind[] = [
 /** 黒帯の品番（見出しの文字で判定。無ければ BBY1） */
 export const BLACK_KINDS = ['BBY1', 'BBY2', 'BB'];
 
-/** 行名の先頭の文字 → 色のコード（現行マクロの対応表を合わせたもの） */
+/**
+ * 行名の先頭 → 色のコード（現行マクロの対応表を合わせたもの）。
+ * カタカナの色名（オレンジ・ブルー …）は「ブ」で始まる色が 3 つあるので、名前全体で先に見る。半角カナ（ｵﾚﾝｼﾞ）は全角にしてから比べる
+ */
 const COLORS: [string, string][] = [
+  ['オレンジ', 'OR'], ['ブルー', 'BU'], ['イエロー', 'YL'], ['グリーン', 'GR'], ['ブラウン', 'BR'], ['パープル', 'PU'],
+  ['レッド', 'RD'], ['アクア', 'AQ'], ['ネイビー', 'NV'], ['ブラック', 'BK'], ['ホワイト', 'WH'],
   ['橙', 'OR'], ['オ', 'OR'], ['青', 'BU'], ['黄', 'YL'], ['緑', 'GR'], ['茶', 'BR'], ['紫', 'PU'],
   ['水', 'AQ'], ['紺', 'NV'], ['赤', 'RD'], ['黒', 'BK'], ['白', 'WH']
 ];
+
+/** 行名の色のコード（無ければ undefined） */
+function colorOf(label: string): string | undefined {
+  const l = label.normalize('NFKC');
+  return COLORS.find(([ch]) => l.startsWith(ch))?.[1];
+}
 
 export interface ObiLine {
   gcode: string;
@@ -255,7 +266,7 @@ export function parseObiSheet(rows: string[][], fileName: string, sheet: string,
     const labelOf = (row: string[]) => (row[firstCol - 1] || row[0] || '').trim();
     // 合計の行・「黒帯合計」などの見出しは色の行と間違えないよう除く
     const next = rows.slice(hr + 1, hr + 16).map(r => clean(labelOf(r))).filter(l => !/合計|本数|モール数|黒帯/.test(l));
-    const isColor = next.some(l => COLORS.some(([ch]) => l.startsWith(ch)));
+    const isColor = next.some(l => colorOf(l) != null);
     const isBlack = next.some(l => goldOf(l) != null);
     if (!isColor && !isBlack) {
       continue; // 空手着の号の表など
@@ -273,7 +284,7 @@ export function parseObiSheet(rows: string[][], fileName: string, sheet: string,
       }
       const cells = [...sizes.entries()].map(([j, n]) => ({ n, qty: toNum(rows[r][j] ?? '') })).filter(e => e.qty != 0);
       const gold = goldOf(lab);
-      const color = COLORS.find(([ch]) => lab.startsWith(ch))?.[1];
+      const color = colorOf(lab);
       if (isBlack && gold == null && !color && lab && cells.length == 0) {
         continue;
       }
@@ -410,7 +421,7 @@ function parseNameList(rows: string[][], order: ObiOrder, unknown: string[]): nu
       continue;
     }
     if (cColor >= 0) {
-      const color = COLORS.find(([ch]) => clean(row[cColor] ?? '').startsWith(ch))?.[1];
+      const color = colorOf(clean(row[cColor] ?? ''));
       if (!color) {
         unknown.push(label + '（帯色 ' + (row[cColor] ?? '') + '）');
         continue;
