@@ -74,14 +74,22 @@
               <td colspan="17">
                 <table class="mei">
                   <thead>
-                    <tr><th>行</th><th>商品コード</th><th>商品名</th><th>数量</th><th>単価</th><th>金額</th><th>税区分</th><th>明細備考</th></tr>
+                    <tr><th>行</th><th>商品コード</th><th>商品名</th><th>数量</th><th>単価</th><th>金額</th><th>税区分</th><th>倉庫</th><th>明細備考</th></tr>
                   </thead>
                   <tbody>
                     @for (l of o.lines; track l.line) {
                       <tr>
                         <td class="num">{{l.line}}</td><td>{{l.gcode}}</td><td>{{l.gtext}}</td>
                         <td class="num">{{l.suu | number:'1.0-2'}}</td><td class="num">{{l.tanka | number:'1.0-2'}}</td>
-                        <td class="num">{{l.money | number:'1.0-2'}}</td><td>{{l.mtax}}</td><td>{{l.memo}}</td>
+                        <td class="num">{{l.money | number:'1.0-2'}}</td><td>{{l.mtax}}</td>
+                        <td>
+                          <select [(ngModel)]="l.scode" [disabled]="busy || !!o.denno">
+                            @for (s of strsrv.scds; track s.value) {
+                              <option [value]="s.value">{{s.viewval}}</option>
+                            }
+                          </select>
+                        </td>
+                        <td>{{l.memo}}</td>
                       </tr>
                     }
                   </tbody>

@@ -23,7 +23,11 @@ export interface OcnkConf {
   narrow: (s: string) => string;
 }
 
-export interface OcnkLine { line: number; gcode: string; gtext: string; suu: number; tanka: number; money: number; mtax: string; memo: string }
+/** 出荷倉庫の初期値 */
+export const OCNK_DEFAULT_SCODE = '01';
+
+/** scode：出荷倉庫（画面で明細ごとに選ぶ。初期値 01） */
+export interface OcnkLine { line: number; gcode: string; gtext: string; suu: number; tanka: number; money: number; mtax: string; memo: string; scode: string }
 
 export interface OcnkOrder {
   cusden: string; kbn: string; webid: string; mcode: string; kake: boolean;
@@ -205,7 +209,7 @@ export function parseOrders(rows: string[][], c: OcnkConf): OcnkParsed {
   };
 
   const addLine = (o: OcnkOrder, gcode: string, tanka: number, suu: number, mtax: string, memo: string, gtext = '') => {
-    o.lines.push({ line: o.lines.length + 1, gcode, gtext, suu, tanka, money: tanka * suu, mtax, memo });
+    o.lines.push({ line: o.lines.length + 1, gcode, gtext, suu, tanka, money: tanka * suu, mtax, memo, scode: OCNK_DEFAULT_SCODE });
   };
 
   /** 「[刺繍位置がＡの場合　書体]」形式（位置Ａ～Ｅ別）の刺繍（Add_Sishu_Lines） */

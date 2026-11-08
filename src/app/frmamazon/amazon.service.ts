@@ -156,17 +156,26 @@ export class AmazonService {
         total10 += money + tax;
       }
       return {
-        id, denno, line: i + 1, scode: AMZ_SCODE, gcode: l.gcode, gtext: nz(l.gtext), suu: l.qty, tanka: l.price, money,
+        id, denno, line: i + 1, scode: l.scode || AMZ_SCODE, gcode: l.gcode, gtext: nz(l.gtext), suu: l.qty, tanka: l.price, money,
         toutmoney: money, tinmoney: money + tax, taxmoney: tax, taxrate: String(l.taxrate), mtax: AMZ_MTAX,
         genka: l.genka, tgenka: l.genka * l.qty, tanka1: l.tanka3, mmemo: i == 0 ? 'PO:' + o.po : null,
         gskbn: st.gsk.get(l.gcode), del: false
       };
     });
-    const { mzai, zinit, zinc } = this.stksrv.rows(st, denno, AMZ_SCODE, today, mei);
+    // 倉庫は明細ごと（倉庫ごとに在庫の行を作る）
+    const mzai: object[] = [];
+    const zinit: object[] = [];
+    const zinc: object[] = [];
+    for (const sc of [...new Set(mei.map(m => m.scode))]) {
+      const r = this.stksrv.rows(st, denno, sc, today, mei.filter(m => m.scode == sc));
+      mzai.push(...r.mzai);
+      zinit.push(...r.zinit);
+      zinc.push(...r.zinc);
+    }
 
     const window = o.from ? '着荷ウィンドウ ' + o.from.replace(/-/g, '/') + (o.to && o.to != o.from ? '～' + o.to.replace(/-/g, '/') : '') : '';
     const jyuden = {
-      id, denno, day: today, hday: o.from, mcode: AMAZON_MCODE, scde: AMAZON_MCODE, ncode: AMAZON_MCODE, nadr: o.nadr, scode: AMZ_SCODE,
+      id, denno, day: today, hday: o.from, mcode: AMAZON_MCODE, scde: AMAZON_MCODE, ncode: AMAZON_MCODE, nadr: o.nadr, scode: mei[0]?.scode ?? AMZ_SCODE,
       tcode: nz(m.tcode), tcode1: nz(m.tcode1), daibunrui: nz(m.daibunrui), chubunrui: nz(m.chubunrui),
       jcode: AMZ_JCODE, pcode: nz(m.pcode), bcode: AMZ_BCODE, bkcode: AMZ_BCODE, cusden: o.po,
       skbn: SKBN_URIAGE, yday: this.defsrv.yday(), hcode: AMZ_HCODE, buntype,

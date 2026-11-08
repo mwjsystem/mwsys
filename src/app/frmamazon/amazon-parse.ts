@@ -3,6 +3,9 @@
  * 現行の「amazon受注テキスト変換.xlsm」の置き換え。列は見出しの名前で探す。
  */
 
+/** 出荷倉庫の初期値 */
+export const AMZ_DEFAULT_SCODE = '01';
+
 export interface AmzLine {
   jan: string;
   model: string;
@@ -22,6 +25,8 @@ export interface AmzLine {
   tanka3: number | null;
   taxrate: number;
   genka: number;
+  /** 出荷倉庫（画面で明細ごとに選ぶ。初期値 01） */
+  scode: string;
 }
 
 export interface AmzOrder {
@@ -96,7 +101,7 @@ export function parseAmazon(rows: string[][]): AmzOrder[] {
     }
     o.lines.push({
       jan: v('jan'), model: v('model'), asin: v('asin'), name: v('name'), irai: num(v('irai')), qty, price: num(v('price')),
-      gcode: '', gtext: '', tanka3: null, taxrate: 10, genka: 0
+      gcode: '', gtext: '', tanka3: null, taxrate: 10, genka: 0, scode: AMZ_DEFAULT_SCODE
     });
   }
   return orders;

@@ -4,6 +4,7 @@ import { Title } from '@angular/platform-browser';
 import * as FileSaver from 'file-saver';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
+import { StoreService } from './../services/store.service';
 import { OcnkMaster, OcnkService } from './ocnk.service';
 import { OcnkDojo, OcnkOrder, parseCsv, parseOrders } from './ocnk-parse';
 import { fillOcnkBook } from './ocnk-excel';
@@ -34,6 +35,7 @@ export class FrmocnkComponent implements OnInit {
   private srv = inject(OcnkService);
   private usrsrv = inject(UserService);
   stfsrv = inject(StaffService);
+  strsrv = inject(StoreService);
   private title = inject(Title);
   private cdRef = inject(ChangeDetectorRef);
 
@@ -58,6 +60,7 @@ export class FrmocnkComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.strsrv.getStore();
     try {
       this.master = await this.srv.master();
     } catch (e) {

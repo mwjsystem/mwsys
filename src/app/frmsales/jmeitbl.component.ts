@@ -199,7 +199,8 @@ export class JmeitblComponent implements OnInit {
         lctinmoney = lcmoney + lctaxmoney;
         break;
       case '1':
-        lctaxmoney = Math.floor(ctrl.tanka * (1 + lctaxrate)) * ctrl.suu;
+        // 内税：税込金額に含まれる消費税（金額 × 税率 ÷ (1 + 税率)。取込と同じく切り上げ）
+        lctaxmoney = Math.sign(lcmoney) * Math.ceil(Math.round(Math.abs(lcmoney) * lctaxrate * 100) / Math.round((1 + lctaxrate) * 100));
         lctoutmoney = lcmoney - lctaxmoney;
         lctinmoney = lcmoney;
         break;

@@ -1,6 +1,8 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { UserService } from './../services/user.service';
+import { StoreService } from './../services/store.service';
 import { parseCsv } from './../frmocnk/ocnk-parse';
 import { AmazonService } from './amazon.service';
 import { AmzLine, AmzOrder, lineMoney, parseAmazon } from './amazon-parse';
@@ -19,11 +21,12 @@ import { DenlinkComponent } from './../share/denlink/denlink.component';
   templateUrl: './frmamazon.component.html',
   styleUrls: ['./../frmocnk/frmocnk.component.scss'],
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MatToolbar, MatButton, MatIcon, DecimalPipe, DenlinkComponent]
+  imports: [MatToolbar, MatButton, MatIcon, FormsModule, DecimalPipe, DenlinkComponent]
 })
-export class FrmamazonComponent {
+export class FrmamazonComponent implements OnInit {
   private srv = inject(AmazonService);
   private usrsrv = inject(UserService);
+  strsrv = inject(StoreService);
   private title = inject(Title);
   private cdRef = inject(ChangeDetectorRef);
 
@@ -38,6 +41,10 @@ export class FrmamazonComponent {
 
   constructor() {
     this.title.setTitle('Amazon受注取込(MWSystem)');
+  }
+
+  ngOnInit() {
+    this.strsrv.getStore();
   }
 
   get envName(): string {

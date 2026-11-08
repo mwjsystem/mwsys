@@ -191,17 +191,26 @@ export class OcnkService {
 
     // 6. 明細・明細在庫・在庫（在庫は行が無ければ作成 → 受注数(jyut)を加算）
     const mei = o.lines.map((l, i) => ({
-      id, denno, line: i + 1, scode: WEB_SCODE, gcode: l.gcode, gtext: nz(l.gtext), suu: Math.round(l.suu), tanka: l.tanka, money: l.money,
+      id, denno, line: i + 1, scode: l.scode || WEB_SCODE, gcode: l.gcode, gtext: nz(l.gtext), suu: Math.round(l.suu), tanka: l.tanka, money: l.money,
       mtax: nz(l.mtax), mmemo: nz(l.memo), gskbn: st.gsk.get(l.gcode), del: false
     }));
-    const { mzai, zinit, zinc } = this.stksrv.rows(st, denno, WEB_SCODE, o.day, mei);
+    // 倉庫は明細ごと（倉庫ごとに在庫の行を作る）
+    const mzai: object[] = [];
+    const zinit: object[] = [];
+    const zinc: object[] = [];
+    for (const sc of [...new Set(mei.map(m => m.scode))]) {
+      const r = this.stksrv.rows(st, denno, sc, o.day, mei.filter(m => m.scode == sc));
+      mzai.push(...r.mzai);
+      zinit.push(...r.zinit);
+      zinc.push(...r.zinc);
+    }
 
     // 7. 受注伝票。金額（おちゃのこは税込。消費税は 10/110 の端数切り上げ、税抜は 税込 - 消費税）
     const total = Math.round(o.total);
     const daibiki = isDaibiki(o.pay);
     const buntype = await this.defsrv.buntype(WEB_BUNTYPE);
     const jyuden = {
-      id, denno, day: o.day, hday: o.hday, htime: nz(o.htime), mcode, scde: mcode, ncode: mcode, nadr, scode: WEB_SCODE,
+      id, denno, day: o.day, hday: o.hday, htime: nz(o.htime), mcode, scde: mcode, ncode: mcode, nadr, scode: mei[0]?.scode ?? WEB_SCODE,
       tcode: nz(o.tanto), tcode1: nz(o.etanto) ?? nz(member?.tcode1),
       daibunrui: nz(o.daibunrui) ?? nz(member?.daibunrui), chubunrui: nz(o.bumon) ?? nz(member?.chubunrui),
       jcode: WEB_JCODE, pcode: nz(o.nyukin), bcode: o.bcode, bkcode: o.bkcode,

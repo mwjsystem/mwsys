@@ -50,14 +50,22 @@
               <td colspan="9">
                 <table class="mei">
                   <thead>
-                    <tr><th>JAN</th><th>商品コード</th><th>商品名</th><th>依頼数量</th><th>受領予定</th><th>仕入価格</th><th>代理店単価</th><th>Amazon の商品名</th></tr>
+                    <tr><th>JAN</th><th>商品コード</th><th>商品名</th><th>依頼数量</th><th>受領予定</th><th>仕入価格</th><th>代理店単価</th><th>倉庫</th><th>Amazon の商品名</th></tr>
                   </thead>
                   <tbody>
                     @for (l of o.lines; track $index) {
                       <tr [class.dif]="priceDiff(l)">
                         <td>{{l.jan}}</td><td>{{l.gcode}}</td><td>{{l.gtext}}</td>
                         <td class="num">{{l.irai | number}}</td><td class="num">{{l.qty | number}}</td>
-                        <td class="num">{{l.price | number}}</td><td class="num">{{l.tanka3 | number}}</td><td>{{l.name}}</td>
+                        <td class="num">{{l.price | number}}</td><td class="num">{{l.tanka3 | number}}</td>
+                        <td>
+                          <select [(ngModel)]="l.scode" [disabled]="busy || !!o.denno">
+                            @for (s of strsrv.scds; track s.value) {
+                              <option [value]="s.value">{{s.viewval}}</option>
+                            }
+                          </select>
+                        </td>
+                        <td>{{l.name}}</td>
                       </tr>
                     }
                   </tbody>
