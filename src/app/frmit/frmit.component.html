@@ -1,0 +1,85 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>I&amp;T受注取込</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+@if (error) {
+  <p class="err">{{error}}</p>
+}
+<div class="bar">
+  <button mat-raised-button color="primary" type="button" (click)="csv.click()" [disabled]="busy">
+    <mat-icon>upload_file</mat-icon>CSV を選ぶ
+  </button>
+  <input #csv type="file" accept=".csv" hidden (change)="onFile($event)">
+  <span>{{fileName}}</span>
+  <button mat-raised-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
+    <mat-icon>save</mat-icon>登録（{{targetCount}} 件）
+  </button>
+  @if (progress) {
+    <span>{{progress}}</span>
+  }
+</div>
+@if (message) {
+  <p class="msg">{{message}}</p>
+}
+@if (orders.length > 0) {
+  <p class="note">受注 {{orders.length | number}} 件・明細 {{lineCount | number}} 行。受注先は {{name}}（{{mcode}}）、受注日は今日、
+    単価は商品マスタの代理店単価、数量は総数で登録します。納品先は CSV の納入先です（顧客の住所に無ければ追加します）。
+    区分・担当者・配送方法などは、この顧客の直近の受注伝票に合わせます。倉庫は ▶ で明細を開いて選べます（初期値 01）。
+    @if (diffOrders > 0) {
+      <span class="warnc">I&amp;T の発注単価が代理店単価と違う明細がある注文が {{diffOrders}} 件あります（黄色の行）。</span>
+    }
+  </p>
+  <div class="scroll">
+    <table class="rep">
+      <thead>
+        <tr>
+          <th>注文No.</th><th>発注日</th><th>納入先</th><th>〒</th><th>住所</th><th>電話番号</th><th>明細</th><th>金額（税抜）</th>
+          <th>単価の違い</th><th>I&amp;T 備考</th><th>処理結果</th><th>伝票番号</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (o of orders; track o.no) {
+          <tr [class.ng]="o.err || o.result.startsWith('エラー')" [class.dif]="!o.err && diffCount(o) > 0">
+            <td><a href="javascript:void(0)" class="tg" (click)="toggle(o)">{{isOpen(o) ? '▼' : '▶'}}</a>{{o.no}}</td>
+            <td>{{o.hday}}</td>
+            <td>{{o.name}}{{o.company ? '（' + o.company + (o.busho ? ' ' + o.busho : '') + '）' : ''}}</td>
+            <td>{{o.zip}}</td><td>{{o.pref}}{{o.addr}}</td><td>{{o.tel}}</td>
+            <td class="num">{{o.lines.length}}</td>
+            <td class="num">{{amount(o) | number:'1.0-0'}}</td>
+            <td class="num">{{diffCount(o) || ''}}</td>
+            <td>{{o.bikou}}</td>
+            <td>{{o.err ? 'エラー：' + o.err : o.result}}</td><td><app-denlink [denno]="o.denno" /></td>
+          </tr>
+          @if (isOpen(o)) {
+            <tr class="det">
+              <td colspan="12">
+                <table class="mei">
+                  <thead>
+                    <tr><th>JAN</th><th>貴社品番</th><th>商品コード</th><th>商品名</th><th>総数</th><th>代理店単価</th><th>I&amp;T 発注単価</th><th>倉庫</th><th>I&amp;T の品名</th></tr>
+                  </thead>
+                  <tbody>
+                    @for (l of o.lines; track $index) {
+                      <tr [class.dif]="priceDiff(l)">
+                        <td>{{l.jan}}</td><td>{{l.hinban}}</td><td>{{l.gcode}}</td><td>{{l.gtext}}</td>
+                        <td class="num">{{l.qty | number}}</td>
+                        <td class="num">{{l.tanka3 | number}}</td><td class="num">{{l.price | number}}</td>
+                        <td>
+                          <select [(ngModel)]="l.scode" [disabled]="busy || !!o.denno">
+                            @for (s of strsrv.scds; track s.value) {
+                              <option [value]="s.value">{{s.viewval}}</option>
+                            }
+                          </select>
+                        </td>
+                        <td style="font-size: 11px;">{{l.name}}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+}
