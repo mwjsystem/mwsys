@@ -160,22 +160,33 @@ export class MovingService {
 
   qryMovden(denno: number): Observable<Movsub | null> {
     let observable: Observable<Movsub | null> = new Observable<Movsub | null>(observer => {
-      this.apollo.watchQuery<MovdenResult>({
+      // 1 回読んだら終える（読み直すたびに前の問い合わせが残り、後からキャッシュの更新で画面を書き換えないように）
+      const sub = this.apollo.watchQuery<MovdenResult>({
         query: this.GetTran,
         variables: {
           id: this.usrsrv.compid,
           dno: denno
         },
+        // 保存後に読み直すとき、キャッシュの古い内容（保存前）を出さない（在庫の取り消し用データもこの内容から作るため）
+        fetchPolicy: 'network-only',
       })
         .valueChanges
-        .subscribe(({ data }) => {
+        .subscribe((res) => {
+          // Apollo（v4）はエラーを結果の error で返す（data は無い）。読み込み中のまま止まらないようエラーにする
+          if (res.error) {
+            observer.error(res.error);
+            return;
+          }
+          const data = res.data;
           if (!data) {
             return;
           }
           observer.next((data as MovdenResult).trmovsub_by_pk);
+          observer.complete();
         }, (error) => {
           observer.error(error);
         });
+      return () => sub.unsubscribe();
     });
     return observable;
   }

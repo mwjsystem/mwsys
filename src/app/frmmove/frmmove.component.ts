@@ -379,6 +379,12 @@ export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
   cancel(): void {
     if (this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
       this.mode = 3;
+      // 照会に戻すときは入力できないようにする（以前は mode を変えるだけで、保存後・キャンセル後も入力できてしまった）。
+      // 受注伝票・発注伝票と同じく、保存した内容を読み直して表示する（キャンセルしたときは変更を捨てる）
+      if (this.denno > 0) {
+        this.getMovden(this.denno);
+      }
+      this.refresh();
       this.form.markAsPristine();
       history.replaceState('', '', './frmmove/' + this.mode + '/' + this.denno);
     }
