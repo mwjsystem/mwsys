@@ -96,11 +96,14 @@ export class TaikaiService {
     return n;
   }
 
-  /** 大会倉庫（倉庫コードが 5 で始まる倉庫） */
+  /** 大会倉庫（倉庫コードが 5 で始まる倉庫と、名前に「大会」がある倉庫。削除フラグが空の倉庫も含める） */
   async stores(): Promise<{ code: string; name: string }[]> {
     const Get = gql`
       query get_taikai_store($id: smallint!) {
-        msstore(where: {id: {_eq: $id}, code: {_like: "5%"}, del: {_eq: false}}, order_by: {code: asc}) { code subname }
+        msstore(where: {id: {_eq: $id}, _and: [
+          {_or: [{code: {_like: "5%"}}, {name: {_like: "%大会%"}}, {subname: {_like: "%大会%"}}]},
+          {_or: [{del: {_is_null: true}}, {del: {_eq: false}}]}
+        ]}, order_by: {code: asc}) { code subname }
       }`;
     const q = await this.query<{ msstore: { code: string; subname: string | null }[] }>(Get, { id: this.usrsrv.compid });
     return q.msstore.map(e => ({ code: e.code, name: e.subname ?? '' }));
