@@ -159,7 +159,8 @@ export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
             history.replaceState('', '', './frmmove');
           } else {
             // console.log(result);
-            let movsub: Movsub = result;
+            // 配送方法は数値の列で返る（送り状マスタのコードは文字）。文字にしないと選択肢と合わず空に見える
+            let movsub: Movsub = { ...result, hcode: result.hcode == null ? result.hcode : String(result.hcode) } as Movsub;
             this.form.patchValue(movsub);
             this.selHcd(movsub.hcode); // 保存済みの配送方法に合わせて、配送時間の候補を出す
             this.usrsrv.setTmstmp(movsub);

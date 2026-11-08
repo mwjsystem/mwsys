@@ -646,7 +646,7 @@ export class ShipService {
       }`;
     type MoveQ = {
       trmovsub_by_pk: {
-        denno: number; day: string | null; incode: string; outcode: string; tcode: string | null; hcode: string | null;
+        denno: number; day: string | null; incode: string; outcode: string; tcode: string | null; hcode: string | number | null;
         hday: string | null; htime: string | number | null; okurino: string | number | null; okurisuu: number | null;
         dmemo: string | null; omemo: string | null; smemo: string | null;
         szip: string | null; sadr: string | null; sname: string | null; stel: string | null;
@@ -669,7 +669,8 @@ export class ShipService {
     if (!m.day) {
       throw new Error('移動日が未入力です');
     }
-    const hcode = (m.hcode ?? '').trim();
+    // 移動伝票の配送方法は数値の列（送り状マスタのコードは文字）なので、文字にしてから比べる
+    const hcode = String(m.hcode ?? '').trim();
     if (!hcode) {
       throw new Error('配送方法が未入力です');
     }
