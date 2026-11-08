@@ -11,6 +11,12 @@ export interface JyuStock {
   zgsk: Map<string, string>;
 }
 
+/**
+ * 在庫（trzaiko）の行を新しく作るときの数量の列の初期値。
+ * 行が無ければ作ってから _inc で加算するため、列が NULL で作られると NULL + n = NULL になり加算が消える。明示的に 0 で作る
+ */
+export const ZAIKO_ZERO = { hnyu: 0, movi: 0, teni: 0, nyuk: 0, syuk: 0, movo: 0, teno: 0, haki: 0, jyut: 0 };
+
 /** 受注明細 1 行分の在庫に関わる値 */
 export interface JyuStockLine { line: number; gcode: string; suu: number }
 
@@ -110,7 +116,7 @@ export class JyuStockService {
     const zinit: object[] = [];
     const zinc: object[] = [];
     zai.forEach((qty, gcode) => {
-      zinit.push({ id, scode, gcode, day });
+      zinit.push({ id, scode, gcode, day, ...ZAIKO_ZERO });
       zinc.push({
         where: { id: { _eq: id }, scode: { _eq: scode }, gcode: { _eq: gcode }, day: { _eq: day } },
         _inc: { jyut: qty }

@@ -359,26 +359,12 @@ export class MovtblComponent implements OnInit {
       this.frmArr.push(this.createRow(i + 1, e));
       this.setPable(i, e.gcode, e.msgood.msgzais);
       i += 1;
-      // console.log(e);
-
-      e.msgood.msgzais.forEach(zai => {
-        const parentForm = this.parentForm();
-        this.trzaiko.push({
-          scode: this.parentCtl().incode.value,
-          gcode: zai.zcode,
-          day: this.parentCtl().day.value,
-          movi: e.suu * zai.irisu * -1,
-          movo: 0
-        });
-        this.trzaiko.push({
-          scode: this.parentCtl().outcode.value,
-          gcode: zai.zcode,
-          day: this.parentCtl().day.value,
-          movi: 0,
-          movo: e.suu * zai.irisu * -1,
-        });
-      });
     });
+    // 取り消し用（読込時の在庫を戻す）データ。保存時の加算（getZaikoNew）と同じ数え方にする
+    // （在庫品は自身、セット品は在庫対象の構成品。以前は全構成品で数えていて、保存時とずれることがあった）
+    const day = this.parentCtl().day.value;
+    const lcday = day instanceof Date ? this.usrsrv.formatDate(day) : day ? String(day).slice(0, 10) : null;
+    this.setTrzaikoFrom(this.getZaikoNew(lcday, this.parentCtl().incode.value, this.parentCtl().outcode.value));
     this.refresh();
   }
 

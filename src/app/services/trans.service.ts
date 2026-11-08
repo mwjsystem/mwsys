@@ -222,8 +222,13 @@ export class TransService {
         },
       })
         .valueChanges
-        .subscribe(({ data }) => {
-          // console.log('出荷',data);
+        .subscribe((res) => {
+          const data = res.data;
+          // Apollo（v4）はエラーを結果の error で返す（data は無い）。黙って待ち続けないよう、出して空で返す
+          if (res.error) {
+            console.log('error query get_trans', res.error);
+            return resolve([]);
+          }
           if (!data) {
             return;
           }

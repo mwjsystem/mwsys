@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 import { UserService } from './../services/user.service';
-import { JyuStock, JyuStockService } from './../services/jyustock.service';
+import { JyuStock, JyuStockService, ZAIKO_ZERO } from './../services/jyustock.service';
 import { JyuDefaultService } from './../services/jyudefault.service';
 import { JDST } from './../frmship/ship-forms';
 import { lineMoney } from './../frmrakuten/rakuten-parse';
@@ -54,7 +54,7 @@ function moveZaiko(st: JyuStock, id: number, day: string, incode: string, outcod
   const zinc: object[] = [];
   const where = (scode: string, gcode: string) => ({ id: { _eq: id }, scode: { _eq: scode }, gcode: { _eq: gcode }, day: { _eq: day } });
   qty.forEach((n, gcode) => {
-    zinit.push({ id, scode: incode, gcode, day }, { id, scode: outcode, gcode, day });
+    zinit.push({ id, scode: incode, gcode, day, ...ZAIKO_ZERO }, { id, scode: outcode, gcode, day, ...ZAIKO_ZERO });
     zinc.push({ where: where(incode, gcode), _inc: { movi: n } }, { where: where(outcode, gcode), _inc: { movo: n } });
   });
   return { zinit, zinc };
@@ -286,7 +286,7 @@ export class TaikaiService {
       const syuk = new Map<string, number>();
       (r.mzai as { gcode: string; suu: number }[]).forEach(z => syuk.set(z.gcode, (syuk.get(z.gcode) ?? 0) + z.suu));
       syuk.forEach((n, gcode) => {
-        zinit.push({ id, scode, gcode, day });
+        zinit.push({ id, scode, gcode, day, ...ZAIKO_ZERO });
         zinc.push({ where: { id: { _eq: id }, scode: { _eq: scode }, gcode: { _eq: gcode }, day: { _eq: day } }, _inc: { syuk: n } });
       });
       variables['madr'] = madr;

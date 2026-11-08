@@ -335,7 +335,34 @@ export class StockService {
         });
     });
   }
-  getStock(gcd: string, gskbn: string, scd?: string, date?: Date): Promise<Stock[]> {
+  /** 同時に走らせる在庫の問い合わせの数（明細の多い伝票で一度に数百件出すと Hasura が 503 を返すため） */
+  private static readonly MAX_STOCK = 4;
+  private stockRunning = 0;
+  private stockWaiting: (() => void)[] = [];
+
+  /** 在庫の問い合わせ。同時に MAX_STOCK 件までにして、残りは順番待ちにする */
+  async getStock(gcd: string, gskbn: string, scd?: string, date?: Date): Promise<Stock[]> {
+    if (this.stockRunning >= StockService.MAX_STOCK) {
+      await new Promise<void>(res => this.stockWaiting.push(res));
+    }
+    this.stockRunning++;
+    try {
+      // 応答の無い問い合わせ（エラーで data が無いときなど）で順番待ちが止まらないよう、30 秒で打ち切る
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const timeout = new Promise<Stock[]>(res => timer = setTimeout(() => {
+        console.log('error query stock（30 秒で応答なし）', gcd, scd);
+        res([]);
+      }, 30000));
+      const r = await Promise.race([this.getStock0(gcd, gskbn, scd, date), timeout]);
+      clearTimeout(timer);
+      return r;
+    } finally {
+      this.stockRunning--;
+      this.stockWaiting.shift()?.();
+    }
+  }
+
+  private getStock0(gcd: string, gskbn: string, scd?: string, date?: Date): Promise<Stock[]> {
     let scodes: string[] = [];
     let lcdate: Date;
     const GetView = gql`

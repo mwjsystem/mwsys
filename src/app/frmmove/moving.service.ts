@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
+import { ZAIKO_ZERO } from './../services/jyustock.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
@@ -214,9 +215,44 @@ export class MovingService {
     });
   }
 
-  updMovden(denno: number, movsub: MovsubSet, movmei: MovmeiInput[]): Promise<UpdMovdenResult> {
+  /**
+   * 在庫の増減（取り消し分・加算分）を 倉庫・商品・日付 ごとにまとめ、伝票と同じミューテーションで書く行にする
+   * （在庫の行が無ければ作り、移動入庫・移動出庫を加算する）
+   */
+  zaikoRows(list: Zaiko[]): { zinit: object[]; zinc: object[] } {
+    const id = this.usrsrv.compid;
+    const sum = new Map<string, Zaiko>();
+    for (const z of list) {
+      if (!z.scode || !z.gcode || !z.day) {
+        continue;
+      }
+      const k = z.scode + '\t' + z.gcode + '\t' + z.day;
+      const s = sum.get(k) ?? { scode: z.scode, gcode: z.gcode, day: z.day, movi: 0, movo: 0 };
+      s.movi += Number(z.movi) || 0;
+      s.movo += Number(z.movo) || 0;
+      sum.set(k, s);
+    }
+    const zinit: object[] = [];
+    const zinc: object[] = [];
+    sum.forEach(z => {
+      if (z.movi == 0 && z.movo == 0) {
+        return;
+      }
+      zinit.push({ id, scode: z.scode, gcode: z.gcode, day: z.day, ...ZAIKO_ZERO });
+      zinc.push({
+        where: { id: { _eq: id }, scode: { _eq: z.scode }, gcode: { _eq: z.gcode }, day: { _eq: z.day } },
+        _inc: { movi: z.movi, movo: z.movo }
+      });
+    });
+    return { zinit, zinc };
+  }
+
+  /** 変更保存。伝票・明細・在庫の増減（zaiko）を 1 トランザクションで書く（途中で失敗しても在庫だけずれない） */
+  updMovden(denno: number, movsub: MovsubSet, movmei: MovmeiInput[], zaiko: Zaiko[]): Promise<UpdMovdenResult> {
+    const { zinit, zinc } = this.zaikoRows(zaiko);
     const UpdateTran = gql`
-      mutation upd_movsub($id: smallint!, $dno: Int!,$_set: trmovsub_set_input!,$obj:[trmovden_insert_input!]!) {
+      mutation upd_movsub($id: smallint!, $dno: Int!,$_set: trmovsub_set_input!,$obj:[trmovden_insert_input!]!,
+        $zinit: [trzaiko_insert_input!]!, $zinc: [trzaiko_updates!]!) {
         update_trmovsub(where: {id: {_eq:$id},denno: {_eq:$dno}}, _set: $_set)  {
           affected_rows
         }
@@ -224,6 +260,12 @@ export class MovingService {
           affected_rows
         }
         insert_trmovden(objects: $obj) {
+          affected_rows
+        }
+        insert_trzaiko(objects: $zinit, on_conflict: {constraint: trzaiko_pkey, update_columns: []}) {
+          affected_rows
+        }
+        update_trzaiko_many(updates: $zinc) {
           affected_rows
         }
       }`;
@@ -234,7 +276,9 @@ export class MovingService {
           id: this.usrsrv.compid,
           dno: denno,
           _set: movsub,
-          obj: movmei
+          obj: movmei,
+          zinit,
+          zinc
         },
         refetchQueries: [
           {
@@ -244,20 +288,33 @@ export class MovingService {
               dno: denno
             },
           }],
-      }).subscribe(({ data }) => {
-        return resolve(data as UpdMovdenResult);
+      }).subscribe((res) => {
+        // Apollo（v4）はエラーを例外ではなく結果の error で返すことがある
+        if (res.error || !res.data) {
+          return reject(res.error ?? new Error('保存の結果がありません'));
+        }
+        return resolve(res.data as UpdMovdenResult);
       }, (error) => {
         return reject(error);
       });
     });
   }
-  insMovden(movsub: MovsubNew[], movmei: MovmeiInput[]): Promise<InsMovdenResult> {
+  /** 新規登録。伝票・明細・在庫の加算（zaiko）を 1 トランザクションで書く */
+  insMovden(movsub: MovsubNew[], movmei: MovmeiInput[], zaiko: Zaiko[]): Promise<InsMovdenResult> {
+    const { zinit, zinc } = this.zaikoRows(zaiko);
     const InsertTran = gql`
-      mutation ins_movsub($obj:[trmovsub_insert_input!]!,$objm:[trmovden_insert_input!]!) {
+      mutation ins_movsub($obj:[trmovsub_insert_input!]!,$objm:[trmovden_insert_input!]!,
+        $zinit: [trzaiko_insert_input!]!, $zinc: [trzaiko_updates!]!) {
         insert_trmovsub(objects: $obj)  {
           affected_rows
         }
         insert_trmovden(objects: $objm)  {
+          affected_rows
+        }
+        insert_trzaiko(objects: $zinit, on_conflict: {constraint: trzaiko_pkey, update_columns: []}) {
+          affected_rows
+        }
+        update_trzaiko_many(updates: $zinc) {
           affected_rows
         }
       }`;
@@ -266,10 +323,15 @@ export class MovingService {
         mutation: InsertTran,
         variables: {
           obj: movsub,
-          objm: movmei
+          objm: movmei,
+          zinit,
+          zinc
         },
-      }).subscribe(({ data }) => {
-        return resolve(data as InsMovdenResult);
+      }).subscribe((res) => {
+        if (res.error || !res.data) {
+          return reject(res.error ?? new Error('登録の結果がありません'));
+        }
+        return resolve(res.data as InsMovdenResult);
       }, (error) => {
         return reject(error);
       });
