@@ -2,9 +2,11 @@ import { Directive, ElementRef, inject, output } from '@angular/core';
 
 /**
  * 伝票の明細表のキー操作（改善要望 No.9・17）。表の要素に付ける。
- * - ↓：次の入力欄へ／↑：前の入力欄へ（通販Pro と同じ。Tab と同じ順。数量の欄で数値が増減しないようにする）
+ * - →：次の入力欄へ／←：前の入力欄へ（Enter・Tab と同じ順）。
+ *   文字の途中ではカーソルを動かし、先頭で ← ・末尾で → を押したとき（全部選んだ状態でも）に欄を移る
  * - Enter で次の欄へ進むのは TabDirective。最後の入力欄で Enter を押すと gridNavEnd を出す（明細の行を足す）
- * 日本語入力の変換中（確定の Enter）は何もしない。
+ * 順番は TabDirective が要素に付ける data-tabidx を使う（[tabIndex]="式" は要素の tabindex にならないため）。
+ * 日本語入力の変換中は何もしない。
  */
 @Directive({
   selector: '[gridNav]',
@@ -18,7 +20,7 @@ export class GridNavDirective {
   readonly gridNavEnd = output<void>();
 
   onKey(e: KeyboardEvent): void {
-    if (e.key !== 'Enter' && e.key !== 'ArrowUp' && e.key !== 'ArrowDown') {
+    if (e.key !== 'Enter' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
       return;
     }
     if (e.isComposing || e.keyCode === 229 || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
@@ -41,28 +43,48 @@ export class GridNavDirective {
       }
       return;
     }
-    e.preventDefault();
-    this.move(e.key === 'ArrowUp' ? list[k - 1] : list[k + 1]);
-  }
-
-  /** 表の中で入力できる欄（tabIndex を付けたもの）を、Tab で進む順に */
-  private inputs(): HTMLInputElement[] {
-    return Array.from(this.host.nativeElement.querySelectorAll<HTMLInputElement>('input'))
-      .filter(el => el.tabIndex > 0 && !el.disabled && !el.readOnly && el.type !== 'checkbox' && el.offsetParent !== null)
-      .map((el, dom) => ({ el, dom }))
-      .sort((a, b) => a.el.tabIndex - b.el.tabIndex || a.dom - b.dom)
-      .map(x => x.el);
-  }
-
-  private move(el: HTMLInputElement | undefined): void {
-    if (!el) {
-      return;
+    const left = e.key === 'ArrowLeft';
+    if (!this.atEdge(t, left)) {
+      return; // 文字の途中はふつうにカーソルを動かす
     }
-    el.focus();
+    const to = list[left ? k - 1 : k + 1];
+    if (to) {
+      e.preventDefault();
+      to.focus();
+      try {
+        to.select();
+      } catch {
+        // select できない欄もある
+      }
+    }
+  }
+
+  /** カーソルが先頭（←）・末尾（→）にあるか。全部選んだ状態・数値の欄（カーソル位置が取れない）は端とみなす */
+  private atEdge(el: HTMLInputElement, left: boolean): boolean {
+    let s: number | null;
+    let en: number | null;
     try {
-      el.select();
+      s = el.selectionStart;
+      en = el.selectionEnd;
     } catch {
-      // type=number など select できない欄もある
+      return true;
     }
+    if (s == null || en == null) {
+      return true;
+    }
+    const len = el.value.length;
+    if (s === 0 && en === len) {
+      return true;
+    }
+    return left ? (s === 0 && en === 0) : (s === len && en === len);
+  }
+
+  /** 表の中で入力できる欄（TabDirective の番号があるもの）を、Enter で進む順に */
+  private inputs(): HTMLInputElement[] {
+    return Array.from(this.host.nativeElement.querySelectorAll<HTMLInputElement>('input[data-tabidx]'))
+      .map((el, dom) => ({ el, dom, idx: Number(el.dataset['tabidx']) }))
+      .filter(x => !isNaN(x.idx) && !x.el.disabled && !x.el.readOnly && x.el.type !== 'checkbox' && x.el.offsetParent !== null)
+      .sort((a, b) => a.idx - b.idx || a.dom - b.dom)
+      .map(x => x.el);
   }
 }

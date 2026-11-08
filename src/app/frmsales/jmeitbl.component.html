@@ -32,10 +32,10 @@
     matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
   }
   @let obi = obiInfo();
-  @if (obi.cb19 > 0 || obi.ori > 0) {
-    <!-- 帯（CB19）・織マーク（Z14）の本数（No.10）。明細を入れるとすぐ変わる。内訳（色・号）はマウスを乗せると出る -->
+  @if (obi.obi > 0 || obi.ori > 0) {
+    <!-- 帯・織マーク（Z14）の本数（No.10。帯は刺繍指示書と同じ判定）。明細を入れるとすぐ変わる。内訳（色・号）はマウスを乗せると出る -->
     <span style="margin: 0 1em; font-size: 1.05em; white-space: nowrap; cursor: default;" [matTooltip]="obi.tip" matTooltipClass="ttips">
-      @if (obi.cb19 > 0) { 帯 CB19：<b>{{obi.cb19 | number}}</b>本 }
+      @if (obi.obi > 0) { 帯：<b>{{obi.obi | number}}</b>本 }
       @if (obi.ori > 0) { 織マーク：<b>{{obi.ori | number}}</b> }
     </span>
   }

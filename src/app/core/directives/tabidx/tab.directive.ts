@@ -4,7 +4,9 @@ import { TabService } from './tab.service';
 @Directive({
     selector: '[tabIndex]',
     host: {
-        '(keydown)': 'onInput($event)'
+        '(keydown)': 'onInput($event)',
+        // [tabIndex]="式" はこのディレクティブが受け取り、要素の tabindex にはならない。明細のキー操作（GridNavDirective）が順番を読めるように残す
+        '[attr.data-tabidx]': 'index'
     }
 })
 export class TabDirective implements AfterViewInit  {
