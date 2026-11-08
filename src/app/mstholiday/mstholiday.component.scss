@@ -1,0 +1,59 @@
+// 稼働日カレンダ: 12 か月を並べ、日付を押して休日を切り替える
+.cal-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 8px 12px;
+  align-items: flex-start;
+}
+.months {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+  flex: 1 1 720px;
+}
+.month {
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  padding: 6px;
+}
+.mtitle {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  font-size: 12px;
+  text-align: center;
+}
+.wh { color: #666666; }
+.sun { color: #c62828; }
+.sat { color: #1565c0; }
+.day {
+  border: 1px solid transparent;
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 3px 0;
+  font-size: 12px;
+  cursor: pointer;
+  &:hover { border-color: #999999; }
+  &.sun, &.sat { background: #f3f3f3; }
+  &.hol { background: #e53935; color: #ffffff; font-weight: bold; }
+  // 保存していない変更
+  &.chg { outline: 2px dashed #fb8c00; outline-offset: -2px; }
+  &.today { border-color: #1565c0; }
+  // 国民の祝日なのに休日になっていない日
+  &.jpmiss { color: #c62828; text-decoration: underline; text-decoration-thickness: 2px; font-weight: bold; }
+}
+.list {
+  flex: 0 0 200px;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+  .chg { color: #e65100; font-weight: bold; }
+}

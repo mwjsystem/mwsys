@@ -1,0 +1,68 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>稼働日カレンダ</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+<p class="note">
+  日付を押すと、休日と稼働日が切り替わります（赤が休日）。土日はもともと休みとして扱うので、祝日・年末年始・夏季休業など、土日以外の休みを入れてください。
+  出荷予定日の計算や、日付の選択で休日を飛ばすのに使います。最後に「保存」を押してください。
+  「国民の祝日を入れる」で、その年の祝日・振替休日・国民の休日をまとめて入れられます（春分の日・秋分の日は計算で出すので、官報の発表と念のため見比べてください）。
+  祝日なのに休日になっていない日は、赤い下線で示します。
+</p>
+<div class="bar">
+  <button mat-icon-button type="button" (click)="move(-1)" [disabled]="busy" title="前の年">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+  <span style="font-size: 18px; font-weight: bold;">{{year}} 年</span>
+  <button mat-icon-button type="button" (click)="move(1)" [disabled]="busy" title="次の年">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+  <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="busy || !dirty">
+    <mat-icon>save</mat-icon>保存
+  </button>
+  <button mat-raised-button color="accent" type="button" (click)="addJp()" [disabled]="busy || !jpSupported"
+    title="この年の国民の祝日（振替休日・国民の休日を含む。土日の分は除く）を休日に入れます">
+    <mat-icon>event_available</mat-icon>国民の祝日を入れる
+  </button>
+  <button mat-raised-button type="button" (click)="undo()" [disabled]="busy || !dirty">
+    <mat-icon>undo</mat-icon>変更を取り消す
+  </button>
+  @if (dirty) {
+    <span class="warnc">未保存：休日の追加 {{added.length}} 日・削除 {{removed.length}} 日</span>
+  }
+</div>
+@if (error) {
+  <p class="err">{{error}}</p>
+}
+@if (message) {
+  <p class="msg">{{message}}</p>
+}
+<div class="cal-wrap">
+  <div class="months">
+    @for (mo of months; track mo.m) {
+      <div class="month">
+        <div class="mtitle">{{mo.m}} 月</div>
+        <div class="grid">
+          @for (w of week; track $index) {
+            <div class="wh" [class.sun]="$index == 0" [class.sat]="$index == 6">{{w}}</div>
+          }
+          @for (day of mo.days; track $index) {
+            @if (day) {
+              <button type="button" class="day" [class]="cls(day)" (click)="toggle(day)" [disabled]="busy"
+                [title]="label(day.date) + (cls(day)['hol'] ? '：休日' : '')">{{day.d}}</button>
+            } @else {
+              <div></div>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+  <div class="list">
+    <div class="mtitle">{{year}} 年の休日（{{list.length}} 日）</div>
+    @for (d of list; track d) {
+      <div [class.chg]="!saved.has(d)">{{label(d)}}</div>
+    } @empty {
+      <div class="note">登録されていません</div>
+    }
+  </div>
+</div>

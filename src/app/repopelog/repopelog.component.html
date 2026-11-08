@@ -1,0 +1,79 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>作業ログ</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+<p class="note">伝票の登録・変更・削除などの操作の記録（操作ログ）を探して表示します。新しい順に最大 1,000 件まで出します。</p>
+<div class="bar" style="font-size: 13px;">
+  <label>期間
+    <input type="date" [(ngModel)]="from" [disabled]="busy">
+  </label>
+  〜
+  <input type="date" [(ngModel)]="to" [disabled]="busy">
+  <label>種別
+    <select [(ngModel)]="extype" [disabled]="busy">
+      <option value="">（すべて）</option>
+      @for (e of extypes; track e.value) {
+        <option [value]="e.value">{{e.value}} {{e.viewval}}</option>
+      }
+    </select>
+  </label>
+  <label>伝票番号など
+    <input style="width: 8em;" [(ngModel)]="keycode" (keyup.enter)="search()" [disabled]="busy">
+  </label>
+  <label>担当者
+    <select [(ngModel)]="tcode" [disabled]="busy">
+      <option value="">（すべて）</option>
+      @for (s of stfsrv.tcds; track s.value) {
+        @if (s.value) {
+          <option [value]="s.value">{{s.viewval}}</option>
+        }
+      }
+    </select>
+  </label>
+  <label>内容に含む文字
+    <input style="width: 12em;" [(ngModel)]="memo" (keyup.enter)="search()" [disabled]="busy">
+  </label>
+  <button mat-raised-button color="primary" type="button" (click)="search()" [disabled]="busy">
+    <mat-icon>search</mat-icon>検索
+  </button>
+</div>
+@if (error) {
+  <p class="err">{{error}}</p>
+}
+@if (busy) {
+  <p class="msg">読み込んでいます…</p>
+} @else if (searched) {
+  <p class="msg">
+    {{shown.length}} 件
+    @if (over) {
+      <span class="warnc">1,000 件を超えたので、新しい方から 1,000 件だけ出しています。条件を絞ってください。</span>
+    }
+  </p>
+  @if (shown.length > 0) {
+    <div class="scroll">
+      <table class="rep" aria-label="作業ログの検索結果">
+        <thead>
+          <tr><th>日時</th><th>種別</th><th>伝票番号など</th><th>担当者</th><th>内容</th><th>状態</th></tr>
+        </thead>
+        <tbody>
+          @for (r of shown; track r.sequ) {
+            <tr>
+              <td>{{r.created_at | date:'yyyy/M/d H:mm:ss'}}</td>
+              <td>{{extypeName(r.extype)}}</td>
+              <td>
+                @if (link(r); as url) {
+                  <a class="tg" [href]="url" target="_blank" title="伝票を別のタブで開く">{{r.keycode}}</a>
+                } @else {
+                  {{r.keycode}}
+                }
+              </td>
+              <td>{{staff(r.created_by)}}</td>
+              <td style="white-space: pre-wrap; min-width: 24em;">{{r.memo}}</td>
+              <td>{{r.status}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}

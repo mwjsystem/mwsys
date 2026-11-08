@@ -120,11 +120,9 @@
   </mat-menu>
   <button mat-button [matMenuTriggerFor]="syst">システム</button>
   <mat-menu #syst="matMenu">
-    <a mat-menu-item>受注テキスト読込</a>
-    <a mat-menu-item>マスタデータ読込</a>
     <a mat-menu-item>入金テキスト読込</a>
-    <a mat-menu-item>稼働日カレンダ</a>
-    <a mat-menu-item>作業ログ</a>
+    <a mat-menu-item routerLink="/mstholiday">稼働日カレンダ</a>
+    <a mat-menu-item routerLink="/repopelog">作業ログ</a>
   </mat-menu>
   <button mat-button [matMenuTriggerFor]="menu">
     <mat-icon>settings</mat-icon>設定
