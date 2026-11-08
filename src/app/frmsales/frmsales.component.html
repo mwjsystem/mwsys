@@ -28,12 +28,12 @@
       </button>
     }
     @if (mode==1 || mode==2) {
-      <button mat-flat-button (click)="save()" [disabled]="form.invalid"
+      <button mat-flat-button (click)="save()" [disabled]="!canSave()"
         [color]="usrsrv.getColor(mode)">
         <mat-icon>save</mat-icon>保存
       </button>
     }
-    @if ((mode==1 || mode==2) && form.invalid) {
+    @if ((mode==1 || mode==2) && !canSave()) {
       <div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" >修正が必要！</div>
     }
     <!-- <div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" *ngIf="this.vnyuzan.nyuzan==0 && this.vnyuzan.denno" >入金済！</div> -->

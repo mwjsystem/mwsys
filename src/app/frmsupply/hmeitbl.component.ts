@@ -21,6 +21,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
 import { TabDirective } from '../core/directives/tabidx/tab.directive';
 import { GridNavDirective } from '../core/directives/gridnav.directive';
+import { MatTooltip } from '@angular/material/tooltip';
 import { NuminputDirective } from '../core/directives/numinput.directive';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { rowCtl, objectToArray } from '../core/form-helpers';
@@ -44,7 +45,7 @@ type ParentField = 'day' | 'mtax';
     templateUrl: './hmeitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatFormField, MatLabel, MatInput, FormsModule, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, TabDirective, GridNavDirective, NuminputDirective, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
+    imports: [MatFormField, MatLabel, MatInput, FormsModule, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, TabDirective, GridNavDirective, MatTooltip, NuminputDirective, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
 })
 export class HmeitblComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);

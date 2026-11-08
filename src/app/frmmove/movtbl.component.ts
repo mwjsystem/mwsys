@@ -18,6 +18,7 @@ import { MatPrefix, MatFormField, MatInput, MatSuffix } from '@angular/material/
 import { MatIcon } from '@angular/material/icon';
 import { TabDirective } from '../core/directives/tabidx/tab.directive';
 import { GridNavDirective } from '../core/directives/gridnav.directive';
+import { MatTooltip } from '@angular/material/tooltip';
 import { DecimalPipe } from '@angular/common';
 import { rowCtl, objectToArray } from '../core/form-helpers';
 
@@ -33,7 +34,7 @@ type ParentField = 'outcode' | 'incode' | 'day';
     templateUrl: './movtbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, MatFormField, MatInput, TabDirective, GridNavDirective, MatSuffix, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
+    imports: [MatButton, MatMenuTrigger, MatMenu, MatMenuItem, CdkCopyToClipboard, FormsModule, ReactiveFormsModule, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCheckbox, MatCellDef, MatCell, MatIconButton, MatPrefix, MatIcon, MatFormField, MatInput, TabDirective, GridNavDirective, MatTooltip, MatSuffix, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, DecimalPipe]
 })
 export class MovtblComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);

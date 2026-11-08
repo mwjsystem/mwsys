@@ -28,7 +28,7 @@
     >一括設定</button>
   }
   @if (frmArr.enabled && usrsrv.compid == 1) {
-    <button mat-flat-button class="w-48" color="accent" (click)="setKoguchi()" [disabled]="parentForm().invalid"
+    <button mat-flat-button class="w-48" color="accent" (click)="setKoguchi()" [disabled]="!validIgnoringEmpty(parentForm())"
     matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
   }
   @let obi = obiInfo();

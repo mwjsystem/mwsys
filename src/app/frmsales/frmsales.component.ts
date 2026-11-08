@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, AbstractControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { dropEmptyMei, validIgnoringEmpty } from '../share/mei-row';
 import { Subscription, firstValueFrom } from 'rxjs';
 import gql from 'graphql-tag';
 
@@ -824,8 +825,16 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     return tooltip;
   }
 
+  /** 保存ボタンを押せるか（明細の空の行だけが原因のエラーなら押せる。保存の前にその行を消す） */
+  canSave(): boolean {
+    return validIgnoringEmpty(this.form);
+  }
+
   async save(): Promise<boolean> {
-	this.jmisrv.isSaving = true;  
+    if (dropEmptyMei(this.form.get('mtbl') as FormArray)) {
+      this.jmeitbl().refresh();
+    }
+	this.jmisrv.isSaving = true;
     // console.log(Boolean(this.usrsrv.editFrmval(this.form, 'torikbn')), this.usrsrv.editFrmval(this.form, 'iadr'),);
     // console.log(this.form.get('iadr'), this.usrsrv.editFrmval(this.form, 'iadr'));
     let jyuden: JyudenSet = {

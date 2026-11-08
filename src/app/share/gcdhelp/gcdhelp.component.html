@@ -6,7 +6,7 @@
     <div class="jdh-fields">
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
         <mat-label>商品コード</mat-label>
-        <input matInput [(ngModel)]="gcode" (change)="gcode=convUpper($event)" [ngModelOptions]="{standalone: true}">
+        <input matInput [(ngModel)]="gcode" (input)="gcode=toUpperLive($event, gcode)" (change)="gcode=convUpper($event)" [ngModelOptions]="{standalone: true}">
       </mat-form-field>
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-48">
         <mat-label>商品名称</mat-label>
@@ -24,7 +24,7 @@
     <div class="jdh-fields">
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
         <mat-label>商品ｸﾞﾙｰﾌﾟｺｰﾄﾞ</mat-label>
-        <input matInput [(ngModel)]="code" (change)="code=convUpper($event)" (keydown.f4)="grpcdHelp()"
+        <input matInput [(ngModel)]="code" (input)="code=toUpperLive($event, code)" (change)="code=convUpper($event)" (keydown.f4)="grpcdHelp()"
           [ngModelOptions]="{standalone: true}">
         <button mat-icon-button matSuffix (click)="grpcdHelp()" aria-label="商品グループコードを検索して選ぶ">
           <mat-icon>find_replace</mat-icon>

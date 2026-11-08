@@ -41,19 +41,20 @@
           行番号
         </th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-          <mat-form-field style="width: 5em;">
-            <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
+          <!-- 行の追加・削除のボタンは入力欄の外に置く（欄の中に 2 つ入れると幅が足りず、削除のボタンが隠れていた） -->
+          <div class="flex items-center" style="white-space: nowrap;">
+            <mat-form-field style="width: 3em;">
+              <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
+            </mat-form-field>
             @if (frmArr.enabled) {
-              <button mat-icon-button matPrefix (click)="insRow(getIdx(i)+1)">
+              <button mat-icon-button (click)="insRow(getIdx(i)+1)" matTooltip="下に行を追加">
                 <mat-icon>add_circle</mat-icon>
               </button>
-            }
-            @if (frmArr.enabled) {
-              <button mat-icon-button matPrefix (click)="delRow(getIdx(i))">
+              <button mat-icon-button (click)="delRow(getIdx(i))" matTooltip="この行を削除">
                 <mat-icon>remove_circle</mat-icon>
               </button>
             }
-          </mat-form-field>
+          </div>
         </td>
       </ng-container>
       <ng-container matColumnDef="gcode">

@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { dropEmptyMei, validIgnoringEmpty } from '../share/mei-row';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
@@ -316,7 +317,15 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
     }
   }
 
+  /** 保存ボタンを押せるか（明細の空の行だけが原因のエラーなら押せる。保存の前にその行を消す） */
+  canSave(): boolean {
+    return validIgnoringEmpty(this.form);
+  }
+
   async save() {
+    if (dropEmptyMei(this.form.get('mtbl') as FormArray)) {
+      this.hmeitbl().refresh();
+    }
 
     let hatden: HatdenSet = {
       // id: this.usrsrv.compid,

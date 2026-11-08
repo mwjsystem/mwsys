@@ -76,6 +76,9 @@ export class GcdhelpComponent implements OnInit {
   }
 
   filterGcd() {
+    // 商品コード・グループコードは大文字で登録されているので、小文字で入れても（受け取っても）大文字で探す
+    this.gcode = String(this.gcode ?? '').toUpperCase();
+    this.code = String(this.code ?? '').toUpperCase();
     // console.log(this.tkbn);
     let varWh: HasuraWhere = {
       "where": {
@@ -154,6 +157,27 @@ export class GcdhelpComponent implements OnInit {
         this.refresh();
       }
     );
+  }
+
+  /**
+   * 打っている間に小文字を大文字にする（以前は欄を離れたときだけ変換していた）。
+   * 日本語入力の変換中は触らない（変換が壊れるため）。カーソルの位置はそのまま
+   */
+  toUpperLive(event: Event, cur: string): string {
+    const el = event.target as HTMLInputElement;
+    if ((event as InputEvent).isComposing) {
+      return cur;
+    }
+    const up = el.value.toUpperCase();
+    if (up !== el.value) {
+      const s = el.selectionStart;
+      const e = el.selectionEnd;
+      el.value = up;
+      if (s != null && e != null) {
+        el.setSelectionRange(s, e);
+      }
+    }
+    return up;
   }
 
   convUpper(event: Event): string {

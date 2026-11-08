@@ -30,6 +30,7 @@ import { TabDirective } from '../core/directives/tabidx/tab.directive';
 import { NuminputDirective } from '../core/directives/numinput.directive';
 import { GridNavDirective } from '../core/directives/gridnav.directive';
 import { sijiOf } from '../frmsiji/siji';
+import { dropEmptyMei, validIgnoringEmpty } from '../share/mei-row';
 import { rowCtl, objectToArray } from '../core/form-helpers';
 import { DecimalPipe, PercentPipe } from '@angular/common';
 
@@ -287,7 +288,12 @@ export class JmeitblComponent implements OnInit {
     this.refresh();
   }
 
+  /** 空の明細行だけが原因のエラーなら、個口計算・保存はできる（テンプレートから使う） */
+  readonly validIgnoringEmpty = validIgnoringEmpty;
+
   setKoguchi() {
+    // 最後の欄の Enter で足した空の行は消してから計算する
+    dropEmptyMei(this.frmArr);
     // console.log(this.frmArr);
     let i: number = 0;
     let forDel: number[] = [];
