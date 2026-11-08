@@ -24,6 +24,7 @@
   帯の注文用紙を読み込みます。複数のファイルを選べます。用紙 1 枚 = 受注伝票 1 枚です。
   色帯は「0号〜8号」の表（CB19・CB-K・CBKK1・CB19-H）、色は行名の先頭の文字で決めます。線入りの色帯はモール代（半周）を足します（品番が SV 付きの帯は線の代金を含むので数えません）。CB-K の赤帯は極真会刺繍代（Z05 600 円）と織マーク代（Z14 100 円）を足します。
   黒帯は「金モールN本」の行の表（品番 BBY1・BB）、金モールは「単価に含む本数」を超えた分を金モール代（一周）にします。織マーク代は用紙ごとに付けられます。
+  名前の一覧の用紙（「お名前・号数」の列。帯色の列があれば色帯、無ければ黒帯で段 = 金モールの本数）は 1 人 1 行で名前を明細備考にし、ネーム刺繍代（Z05。黒帯は 6 文字目から）・道場名の刺繍代（Z06）を足します。
   単価は受注伝票と同じく顧客の単価区分（特別単価があればそれ）、モール代・織マーク代は画面の単価です。受注方法はメール、受注日は今日、納品先は顧客の住所です。
   用紙に送り先・備考の記入があるときは、登録後に受注伝票で直してください。倉庫は明細ごとに選べます（初期値 01）。
 </p>
@@ -81,6 +82,22 @@
         </label>
         @if (o.goldOnForm != null) {
           <span style="color: #666666;">（用紙の金モール数 {{o.goldOnForm}} 本）</span>
+        }
+      }
+      @if (o.list) {
+        <label>ネーム刺繍（Z05）単価
+          <input type="number" min="0" step="1" style="width: 5em; text-align: right;" [(ngModel)]="o.nameTanka" (change)="changeSetting(o)" [disabled]="busy || !!o.denno">円
+        </label>
+        <label>帯の単価に含む文字数
+          <input type="number" min="0" step="1" style="width: 4em; text-align: right;" [(ngModel)]="o.nameFree" (change)="changeSetting(o)" [disabled]="busy || !!o.denno">文字
+        </label>
+        @if (hasDojo(o)) {
+          <label>道場名の刺繍（Z06）単価
+            <input type="number" min="0" step="1" style="width: 5em; text-align: right;" [(ngModel)]="o.dojoTanka" (change)="changeSetting(o)" [disabled]="busy || !!o.denno">円
+          </label>
+          <label>明細備考（道場名）
+            <input style="width: 10em;" [(ngModel)]="o.dojoMemo" (change)="changeSetting(o)" maxlength="40" [disabled]="busy || !!o.denno">
+          </label>
         }
       }
       <label>

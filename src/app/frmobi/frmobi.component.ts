@@ -65,10 +65,17 @@ export class FrmobiComponent implements OnInit {
     o.goldTanka = Math.max(0, Math.round(Number(o.goldTanka) || 0));
     o.oriTanka = Math.max(0, Math.round(Number(o.oriTanka) || 0));
     o.goldIncl = Math.max(0, Math.round(Number(o.goldIncl) || 0));
+    o.nameTanka = Math.max(0, Math.round(Number(o.nameTanka) || 0));
+    o.nameFree = Math.max(0, Math.round(Number(o.nameFree) || 0));
+    o.dojoTanka = Math.max(0, Math.round(Number(o.dojoTanka) || 0));
     const scodes = new Map(o.lines.map(l => [l.gcode + '|' + l.label, l.scode]));
     buildObiLines(o);
     o.lines.forEach(l => l.scode = scodes.get(l.gcode + '|' + l.label) ?? l.scode);
     await this.changeMcode(o);
+  }
+
+  hasDojo(o: ObiOrder): boolean {
+    return o.colorCells.some(c => c.dojo);
   }
 
   taxName(o: ObiOrder): string {
@@ -112,7 +119,7 @@ export class FrmobiComponent implements OnInit {
           }
         });
         if (found == 0) {
-          errs.push(f.name + '：色帯・黒帯の表（号の見出しと、色・金モールの本数の行）が見つかりません（名前の一覧の用紙はまだ取り込めません）');
+          errs.push(f.name + '：色帯・黒帯の表（号の見出しと、色・金モールの本数の行）も、名前の一覧（「お名前」「号数」の列）も見つかりません');
         }
       }
       for (const o of this.orders) {

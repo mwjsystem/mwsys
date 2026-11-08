@@ -114,10 +114,21 @@ export interface ObiLine {
   scode: string;
 }
 
-/** 色帯の表のマス（数量のあるもの） */
-export interface ColorCell { label: string; size: string; color: string; line: '' | 'silver' | 'gold'; qty: number }
-/** 黒帯の表のマス（gold は金モールの本数） */
-export interface BlackCell { label: string; size: string; gold: number; qty: number }
+/** 色帯の表のマス（数量のあるもの）。名前の一覧の用紙は 1 人 1 行（name・dojo は道場名の刺繍あり） */
+export interface ColorCell { label: string; size: string; color: string; line: '' | 'silver' | 'gold'; qty: number; name?: string; dojo?: boolean }
+/** 黒帯の表のマス（gold は金モールの本数。名前の一覧の用紙は段）。名前の一覧の用紙は 1 人 1 行 */
+export interface BlackCell { label: string; size: string; gold: number; qty: number; name?: string }
+
+/** ネーム刺繍・道場名刺繍の商品コード・単価の初期値（現行マクロと同じ） */
+export const NAME_GCODE = 'Z05';
+export const NAME_DEFAULT_TANKA = 250;
+export const DOJO_GCODE = 'Z06';
+export const DOJO_DEFAULT_TANKA = 2000;
+/** 黒帯の名前の一覧で、帯の単価に含むネームの文字数（現行の極真黒帯の用紙と同じ。6 文字目から刺繍代） */
+const BLACK_NAME_FREE = 5;
+
+/** 名前の文字数（空白を除く） */
+export const nameLen = (s: string) => (s ?? '').replace(/[\s　]+/g, '').length;
 
 export interface ObiOrder {
   fileName: string;
@@ -144,6 +155,14 @@ export interface ObiOrder {
   ori: boolean;
   oriTanka: number;
   oriMemo: string;
+  /** 名前の一覧の用紙（1 人 1 行） */
+  list: boolean;
+  /** ネーム刺繍代（Z05）の単価・帯の単価に含む文字数 */
+  nameTanka: number;
+  nameFree: number;
+  /** 道場名の刺繍代（Z06）の単価・明細備考（道場名） */
+  dojoTanka: number;
+  dojoMemo: string;
   lines: ObiLine[];
   /** 用紙の備考・送り先の記入（伝票備考にする・確認用） */
   bikou: string;
@@ -212,9 +231,14 @@ function sizeCols(row: string[]): Map<number, string> | null {
  * 色帯・黒帯の表がどちらも無ければ null。kindKey を渡せばその種類で、無ければ用紙の見出しで判定する
  */
 export function parseObiSheet(rows: string[][], fileName: string, sheet: string, kindKey?: string): ObiOrder | null {
+  // 記入例のシート（「料金自動計算付発注書【例】」など）は読まない
+  if (/【例】|\(例\)|（例）|記入例/.test(sheet)) {
+    return null;
+  }
   const order: ObiOrder = {
     fileName, sheet, mcode: '', kind: '', black: '', title: '', colorCells: [], blackCells: [], goldOnForm: null,
     mallTanka: MALL_DEFAULT_TANKA, goldTanka: GOLD_DEFAULT_TANKA, goldIncl: 0, ori: false, oriTanka: ORI_DEFAULT_TANKA, oriMemo: '',
+    list: false, nameTanka: NAME_DEFAULT_TANKA, nameFree: 0, dojoTanka: DOJO_DEFAULT_TANKA, dojoMemo: '',
     lines: [], bikou: '', okurisaki: '', belts: 0, sv: 0, blackBelts: 0,
     perr: '', pwarn: '', mname: '', err: '', warn: '', result: '', denno: null
   };
@@ -284,7 +308,11 @@ export function parseObiSheet(rows: string[][], fileName: string, sheet: string,
     hr = r;
   }
   if (firstHead < 0) {
-    return null;
+    firstHead = parseNameList(rows, order, unknown);
+    if (firstHead < 0) {
+      return null;
+    }
+    lastRow = rows.length;
   }
 
   // 色帯の種類（表より上の文字）
@@ -338,6 +366,78 @@ export function parseObiSheet(rows: string[][], fileName: string, sheet: string,
   return order;
 }
 
+/**
+ * 名前の一覧の用紙（1 人 1 行。第 3 段階）を読む。見出しの行（「お名前」か「名前」と「号数」の列）が無ければ -1。
+ *  - 「帯色」の列があれば色帯（CB-K の指示書など）: 帯色・号数・名前、「銀線の有無」「道場名の有無」が〇なら銀線入り・道場名の刺繍あり
+ *  - 無ければ黒帯（極真の黒帯発注書など）: お名前・段・号数。金モールは段の本数（1 本目は帯の単価に含む）
+ * 見出しの行を返す
+ */
+function parseNameList(rows: string[][], order: ObiOrder, unknown: string[]): number {
+  const hr = rows.findIndex(r => r.some(c => /^(お名前|名前)$/.test(clean(c ?? ''))) && r.some(c => clean(c ?? '') == '号数'));
+  if (hr < 0) {
+    return -1;
+  }
+  const col = (re: RegExp) => rows[hr].findIndex(c => re.test(clean(c ?? '')));
+  const cName = col(/^(お名前|名前)$/);
+  const cSize = col(/^号数$/);
+  const cDan = col(/^段/);
+  const cColor = col(/^帯色|^色$/);
+  const cSilver = col(/^銀線/);
+  const cDojo = col(/^道場名/);
+  order.list = true;
+  const top = rows.slice(0, hr + 1).flatMap(r => r.filter(c => c)).map(clean).join(' ');
+  if (cColor < 0) {
+    order.black = BLACK_KINDS.find(b => top.includes(b)) ?? 'BBY1';
+    order.goldIncl = 1;
+    order.nameFree = BLACK_NAME_FREE;
+  }
+  const yes = (s: string) => /^[〇○◯Oo1有]/.test(clean(s ?? ''));
+  let dan4 = 0;
+  for (let r = hr + 1; r < rows.length; r++) {
+    const row = rows[r];
+    const name = (row[cName] ?? '').trim();
+    const sizeText = clean(row[cSize] ?? '').replace(/号$/, '');
+    // 一覧の下の合計の行（「金モール本数」「文字計」など）で終わり
+    if (/本数|合計|文字計|^計$/.test(clean(name)) || /文字計|合計/.test(sizeText)) {
+      break;
+    }
+    if (!name && !sizeText) {
+      continue;
+    }
+    const label = (r + 1) + '行目 ' + name;
+    if (!/^\d$/.test(sizeText)) {
+      unknown.push(label + '（号数 ' + (row[cSize] ?? '') + '）');
+      continue;
+    }
+    if (cColor >= 0) {
+      const color = COLORS.find(([ch]) => clean(row[cColor] ?? '').startsWith(ch))?.[1];
+      if (!color) {
+        unknown.push(label + '（帯色 ' + (row[cColor] ?? '') + '）');
+        continue;
+      }
+      order.colorCells.push({
+        label, size: sizeText, color, line: cSilver >= 0 && yes(row[cSilver]) ? 'silver' : '', qty: 1, name,
+        dojo: cDojo >= 0 && yes(row[cDojo])
+      });
+    } else {
+      const dan = cDan >= 0 ? toNum(row[cDan] ?? '') : 0;
+      if (dan >= 4) {
+        dan4++;
+      }
+      order.blackCells.push({ label, size: sizeText, gold: dan, qty: 1, name });
+    }
+  }
+  if (dan4 > 0) {
+    order.pwarn = '4 段以上の帯が ' + dan4 + ' 本あります。極真技術審査機構の代金などがあれば、受注伝票に手で追加してください';
+  }
+  // 顧客コードの欄が無い用紙は、見出しの先頭の数字（「410947極真会館…」）
+  const m = top.match(/(?:^|\s)(\d{5,6})(?=\D)/);
+  if (m) {
+    order.mcode = m[1];
+  }
+  return hr;
+}
+
 /** 用紙の数量と画面の設定から明細を作る（設定を変えたら呼び直す） */
 export function buildObiLines(o: ObiOrder): void {
   const kind = OBI_KINDS.find(k => k.key == o.kind) ?? OBI_KINDS.find(k => k.key == 'CB19')!;
@@ -347,10 +447,15 @@ export function buildObiLines(o: ObiOrder): void {
   o.sv = 0;
   o.blackBelts = 0;
   // 色帯
+  let chars = 0;
+  let dojo = 0;
   for (const c of o.colorCells) {
     const sv = c.line != '';
     const gcode = kind.code(c.size, c.color, sv);
-    lines.push(line(gcode, c.label + ' ' + c.size + '号', c.qty, c.line == 'gold' ? '金ﾓｰﾙ入り' : sv ? kind.svMemo : ''));
+    const memo = c.name ?? (c.line == 'gold' ? '金ﾓｰﾙ入り' : sv ? kind.svMemo : '');
+    lines.push(line(gcode, c.name != null ? c.label : c.label + ' ' + c.size + '号', c.qty, memo));
+    chars += Math.max(0, nameLen(c.name ?? '') - o.nameFree);
+    dojo += c.dojo ? c.qty : 0;
     o.belts += c.qty;
     if (sv) {
       o.sv += c.qty;
@@ -367,12 +472,22 @@ export function buildObiLines(o: ObiOrder): void {
   // 黒帯（号・金モールの本数ごとに 1 行。単価に含む本数を超えた金モールを MALL にする）
   let gold = 0;
   for (const c of o.blackCells) {
-    lines.push(line(o.black + '-' + c.size, c.label + ' ' + c.size + '号', c.qty, c.gold > 0 ? '金ﾓｰﾙ' + c.gold + '本' : ''));
+    const memo = c.name ?? (c.gold > 0 ? '金ﾓｰﾙ' + c.gold + '本' : '');
+    lines.push(line(o.black + '-' + c.size, c.name != null ? c.label + '（' + c.gold + '段）' : c.label + ' ' + c.size + '号', c.qty, memo));
     o.blackBelts += c.qty;
     gold += c.qty * Math.max(0, c.gold - o.goldIncl);
+    chars += Math.max(0, nameLen(c.name ?? '') - o.nameFree);
   }
   if (gold > 0) {
-    lines.push(line(MALL_GCODE, '黒帯の金モール代（一周）', gold, '金/一周', o.goldTanka));
+    lines.push(line(MALL_GCODE, '黒帯の金モール代（一周）', gold, o.list ? '金線入れ' : '金/一周', o.goldTanka));
+  }
+  // ネーム刺繍代（文字数）・道場名の刺繍代（名前の一覧の用紙）
+  if (chars > 0) {
+    lines.push(line(NAME_GCODE, 'ネーム刺繍代（' + (o.nameFree > 0 ? o.nameFree + ' 文字を超えた分' : '文字数') + '）', chars,
+      o.nameFree > 0 ? '追加ﾈｰﾑ文字数' : 'ﾈｰﾑ刺繍 1文字' + o.nameTanka + '円', o.nameTanka));
+  }
+  if (dojo > 0) {
+    lines.push(line(DOJO_GCODE, '道場名の刺繍代', dojo, o.dojoMemo, o.dojoTanka));
   }
   // 織マーク代（帯の本数分）
   const all = o.belts + o.blackBelts;
