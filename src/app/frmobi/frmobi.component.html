@@ -1,0 +1,88 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>帯注文取込</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+@if (error) {
+  <p class="err" style="white-space: pre-line;">{{error}}</p>
+}
+<div class="bar">
+  <button mat-raised-button color="primary" type="button" (click)="xls.click()" [disabled]="busy">
+    <mat-icon>upload_file</mat-icon>注文用紙（Excel）を選ぶ
+  </button>
+  <input #xls type="file" accept=".xlsx" multiple hidden (change)="onFile($event)">
+  <button mat-raised-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
+    <mat-icon>save</mat-icon>登録（{{targetCount}} 件）
+  </button>
+  @if (progress) {
+    <span>{{progress}}</span>
+  }
+</div>
+@if (message) {
+  <p class="msg">{{message}}</p>
+}
+<p class="note">
+  色帯の注文用紙（「0号〜8号」の表。CB19・CB-K・CBKK1・CB19-H）を読み込みます。複数のファイルを選べます。用紙 1 枚 = 受注伝票 1 枚です。
+  色は行名の先頭の文字、銀線入りの行は銀線（MALL）代を足します。CB-K の赤帯は極真会刺繍代（Z05 600 円）と織マーク代（Z14 100 円）を足します。
+  単価は受注伝票と同じく顧客の単価区分（特別単価があればそれ）です。受注方法はメール、受注日は今日、納品先は顧客の住所です。
+  用紙に送り先・備考の記入があるときは、登録後に受注伝票で直してください。倉庫は明細ごとに選べます（初期値 01）。
+</p>
+@for (o of orders; track $index) {
+  <div class="scroll" style="max-height: none; border: 1px solid #cccccc; padding: 6px; margin-bottom: 10px;"
+    [style.background]="o.err || o.result.startsWith('エラー') ? '#fde7e7' : ''">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 13px;">
+      <b>{{o.fileName}}</b><span>（シート {{o.sheet}}）</span>
+      <label>帯の種類
+        <select [ngModel]="o.kind" (ngModelChange)="changeKind(o, $event)" [disabled]="busy || !!o.denno">
+          @for (k of kinds; track k.key) {
+            <option [value]="k.key">{{k.name}}</option>
+          }
+        </select>
+      </label>
+      @if (o.title) {
+        <span style="font-size: 11px; color: #666666;">用紙の見出し：{{o.title}}</span>
+      }
+      <label>顧客コード
+        <input class="mc" style="width: 7em;" [(ngModel)]="o.mcode" (change)="changeMcode(o)" maxlength="12" [disabled]="busy || !!o.denno">
+      </label>
+      <span>{{o.mname}}</span>
+      <span>帯 {{o.belts | number}} 本{{o.sv ? '（銀線入り ' + o.sv + ' 本）' : ''}}</span>
+      <span>金額（{{taxName(o)}}）{{amount(o) | number:'1.0-0'}} 円</span>
+      <span>{{o.err ? 'エラー：' + o.err : o.result}}</span>
+      <app-denlink [denno]="o.denno" />
+    </div>
+    @if (o.warn) {
+      <p class="warnc" style="margin: 4px 0;">{{o.warn}}</p>
+    }
+    @if (o.okurisaki || o.bikou) {
+      <p style="margin: 4px 0; font-size: 12px; color: #c62828;">
+        @if (o.okurisaki) {
+          送り先の記入：{{o.okurisaki}}
+        }
+        @if (o.bikou) {
+          備考：{{o.bikou}}
+        }
+      </p>
+    }
+    <table class="rep">
+      <thead>
+        <tr><th>用紙の行</th><th>商品コード</th><th>商品名</th><th>数量</th><th>単価</th><th>金額</th><th>明細備考</th><th>倉庫</th></tr>
+      </thead>
+      <tbody>
+        @for (l of o.lines; track $index) {
+          <tr [class.ng]="!l.gtext">
+            <td>{{l.label}}</td><td>{{l.gcode}}</td><td>{{l.gtext}}</td>
+            <td class="num">{{l.qty | number}}</td><td class="num">{{l.tanka | number}}</td>
+            <td class="num">{{money(o, l) | number}}</td><td>{{l.memo}}</td>
+            <td>
+              <select [(ngModel)]="l.scode" [disabled]="busy || !!o.denno">
+                @for (s of strsrv.scds; track s.value) {
+                  <option [value]="s.value">{{s.viewval}}</option>
+                }
+              </select>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
