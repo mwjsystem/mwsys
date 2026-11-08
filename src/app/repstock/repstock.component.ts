@@ -86,7 +86,8 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           this.scode = params['scode'];
           //   this.chSok=true;
         } else {
-          this.scode = result.scode
+          // 担当者の倉庫が無ければ朝来倉庫（01）を最初に表示する
+          this.scode = result.scode || '01';
         }
         if (params['gcode'] != null) {
           this.gcode = params['gcode'];
@@ -116,9 +117,8 @@ export class RepstockComponent implements OnInit, AfterViewInit {
   }
   onEnter(): void {
     // console.log(this.usrsrv.staff.scode,this.scode != null);
-    if (this.scode != null) {
-    } else {
-      this.scode = this.usrsrv.staff.scode;
+    if (!this.scode) {
+      this.scode = this.usrsrv.staff.scode || '01';
     }
     if (this.gcode !== this.stcsrv.stcGcd) {
       this.stcsrv.stc.stock = 0;

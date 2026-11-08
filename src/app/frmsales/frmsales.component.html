@@ -633,9 +633,11 @@
       <mat-label>消費税</mat-label>
       <input matInput [value]="form.value.taxtotal | number" class="i_num" disabled>
     </mat-form-field>
-    <mat-form-field style="width:6em;" class="i_num fw_b">
-      <mat-label>税込合計額</mat-label>
-      <input matInput [value]="form.value.total | number" class="i_num" disabled>
+    <!-- 税込合計額は一番目立たせる（大きく・太字・濃い赤。disabled の灰色の文字色を上書き） -->
+    <mat-form-field style="width:8em;" class="i_num fw_b">
+      <mat-label style="font-weight: bold;">税込合計額</mat-label>
+      <input matInput [value]="form.value.total | number" class="i_num" disabled
+        style="font-size: 1.35em; font-weight: bold; color: #b71c1c !important; -webkit-text-fill-color: #b71c1c;">
     </mat-form-field>
     <mat-form-field style="width:6em;" class="i_num">
       <mat-label>商品原価</mat-label>

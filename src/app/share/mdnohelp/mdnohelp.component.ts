@@ -27,7 +27,8 @@ interface Movsub {
   incode: string;
   outcode: string;
   tcode: string;
-  obikou: string;
+  /** 伝票備考（以前は無い列 obikou を問い合わせていて、検索がエラーになり灰色の画面のまま止まっていた） */
+  dmemo: string | null;
   updated_at: Date;
   updated_by: string
 }
@@ -67,7 +68,7 @@ export class MdnohelpComponent implements OnInit, OnDestroy {
     'incode',
     'outcode',
     'tcode',
-    'obikou',
+    'dmemo',
     'updated_at',
     'updated_by'
   ];
@@ -80,6 +81,12 @@ export class MdnohelpComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;
     this.fday.setMonth(this.fday.getMonth() - 1);
+    this.strsrv.getStore();
+  }
+
+  /** 倉庫の名前（一覧で倉庫コードの横に出す） */
+  storeName(code: string): string {
+    return this.strsrv.scds.find(e => e.value == code)?.viewval ?? '';
   }
 
   ngOnDestroy(): void {
@@ -89,7 +96,7 @@ export class MdnohelpComponent implements OnInit, OnDestroy {
   get_movden(): void {
     let varWh: HasuraWhere = { "where": { "_and": [{ "id": { "_eq": this.usrsrv.compid } }] } };
     if (this.fday) {
-      varWh.where._and.push({ "day": { "_gt": this.fday } });
+      varWh.where._and.push({ "day": { "_gt": this.usrsrv.formatDate(this.fday) } });
     }
     if (this.fincd) {
       varWh.where._and.push({ "incode": { "_eq": this.fincd } });
@@ -108,7 +115,7 @@ export class MdnohelpComponent implements OnInit, OnDestroy {
         incode
         outcode
         tcode
-        obikou
+        dmemo
         updated_at
         updated_by
       }
@@ -122,13 +129,23 @@ export class MdnohelpComponent implements OnInit, OnDestroy {
       variables: varWh
     })
       .valueChanges
-      .subscribe(({ data }) => {
+      .subscribe((res) => {
+        // Apollo（v4）はエラーを結果の error で返す（data は無い）。灰色の画面（読み込み中）のまま止まらないよう、外してから知らせる
+        if (res.error) {
+          console.log('error query get_movsub', res.error);
+          this.usrsrv.toastErr('移動伝票を検索できませんでした', res.error.message);
+          this.overlayRef.detach();
+          this.cdRef.detectChanges();
+          return;
+        }
+        const data = res.data;
         if (!data) {
           return;
         }
         const result = data as MovsubResult;
         if (result.trmovsub.length == 0) {
           this.usrsrv.toastWar("条件に合うデータが見つかりませんでした");
+          this.dataSource = new MatTableDataSource<Movsub>([]);
         } else {
           let srcdata = result.trmovsub;
           this.dataSource = new MatTableDataSource<Movsub>(srcdata);

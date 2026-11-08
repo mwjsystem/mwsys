@@ -186,15 +186,20 @@ export class JmeitblComponent implements OnInit {
   }
   calcMei(i: number): void {
     const ctrl = this.frmArr.controls[i].value;
-    const lcmoney: number = ctrl.tanka * ctrl.suu;
-    const lctaxrate: number = +this.frmArr.getRawValue()[i]['taxrate'] / 100;
+    // 単価・数量が空でも計算できるように 0 とみなす。税率が無い商品（単価未登録など）は 10%、税区分が無ければ顧客の税区分（無ければ外税）
+    const tanka = Number(ctrl.tanka) || 0;
+    const suu = Number(ctrl.suu) || 0;
+    const lcmoney: number = tanka * suu;
+    const rate = Number(this.frmArr.getRawValue()[i]['taxrate']);
+    const lctaxrate: number = (isNaN(rate) || this.frmArr.getRawValue()[i]['taxrate'] == null || this.frmArr.getRawValue()[i]['taxrate'] === '' ? 10 : rate) / 100;
     let lctaxmoney: number = 0;
     let lctoutmoney: number = 0;
     let lctinmoney: number = 0;
     let lcgenka: number = 0;
-    switch (this.frmArr.getRawValue()[i]['mtax']) {
+    const mtax = this.frmArr.getRawValue()[i]['mtax'] ?? this.jmisrv.mtax ?? '0';
+    switch (mtax) {
       case '0':
-        lctaxmoney = Math.round(ctrl.tanka * lctaxrate) * ctrl.suu;
+        lctaxmoney = Math.round(tanka * lctaxrate) * suu;
         lctoutmoney = lcmoney;
         lctinmoney = lcmoney + lctaxmoney;
         break;
@@ -210,8 +215,7 @@ export class JmeitblComponent implements OnInit {
         lctinmoney = lcmoney;
         break;
     }
-    console.log('calc_mei',ctrl);
-    lcgenka = Math.round(ctrl.genka * ctrl.suu);
+    lcgenka = Math.round((Number(ctrl.genka) || 0) * suu);
     this.frmArr.controls[i].patchValue({
       money: lcmoney,
       tgenka: lcgenka,
@@ -622,35 +626,34 @@ export class JmeitblComponent implements OnInit {
           rowCtl<RowField>(this.frmArr.controls[i]).gcode.setErrors(null);
           this.frmArr.controls[i].patchValue(msgds);
           this.frmArr.controls[i].patchValue(msgds.msggroup);
-          this.frmArr.controls[i].patchValue(msgds.msgtankas[0]);
-          this.frmArr.controls[i].patchValue({ scode: this.parentForm().value.scode });
-          let lctanka: number = 0;
-          let lcgenka: number = 0;
-          // console.log(msgds.msgtankas[0], this.usrsrv.system.currate);
-          if (msgds.msgtankas[0].currency == "USD") {
-            lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate);
-            // lcgenka = Math.round((msgds.msgtankas[0].genka) * this.usrsrv.system.currate) + msgds.msgtankas[0].cost;
-          } else {
-            lcgenka = msgds.msgtankas[0].genka;
-            // lcgenka = msgds.msgtankas[0].genka + msgds.msgtankas[0].cost;
+          // 単価が未登録の商品（GOODS-OEM など）は単価の行が無い。無いときも税率・税区分は入れる（手で単価を入れたとき税込金額・合計が出るように）
+          const t0 = msgds.msgtankas[0];
+          if (t0) {
+            this.frmArr.controls[i].patchValue(t0);
           }
-		  let j: number = -1;
-		  if ( msgds.msgtankas.length === 0) {
-
-		  }	else {
-		    j = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn)
-		  }		
-		  // console.log(msgds.msgsptnks,this.jmisrv.sptnkbn,j);
+          this.frmArr.controls[i].patchValue({ scode: this.parentForm().value.scode });
+          let lctanka: number | null = null;
+          let lcgenka: number = 0;
+          if (t0?.currency == "USD") {
+            lcgenka = Math.round((t0.genka) * this.usrsrv.system.currate);
+          } else {
+            lcgenka = t0?.genka ?? 0;
+          }
+          let j: number = -1;
+          if (t0) {
+            j = msgds.msgsptnks.findIndex(obj => obj.sptnkbn == this.jmisrv.sptnkbn);
+          }
           if (j > -1) {
             lctanka = msgds.msgsptnks[j].sptanka;
-          } else {
-            lctanka = msgds.msgtankas[0][('tanka' + this.jmisrv.tankakbn) as TankaKey];
+          } else if (t0) {
+            lctanka = t0[('tanka' + this.jmisrv.tankakbn) as TankaKey];
           }
-          // console.log(i, lctanka);
           this.frmArr.controls[i].patchValue({
             mtax: this.jmisrv.mtax,
-            tanka1: msgds.msgtankas[0]['tanka1'],
-            tanka: lctanka,
+            taxrate: t0?.taxrate ?? '10',
+            tanka1: t0?.['tanka1'] ?? null,
+            // 単価が 0・未登録の商品（Z06・Z14 など手で入れる商品）は 0 を入れず空にする（0 を消す手間を省く）
+            tanka: lctanka ? lctanka : null,
             genka: lcgenka
           });
           if (msgds.ordering) {
@@ -949,7 +952,8 @@ export class JmeitblComponent implements OnInit {
           gcode: this.usrsrv.editFrmval(control, 'gcode'),
           gtext: this.usrsrv.editFrmval(control, 'gtext'),
           suu: this.usrsrv.editFrmval(control, 'suu'),
-          tanka: this.usrsrv.editFrmval(control, 'tanka'),
+          // 単価を空のままにしたときは 0 で保存する（入力時に 0 を出さないようにしたため）
+          tanka: this.usrsrv.editFrmval(control, 'tanka') ?? 0,
           toutmoney: this.usrsrv.editFrmval(control, 'toutmoney'),
           tinmoney: this.usrsrv.editFrmval(control, 'tinmoney'),
           mmemo: this.usrsrv.editFrmval(control, 'mmemo'),

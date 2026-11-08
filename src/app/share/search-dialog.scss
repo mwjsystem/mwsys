@@ -1,9 +1,13 @@
 // 伝票番号検索系ダイアログ（jdnohelp / ndnohelp / hdnohelp / sdnohelp / mdnohelp）で共通の見た目。
 // jdnohelp.component.scss のレイアウトを共有化したもの。Material 3 のシステムトークン（--mat-sys-*）を使う。
+// ダイアログ全体はスクロールさせず、検索結果（.jdh-content）だけをスクロールさせる。
+// 両方がスクロールすると、外側を動かしたときに見出しの行（sticky）が表と一緒に動き、ずれて見える
 :host {
   display: flex;
   flex-direction: column;
+  height: 100%;
   max-height: 100%;
+  overflow: hidden;
 }
 
 .jdh-title {
@@ -11,12 +15,15 @@
 }
 
 // ---- 検索条件 ----
+// 条件のグループは横に並べ、検索結果の高さを広く取る（入りきらない幅のときだけ折り返す）
 .jdh-filters {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin: 0 1.5rem 0.75rem;
-  padding: 0.75rem 1rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 1.5rem;
+  margin: 0 1.5rem 0.5rem;
+  padding: 0.5rem 1rem;
   background: var(--mat-sys-surface-container-low, #f7f2fa);
   border: 1px solid var(--mat-sys-outline-variant, #cac4d0);
   border-radius: 12px;
@@ -46,19 +53,25 @@
 .jdh-actions {
   display: flex;
   justify-content: flex-end;
+  margin-left: auto;
 }
 
 // ---- 検索結果 ----
 .jdh-content {
   flex: 1 1 auto;
   min-height: 0;
+  // Material の既定（高さ 65vh まで）をやめ、ダイアログの残りの高さいっぱいを使う
+  max-height: none;
+  overflow: auto;
+  // 見出しの行（sticky）はスクロール領域の上の余白の分だけ下で止まり、その隙間に明細の行が見えてしまうので、上の余白を無くす
+  padding-top: 0 !important;
 }
 
 .jdh-summary {
   display: flex;
   align-items: baseline;
   gap: 1rem;
-  padding: 0 0.25rem 0.5rem;
+  padding: 0.5rem 0.25rem 0.5rem;
 }
 
 .jdh-count {
@@ -74,13 +87,20 @@
 .jdh-table {
   width: 100%;
 
+  // 見出しの行はスクロールしても上に残す。下の行が透けたり上に重なったりしないよう、不透明にして前に出す
   th.mat-mdc-header-cell {
+    position: sticky;
+    top: 0;
+    z-index: 3;
     background: var(--mat-sys-surface-container, #f3edf7);
+    background-clip: padding-box;
     font-weight: 600;
     white-space: nowrap;
   }
 
   td.mat-mdc-cell {
+    position: relative;
+    z-index: 0;
     white-space: nowrap;
   }
 
