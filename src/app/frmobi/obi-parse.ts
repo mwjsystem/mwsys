@@ -34,6 +34,8 @@ export function sheetRows(ws: SheetLike, maxRows = 120, maxCols = 40): string[][
 export const OBI_DEFAULT_SCODE = '01';
 /** 銀線（モール）代の商品コード（銀線入りの帯 1 本につき 1） */
 export const MALL_GCODE = 'MALL';
+/** 銀線（MALL）代の単価の初期値（画面で変えられる） */
+export const MALL_DEFAULT_TANKA = 350;
 
 /** 帯の種類。code(号, 色, 銀線) で商品コードを作る */
 export interface ObiKind {
@@ -197,6 +199,7 @@ export function parseObiSheet(rows: string[][], fileName: string, sheet: string,
     perr: '', mname: '', err: '', warn: '', result: '', denno: null
   };
   const unknown: string[] = [];
+  let mall = 0;
   let r = hr + 1;
   for (; r < rows.length; r++) {
     const label = labelOf(rows[r]);
@@ -220,22 +223,27 @@ export function parseObiSheet(rows: string[][], fileName: string, sheet: string,
         unknown.push(label + ' ' + c.n + '号（数量 ' + c.qty + '）');
         continue;
       }
+      const gcode = kind.code(c.n, color, sv);
       order.lines.push({
-        gcode: kind.code(c.n, color, sv), label: label + ' ' + c.n + '号', qty: c.qty, memo: sv ? kind.svMemo : '',
+        gcode, label: label + ' ' + c.n + '号', qty: c.qty, memo: sv ? kind.svMemo : '',
         gtext: '', tanka: 0, taxrate: 10, genka: 0, scode: OBI_DEFAULT_SCODE
       });
       order.belts += c.qty;
       if (sv) {
         order.sv += c.qty;
+        // 品番が SV 付きの帯は銀線の代金を含むので、銀線（MALL）代には数えない（二重取りになる）
+        if (!gcode.endsWith('SV')) {
+          mall += c.qty;
+        }
       }
     }
   }
   order.lines.push(...(kind.extras?.(order.lines) ?? []));
-  // 銀線（モール）代：銀線入りの帯の本数
-  if (order.sv > 0) {
+  // 銀線（モール）代：品番に SV が付かない銀線入りの帯の本数。単価は画面で変えられる（初期値 350 円）
+  if (mall > 0) {
     order.lines.push({
-      gcode: MALL_GCODE, label: '銀線（モール）代', qty: order.sv, memo: '',
-      gtext: '', tanka: 0, taxrate: 10, genka: 0, scode: OBI_DEFAULT_SCODE
+      gcode: MALL_GCODE, label: '銀線（モール）代', qty: mall, memo: '', fixed: MALL_DEFAULT_TANKA,
+      gtext: '', tanka: MALL_DEFAULT_TANKA, taxrate: 10, genka: 0, scode: OBI_DEFAULT_SCODE
     });
   }
 

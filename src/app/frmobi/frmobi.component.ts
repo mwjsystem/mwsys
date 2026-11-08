@@ -5,7 +5,7 @@ import { UserService } from './../services/user.service';
 import { StoreService } from './../services/store.service';
 import { lineMoney } from './../frmrakuten/rakuten-parse';
 import { ObiService } from './obi.service';
-import { ObiLine, ObiOrder, OBI_KINDS, parseObiSheet, sheetRows } from './obi-parse';
+import { ObiLine, ObiOrder, OBI_KINDS, MALL_GCODE, parseObiSheet, sheetRows } from './obi-parse';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -31,6 +31,7 @@ export class FrmobiComponent implements OnInit {
   private cdRef = inject(ChangeDetectorRef);
 
   readonly kinds = OBI_KINDS;
+  readonly mallCode = MALL_GCODE;
   orders: ObiOrder[] = [];
   busy = false;
   error = '';
@@ -58,6 +59,13 @@ export class FrmobiComponent implements OnInit {
 
   amount(o: ObiOrder): number {
     return o.lines.reduce((s, l) => s + this.money(o, l), 0);
+  }
+
+  /** 銀線（MALL）の単価を画面で変えたとき（顧客コードを直して読み直しても残す） */
+  setMall(l: ObiLine, v: number | string | null) {
+    const n = Math.max(0, Math.round(Number(v) || 0));
+    l.tanka = n;
+    l.fixed = n;
   }
 
   taxName(o: ObiOrder): string {
