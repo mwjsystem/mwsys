@@ -33,13 +33,14 @@
   </button>
   <label style="font-size: 13px;" title="カレンダーを押して休日にする日に付ける名前です（国民の祝日の日は祝日の名前になります）。あとから右の一覧で変えられます">
     押して入れる日の名前
-    <input style="width: 9em;" list="holnames" [value]="newName" (input)="newName = $any($event.target).value" maxlength="20">
+    <input style="width: 9em;" [value]="newName" (input)="newName = $any($event.target).value" maxlength="20">
   </label>
-  <datalist id="holnames">
+  <select #pick1 class="pick" (change)="newName = pick1.value; pick1.value = ''" title="候補から選ぶ">
+    <option value="">候補から選ぶ</option>
     @for (n of nameOptions; track n) {
-      <option [value]="n"></option>
+      <option [value]="n">{{n}}</option>
     }
-  </datalist>
+  </select>
   @if (dirty) {
     <span class="warnc">未保存：休日の追加 {{added.length}} 日・削除 {{removed.length}} 日・名前の変更 {{renamed.length}} 日</span>
   }
@@ -85,8 +86,14 @@
     @for (d of list; track d) {
       <div class="hrow" [class.chg]="!saved.has(d) || renamed.includes(d)">
         <span class="hdate">{{dateLabel(d)}}</span>
-        <input class="hname" list="holnames" [class.paidname]="isPaidName(edits.get(d))" [value]="edits.get(d) ?? ''" (input)="setName(d, $any($event.target).value)" maxlength="20"
+        <input class="hname" [class.paidname]="isPaidName(edits.get(d))" [value]="edits.get(d) ?? ''" (input)="setName(d, $any($event.target).value)" maxlength="20"
           [disabled]="busy" [class.blank]="!(edits.get(d) ?? '').trim()" title="休日の名前（例：年末年始、夏季休業）">
+        <select #pick2 class="pick small" (change)="setName(d, pick2.value); pick2.value = ''" [disabled]="busy" title="候補から選ぶ">
+          <option value="">▼</option>
+          @for (n of nameOptions; track n) {
+            <option [value]="n">{{n}}</option>
+          }
+        </select>
       </div>
     } @empty {
       <div class="note">登録されていません</div>
