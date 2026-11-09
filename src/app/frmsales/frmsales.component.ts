@@ -460,6 +460,11 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   }
 
   onEnter() {
+    // 新規登録中（参照登録を含む）は読み込まない。伝票番号の欄からカーソルが外れたとき（blur）に、
+    // 伝票番号 0 として読み込み、入力中の内容を消してしまうため
+    if (this.mode == 1) {
+      return;
+    }
     this.jmisrv.denno = this.usrsrv.convNumber(this.jmisrv.denno);
     this.getJyuden(this.jmisrv.denno);
   }
@@ -849,6 +854,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.vnyuzan = { denno: 0, nyuzan: 0 };
     this.paid = false;
     this.savedUday = null;
+    // 元の伝票の登録日時・登録者などは出さない
+    this.usrsrv.setTmstmp({ created_at: '', created_by: '', updated_at: '', updated_by: '' });
     // 元の伝票の在庫の取り消し分（変更の保存で使う）は、新規では使わない
     this.jmisrv.trzaiko = [];
     this.jmisrv.isSaving = false;
