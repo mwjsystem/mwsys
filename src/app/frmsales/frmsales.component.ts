@@ -531,7 +531,14 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
             this.usrsrv.setTmstmp(jyuden);
             this.jmisrv.denno = denno;
 			this.vnyuzan = jyuden.vnyuzan;
-            this.paid = (jyuden.vnyuzan?.trnyusubs?.length ?? 0) > 0;
+            this.paid = false;
+            this.jmisrv.isPaid(denno).then(p => {
+              if (this.jmisrv.denno == denno && this.paid != p) {
+                this.paid = p;
+                this.refresh();
+                this.cdRef.detectChanges();
+              }
+            });
             this.savedUday = (jyuden.uday as unknown as string | null) ?? null;
             this.getMember(jyuden.mcode, false);
             if (jyuden.del == true) {

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, firstValueFrom } from 'rxjs';
 // import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
 import gql from 'graphql-tag';
@@ -127,7 +127,6 @@ export class JyumeiService {
         bkcode
 		vnyuzan {
           nyuzan
-          trnyusubs(limit: 1) { denno }
         }
         trjyumeis(order_by: {line: asc}) {
           line
@@ -193,16 +192,46 @@ export class JyumeiService {
         },
       })
         .valueChanges
-        .subscribe(({ data }) => {
-          if (!data) {
+        .subscribe((res) => {
+          // Apollo v4 はエラーを data なしの結果で返す。止まったままにならないよう、エラーとして渡す
+          if (res.error && !res.data) {
+            observer.error(res.error);
             return;
           }
-          observer.next((data as JyudenResult).trjyuden_by_pk);
+          if (!res.data) {
+            return;
+          }
+          observer.next((res.data as JyudenResult).trjyuden_by_pk);
         }, (error) => {
           observer.error(error);
         });
     });
     return observable;
+  }
+
+  /**
+   * 入金済か（入金が 1 件でも登録されているか）。受注伝票の読み込みとは別に読む
+   * （読めなかったときは、伝票の照会を止めないように false にする）
+   */
+  async isPaid(denno: number): Promise<boolean> {
+    const Get = gql`
+      query get_paid($id: smallint!, $dno: Int!) {
+        vnyuzan(where: {id: {_eq: $id}, denno: {_eq: $dno}}) {
+          trnyusubs(limit: 1) { denno }
+        }
+      }`;
+    try {
+      const res = await firstValueFrom(this.apollo.query<{ vnyuzan: { trnyusubs: { denno: number }[] }[] }>({
+        query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, dno: denno }, errorPolicy: 'all'
+      }));
+      if (res.error) {
+        throw res.error;
+      }
+      return ((res.data as { vnyuzan: { trnyusubs: { denno: number }[] }[] } | undefined)?.vnyuzan[0]?.trnyusubs?.length ?? 0) > 0;
+    } catch (e) {
+      console.log('error query get_paid', e);
+      return false;
+    }
   }
   async getDenno() {
     if (this.denno == 0) {
