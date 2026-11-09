@@ -600,8 +600,9 @@ export class UserService {
       control.clearValidators();
     });
   }
-  openMst(func: string, value: string) {
-    const url = this.router.createUrlTree(["/" + func, "3", value]);
+  /** 画面を別のタブで開く（mode: 3 = 照会。受注伝票の 5 = 参照登録） */
+  openMst(func: string, value: string, mode: string = "3") {
+    const url = this.router.createUrlTree(["/" + func, mode, value]);
     // window.open(url.toString(),null,'top=100,left=100');
     window.open(url.toString());
   }
@@ -732,6 +733,9 @@ export class UserService {
     }
     if (obj?.existed) {
       ret += "マスタ登録済です！";
+    }
+    if (obj?.closed) {
+      ret += "締め日（" + obj.closed + "）以前の日付は入力できません！";
     }
     // console.log(obj);
     if (i) {

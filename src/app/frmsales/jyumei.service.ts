@@ -57,6 +57,11 @@ export class JyumeiService {
   public obisu: number = 0;
   public iaddress: string = "";
   public trzaiko: mwI.Zaiko[] = [];
+  /**
+   * 明細を変えられない理由（入金済・締め日以前）。空でなければ、変更のときも明細の品番・数量・単価と行の追加・削除はできない
+   * （明細の商品名・明細備考は変えられる）
+   */
+  public meiLock: string = '';
   public subject = new Subject<boolean>();
   public observe = this.subject.asObservable();
   public isSaving!: boolean;
@@ -122,6 +127,7 @@ export class JyumeiService {
         bkcode
 		vnyuzan {
           nyuzan
+          trnyusubs(limit: 1) { denno }
         }
         trjyumeis(order_by: {line: asc}) {
           line

@@ -2,6 +2,8 @@ declare namespace mwI {
   interface Vnyuzan {
     denno: number;
 	nyuzan: number;
+	/** 入金の明細（1 件でもあれば入金済） */
+	trnyusubs?: { denno: number }[];
   }
   interface Jyuden {
     id: number;

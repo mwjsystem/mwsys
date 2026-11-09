@@ -14,6 +14,7 @@ const routes: Routes = [
   { path: 'frmamazon', loadChildren: () => import('./frmamazon/frmamazon.module').then(m => m.FrmamazonModule), canActivate: [AuthGuard] },
   { path: 'frmrakuten', loadChildren: () => import('./frmrakuten/frmrakuten.module').then(m => m.FrmrakutenModule), canActivate: [AuthGuard] },
   { path: 'repopelog', loadChildren: () => import('./repopelog/repopelog.module').then(m => m.RepopelogModule), canActivate: [AuthGuard] },
+  { path: 'mstclose', loadChildren: () => import('./mstclose/mstclose.module').then(m => m.MstcloseModule), canActivate: [AuthGuard] },
   { path: 'mstholiday', loadChildren: () => import('./mstholiday/mstholiday.module').then(m => m.MstholidayModule), canActivate: [AuthGuard] },
   { path: 'frmsiji', loadChildren: () => import('./frmsiji/frmsiji.module').then(m => m.FrmsijiModule), canActivate: [AuthGuard] },
   { path: 'frmtaikai', loadChildren: () => import('./frmtaikai/frmtaikai.module').then(m => m.FrmtaikaiModule), canActivate: [AuthGuard] },

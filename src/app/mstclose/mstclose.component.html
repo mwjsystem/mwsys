@@ -1,0 +1,31 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>締め日設定</span>
+  <span class="env">接続先：{{envName}}</span>
+</mat-toolbar>
+<p class="note">
+  締め日以前の売上日の受注伝票は、金額に関わる項目（受注先・締請求・代引金額・明細の品番・数量・単価、行の追加・削除）を変えられなくなります（出荷日・送り状・備考などは変えられます）。
+  また、受注伝票の出荷日・売上日に締め日以前の日付を入れられなくなります。月の締めが終わったら、その月の末日を入れてください。
+</p>
+<div class="bar" style="align-items: center; gap: 12px;">
+  <span style="font-size: 16px;">今の締め日：<b style="font-size: 20px;">{{label(saved)}}</b></span>
+  @if (!editing) {
+    <button mat-raised-button color="primary" type="button" (click)="startEdit()" [disabled]="busy || !!error && !saved">
+      <mat-icon>edit</mat-icon>変更
+    </button>
+  } @else {
+    <input type="date" [value]="day" (input)="day = $any($event.target).value" style="font-size: 16px;">
+    <button mat-button type="button" (click)="day = lastMonthEnd()" title="先月の末日を入れます">先月末</button>
+    <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="busy">
+      <mat-icon>save</mat-icon>保存
+    </button>
+    <button mat-raised-button type="button" (click)="cancel()" [disabled]="busy">
+      <mat-icon>close</mat-icon>キャンセル
+    </button>
+  }
+</div>
+@if (error) {
+  <p class="err">{{error}}</p>
+}
+@if (message) {
+  <p class="msg">{{message}}</p>
+}

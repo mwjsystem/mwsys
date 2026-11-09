@@ -159,6 +159,11 @@ export class RephistoryComponent {
     this.usrsrv.openMst('frmsales', String(o.head.denno));
   }
 
+  /** この伝票を元に新しい受注伝票を作る（受注伝票の参照登録を別のタブで開く） */
+  copyDen(o: HistOrder) {
+    this.usrsrv.openMst('frmsales', String(o.head.denno), '5');
+  }
+
   mcdHelp(): void {
     let dialogConfig = new MatDialogConfig();
     dialogConfig.width = '100vw';

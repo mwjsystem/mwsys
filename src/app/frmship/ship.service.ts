@@ -79,7 +79,7 @@ export interface ShipSave {
 
 interface JyudenQ {
   denno: number; mcode: string; ncode: string | null; nadr: number | null; iadr: number | null; buntype: string | null;
-  yday: string | null; sday: string | null; uday: string | null; hcode: string | null; okurisuu: number | null; okurino: string | null;
+  day?: string | null; yday: string | null; sday: string | null; uday: string | null; hcode: string | null; okurisuu: number | null; okurino: string | null;
   tcode: string | null; pcode: string | null; dmemo: string | null; nmemo: string | null; keep: string | null; cusden: string | null;
   total: number | null; taxtotal: number | null; gtotalzn: number | null; soryozn: number | null; tesuzn: number | null; nebikizn: number | null;
   total8: number | null; total10: number | null; denku: number | null; jdstatus: string | null; shipdir: string | null;
@@ -178,12 +178,12 @@ export class ShipService {
     const GetDoc = gql`
       query get_shipdoc($id: smallint!, $dnos: [Int!]!) {
         trjyuden(where: {id: {_eq: $id}, denno: {_in: $dnos}}) {
-          denno mcode ncode nadr iadr buntype yday sday uday hcode okurisuu okurino tcode pcode dmemo nmemo keep cusden
+          denno mcode ncode nadr iadr buntype day yday sday uday hcode okurisuu okurino tcode pcode dmemo nmemo keep cusden
           total taxtotal gtotalzn soryozn tesuzn nebikizn total8 total10 denku jdstatus shipdir
           hday htime omemo daibiki daibzei eidome eicode
         }
         trjyumei(where: {id: {_eq: $id}, denno: {_in: $dnos}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, order_by: [{denno: asc}, {line: asc}]) {
-          denno line gcode gtext suu touttanka toutmoney taxrate mmemo spec scode
+          denno line gcode gtext suu touttanka toutmoney tinmoney taxrate mmemo spec scode
         }
         msstaff(where: {id: {_eq: $id}}) { code sei mei }
         mshokuri(where: {id: {_eq: $id}}) { code name }
@@ -238,6 +238,9 @@ export class ShipService {
         irai: j.iadr != null ? { name: adr(j.mcode, j.iadr)?.adrname || memberName(j.mcode), adr: adr(j.mcode, j.iadr) } : undefined,
         sday: j.sday ?? '',
         yday: j.yday,
+        day: j.day ?? null,
+        gtotal: n(j.gtotalzn),
+        tcode: j.tcode,
         uday: j.uday,
         okurino: j.okurino,
         okurisuu: j.okurisuu,
@@ -257,7 +260,7 @@ export class ShipService {
           const g = goods.find(e => e.gcode == m.gcode);
           return {
             line: m.line, gcode: m.gcode, gtext: m.gtext, suu: sign * Number(m.suu ?? 0),
-            touttanka: Number(m.touttanka ?? 0), toutmoney: sign * Number(m.toutmoney ?? 0),
+            touttanka: Number(m.touttanka ?? 0), toutmoney: sign * Number(m.toutmoney ?? 0), tinmoney: sign * Number(m.tinmoney ?? 0),
             taxrate: m.taxrate, mmemo: m.mmemo, unit: g?.unit ?? null, tanano: g?.tanano ?? null, jan: g?.jan ?? null,
             spec: m.spec ?? null, scode: m.scode ?? null
           };

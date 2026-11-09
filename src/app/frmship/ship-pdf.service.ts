@@ -9,7 +9,7 @@ import { AmazonLabel, LabelOption, amazonLabelDoc } from './amazon-label';
 /** 住所（msmadr） */
 export interface ShipAdr { mcode: string; eda: number; zip: string | null; region: string | null; local: string | null; street: string | null; extend: string | null; extend2: string | null; adrname: string | null; tel?: string | null }
 /** 受注明細（trjyumei + 商品マスタの単位・棚番） */
-export interface ShipLine { line: number; gcode: string; gtext: string; suu: number; touttanka: number; toutmoney: number; taxrate: string | null; mmemo: string | null; unit: string | null; tanano: string | null; jan?: string | null; spec?: string | null; scode?: string | null }
+export interface ShipLine { line: number; gcode: string; gtext: string; suu: number; touttanka: number; toutmoney: number; taxrate: string | null; mmemo: string | null; unit: string | null; tanano: string | null; jan?: string | null; spec?: string | null; scode?: string | null; tinmoney?: number }
 /** 会社情報（mssystem） */
 export interface ShipSystem { kname: string | null; invno: string | null; zip: string | null; adr: string | null; tel: string | null; fax: string | null }
 
@@ -30,6 +30,12 @@ export interface ShipDoc {
   sday: string;
   /** 出荷予定日（yyyy-mm-dd） */
   yday?: string | null;
+  /** 受付日（yyyy-mm-dd） */
+  day?: string | null;
+  /** 商品の税抜合計（送料・手数料・値引きを除く） */
+  gtotal?: number;
+  /** 担当者コード */
+  tcode?: string | null;
   /** 売上日（yyyy-mm-dd） */
   uday: string | null;
   okurino: string | null;

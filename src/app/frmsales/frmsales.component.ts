@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild, inject } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, FormArray, AbstractControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl, FormArray, AbstractControl, Validators, ValidationErrors, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { dropEmptyMei, validIgnoringEmpty } from '../share/mei-row';
 import { Subscription, firstValueFrom } from 'rxjs';
 import gql from 'graphql-tag';
@@ -31,6 +31,8 @@ import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component
 import { SSTATUS } from './../frminvoice/invoice.service';
 import { JDST, shipNote } from './../frmship/ship-forms';
 import { ShipService } from './../frmship/ship.service';
+import { ClosedayService } from './../services/closeday.service';
+import { DenprintComponent, DenprintData } from './denprint.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -82,6 +84,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   jmisrv = inject(JyumeiService);
   private dwlsrv = inject(DownloadService);
   private shipsrv = inject(ShipService);
+  closesrv = inject(ClosedayService);
   private apollo = inject(Apollo);
   private overlay = inject(Overlay);
   private cdRef = inject(ChangeDetectorRef);
@@ -127,6 +130,31 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   });
   private jyudenSub?: Subscription;
   private memberSub?: Subscription;
+  /** 参照登録で元にする伝票番号（URL の mode が 5 のとき。読み込んだら新規の伝票にする） */
+  private copyFrom = 0;
+  /** 入金済（入金が 1 件でも登録されている）か */
+  paid = false;
+  /** 読み込んだときの売上日（締め日以前かの判定に使う） */
+  private savedUday: string | null = null;
+
+  /** 金額に関わる項目を変えられない理由（入金済・締め日以前）。無ければ空 */
+  lockReason(): string {
+    if (!this.jmisrv.denno || this.mode == 1) {
+      return '';
+    }
+    const r: string[] = [];
+    if (this.paid) {
+      r.push('入金済');
+    }
+    if (this.closesrv.isClosed(this.savedUday)) {
+      r.push('締め日（' + this.closesrv.closeday + '）以前');
+    }
+    return r.join('・');
+  }
+
+  /** 出荷日・売上日に締め日以前の日付を入れられないようにする */
+  private closedValidator = (c: AbstractControl): ValidationErrors | null =>
+    c.dirty && c.value && this.closesrv.isClosed(c.value) ? { closed: this.closesrv.closeday } : null;
   constructor() {
     super();
     const title = this.title;
@@ -147,8 +175,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       buntype: new FormControl(''),
       day: new FormControl(''),
       yday: new FormControl(''),
-      sday: new FormControl(''),
-      uday: new FormControl(''),
+      sday: new FormControl('', this.closedValidator),
+      uday: new FormControl('', this.closedValidator),
       nday: new FormControl(''),
       tcode: new FormControl(''),
       scode: new FormControl(''),
@@ -199,6 +227,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.okrsrv.getHktime();
     this.strsrv.getStore();
     this.bunsrv.getBunrui();
+    this.closesrv.load(true).then(() => this.cdRef.detectChanges());
 	// console.log('納品書タイプ',this.bnssrv.buntype);
   }
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
@@ -208,6 +237,11 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
           this.cancel();
         } else {
           this.mode = Number(params.get('mode'));
+          // 5 = 参照登録（受注履歴などから）。元の伝票を照会で読み込んでから新規にする
+          if (this.mode == 5) {
+            this.copyFrom = Number(params.get('denno'));
+            this.mode = 3;
+          }
           this.refresh();
         }
         if (params.get('denno') !== null) {
@@ -323,6 +357,15 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     }
   }
 
+  /** 帳票（No.33）: 請求書・見積書・納品書・作業指示書・受注票・振込用紙を選んで PDF にする（納品書タイプの帳票が最初に選ばれる） */
+  printDen() {
+    if (!this.jmisrv.denno) {
+      return;
+    }
+    const data: DenprintData = { denno: this.jmisrv.denno, buntype: this.form.getRawValue().buntype ?? null };
+    this.dialog.open(DenprintComponent, { width: '560px', maxWidth: '95vw', data });
+  }
+
   /** 出荷指示: 受注一覧（出荷指示）をこの伝票だけで開く（編集中なら先に保存する） */
   async shipOne() {
     if (this.mode == 2 && !(await this.save())) {
@@ -429,6 +472,17 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       this.form.enable();
       this.usrsrv.enableMtbl(this.form);
     }
+    // 入金済・締め日以前の伝票の変更：金額に関わる項目（受注先・締請求・代引金額・明細の品番・数量・単価など）は変えられない
+    const lock = this.mode == 2 ? this.lockReason() : '';
+    this.jmisrv.meiLock = lock;
+    if (lock) {
+      (['torikbn', 'mcode', 'daibiki', 'daibzei'] as JyudenField[]).forEach(f => this.ctl[f].disable());
+      if (this.closesrv.isClosed(this.savedUday)) {
+        this.ctl.sday.disable();
+        this.ctl.uday.disable();
+      }
+      this.jmeitbl().lockMei();
+    }
   }
 
   get frmArr(): FormArray {
@@ -477,6 +531,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
             this.usrsrv.setTmstmp(jyuden);
             this.jmisrv.denno = denno;
 			this.vnyuzan = jyuden.vnyuzan;
+            this.paid = (jyuden.vnyuzan?.trnyusubs?.length ?? 0) > 0;
+            this.savedUday = (jyuden.uday as unknown as string | null) ?? null;
             this.getMember(jyuden.mcode, false);
             if (jyuden.del == true) {
               this.mode = 4;
@@ -487,6 +543,10 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
           }
           this.refresh();
           this.overlayRef.detach();
+          if (result != null && this.copyFrom == denno) {
+            this.copyFrom = 0;
+            this.copyAsNew();
+          }
         }, error => {
           console.log('error query GetJyuden', error);
           this.usrsrv.toastInf("受注伝票読込エラー");
@@ -749,6 +809,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.jmisrv.denno = 0;
     this.idenno = null;
     this.istatus = '';
+    this.paid = false;
+    this.savedUday = null;
     this.ctl.tcode.setValue(this.usrsrv.staff.code);
     this.ctl.day.setValue(new Date());
     this.ctl.yday.setValue(this.usrsrv.getNextday(new Date()));
@@ -760,6 +822,50 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.jmeitbl().addRows(1);
   }
 
+  /**
+   * 参照登録（③）：表示中の伝票を元に、新しい受注伝票を作る。
+   * 受注先・納品先・明細などはそのまま写し、受付日は今日、出荷予定日は次の稼働日にする。
+   * 出荷日・売上日・入金予定日・配送希望日・送り状番号・受注先発注番号・同梱伝票、明細の在庫区分・発注/移動の伝票番号は空にする
+   */
+  copyAsNew(): void {
+    const src = this.jmisrv.denno;
+    if (!src || this.mode != 3) {
+      return;
+    }
+    this.jyudenSub?.unsubscribe();
+    this.mode = 1;
+    this.jmisrv.denno = 0;
+    this.idenno = null;
+    this.istatus = '';
+    this.jdstatus = '';
+    this.keepSuggest = '';
+    this.vnyuzan = { denno: 0, nyuzan: 0 };
+    this.paid = false;
+    this.savedUday = null;
+    // 元の伝票の在庫の取り消し分（変更の保存で使う）は、新規では使わない
+    this.jmisrv.trzaiko = [];
+    this.jmisrv.isSaving = false;
+    this.refresh();
+    this.form.patchValue({
+      tcode: this.usrsrv.staff.code,
+      day: new Date(),
+      yday: this.usrsrv.getNextday(new Date()),
+      sday: null, uday: null, nday: null, hday: null, okurino: null, cusden: null, dokono: null
+    });
+    const tbl = this.jmeitbl();
+    this.frmArr.controls.forEach((c, i) => {
+      c.patchValue({ spec: null, spdet: null, sday: null });
+      // 在庫区分は今の受注可能数で決め直す
+      const r = c.getRawValue();
+      tbl.setPable(i, r.gcode, r.msgzais ?? []);
+    });
+    tbl.refresh();
+    this.form.markAsDirty();
+    history.replaceState('', '', './frmsales/1');
+    this.usrsrv.toastInf('受注伝票' + src + 'を元に新しい伝票を作りました。内容を確かめて保存してください');
+    this.cdRef.detectChanges();
+  }
+
   modeToUpd(): void {
     if (this.idenno) {
       this.usrsrv.toastWar('受注伝票' + this.jmisrv.denno + 'は請求済（請求伝票' + this.idenno + '）のため編集できません');
@@ -768,6 +874,9 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.mode = 2;
 	this.jmisrv.isSaving = false;
     this.refresh();
+    if (this.jmisrv.meiLock) {
+      this.usrsrv.toastInf(this.jmisrv.meiLock + 'の伝票です。金額に関わる項目（明細の品番・数量・単価、行の追加・削除など）は変えられません');
+    }
     history.replaceState('', '', './frmsales/' + this.mode + '/' + this.jmisrv.denno);
   }
 

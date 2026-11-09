@@ -125,6 +125,22 @@ export class JmeitblComponent implements OnInit {
     'taxrate',
     'currency'];
 
+  /** 明細を変えられるか（入力中で、入金済・締め日以前のロックが無い）。行の追加・削除・貼付・一括設定などのボタンを出す */
+  get canEdit(): boolean {
+    return this.frmArr.enabled && !this.jmisrv.meiLock;
+  }
+
+  /** 金額に関わる明細の項目（入金済・締め日以前の伝票では変えられない） */
+  static readonly LOCK_COLS = ['gcode', 'suu', 'tanka', 'mtax', 'taxmoney', 'taxrate'];
+
+  /** 入金済・締め日以前の伝票の変更で、明細の金額に関わる項目を変えられないようにする */
+  lockMei(): void {
+    this.frmArr.controls.forEach(g => {
+      JmeitblComponent.LOCK_COLS.forEach(k => g.get(k)?.disable({ emitEvent: false }));
+    });
+    this.refresh();
+  }
+
   ngOnInit(): void {
     this.displayedColumns = this.defCol;
     this.addRows(1);
@@ -969,7 +985,7 @@ export class JmeitblComponent implements OnInit {
   /** 最後の明細の最後の欄で Enter（No.9）。品番が入っていれば新しい行を足し、その品番の欄へ進む */
   addLastRow() {
     const last = this.frmArr.length - 1;
-    if (this.frmArr.enabled && last >= 0 && String(this.frmArr.getRawValue()[last]?.gcode ?? '').trim() !== '') {
+    if (this.canEdit && last >= 0 && String(this.frmArr.getRawValue()[last]?.gcode ?? '').trim() !== '') {
       this.addNewrow(last);
     }
   }

@@ -76,6 +76,7 @@
             <td class="name">
               <a href="javascript:void(0)" class="tg" (click)="toggle(o)">{{isOpen(o) ? '▼' : '▶'}}</a>
               <a href="javascript:void(0)" (click)="openDen(o)">{{o.head.denno}}</a>
+              <a href="javascript:void(0)" class="cp" (click)="copyDen(o)" title="この伝票を元に新しい受注伝票を作ります（参照登録。別のタブで開きます）">参照登録</a>
             </td>
             <td>{{o.head.day}}</td><td>{{o.head.sday}}</td><td>{{o.head.uday}}</td>
             <td>{{o.head.mcode}}</td><td>{{o.head.adrname}}</td>

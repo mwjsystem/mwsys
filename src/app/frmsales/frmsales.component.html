@@ -5,6 +5,11 @@
         <mat-icon>add_box</mat-icon>新規
       </button>
     }
+    @if ((mode==3 || mode==4) && this.jmisrv.denno) {
+      <button mat-flat-button (click)="mode = 3; copyAsNew()" [color]="usrsrv.getColor(mode)">
+        <mat-icon matTooltip="この伝票を元に新しい受注伝票を作ります（日付・送り状番号などは空になります）" matTooltipClass="ttips">content_copy</mat-icon>参照登録
+      </button>
+    }
     @if (mode==3 && this.jmisrv.denno && !idenno) {
       <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)">
         <mat-icon>edit</mat-icon>編集
@@ -36,7 +41,13 @@
     @if ((mode==1 || mode==2) && !canSave()) {
       <div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" >修正が必要！</div>
     }
-    <!-- <div matTooltip="{{getInvalid()}}" matTooltipClass="ttips" *ngIf="this.vnyuzan.nyuzan==0 && this.vnyuzan.denno" >入金済！</div> -->
+    @let lk = lockReason();
+    @if (lk) {
+      <span style="margin: 0 6px; font-weight: bold; white-space: nowrap;"
+        matTooltip="金額に関わる項目（受注先・締請求・代引金額・明細の品番・数量・単価、行の追加・削除）は変えられません。出荷日・送り状・備考などは変えられます" matTooltipClass="ttips">
+        <mat-icon style="vertical-align: middle;">lock</mat-icon>{{lk}}
+      </span>
+    }
     @if (mode==1 || mode==2) {
       <button mat-flat-button (click)="cancel()" [color]="usrsrv.getColor(mode)">
         <mat-icon>cancel</mat-icon>中止
@@ -68,16 +79,14 @@
       </button>
     }
     <a id="csv-donwload" data-type="text/csv"></a>
-    @if (mode==3) {
+    @if (mode==3 && jmisrv.denno) {
       <button mat-flat-button [matMenuTriggerFor]="papermenu" [color]="usrsrv.getColor(mode)">
         <mat-icon>description</mat-icon>帳票
       </button>
     }
     <mat-menu #papermenu="matMenu">
+      <button mat-menu-item (click)="printDen()">請求書・見積書・納品書・指示書など（PDF）</button>
       <button mat-menu-item (click)="makeFrmKeep()" [disabled]="keepBusy">キープ表（倉庫へFAX）</button>
-      @for (msbun of bnssrv.bunsho; track msbun) {
-        <button mat-menu-item (click)="makeFrmShip(msbun.code + 'hkaeNONNNON')">{{msbun.group}} {{msbun.name}}</button>
-      }
       <!-- <mat-form-field>
       <mat-label>帳票選択</mat-label>
       <mat-select #mselbun>

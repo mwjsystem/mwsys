@@ -26,6 +26,39 @@ const C39: Record<string, string> = {
 /** バーの位置と幅（細い線 = 1 の単位） */
 export interface Bars { bars: { x: number; w: number }[]; width: number }
 
+/** Codabar（NW-7）の 1 文字（バー・スペースを交互に 7 本。1 が太い） */
+const NW7: Record<string, string> = {
+  '0': '0000011', '1': '0000110', '2': '0001001', '3': '1100000', '4': '0010010',
+  '5': '1000010', '6': '0100001', '7': '0100100', '8': '0110000', '9': '1001000',
+  '-': '0001100', '$': '0011000', ':': '1000101', '/': '1010001', '.': '1010100', '+': '0010101',
+  'A': '0011010', 'B': '0101001', 'C': '0001011', 'D': '0001110'
+};
+
+/**
+ * Codabar（NW-7）。送り状番号のバーコード（現行の帳票と同じく、スタート・ストップ文字は a）。
+ * 数字と - $ : / . + だけ使える。使えない文字があればエラー
+ */
+export function codabar(text: string, start = 'A', stop = 'A', wide = 2.5): Bars {
+  const s = start.toUpperCase() + text + stop.toUpperCase();
+  const bars: { x: number; w: number }[] = [];
+  let x = 0;
+  for (const ch of s) {
+    const p = NW7[ch];
+    if (!p) {
+      throw new Error('NW-7 で使えない文字です：' + ch);
+    }
+    for (let i = 0; i < 7; i++) {
+      const w = p[i] == '1' ? wide : 1;
+      if (i % 2 == 0) {
+        bars.push({ x, w });
+      }
+      x += w;
+    }
+    x += 1;
+  }
+  return { bars, width: x - 1 };
+}
+
 /** Code39（前後のスタート・ストップ文字 * は自動で付ける）。使えない文字があればエラー */
 export function code39(text: string, wide = 3): Bars {
   const s = '*' + text.toUpperCase() + '*';

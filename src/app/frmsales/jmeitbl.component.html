@@ -1,17 +1,17 @@
 <!-- <div style="height: 40px;" class="grid grid-row gap-2 mat-elevation-z8"> -->
 <mat-toolbar style="height:40px;text-align:center;" class="flex flex-row">
-  @if (frmArr.enabled && hatden.length>0) {
+  @if (canEdit && hatden.length>0) {
     <button mat-flat-button color="warn" (click)="toFrmsup()">発注伝票登録</button>
   }
-  @if (frmArr.enabled && movden.length>0) {
+  @if (canEdit && movden.length>0) {
     <button mat-flat-button color="warn" (click)="toFrmsup()"
     >移動伝票登録(加工用)</button>
   }
-  @if (frmArr.enabled && movden.length>0) {
+  @if (canEdit && movden.length>0) {
     <button mat-flat-button color="primary" (click)="toFrmmov()"
     >加工依頼(移動・指示書)</button>
   }
-  @if (frmArr.enabled) {
+  @if (canEdit) {
     <mat-form-field style="width: 10em;">
       <mat-label>在庫状態一括設定</mat-label>
       <mat-select [(ngModel)]="jmeikbn" [ngModelOptions]="{standalone: true}" [panelClass]="'my-panel-class'">
@@ -23,13 +23,18 @@
       </mat-select>
     </mat-form-field>
   }
-  @if (frmArr.enabled) {
+  @if (canEdit) {
     <button mat-flat-button class="w-24" color="primary" (click)="setJmeikbn(jmeikbn)"
     >一括設定</button>
   }
-  @if (frmArr.enabled && usrsrv.compid == 1) {
+  @if (canEdit && usrsrv.compid == 1) {
     <button mat-flat-button class="w-48" color="accent" (click)="setKoguchi()" [disabled]="!validIgnoringEmpty(parentForm())"
     matTooltip="個口数計算・送料明細追加" matTooltipClass="ttips">個口送料等計算</button>
+  }
+  @if (jmisrv.meiLock && frmArr.enabled) {
+    <span style="margin: 0 1em; color: #c62828; font-weight: bold; white-space: nowrap;">
+      <mat-icon style="vertical-align: middle;">lock</mat-icon>{{jmisrv.meiLock}}のため、品番・数量・単価と行の追加・削除はできません
+    </span>
   }
   @let obi = obiInfo();
   @if (obi.obi > 0 || obi.ori > 0) {
@@ -42,16 +47,16 @@
   <button mat-flat-button class="w-24 m-1" color="warn" [matMenuTriggerFor]="cnp">コピペ</button>
   <mat-menu #cnp="matMenu">
     <button mat-menu-item [cdkCopyToClipboard]="copyToClipboard" (click)="copyData()">明細をｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ</button>
-    @if (frmArr.enabled && navCli) {
+    @if (canEdit && navCli) {
       <button mat-menu-item (click)="pasteFromClipboard(true)"
       >ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(明細洗替)</button>
     }
-    @if (frmArr.enabled && navCli) {
+    @if (canEdit && navCli) {
       <button mat-menu-item (click)="pasteFromClipboard(false)"
       >ｸﾘｯﾌﾟﾎﾞｰﾄﾞから貼付(末尾に追加)</button>
     }
   </mat-menu>
-  <!-- <span *ngIf="frmArr.enabled">←ここにExcel等から貼付([ctrl]ｷｰ＋[v]) １列目：商品ｺｰﾄﾞ、2列目：数量、３列目(任意)：単価</span> -->
+  <!-- <span *ngIf="canEdit">←ここにExcel等から貼付([ctrl]ｷｰ＋[v]) １列目：商品ｺｰﾄﾞ、2列目：数量、３列目(任意)：単価</span> -->
 <!-- </div> -->
 </mat-toolbar>
 <div class="mat-elevation-z8">
@@ -59,19 +64,19 @@
     <table mat-table formArrayName="mtbl" [dataSource]="dataSource" aria-label="Elements" gridNav (gridNavEnd)="addLastRow()">
       <ng-container matColumnDef="chk" sticky>
         <th mat-header-cell *matHeaderCellDef class="i_num">
-          @if (frmArr.enabled) {
+          @if (canEdit) {
             <mat-checkbox (change)="setAll($event.checked)"></mat-checkbox>
           }
         </th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-          @if (frmArr.enabled) {
+          @if (canEdit) {
             <mat-checkbox formControlName="chk"></mat-checkbox>
           }
         </td>
       </ng-container>
       <ng-container matColumnDef="line" sticky>
         <th mat-header-cell *matHeaderCellDef>行番号
-          @if (frmArr.enabled) {
+          @if (canEdit) {
             <button mat-icon-button (click)="insRow(false,getIdx(0))">
               <mat-icon>add_circle</mat-icon>
             </button>
@@ -81,17 +86,17 @@
           <mat-form-field style="width: 2em;">
             <input matInput [value]="frmArr.getRawValue()[getIdx(i)]['line']" class="i_num" disabled>
           </mat-form-field>
-          @if (frmArr.enabled) {
+          @if (canEdit) {
             <button mat-icon-button (click)="insRow(false,getIdx(i)+1)">
               <mat-icon>add_circle</mat-icon>
             </button>
           }
-          @if (frmArr.enabled) {
+          @if (canEdit) {
             <button mat-icon-button (click)="insRow(true,getIdx(i)+1)">
               <mat-icon>content_copy</mat-icon>
             </button>
           }
-          @if (frmArr.enabled) {
+          @if (canEdit) {
             <button mat-icon-button (click)="delRow(getIdx(i))">
               <mat-icon>remove_circle</mat-icon>
             </button>
@@ -121,7 +126,7 @@
       <mat-form-field>
         <input #gcdInputs [tabIndex]="hidx + i * mcols + 1" matInput formControlName="gcode"
           (change)="updGds(getIdx(i),$event.target.value)" maxlength="20" (keydown.f4)="gcdHelp(getIdx(i))">
-        @if (frmArr.enabled) {
+        @if (canEdit) {
           <button mat-icon-button matSuffix (click)="gcdHelp(getIdx(i))">
             <mat-icon>find_replace</mat-icon>
           </button>
@@ -255,13 +260,13 @@
     <td mat-cell *matCellDef="let row; let i =index" [formGroupName]="getIdx(i)">
       <mat-form-field [style.display]="frmArr.getRawValue()[getIdx(i)]['gskbn']=='2' ?  'none' : 'block'">
         <input matInput formControlName="spdet">
-        @if (frmArr.enabled && frmArr.getRawValue()[getIdx(i)]['gskbn']=='1') {
+        @if (canEdit && frmArr.getRawValue()[getIdx(i)]['gskbn']=='1') {
           <button mat-icon-button matPrefix (click)="jyumZai(getIdx(i))"
             >
             内訳
           </button>
         }
-        @if (frmArr.enabled) {
+        @if (canEdit) {
           <button mat-icon-button matSuffix (click)="spdetHelp(getIdx(i))">
             <mat-icon>find_replace</mat-icon>
           </button>
