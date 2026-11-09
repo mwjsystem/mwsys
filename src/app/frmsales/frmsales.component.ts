@@ -32,7 +32,7 @@ import { SSTATUS } from './../frminvoice/invoice.service';
 import { JDST, shipNote } from './../frmship/ship-forms';
 import { ShipService } from './../frmship/ship.service';
 import { ClosedayService } from './../services/closeday.service';
-import { DenprintComponent, DenprintData } from './denprint.component';
+import { DenprintComponent, DenprintData, DenprintResult } from './denprint.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -358,12 +358,18 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   }
 
   /** 帳票（No.33）: 請求書・見積書・納品書・作業指示書・受注票・振込用紙を選んで PDF にする（納品書タイプの帳票が最初に選ばれる） */
-  printDen() {
+  printDen(code?: number) {
     if (!this.jmisrv.denno) {
       return;
     }
-    const data: DenprintData = { denno: this.jmisrv.denno, buntype: this.form.getRawValue().buntype ?? null };
-    this.dialog.open(DenprintComponent, { width: '560px', maxWidth: '95vw', data });
+    const denno = this.jmisrv.denno;
+    const data: DenprintData = { denno, buntype: this.form.getRawValue().buntype ?? null, code };
+    this.dialog.open(DenprintComponent, { width: '600px', maxWidth: '95vw', data }).afterClosed().subscribe((r: DenprintResult) => {
+      // 大会準備リストを倉庫へ FAX すると受注ステータスが変わるので読み直す
+      if (r == 'fax' && this.jmisrv.denno == denno && this.mode == 3) {
+        this.getJyuden(denno);
+      }
+    });
   }
 
   /** 出荷指示: 受注一覧（出荷指示）をこの伝票だけで開く（編集中なら先に保存する） */

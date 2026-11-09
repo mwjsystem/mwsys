@@ -23,7 +23,8 @@ export interface DenPrintForm {
   code: number;
   /** 帳票の名前（選択欄に出す） */
   name: string;
-  kind: 'money' | 'work' | 'order' | 'furikomi';
+  /** keep = キープ表（QR 付き）、siji = 刺繍指示書（帯。Excel を別のタブで作る） */
+  kind: 'money' | 'work' | 'order' | 'furikomi' | 'keep' | 'siji';
   /** タイトル。{ate} は印刷のときに入れる宛先（空なら手書き用の空白） */
   title: string;
   /** 日付の見出しの初期値 */
@@ -58,6 +59,11 @@ export interface DenPrintForm {
   boxText?: string;
   /** 下に「指示書　枚」を出す */
   shijisho?: boolean;
+  /**
+   * キープ表と同じ仕組みにする（QR コードを付け、倉庫宛 FAX フォルダに保存すると受注ステータスを「キープ表FAX済」にする。
+   * 倉庫のスマホで QR を読み、商品のバーコードを読んで確保数を入れる）
+   */
+  keep?: boolean;
 }
 
 const ORI: WorkLine = { type: 'ori' };
@@ -88,7 +94,7 @@ export const DEN_PRINT_FORMS: DenPrintForm[] = [
   { ...MITSU, code: 16, name: '見積書(別納)', betsuno: true },
   { kind: 'money', code: 20, name: '出荷票(A4)', title: '出　荷　票', dayLabel: '売上日', staff: true },
   { kind: 'order', code: 21, name: '受注票(A4)', title: '受　注　票', dayLabel: '出荷予定日' },
-  { ...WORK, code: 32, name: '大会準備リスト', title: '大会準備リスト', dayLabel: '出荷予定日', shijisho: false },
+  { ...WORK, code: 32, name: '大会準備リスト', title: '大会準備リスト', dayLabel: '出荷予定日', shijisho: false, keep: true },
   { ...WORK, code: 33, name: '本社引取', title: '本社持ち帰りお願い致します', dayLabel: '売上日', shijisho: false },
   { ...WORK, code: 36, name: '○○へ発送お願いします', title: '【{ate}へ発送お願します】', dayLabel: '受付日', askAte: true },
   { ...WORK, code: 40, name: '加工稟議書(オリマークNo.指示)', title: '【{ate}様にお渡し下さい】', dayLabel: '受付日', askAte: true,
@@ -96,13 +102,20 @@ export const DEN_PRINT_FORMS: DenPrintForm[] = [
   { ...WORK, code: 41, name: '加工稟議書(フリー)', title: '【{ate}】', dayLabel: '受付日', askAte: true },
   { ...WORK, code: 42, name: '加工稟議書(オリマークのみ渡し)', title: '【{ate}様にオリマークのみお渡し下さい】', dayLabel: '受付日', askAte: true,
     work: [ORI], shijisho: false },
-  { ...SEIKYU, code: 43, name: '請求書(都度、明細税込み)', taxIn: true }
+  { ...SEIKYU, code: 43, name: '請求書(都度、明細税込み)', taxIn: true },
+  // 納品書タイプには無い帳票（番号は選択欄で使うだけ）
+  { kind: 'keep', code: 900, name: 'キープ表', title: 'キープ表', dayLabel: '受付日', keep: true },
+  { kind: 'siji', code: 901, name: '刺繍指示書（帯）', title: '刺繍指示書', dayLabel: '受付日' }
 ];
 
-/** 様式の種類の名前（選択欄のグループ） */
-export const KIND_NAMES: Record<DenPrintForm['kind'], string> = {
-  money: '金額のある帳票', work: '作業指示書', order: '受注票', furikomi: '振込用紙'
+/** 選択欄のグループ（表示の順） */
+export type FormGroupKey = 'money' | 'work' | 'keep' | 'order' | 'siji' | 'furikomi';
+export const GROUP_NAMES: Record<FormGroupKey, string> = {
+  money: 'お客様向け（金額あり）', work: '作業指示書', keep: '倉庫で QR を読んで確認する', order: '受注票',
+  siji: '刺繍指示書', furikomi: '振込用紙'
 };
+/** 帳票の選択欄のグループ（キープ表と大会準備リストは「倉庫で QR を読んで確認する」） */
+export const groupOf = (f: DenPrintForm): FormGroupKey => f.keep ? 'keep' : f.kind;
 
 /** 納品書タイプ（'01' でも '1' でもよい）の帳票。無ければ undefined */
 export function findPrintForm(buntype: string | number | null | undefined): DenPrintForm | undefined {

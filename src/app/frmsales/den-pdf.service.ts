@@ -3,6 +3,7 @@ import type { Content, TableCell, TDocumentDefinitions } from 'pdfmake/interface
 import { PdfService } from './../services/pdf.service';
 import { UserService } from './../services/user.service';
 import { barcodeCanvas, codabar } from './../services/barcode';
+import { ShipPdfService } from './../frmship/ship-pdf.service';
 import type { ShipAdr, ShipDoc, ShipLine } from './../frmship/ship-pdf.service';
 import { DayLabel, DenPrintForm, FURIKOMI_ACCOUNT, WorkLine } from './den-forms';
 
@@ -12,6 +13,8 @@ export interface DenPrintOption {
   dayLabel: DayLabel;
   /** タイトルの {ate} に入れる宛先（空なら手書き用の空白） */
   ate: string;
+  /** 倉庫のスマホで読む QR コードの URL（キープ確認の画面）。大会準備リストに付ける */
+  qr?: string;
 }
 
 const yen = (v: number | null | undefined): string => Number(v ?? 0).toLocaleString('ja-JP');
@@ -54,6 +57,7 @@ const box = (stack: Content[], width: number | string = '*', minHeight = 0): Con
 })
 export class DenPdfService {
   private pdfsrv = inject(PdfService);
+  private spdfsrv = inject(ShipPdfService);
   private usrsrv = inject(UserService);
   /** 角印の画像（会社 ID → data URL。無ければ null） */
   private stamps = new Map<number, Promise<string | null>>();
@@ -70,8 +74,14 @@ export class DenPdfService {
       case 'order':
         doc = this.orderDoc(d, opt);
         break;
-      default:
+      case 'keep':
+        // キープ表は出荷指示と同じもの
+        return this.spdfsrv.keep(d, opt.qr ?? '');
+      case 'furikomi':
         doc = this.furikomiDoc(d);
+        break;
+      default:
+        throw new Error(opt.form.name + ' は PDF にできません');
     }
     return this.pdfsrv.createPdf(doc);
   }
@@ -345,7 +355,17 @@ export class DenPdfService {
         {
           columns: [
             { width: 250, stack: [toBox] },
-            { width: '*', stack: [...(f.work ?? []).map(workLine), { columns: [{ width: '*', text: '' }, { width: 'auto', stack: [this.infoTable(d, opt, true)] }], margin: [0, 6, 0, 0] }] }
+            { width: '*', stack: [
+              ...(f.work ?? []).map(workLine),
+              ...(opt.qr ? [{
+                columns: [
+                  { width: '*', text: 'スマホで QR コードを読み、\n商品のバーコードを読んで\n確保数を入力してください。', fontSize: 8, margin: [0, 10, 0, 0] },
+                  { width: 76, stack: [{ qr: opt.qr, fit: 70, alignment: 'center', eccLevel: 'M' }, { text: 'キープ確認', fontSize: 7, alignment: 'center' }] }
+                ],
+                margin: [0, 0, 0, 4]
+              } as Content] : []),
+              { columns: [{ width: '*', text: '' }, { width: 'auto', stack: [this.infoTable(d, opt, true)] }], margin: [0, 6, 0, 0] }
+            ] }
           ],
           columnGap: 14,
           margin: [0, 0, 0, 8]

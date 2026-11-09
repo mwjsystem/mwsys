@@ -74,9 +74,6 @@
         [color]="usrsrv.getColor(mode)">
         <mat-icon matTooltip="受注一覧（出荷指示）でこの伝票の出荷指示フォルダを NAS に作成します。出荷日、納品書ﾀｲﾌﾟ、配送伝票を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
       </button>
-      <button mat-flat-button (click)="usrsrv.openMst('frmsiji', '' + jmisrv.denno)" [disabled]="!jmisrv.denno" [color]="usrsrv.getColor(mode)">
-        <mat-icon matTooltip="この伝票の帯の本数を、帯刺繍指示書の Excel にセットします（別のタブで開きます）" matTooltipClass="ttips">content_cut</mat-icon>刺繍指示書
-      </button>
     }
     <a id="csv-donwload" data-type="text/csv"></a>
     @if (mode==3 && jmisrv.denno) {
@@ -85,8 +82,18 @@
       </button>
     }
     <mat-menu #papermenu="matMenu">
-      <button mat-menu-item (click)="printDen()">請求書・見積書・納品書・指示書など（PDF）</button>
-      <button mat-menu-item (click)="makeFrmKeep()" [disabled]="keepBusy">キープ表（倉庫へFAX）</button>
+      <button mat-menu-item (click)="printDen()">
+        <mat-icon>description</mat-icon>帳票を選ぶ（請求書・見積書・納品書・指示書・受注票など）
+      </button>
+      <button mat-menu-item (click)="makeFrmKeep()" [disabled]="keepBusy">
+        <mat-icon>fax</mat-icon>キープ表を倉庫へFAX
+      </button>
+      <button mat-menu-item (click)="printDen(32)">
+        <mat-icon>emoji_events</mat-icon>大会準備リスト（QR付き・倉庫へFAX）
+      </button>
+      <button mat-menu-item (click)="usrsrv.openMst('frmsiji', '' + jmisrv.denno)">
+        <mat-icon>content_cut</mat-icon>刺繍指示書（帯）
+      </button>
       <!-- <mat-form-field>
       <mat-label>帳票選択</mat-label>
       <mat-select #mselbun>

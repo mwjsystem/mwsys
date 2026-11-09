@@ -298,7 +298,7 @@ export class ShipService {
    * 載せた明細を trkeep に写しておく（倉庫で確保できた数を記録し、後の変更を見分けるため）。
    * ボタンを押した処理の中で呼ぶこと（最初に NAS への書き込みの許可を求めるため）。保存したファイル（相対パス）を返す
    */
-  async keepFax(denno: number): Promise<string> {
+  async keepFax(denno: number, label = 'キープ表', make?: (d: ShipDoc, url: string) => Promise<Blob>): Promise<string> {
     const root = await this.nassrv.open(NAS_FAX);
     const d = (await this.load([denno]) as (ShipDoc & { staffSei: string })[])[0];
     if (!d) {
@@ -308,8 +308,9 @@ export class ShipService {
       throw new Error('担当者が未設定です');
     }
     const dir = await this.nassrv.folder(root, d.staffSei);
-    const name = d.denno + 'キープ表.pdf';
-    await this.nassrv.write(dir, name, await this.spdfsrv.keep(d, this.keepUrl(d.denno)));
+    const name = d.denno + this.nassrv.safeName(label) + '.pdf';
+    const url = this.keepUrl(d.denno);
+    await this.nassrv.write(dir, name, await (make ? make(d, url) : this.spdfsrv.keep(d, url)));
     const now = new Date();
     const by = this.usrsrv.staff.code;
     const Upd = gql`
@@ -329,6 +330,25 @@ export class ShipService {
         set: { jdstatus: JDST.KEEP_FAX, keep_at: now, keep_by: by }
       }
     }));
+    return d.staffSei + '/' + name;
+  }
+
+  /**
+   * 帳票（受注伝票の帳票メニューで作った PDF）を NAS の倉庫宛 FAX フォルダ（{担当者}/{伝票番号}{帳票名}.pdf）に保存する。
+   * 受注ステータスは変えない。ボタンを押した処理の中で呼ぶこと。保存したファイル（相対パス）を返す
+   */
+  async faxPdf(denno: number, label: string, make: (d: ShipDoc) => Promise<Blob>): Promise<string> {
+    const root = await this.nassrv.open(NAS_FAX);
+    const d = (await this.load([denno]) as (ShipDoc & { staffSei: string })[])[0];
+    if (!d) {
+      throw new Error('受注伝票 ' + denno + ' が見つかりません');
+    }
+    if (!d.staffSei) {
+      throw new Error('担当者が未設定です');
+    }
+    const dir = await this.nassrv.folder(root, d.staffSei);
+    const name = d.denno + this.nassrv.safeName(label) + '.pdf';
+    await this.nassrv.write(dir, name, await make(d));
     return d.staffSei + '/' + name;
   }
 
