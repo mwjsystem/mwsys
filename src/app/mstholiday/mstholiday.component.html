@@ -3,7 +3,7 @@
   <span class="env">接続先：{{envName}}</span>
 </mat-toolbar>
 <p class="note">
-  日付を押すと、休日と稼働日が切り替わります（赤が休日）。土日はもともと休みとして扱うので、祝日・年末年始・夏季休業など、土日以外の休みを入れてください。
+  開いたときは照会です。「変更」を押すと編集でき、日付を押すと、休日と稼働日が切り替わります（赤が休日）。土日はもともと休みとして扱うので、祝日・年末年始・夏季休業など、土日以外の休みを入れてください。
   出荷予定日の計算や、日付の選択で休日を飛ばすのに使います。最後に「保存」を押してください。
   「国民の祝日を入れる」で、その年の祝日・振替休日・国民の休日をまとめて入れられます（春分の日・秋分の日は計算で出すので、官報の発表と念のため見比べてください）。
   祝日なのに休日になっていない日は、赤い下線で示します。休日の名前は右の一覧で変えられます（変えたら「保存」）。
@@ -17,30 +17,43 @@
   <button mat-icon-button type="button" (click)="move(1)" [disabled]="busy" title="次の年">
     <mat-icon>chevron_right</mat-icon>
   </button>
-  <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="busy || !dirty">
-    <mat-icon>save</mat-icon>保存
-  </button>
-  <button mat-raised-button color="accent" type="button" (click)="addJp()" [disabled]="busy || !jpSupported"
-    title="この年の国民の祝日（振替休日・国民の休日を含む。土日の分は除く）を休日に入れます">
-    <mat-icon>event_available</mat-icon>国民の祝日を入れる
-  </button>
-  <button mat-raised-button type="button" (click)="undo()" [disabled]="busy || !dirty">
-    <mat-icon>undo</mat-icon>変更を取り消す
-  </button>
+  @if (!editing) {
+    <span class="mode">照会</span>
+    <button mat-raised-button color="primary" type="button" (click)="startEdit()" [disabled]="busy" title="休日を入れたり外したり、名前を変えたりできるようにします">
+      <mat-icon>edit</mat-icon>変更
+    </button>
+  } @else {
+    <span class="mode editing">変更中</span>
+    <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="busy || !dirty">
+      <mat-icon>save</mat-icon>保存
+    </button>
+    <button mat-raised-button type="button" (click)="endEdit()" [disabled]="busy" title="保存していない変更を捨てて照会に戻ります">
+      <mat-icon>close</mat-icon>キャンセル
+    </button>
+    <button mat-raised-button color="accent" type="button" (click)="addJp()" [disabled]="busy || !jpSupported"
+      title="この年の国民の祝日（振替休日・国民の休日を含む。土日の分は除く）を休日に入れます">
+      <mat-icon>event_available</mat-icon>国民の祝日を入れる
+    </button>
+    <button mat-raised-button type="button" (click)="undo()" [disabled]="busy || !dirty">
+      <mat-icon>undo</mat-icon>変更を取り消す
+    </button>
+  }
   <button mat-raised-button type="button" (click)="excel()" [disabled]="busy"
     title="現行の「最新カレンダー.xlsx」と同じ並びの Excel（12 か月・出勤日数・年間休日・休日の一覧・翌年 1 月）を出します">
     <mat-icon>download</mat-icon>Excel 出力
   </button>
-  <label style="font-size: 13px;" title="カレンダーを押して休日にする日に付ける名前です（国民の祝日の日は祝日の名前になります）。あとから右の一覧で変えられます">
-    押して入れる日の名前
-    <input style="width: 9em;" [value]="newName" (input)="newName = $any($event.target).value" maxlength="20">
-  </label>
-  <select #pick1 class="pick" (change)="newName = pick1.value; pick1.value = ''" title="候補から選ぶ">
-    <option value="">候補から選ぶ</option>
-    @for (n of nameOptions; track n) {
-      <option [value]="n">{{n}}</option>
-    }
-  </select>
+  @if (editing) {
+    <label style="font-size: 13px;" title="カレンダーを押して休日にする日に付ける名前です（国民の祝日の日は祝日の名前になります）。あとから右の一覧で変えられます">
+      押して入れる日の名前
+      <input style="width: 9em;" [value]="newName" (input)="newName = $any($event.target).value" maxlength="20">
+    </label>
+    <select #pick1 class="pick" (change)="newName = pick1.value; pick1.value = ''" title="候補から選ぶ">
+      <option value="">候補から選ぶ</option>
+      @for (n of nameOptions; track n) {
+        <option [value]="n">{{n}}</option>
+      }
+    </select>
+  }
   @if (dirty) {
     <span class="warnc">未保存：休日の追加 {{added.length}} 日・削除 {{removed.length}} 日・名前の変更 {{renamed.length}} 日</span>
   }
@@ -87,13 +100,15 @@
       <div class="hrow" [class.chg]="!saved.has(d) || renamed.includes(d)">
         <span class="hdate">{{dateLabel(d)}}</span>
         <input class="hname" [class.paidname]="isPaidName(edits.get(d))" [value]="edits.get(d) ?? ''" (input)="setName(d, $any($event.target).value)" maxlength="20"
-          [disabled]="busy" [class.blank]="!(edits.get(d) ?? '').trim()" title="休日の名前（例：年末年始、夏季休業）">
-        <select #pick2 class="pick small" (change)="setName(d, pick2.value); pick2.value = ''" [disabled]="busy" title="候補から選ぶ">
-          <option value="">▼</option>
-          @for (n of nameOptions; track n) {
-            <option [value]="n">{{n}}</option>
-          }
-        </select>
+          [disabled]="busy" [readOnly]="!editing" [class.ro]="!editing" [class.blank]="!(edits.get(d) ?? '').trim()" title="休日の名前（例：年末年始、夏季休業）">
+        @if (editing) {
+          <select #pick2 class="pick small" (change)="setName(d, pick2.value); pick2.value = ''" [disabled]="busy" title="候補から選ぶ">
+            <option value="">▼</option>
+            @for (n of nameOptions; track n) {
+              <option [value]="n">{{n}}</option>
+            }
+          </select>
+        }
       </div>
     } @empty {
       <div class="note">登録されていません</div>

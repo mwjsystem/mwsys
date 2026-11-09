@@ -25,6 +25,15 @@
   align-items: baseline;
 }
 .mcount { font-weight: normal; font-size: 12px; color: #444444; b { color: #1565c0; } }
+.mode {
+  font-size: 13px;
+  font-weight: bold;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: #e0e0e0;
+  color: #333333;
+  &.editing { background: #fff3c4; color: #e65100; }
+}
 .summary {
   font-size: 14px;
   b { font-size: 18px; color: #1565c0; }
@@ -54,6 +63,9 @@
   // 保存していない変更
   &.chg { outline: 2px dashed #fb8c00; outline-offset: -2px; }
   &.today { border-color: #1565c0; }
+  // 照会モード：押せる見た目にしない
+  &.ro { cursor: default; &:hover { border-color: transparent; } }
+  &.ro.today { &:hover { border-color: #1565c0; } }
   // 国民の祝日なのに休日になっていない日
   &.jpmiss { color: #c62828; text-decoration: underline; text-decoration-thickness: 2px; font-weight: bold; }
 }
@@ -64,6 +76,7 @@
   .hname { flex: 1 1 auto; min-width: 0; font-size: 13px; padding: 2px 4px; }
   .hname.blank { border: 2px solid #c62828; }
   .hname.paidname { color: #e65100; font-weight: bold; }
+  .hname.ro { border: 1px solid transparent; background: transparent; outline: none; }
   .pick.small { flex: 0 0 2.6em; width: 2.6em; font-size: 12px; }
   border: 1px solid #dddddd;
   border-radius: 6px;

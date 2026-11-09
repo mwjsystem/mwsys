@@ -48,6 +48,8 @@ export class MstholidayComponent implements OnInit {
   edits = new Map<string, string>();
   /** カレンダーを押して入れる日の名前（国民の祝日の日は祝日の名前） */
   newName = '休業日';
+  /** 変更モードか（開いたときは照会モード。「変更」を押すと編集できる） */
+  editing = false;
   busy = false;
   error = '';
   message = '';
@@ -90,6 +92,9 @@ export class MstholidayComponent implements OnInit {
   }
   /** 一覧の名前の欄を変えたとき */
   setName(date: string, value: string) {
+    if (!this.editing) {
+      return;
+    }
     this.edits.set(date, value);
     this.message = '';
   }
@@ -170,8 +175,25 @@ export class MstholidayComponent implements OnInit {
     this.load();
   }
 
+  /** 変更モードにする */
+  startEdit() {
+    this.editing = true;
+    this.message = '';
+    this.error = '';
+  }
+
+  /** 照会モードに戻す（保存していない変更は捨てる） */
+  endEdit() {
+    if (this.dirty && !confirm('保存していない変更があります。捨てて照会に戻りますか？')) {
+      return;
+    }
+    this.undo();
+    this.editing = false;
+    this.error = '';
+  }
+
   toggle(day: Day) {
-    if (this.busy) {
+    if (this.busy || !this.editing) {
       return;
     }
     if (this.current.has(day.date)) {
@@ -196,7 +218,9 @@ export class MstholidayComponent implements OnInit {
       paid: h && isPaid(this.edits.get(day.date)),
       // 国民の祝日なのに休日になっていない日（土日以外）
       jpmiss: !h && this.jp.has(day.date) && day.w != 0 && day.w != 6,
-      today: day.date == this.usrsrv.formatDate(new Date())
+      today: day.date == this.usrsrv.formatDate(new Date()),
+      // 照会モード（押しても切り替わらない）
+      ro: !this.editing
     };
   }
 
@@ -220,6 +244,9 @@ export class MstholidayComponent implements OnInit {
    * 入れるだけで、すでに入っている休日（年末年始など）は消さない。保存は「保存」ボタンで
    */
   addJp() {
+    if (!this.editing) {
+      return;
+    }
     let n = 0;
     for (const d of this.jp.keys()) {
       const w = new Date(d + 'T00:00:00').getDay();
@@ -358,6 +385,7 @@ export class MstholidayComponent implements OnInit {
       [...add, ...ren].forEach(d => this.names.set(d, nameOf(d)));
       del.forEach(d => this.names.delete(d));
       this.edits = new Map(this.names);
+      this.editing = false; // 保存したら照会に戻す
       // ほかの画面（出荷予定日の計算など）の休日も今の内容にする
       const others = this.usrsrv.holidays.filter(h => !String(h).startsWith(this.year + '-'));
       this.usrsrv.holidays = [...others, ...this.saved];
