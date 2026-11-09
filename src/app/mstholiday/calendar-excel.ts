@@ -3,7 +3,8 @@ import type { Workbook, Worksheet, Borders } from 'exceljs';
 /**
  * 稼働日カレンダの Excel（現行の「最新カレンダー.xlsx」と同じ並び）。
  * 1 枚に 12 か月（横 3 か月 × 縦 4 段）、各月の上に出勤日数、下に色の説明・年間の出勤日数と休日数・翌年 1 月、右に休日の一覧。
- * 日付の色：赤 = 日曜・祝日（振替休日・国民の休日を含む）、青 = 土曜・当社指定休業日（休日マスタにある祝日以外の日）
+ * 日付の色：赤 = 日曜・祝日（振替休日・国民の休日を含む）、青 = 土曜・当社指定休業日（休日マスタにある祝日以外の日）、
+ * 橙 = 有給奨励日（休日マスタの名前が「有給奨励日」の日。非稼働日として出勤日数に入れない）
  */
 
 const EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -11,6 +12,11 @@ const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
 const RED = 'FFCC0000';
 const BLUE = 'FF0066CC';
 const GRAY = 'FFE5E5E5';
+const ORANGE = 'FFFF9900';
+
+/** 有給奨励日の名前（休日マスタの名前がこれを含む日は有給奨励日。休日（非稼働日）として数え、橙色にする） */
+export const PAID_NAME = '有給奨励日';
+export const isPaid = (name: string | null | undefined) => !!name && name.includes(PAID_NAME);
 
 const ymd = (y: number, m: number, d: number) => y + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
 
@@ -92,8 +98,9 @@ function monthBlock(ws: Worksheet, d: CalendarData, y: number, m: number, c0: nu
     c.alignment = { horizontal: 'center', vertical: 'middle' };
     const hol = d.holidays.has(date);
     const red = w == 0 || (hol && d.jp.has(date));
-    const blue = !red && (w == 6 || hol);
-    c.font = { size: 12, bold: red || blue, color: { argb: red ? RED : blue ? BLUE : 'FF333333' } };
+    const paid = !red && hol && isPaid(d.names.get(date));
+    const blue = !red && !paid && (w == 6 || hol);
+    c.font = { size: 12, bold: red || blue || paid, color: { argb: red ? RED : paid ? ORANGE : blue ? BLUE : 'FF333333' } };
     c.border = thin;
   }
 }
@@ -140,7 +147,8 @@ export function fillCalendarBook(wb: Workbook, d: CalendarData): void {
   // 色の説明
   const legend: [string, string, string][] = [
     ['赤字', RED, '日曜日・祝日・振替休日'],
-    ['青字', BLUE, '土曜日・当社指定休業日']
+    ['青字', BLUE, '土曜日・当社指定休業日'],
+    ['橙字', ORANGE, '有給奨励日']
   ];
   legend.forEach(([a, color, b], k) => {
     const c1 = ws.getCell(38 + k, 2);

@@ -49,6 +49,8 @@
   &:hover { border-color: #999999; }
   &.sun, &.sat { background: #f3f3f3; }
   &.hol { background: #e53935; color: #ffffff; font-weight: bold; }
+  // 有給奨励日（休日として数える）
+  &.hol.paid { background: #ff9900; }
   // 保存していない変更
   &.chg { outline: 2px dashed #fb8c00; outline-offset: -2px; }
   &.today { border-color: #1565c0; }
@@ -61,6 +63,7 @@
   .hdate { flex: 0 0 6.5em; white-space: nowrap; }
   .hname { flex: 1 1 auto; min-width: 0; font-size: 13px; padding: 2px 4px; }
   .hname.blank { border: 2px solid #c62828; }
+  .hname.paidname { color: #e65100; font-weight: bold; }
   border: 1px solid #dddddd;
   border-radius: 6px;
   padding: 6px 10px;

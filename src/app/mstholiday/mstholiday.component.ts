@@ -8,7 +8,7 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { UserService } from './../services/user.service';
 import { jpHolidays, JP_HOLIDAY_MIN, JP_HOLIDAY_MAX } from './jp-holidays';
-import { daysOfYear, fillCalendarBook, workdays } from './calendar-excel';
+import { daysOfYear, fillCalendarBook, isPaid, PAID_NAME, workdays } from './calendar-excel';
 import * as FileSaver from 'file-saver';
 
 /** カレンダーの 1 日（null は月の始まりの前の空き） */
@@ -192,6 +192,8 @@ export class MstholidayComponent implements OnInit {
       sun: day.w == 0,
       sat: day.w == 6,
       chg: h != this.saved.has(day.date),
+      // 有給奨励日（休日として数える。橙色）
+      paid: h && isPaid(this.edits.get(day.date)),
       // 国民の祝日なのに休日になっていない日（土日以外）
       jpmiss: !h && this.jp.has(day.date) && day.w != 0 && day.w != 6,
       today: day.date == this.usrsrv.formatDate(new Date())
@@ -239,6 +241,18 @@ export class MstholidayComponent implements OnInit {
   }
 
   /** 年間の出勤日数・休日数（休日は土日と、土日以外の休日の内訳も） */
+  /** 名前の候補（入力欄の候補。有給奨励日もここから選べる） */
+  readonly nameOptions = ['休業日', '年末年始', '夏季休業', PAID_NAME, '棚卸し'];
+
+  isPaidName(name: string | undefined): boolean {
+    return isPaid(name);
+  }
+
+  /** この年の有給奨励日の日数（土日以外） */
+  get paidCount(): number {
+    return [...this.current].filter(d => d.startsWith(this.year + '-') && isPaid(this.edits.get(d))).length;
+  }
+
   get yearCount(): { work: number; off: number; weekend: number; other: number } {
     let work = 0;
     for (let m = 1; m <= 12; m++) {
