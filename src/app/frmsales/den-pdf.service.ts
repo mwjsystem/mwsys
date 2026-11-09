@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import type { Content, TableCell, TDocumentDefinitions } from 'pdfmake/interfaces';
 import { PdfService } from './../services/pdf.service';
+import { UserService } from './../services/user.service';
 import { barcodeCanvas, codabar } from './../services/barcode';
 import type { ShipAdr, ShipDoc, ShipLine } from './../frmship/ship-pdf.service';
 import { DayLabel, DenPrintForm, FURIKOMI_ACCOUNT, WorkLine } from './den-forms';
@@ -53,7 +54,9 @@ const box = (stack: Content[], width: number | string = '*', minHeight = 0): Con
 })
 export class DenPdfService {
   private pdfsrv = inject(PdfService);
-  private stamp?: Promise<string | null>;
+  private usrsrv = inject(UserService);
+  /** 角印の画像（会社 ID → data URL。無ければ null） */
+  private stamps = new Map<number, Promise<string | null>>();
 
   async make(d: ShipDoc, opt: DenPrintOption): Promise<Blob> {
     let doc: TDocumentDefinitions;
@@ -73,12 +76,17 @@ export class DenPdfService {
     return this.pdfsrv.createPdf(doc);
   }
 
-  /** 角印の画像（assets/stamp.png）。置いていなければ null（角印なしで出す） */
+  /**
+   * 角印の画像。会社 ID ごとに assets/stamp/{会社ID}.png（例: 会社 ID 1 は assets/stamp/1.png）。
+   * 置いていなければ null（角印なしで出す）
+   */
   private stampImage(): Promise<string | null> {
-    if (!this.stamp) {
-      this.stamp = (async () => {
+    const compid = Number(this.usrsrv.compid);
+    let p = this.stamps.get(compid);
+    if (!p) {
+      p = (async () => {
         try {
-          const res = await fetch('assets/stamp.png');
+          const res = await fetch('assets/stamp/' + compid + '.png');
           if (!res.ok || !(res.headers.get('content-type') ?? '').startsWith('image/')) {
             return null;
           }
@@ -93,8 +101,9 @@ export class DenPdfService {
           return null;
         }
       })();
+      this.stamps.set(compid, p);
     }
-    return this.stamp;
+    return p;
   }
 
   /** 日付の見出しに合う日付 */
