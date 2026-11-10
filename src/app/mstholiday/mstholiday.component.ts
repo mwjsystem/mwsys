@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { loadExcelJs, excelBuffer } from './../services/busy.service';
 import { Title } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
 import gql from 'graphql-tag';
@@ -316,11 +317,11 @@ export class MstholidayComponent implements OnInit {
       const holidays = new Set([...this.current, ...next.map(e => e.d)]);
       const names = new Map([...this.edits, ...next.map(e => [e.d, e.name] as [string, string])]);
       const jp = new Map([...this.jp, ...[...jpHolidays(ny)].filter(([d]) => d.startsWith(ny + '-01-'))]);
-      const lib = await import('exceljs');
+      const lib = await loadExcelJs();
       const Workbook = lib.Workbook ?? lib.default.Workbook;
       const wb = new Workbook();
       fillCalendarBook(wb, { year: this.year, holidays, names, jp });
-      const buf = await wb.xlsx.writeBuffer();
+      const buf = await excelBuffer(wb);
       const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
       FileSaver.saveAs(new Blob([buf], { type }), this.year + 'カレンダー.xlsx');
       if (this.dirty) {

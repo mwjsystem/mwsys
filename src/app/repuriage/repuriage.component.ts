@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { loadExcelJs, excelBuffer } from './../services/busy.service';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import * as FileSaver from 'file-saver';
@@ -162,11 +163,11 @@ export class RepuriageComponent implements OnInit, UriSource {
       const info = '集計の切り口: ' + modes[this.mode] + '　当月 ' + r.monthBiz + ' 営業日　経過 ' + r.monthDone + ' 営業日　'
         + (r.year - 1) + '/12/1〜' + r.year + '/11/30 稼働 ' + r.yearBiz + ' 日（対象日まで ' + r.yearDone + ' 日）';
       // ExcelJS は大きいので、押されたときに読み込む
-      const lib = await import('exceljs');
+      const lib = await loadExcelJs();
       const Workbook = lib.Workbook ?? lib.default.Workbook;
       const wb = new Workbook();
       fillUriBook(wb, this, '売上報告（対象日 ' + ymd + '）', info);
-      const buf = await wb.xlsx.writeBuffer();
+      const buf = await excelBuffer(wb);
       const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
       const stamp = day.getFullYear() + ('0' + (day.getMonth() + 1)).slice(-2) + ('0' + day.getDate()).slice(-2);
       FileSaver.saveAs(new Blob([buf], { type }), '売上報告_' + stamp + '.xlsx');

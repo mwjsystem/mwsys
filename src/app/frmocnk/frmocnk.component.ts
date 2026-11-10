@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { loadExcelJs, excelBuffer } from './../services/busy.service';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import * as FileSaver from 'file-saver';
@@ -200,11 +201,11 @@ export class FrmocnkComponent implements OnInit {
     this.cdRef.detectChanges();
     try {
       // ExcelJS は大きいので、押されたときに読み込む
-      const lib = await import('exceljs');
+      const lib = await loadExcelJs();
       const Workbook = lib.Workbook ?? lib.default.Workbook;
       const wb = new Workbook();
       fillOcnkBook(wb, this.orders);
-      const buf = await wb.xlsx.writeBuffer();
+      const buf = await excelBuffer(wb);
       const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
       FileSaver.saveAs(new Blob([buf], { type }), 'おちゃのこ受注取込.xlsx');
     } catch (e) {

@@ -15,6 +15,8 @@ export interface DenprintData {
   buntype: string | null;
   /** 最初に選ぶ帳票の番号（納品書タイプより優先） */
   code?: number;
+  /** 倉庫宛 FAX フォルダに保存し終わったとき（受注ステータスが変わるので、呼び出し元の画面を読み直す） */
+  onFax?: () => void;
 }
 
 /** ダイアログを閉じたときの結果。'fax' は倉庫宛 FAX フォルダに保存した（キープ表・大会準備リストは受注ステータスが変わる） */
@@ -158,6 +160,7 @@ export class DenprintComponent {
           ? await this.shipsrv.keepFax(this.data.denno, this.form.name, (d, url) => this.make(d, url))
           : await this.shipsrv.faxPdf(this.data.denno, this.form.name, d => this.make(d));
         this.result = 'fax';
+        this.data.onFax?.();
         this.message = '倉庫宛FAXフォルダに保存しました（' + file + '）' + (this.form.keep ? '。受注ステータスを「キープ表FAX済」にしました' : '');
       } else {
         const [d] = await this.shipsrv.load([this.data.denno]);

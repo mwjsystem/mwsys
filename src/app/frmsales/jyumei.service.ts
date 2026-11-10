@@ -190,6 +190,8 @@ export class JyumeiService {
           id: this.usrsrv.compid,
           dno: denno
         },
+        // 読み直したときに、キャッシュの古い内容（受注ステータスなど）を出さないよう、毎回サーバーから読む
+        fetchPolicy: 'network-only',
       })
         .valueChanges
         .subscribe((res) => {

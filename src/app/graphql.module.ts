@@ -5,7 +5,8 @@ import { ApolloClientOptions, ApolloLink, InMemoryCache } from '@apollo/client/c
 import { setContext } from '@apollo/client/link/context';
 import { HttpLink } from 'apollo-angular/http';
 import { AuthService } from '@auth0/auth0-angular';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
+import { BusyService } from './services/busy.service';
 import {
   DocumentNode,
   DefinitionNode,
@@ -119,10 +120,27 @@ const schemaSwitchLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-export function createApollo(httpLink: HttpLink, auth: AuthService): ApolloClientOptions {
+/** データベースを読み書きしているあいだ「処理中」を出すリンク */
+function createBusyLink(busy: BusyService): ApolloLink {
+  return new ApolloLink((operation, forward) => {
+    const mutation = operation.query.definitions.some(d => d.kind === Kind.OPERATION_DEFINITION && d.operation === 'mutation');
+    return new Observable(observer => {
+      const end = busy.begin(mutation ? '保存しています…' : 'データを読み込んでいます…');
+      const sub = forward(operation).subscribe({
+        next: v => observer.next(v),
+        error: e => { end(); observer.error(e); },
+        complete: () => { end(); observer.complete(); }
+      });
+      return () => { end(); sub.unsubscribe(); };
+    });
+  });
+}
+
+export function createApollo(httpLink: HttpLink, auth: AuthService, busy: BusyService): ApolloClientOptions {
   const uri = 'https://mwjtables.herokuapp.com/v1/graphql';
   return {
     link: ApolloLink.from([
+      createBusyLink(busy),
       schemaSwitchLink,
       createAuthLink(auth),
       httpLink.create({ uri, headers: authHeader }),
@@ -136,7 +154,7 @@ export function createApollo(httpLink: HttpLink, auth: AuthService): ApolloClien
     {
       provide: APOLLO_OPTIONS,
       useFactory: createApollo,
-      deps: [HttpLink, AuthService],
+      deps: [HttpLink, AuthService, BusyService],
     },
   ],
 })

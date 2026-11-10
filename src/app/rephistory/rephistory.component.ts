@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { loadExcelJs, excelBuffer } from './../services/busy.service';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -138,11 +139,11 @@ export class RephistoryComponent {
       const s = this.shown;
       const cond = [s.mcode ? '受注先 ' + s.mcode : '', s.gcode ? '商品 ' + s.gcode : '', '受付日 ' + s.from + '〜' + s.to].filter(e => e).join('　');
       // ExcelJS は大きいので、押されたときに読み込む
-      const lib = await import('exceljs');
+      const lib = await loadExcelJs();
       const Workbook = lib.Workbook ?? lib.default.Workbook;
       const wb = new Workbook();
       fillHistBook(wb, this.orders, '受注履歴（' + cond + '）', window.location.origin, this.byGoods);
-      const buf = await wb.xlsx.writeBuffer();
+      const buf = await excelBuffer(wb);
       const type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
       const key = [s.mcode, s.gcode].filter(e => e).join('_').replace(/[\\/:*?"<>|]/g, '_');
       FileSaver.saveAs(new Blob([buf], { type }), '受注履歴_' + key + '.xlsx');

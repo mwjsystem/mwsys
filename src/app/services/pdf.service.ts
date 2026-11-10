@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { BusyService } from './busy.service';
 import type { TDocumentDefinitions } from 'pdfmake/interfaces';
 import * as FileSaver from 'file-saver';
 
@@ -16,6 +17,7 @@ export const PDF_FONT = 'NotoSansJP';
   providedIn: 'root'
 })
 export class PdfService {
+  private busy = inject(BusyService);
   private loading?: Promise<PdfMake>;
 
   /** pdfmake とフォントを読み込む（2 回目以降は読み込み済みのものを返す） */
@@ -65,12 +67,14 @@ export class PdfService {
 
   /** 帳票の定義から PDF を作る。フォントの指定が無ければ日本語フォントにする */
   async createPdf(doc: TDocumentDefinitions): Promise<Blob> {
-    const pdfMake = await this.load();
-    const def: TDocumentDefinitions = {
-      ...doc,
-      defaultStyle: { font: PDF_FONT, ...doc.defaultStyle }
-    };
-    return pdfMake.createPdf(def).getBlob();
+    return this.busy.run('帳票を作成しています…', async () => {
+      const pdfMake = await this.load();
+      const def: TDocumentDefinitions = {
+        ...doc,
+        defaultStyle: { font: PDF_FONT, ...doc.defaultStyle }
+      };
+      return pdfMake.createPdf(def).getBlob();
+    });
   }
 
   /** ファイルとして保存する（ブラウザのダウンロード） */

@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { loadExcelJs } from './../services/busy.service';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { TkdService, SEIKYU_KINDS, SeikyuKind } from './tkd.service';
@@ -86,7 +87,7 @@ export class FrmtkdComponent {
     this.open.clear();
     this.cdRef.detectChanges();
     try {
-      const lib = await import('exceljs');
+      const lib = await loadExcelJs();
       const ExcelJS = (lib as unknown as { default?: typeof lib }).default ?? lib;
       const wb = new ExcelJS.Workbook();
       await wb.xlsx.load(await file.arrayBuffer());

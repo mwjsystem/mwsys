@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { loadExcelJs } from './../services/busy.service';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { UserService } from './../services/user.service';
@@ -96,7 +97,7 @@ export class FrmobiComponent implements OnInit {
     this.cdRef.detectChanges();
     const errs: string[] = [];
     try {
-      const lib = await import('exceljs');
+      const lib = await loadExcelJs();
       const ExcelJS = (lib as unknown as { default?: typeof lib }).default ?? lib;
       this.today = this.usrsrv.formatDate(new Date());
       for (const f of files) {

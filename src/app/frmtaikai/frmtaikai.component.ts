@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { loadExcelJs } from './../services/busy.service';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { UserService } from './../services/user.service';
@@ -106,7 +107,7 @@ export class FrmtaikaiComponent implements OnInit {
     this.sheets = [];
     this.cdRef.detectChanges();
     try {
-      const lib = await import('exceljs');
+      const lib = await loadExcelJs();
       const ExcelJS = (lib as unknown as { default?: typeof lib }).default ?? lib;
       const wb = new ExcelJS.Workbook();
       await wb.xlsx.load(await file.arrayBuffer());

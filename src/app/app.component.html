@@ -1,4 +1,11 @@
 <app-navbar></app-navbar>
+@if (busy.active()) {
+  <!-- 処理中の表示（画面の切り替え・データベースの読み書き・帳票の作成・NAS への保存のあいだ） -->
+  <div class="busy-bar"><mat-progress-bar mode="indeterminate"></mat-progress-bar></div>
+  <div class="busy-msg" role="status" aria-live="polite">
+    <span class="busy-dot"></span>{{busy.label() || '処理中…'}}
+  </div>
+}
 <div class="RouterOutlet">
 <router-outlet></router-outlet>
 </div>

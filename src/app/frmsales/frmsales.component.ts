@@ -32,7 +32,7 @@ import { SSTATUS } from './../frminvoice/invoice.service';
 import { JDST, shipNote } from './../frmship/ship-forms';
 import { ShipService } from './../frmship/ship.service';
 import { ClosedayService } from './../services/closeday.service';
-import { DenprintComponent, DenprintData, DenprintResult } from './denprint.component';
+import { DenprintComponent, DenprintData } from './denprint.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -363,13 +363,14 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       return;
     }
     const denno = this.jmisrv.denno;
-    const data: DenprintData = { denno, buntype: this.form.getRawValue().buntype ?? null, code };
-    this.dialog.open(DenprintComponent, { width: '600px', maxWidth: '95vw', data }).afterClosed().subscribe((r: DenprintResult) => {
-      // 大会準備リストを倉庫へ FAX すると受注ステータスが変わるので読み直す
-      if (r == 'fax' && this.jmisrv.denno == denno && this.mode == 3) {
+    // 倉庫へ FAX し終わったら、すぐに伝票を読み直す（大会準備リストなどは受注ステータスが変わる）
+    const onFax = () => {
+      if (this.jmisrv.denno == denno && this.mode == 3) {
         this.getJyuden(denno);
       }
-    });
+    };
+    const data: DenprintData = { denno, buntype: this.form.getRawValue().buntype ?? null, code, onFax };
+    this.dialog.open(DenprintComponent, { width: '600px', maxWidth: '95vw', data });
   }
 
   /** 出荷指示: 受注一覧（出荷指示）をこの伝票だけで開く（編集中なら先に保存する） */

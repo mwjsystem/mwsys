@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { BusyService } from './busy.service';
 
 /*
  * File System Access API（Chrome / Edge）の型。TypeScript の標準の型定義に無い部分だけを宣言する。
@@ -29,6 +30,7 @@ const STORE = 'handles';
   providedIn: 'root'
 })
 export class NasService {
+  private busy = inject(BusyService);
 
   /** このブラウザでフォルダへの保存が使えるか */
   get supported(): boolean {
@@ -114,12 +116,17 @@ export class NasService {
 
   /** フォルダ dir にファイルを書く（同じ名前があれば上書き） */
   async write(dir: FileSystemDirectoryHandle, fileName: string, data: Blob | string): Promise<void> {
-    const file = await dir.getFileHandle(this.safeName(fileName), { create: true });
-    const w = await file.createWritable();
+    const end = this.busy.begin('NAS に保存しています…');
     try {
-      await w.write(data);
+      const file = await dir.getFileHandle(this.safeName(fileName), { create: true });
+      const w = await file.createWritable();
+      try {
+        await w.write(data);
+      } finally {
+        await w.close();
+      }
     } finally {
-      await w.close();
+      end();
     }
   }
 
