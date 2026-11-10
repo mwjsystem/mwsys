@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { UserService } from './../services/user.service';
+import { ZAIKO_ZERO } from './../services/jyustock.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
@@ -20,6 +21,25 @@ export type HatdenSet = Pick<mwI.Hatden, 'vcode' | 'scode' | 'tcode' | 'dmemo' |
 
 /** 新規登録時に発注伝票（trhatden）へ渡す値。hdstatus は発注状況 */
 export type HatdenNew = HatdenSet & { id: number; denno: number; created_at: Date; created_by: string; hdstatus: string };
+
+/** 操作ログ（tropelog）の作業区分（msbunrui kubun = extype）: 発注伝票。DB のトリガー（db/20261111_hatden_order.sql）と同じ値 */
+export const EXTYPE_HATDEN = '2';
+
+/** 在庫（trzaiko）の発注数（hatu）の増減 1 件。発注伝票の倉庫・発注日・商品ごと */
+export interface HatuZaiko { scode: string; gcode: string; day: string; hatu: number }
+
+/** 発注数の増減を、伝票と同じミューテーションで書く行（在庫の行が無ければ 0 で作ってから加算する） */
+export interface HatuRows { zinit: object[]; zinc: object[] }
+
+/** 受注伝票の保存で一緒に作る発注伝票（受発注の明細から、仕入先・倉庫ごと） */
+export interface AutoOrders {
+  hatden: HatdenNew[];
+  hatmei: HatmeiInput[];
+  zaiko: HatuZaiko[];
+  /** 作った発注伝票（伝票番号と仕入先） */
+  made: { denno: number; vcode: string }[];
+}
+export const NO_ORDERS: AutoOrders = { hatden: [], hatmei: [], zaiko: [], made: [] };
 
 /** get_hatden クエリの結果 */
 interface HatdenResult { trhatden_by_pk: mwI.Trhatden | null }
@@ -85,6 +105,45 @@ export class HatmeiService {
       }
     }`;
 
+  /**
+   * 発注明細から、在庫の発注数（trzaiko.hatu）の増減を作る。倉庫は発注伝票の倉庫、日付は発注日。
+   * sign = -1 は読み込んだときの分の取り消し（変更の保存で、前の発注数を引いてから今の発注数を足す）
+   */
+  hatuOf(scode: string | null, day: string | Date | null, lines: { gcode: string | null; suu: number | string | null }[], sign = 1): HatuZaiko[] {
+    if (!scode || !day) {
+      return [];
+    }
+    const d = typeof day == 'string' ? day.slice(0, 10) : this.usrsrv.formatDate(day);
+    return lines
+      .filter(l => l.gcode && Number(l.suu))
+      .map(l => ({ scode, gcode: String(l.gcode), day: d, hatu: sign * Number(l.suu) }));
+  }
+
+  /** 発注数の増減を 倉庫・商品・日付 ごとにまとめ、伝票と同じミューテーションで書く行にする */
+  hatuRows(list: HatuZaiko[]): HatuRows {
+    const id = this.usrsrv.compid;
+    const sum = new Map<string, HatuZaiko>();
+    for (const z of list) {
+      const k = z.scode + '\t' + z.gcode + '\t' + z.day;
+      const s = sum.get(k) ?? { ...z, hatu: 0 };
+      s.hatu += z.hatu;
+      sum.set(k, s);
+    }
+    const zinit: object[] = [];
+    const zinc: object[] = [];
+    sum.forEach(z => {
+      if (z.hatu == 0) {
+        return;
+      }
+      zinit.push({ id, scode: z.scode, gcode: z.gcode, day: z.day, ...ZAIKO_ZERO, hatu: 0 });
+      zinc.push({
+        where: { id: { _eq: id }, scode: { _eq: z.scode }, gcode: { _eq: z.gcode }, day: { _eq: z.day } },
+        _inc: { hatu: z.hatu }
+      });
+    });
+    return { zinit, zinc };
+  }
+
   qryHatden(denno: number): Observable<mwI.Trhatden | null> {
     // console.log(denno);
     // return new Promise( (resolve,reject) => {
@@ -95,13 +154,19 @@ export class HatmeiService {
           id: this.usrsrv.compid,
           dno: denno
         },
+        // 受注伝票から自動で作った発注伝票などを、キャッシュの古い内容で出さないよう毎回サーバーから読む
+        fetchPolicy: 'network-only',
       })
         .valueChanges
-        .subscribe(({ data }) => {
-          if (!data) {
+        .subscribe((res) => {
+          if (res.error && !res.data) {
+            observer.error(res.error);
             return;
           }
-          observer.next((data as HatdenResult).trhatden_by_pk);
+          if (!res.data) {
+            return;
+          }
+          observer.next((res.data as HatdenResult).trhatden_by_pk);
         }, (error) => {
           // return reject(error);
           observer.error(error);
@@ -109,9 +174,12 @@ export class HatmeiService {
     });
     return observable;
   }
-  updHatden(denno: number, hatden: HatdenSet, hatmei: HatmeiInput[]): Promise<UpdHatdenResult> {
+  /** 変更保存。伝票・明細・在庫の発注数（zaiko: 読込時の分の取り消し＋今の分）を 1 トランザクションで書く */
+  updHatden(denno: number, hatden: HatdenSet, hatmei: HatmeiInput[], zaiko: HatuZaiko[] = []): Promise<UpdHatdenResult> {
+    const { zinit, zinc } = this.hatuRows(zaiko);
     const UpdateTran = gql`
-      mutation upd_hatden($id: smallint!, $hdno: Int!,$_set: trhatden_set_input!,$obj:[trhatmei_insert_input!]!) {
+      mutation upd_hatden($id: smallint!, $hdno: Int!,$_set: trhatden_set_input!,$obj:[trhatmei_insert_input!]!,
+        $zinit: [trzaiko_insert_input!]!, $zinc: [trzaiko_updates!]!) {
         update_trhatden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
           affected_rows
         }
@@ -119,6 +187,12 @@ export class HatmeiService {
           affected_rows
         }
         insert_trhatmei(objects: $obj) {
+          affected_rows
+        }
+        insert_trzaiko(objects: $zinit, on_conflict: {constraint: trzaiko_pkey, update_columns: []}) {
+          affected_rows
+        }
+        update_trzaiko_many(updates: $zinc) {
           affected_rows
         }
       }`;
@@ -129,7 +203,9 @@ export class HatmeiService {
           id: this.usrsrv.compid,
           hdno: denno,
           _set: hatden,
-          obj: hatmei
+          obj: hatmei,
+          zinit,
+          zinc
         },
         refetchQueries: [
           {
@@ -139,20 +215,33 @@ export class HatmeiService {
               dno: denno
             },
           }],
-      }).subscribe(({ data }) => {
-        return resolve(data as UpdHatdenResult);
+      }).subscribe((res) => {
+        // Apollo（v4）はエラーを例外ではなく結果の error で返すことがある
+        if (res.error || !res.data) {
+          return reject(res.error ?? new Error('保存の結果がありません'));
+        }
+        return resolve(res.data as UpdHatdenResult);
       }, (error) => {
         return reject(error);
       });
     });
   }
-  insHatden(hatden: HatdenNew[], hatmei: HatmeiInput[]): Promise<InsHatdenResult> {
+  /** 新規登録。伝票・明細・在庫の発注数（zaiko）を 1 トランザクションで書く */
+  insHatden(hatden: HatdenNew[], hatmei: HatmeiInput[], zaiko: HatuZaiko[] = []): Promise<InsHatdenResult> {
+    const { zinit, zinc } = this.hatuRows(zaiko);
     const InsertTran = gql`
-      mutation ins_hatden($obj:[trhatden_insert_input!]!,$objm:[trhatmei_insert_input!]!) {
+      mutation ins_hatden($obj:[trhatden_insert_input!]!,$objm:[trhatmei_insert_input!]!,
+        $zinit: [trzaiko_insert_input!]!, $zinc: [trzaiko_updates!]!) {
         insert_trhatden(objects: $obj)  {
           affected_rows
         }
         insert_trhatmei(objects: $objm)  {
+          affected_rows
+        }
+        insert_trzaiko(objects: $zinit, on_conflict: {constraint: trzaiko_pkey, update_columns: []}) {
+          affected_rows
+        }
+        update_trzaiko_many(updates: $zinc) {
           affected_rows
         }
       }`;
@@ -161,10 +250,15 @@ export class HatmeiService {
         mutation: InsertTran,
         variables: {
           obj: hatden,
-          objm: hatmei
+          objm: hatmei,
+          zinit,
+          zinc
         },
-      }).subscribe(({ data }) => {
-        return resolve(data as InsHatdenResult);
+      }).subscribe((res) => {
+        if (res.error || !res.data) {
+          return reject(res.error ?? new Error('登録の結果がありません'));
+        }
+        return resolve(res.data as InsHatdenResult);
       }, (error) => {
         return reject(error);
       });

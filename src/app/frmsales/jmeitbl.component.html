@@ -1,7 +1,11 @@
 <!-- <div style="height: 40px;" class="grid grid-row gap-2 mat-elevation-z8"> -->
 <mat-toolbar style="height:40px;text-align:center;" class="flex flex-row">
-  @if (canEdit && hatden.length>0) {
-    <button mat-flat-button color="warn" (click)="toFrmsup()">発注伝票登録</button>
+  @if (canEdit && unordered() > 0) {
+    <!-- 受発注の明細は、受注伝票の保存で発注伝票を自動で作る（手で発注伝票を開く必要はない） -->
+    <span style="margin: 0 1em; color: #e65100; font-weight: bold; white-space: nowrap;"
+      matTooltip="受発注の明細（在庫種別「受発注」）は、保存すると仕入先ごとに発注伝票を自動で作ります" matTooltipClass="ttips">
+      未発注 {{unordered()}} 行（保存で発注伝票を作ります）
+    </span>
   }
   @if (canEdit && movden.length>0) {
     <button mat-flat-button color="warn" (click)="toFrmsup()"
@@ -269,6 +273,13 @@
         @if (canEdit) {
           <button mat-icon-button matSuffix (click)="spdetHelp(getIdx(i))">
             <mat-icon>find_replace</mat-icon>
+          </button>
+        }
+        @if (frmArr.getRawValue()[getIdx(i)]['spec'] == '3' && frmArr.getRawValue()[getIdx(i)]['spdet']) {
+          <!-- 受発注: 在庫状態詳細は発注伝票番号。発注伝票を別のタブで開く -->
+          <button mat-icon-button matSuffix type="button" title="発注伝票を開きます"
+            (click)="usrsrv.openMst('frmsupply', '' + frmArr.getRawValue()[getIdx(i)]['spdet'])">
+            <mat-icon>open_in_new</mat-icon>
           </button>
         }
       </mat-form-field>

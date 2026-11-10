@@ -29,6 +29,11 @@
         <mat-icon>find_replace</mat-icon>
       </button>
     }
+    @if (mode!=1) {
+      <button mat-flat-button (click)="opelog()" [color]="usrsrv.getColor(mode)" [disabled]="!denno">
+        <mat-icon>history</mat-icon>操作ログ
+      </button>
+    }
   <!-- </mat-form-field> -->
   <button mat-flat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'"
     [color]="usrsrv.getColor(mode)">

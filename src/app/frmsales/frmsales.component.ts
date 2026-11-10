@@ -32,6 +32,7 @@ import { SSTATUS } from './../frminvoice/invoice.service';
 import { JDST, shipNote } from './../frmship/ship-forms';
 import { ShipService } from './../frmship/ship.service';
 import { ClosedayService } from './../services/closeday.service';
+import { AutoOrders } from './../frmsupply/hatmei.service';
 import { DenprintComponent, DenprintData } from './denprint.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -960,6 +961,23 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     return validIgnoringEmpty(this.form);
   }
 
+  /** 受発注の明細から発注伝票を作る。作れなかったときはメッセージを出して undefined（保存しない） */
+  private async makeOrders(jdenno: number): Promise<AutoOrders | undefined> {
+    try {
+      return await this.jmeitbl().makeOrders(jdenno);
+    } catch (e) {
+      this.jmisrv.isSaving = false;
+      this.usrsrv.toastErr('発注伝票を作れませんでした', (e as Error).message);
+      console.log('error makeOrders', e);
+      return undefined;
+    }
+  }
+
+  /** 保存のメッセージに足す、作った発注伝票 */
+  private ordersText(o: AutoOrders): string {
+    return o.made.length == 0 ? '' : '。発注伝票 ' + o.made.map(m => m.denno + '（仕入先 ' + m.vcode + '）').join('、') + ' を作りました';
+  }
+
   async save(): Promise<boolean> {
     if (dropEmptyMei(this.form.get('mtbl') as FormArray)) {
       this.jmeitbl().refresh();
@@ -1043,15 +1061,20 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
         (this.frmArr.getRawValue() as { gcode: string; suu: number }[]).map(r => ({ gcode: r.gcode, suu: Number(r.suu) })));
     }
     if (this.mode == 2) {
+      // 受発注の明細でまだ発注していないものから、発注伝票を作る（受注伝票と同じ処理で保存する）
+      const orders = await this.makeOrders(this.jmisrv.denno);
+      if (!orders) {
+        return false;
+      }
       return new Promise(resolve => {
-        // let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno); 
+        // let jyumei=this.jmeitbl.get_jyumei(this.jmisrv.denno);
         this.jmeitbl().editJyumei(this.jmisrv.denno);
         let jyumei = this.jmisrv.trjyumei;
         let jyumzai = this.jmisrv.trjmzai;
         console.log('save変更',jyumzai);
-        this.jmisrv.updJyuden(this.jmisrv.denno, { ...jyuden }, jyumei, jyumzai)
+        this.jmisrv.updJyuden(this.jmisrv.denno, { ...jyuden }, jyumei, jyumzai, orders)
           .then(result => {
-            this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'の変更を保存しました');
+            this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'の変更を保存しました' + this.ordersText(orders));
             //  zaiko更新処理 (読込時分マイナス)
             this.jmisrv.trzaiko.forEach(e => {
               this.jmisrv.updZaiko(e);
@@ -1066,6 +1089,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
             return resolve(true);
 			this.jmisrv.isSaving = false;
           }).catch(error => {
+            this.jmeitbl().undoOrders(orders);
             this.usrsrv.toastErr('データベースエラー', '受注伝票' + this.jmisrv.denno + 'の変更保存ができませんでした');
             console.log('error update_jyuen', error);
             return resolve(false);
@@ -1076,6 +1100,10 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       // console.log('save新規',this.jmisrv.trjmzai);
 	
       this.jmisrv.denno = await this.jmisrv.getDenno();
+      const orders = await this.makeOrders(this.jmisrv.denno);
+      if (!orders) {
+        return false;
+      }
       return new Promise(resolve => {
         this.jmeitbl().editJyumei(this.jmisrv.denno);
         const jyumei = this.jmisrv.trjyumei;
@@ -1091,10 +1119,10 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
           , ...jyuden,
         }]
         // console.log(trjyuden, jyumei);
-        this.jmisrv.insJyuden(trjyuden, jyumei, jyumzai)
+        this.jmisrv.insJyuden(trjyuden, jyumei, jyumzai, orders)
           .then(result => {
             // console.log('insert_trjyu', result);
-            this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'を新規登録しました');
+            this.usrsrv.toastSuc('受注伝票' + this.jmisrv.denno + 'を新規登録しました' + this.ordersText(orders));
             //  zaiko更新処理 　新規
             if (jyuden.skbn != "1") {
               this.jmisrv.zaikoNew.forEach(z => this.jmisrv.updZaiko(z));
@@ -1106,6 +1134,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
             return resolve(true);
 			this.jmisrv.isSaving = false;
           }).catch(error => {
+            this.jmeitbl().undoOrders(orders);
             this.usrsrv.toastErr('データベースエラー', '受注伝票の新規登録ができませんでした');
             console.log('error insert_jyuden', error);
             return resolve(false);

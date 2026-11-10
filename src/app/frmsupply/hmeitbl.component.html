@@ -169,8 +169,15 @@
       <ng-container matColumnDef="jdenno">
         <th mat-header-cell *matHeaderCellDef>受注番号</th>
         <td mat-cell *matCellDef="let row; let i = index" [formGroupName]="getIdx(i)">
-          <mat-form-field style="width:6em;">
+          <mat-form-field style="width:7.5em;">
             <input matInput formControlName="jdenno">
+            @if (frmArr.getRawValue()[getIdx(i)]['jdenno']) {
+              <!-- 受注伝票を別のタブで開く（受注伝票から自動で作った発注をたどる） -->
+              <button mat-icon-button matSuffix type="button" title="受注伝票を開きます"
+                (click)="usrsrv.openMst('frmsales', '' + frmArr.getRawValue()[getIdx(i)]['jdenno'])">
+                <mat-icon>open_in_new</mat-icon>
+              </button>
+            }
           </mat-form-field>
         </td>
       </ng-container>

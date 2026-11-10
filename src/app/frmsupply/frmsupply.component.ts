@@ -17,7 +17,8 @@ import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
 import { VendsService } from './../mstvendor/vends.service';
 import { DownloadService } from './../services/download.service';
-import { HatmeiService, HatdenSet, HatdenNew } from './hatmei.service';
+import { HatmeiService, HatdenSet, HatdenNew, HatuZaiko, EXTYPE_HATDEN } from './hatmei.service';
+import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
 import { filter } from 'rxjs/operators';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -74,6 +75,8 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
   }
   denno: number = 0;
   mode: number = 3;
+  /** 読み込んだときの発注数の取り消し分（在庫 trzaiko.hatu。変更の保存で引いてから、今の発注数を足す） */
+  private oldHatu: HatuZaiko[] = [];
   rows: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -172,6 +175,8 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
             this.usrsrv.setTmstmp(hatden);
             this.hmisrv.hatmei = hatden.vhatzns;
             this.hmeitbl().setHatmei();
+            // 読み込んだときの発注数（変更の保存で、在庫の発注数からいったん引く）
+            this.oldHatu = this.hmisrv.hatuOf(hatden.scode, hatden.day as unknown as string, hatden.vhatzns, -1);
             // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
             this.denno = denno;
             history.replaceState('', '', './frmsupply/' + this.mode + '/' + this.denno);
@@ -189,6 +194,15 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
     }
     this.cdRef.detectChanges();
   }
+  /** 発注伝票の操作ログ（登録・変更。受注伝票から自動で作った発注も含む）を表示する */
+  opelog() {
+    if (!this.denno) {
+      return;
+    }
+    const data: OpelogParam = { extype: EXTYPE_HATDEN, keycode: String(this.denno), title: '発注伝票 ' + this.denno, table: 'trhatden' };
+    this.dialog.open(OpelogComponent, { width: '900px', maxWidth: '95vw', data: data });
+  }
+
   updVcd(value: string): void {
     let vend = this.vensrv.getVendor(value);
     this.form.patchValue({ mtax: vend?.mtax, currency: vend?.currency });
@@ -349,7 +363,9 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
 
     if (this.mode == 2) {
       let hatmei = this.hmeitbl().getHatmei(this.denno);
-      this.hmisrv.updHatden(this.denno, hatden, hatmei)
+      // 在庫の発注数: 読み込んだときの分を引き、今の倉庫・発注日・数量で足す
+      const zaiko = [...this.oldHatu, ...this.hmisrv.hatuOf(hatden.scode, hatden.day, hatmei)];
+      this.hmisrv.updHatden(this.denno, hatden, hatmei, zaiko)
         .then(result => {
           // console.log('update_hatden',result);
           this.usrsrv.toastSuc('発注伝票' + this.denno + 'の変更を保存しました');
@@ -374,7 +390,7 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
         , ...hatden,
       }]
       // console.log(trhatden);
-      this.hmisrv.insHatden(trhatden, hatmei)
+      this.hmisrv.insHatden(trhatden, hatmei, this.hmisrv.hatuOf(hatden.scode, hatden.day, hatmei))
         .then(result => {
           // console.log('insert_trhat',result);
           this.usrsrv.toastSuc('発注伝票' + this.denno + 'を新規登録しました');

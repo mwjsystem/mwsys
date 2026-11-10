@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, Subject, firstValueFrom } from 'rxjs';
 // import { ToastrService } from 'ngx-toastr';
 import { UserService } from './../services/user.service';
+import { HatmeiService, AutoOrders, NO_ORDERS } from './../frmsupply/hatmei.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 
@@ -39,6 +40,7 @@ interface JyudenDeleteResult { update_trjyuden: mwI.AffectedRows }
 export class JyumeiService {
   private usrsrv = inject(UserService);
   private apollo = inject(Apollo);
+  private hmisrv = inject(HatmeiService);
 
   // public jyumei: mwI.Jyumei[] = []; //frmsales⇒jmeitblコンポーネントへ渡すときのみ使用
   public trjyumei: TrjyumeiRow[] = [];
@@ -290,9 +292,32 @@ export class JyumeiService {
     });
   }
 
-  updJyuden(denno: number, jyuden: JyudenSet, jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[]): Promise<JyudenUpdateResult> {
+  /** 受注伝票の保存で一緒に作る発注伝票を、ミューテーションの変数にする */
+  private orderVars(orders: AutoOrders) {
+    const { zinit, zinc } = this.hmisrv.hatuRows(orders.zaiko);
+    return { hden: orders.hatden, hmei: orders.hatmei, zinit, zinc };
+  }
+
+  /**
+   * 変更保存。受発注の明細から作った発注伝票（orders。発注伝票・明細・在庫の発注数）も、同じトランザクションで書く
+   * （受注明細に発注伝票番号だけが入って発注伝票が無い、ということが起きないように）
+   */
+  updJyuden(denno: number, jyuden: JyudenSet, jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[], orders: AutoOrders = NO_ORDERS): Promise<JyudenUpdateResult> {
     const UpdateTran = gql`
-      mutation upd_jyuden($id: smallint!, $hdno: Int!,$_set: trjyuden_set_input!,$obj:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
+      mutation upd_jyuden($id: smallint!, $hdno: Int!,$_set: trjyuden_set_input!,$obj:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!,
+        $hden: [trhatden_insert_input!]!, $hmei: [trhatmei_insert_input!]!, $zinit: [trzaiko_insert_input!]!, $zinc: [trzaiko_updates!]!) {
+        insert_trhatden(objects: $hden) {
+          affected_rows
+        }
+        insert_trhatmei(objects: $hmei) {
+          affected_rows
+        }
+        insert_trzaiko(objects: $zinit, on_conflict: {constraint: trzaiko_pkey, update_columns: []}) {
+          affected_rows
+        }
+        update_trzaiko_many(updates: $zinc) {
+          affected_rows
+        }
         update_trjyuden(where: {id: {_eq:$id},denno: {_eq:$hdno}}, _set: $_set)  {
           affected_rows
         }
@@ -317,7 +342,8 @@ export class JyumeiService {
           hdno: denno,
           _set: jyuden,
           obj: jyumei,
-          obj2: jyumzai
+          obj2: jyumzai,
+          ...this.orderVars(orders)
         },
         refetchQueries: [
           {
@@ -327,18 +353,36 @@ export class JyumeiService {
               dno: denno
             },
           }],
-      }).subscribe(({ data }) => {
-        return resolve(data as JyudenUpdateResult);
+      }).subscribe((res) => {
+        // Apollo（v4）はエラーを例外ではなく結果の error で返すことがある
+        if (res.error || !res.data) {
+          return reject(res.error ?? new Error('保存の結果がありません'));
+        }
+        return resolve(res.data as JyudenUpdateResult);
       }, (error) => {
         return reject(error);
       });
     });
   }
 
-  insJyuden(jyuden: JyudenNew[], jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[]): Promise<JyudenInsertResult> {
+  /** 新規登録。受発注の明細から作った発注伝票（orders）も、同じトランザクションで書く */
+  insJyuden(jyuden: JyudenNew[], jyumei: TrjyumeiRow[], jyumzai: TrjmzaiRow[], orders: AutoOrders = NO_ORDERS): Promise<JyudenInsertResult> {
     const InsertTran = gql`
-      mutation ins_jyuden($obj:[trjyuden_insert_input!]!,$objm:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!) {
+      mutation ins_jyuden($obj:[trjyuden_insert_input!]!,$objm:[trjyumei_insert_input!]!,$obj2:[trjyumzai_insert_input!]!,
+        $hden: [trhatden_insert_input!]!, $hmei: [trhatmei_insert_input!]!, $zinit: [trzaiko_insert_input!]!, $zinc: [trzaiko_updates!]!) {
         insert_trjyuden(objects: $obj)  {
+          affected_rows
+        }
+        insert_trhatden(objects: $hden) {
+          affected_rows
+        }
+        insert_trhatmei(objects: $hmei) {
+          affected_rows
+        }
+        insert_trzaiko(objects: $zinit, on_conflict: {constraint: trzaiko_pkey, update_columns: []}) {
+          affected_rows
+        }
+        update_trzaiko_many(updates: $zinc) {
           affected_rows
         }
         insert_trjyumei(objects: $objm)  {
@@ -354,10 +398,14 @@ export class JyumeiService {
         variables: {
           obj: jyuden,
           objm: jyumei,
-          obj2: jyumzai
+          obj2: jyumzai,
+          ...this.orderVars(orders)
         },
-      }).subscribe(({ data }) => {
-        return resolve(data as JyudenInsertResult);
+      }).subscribe((res) => {
+        if (res.error || !res.data) {
+          return reject(res.error ?? new Error('登録の結果がありません'));
+        }
+        return resolve(res.data as JyudenInsertResult);
       }, (error) => {
         return reject(error);
       });

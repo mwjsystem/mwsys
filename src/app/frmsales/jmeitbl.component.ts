@@ -13,6 +13,10 @@ import { StockService, Stcbs } from './../services/stock.service';
 // import { GoodsService } from './../services/goods.service';
 import { MembsService } from './../mstmember/membs.service';
 import { JyumeiService, TrjyumeiRow } from './jyumei.service';
+import { HatmeiService, AutoOrders, NO_ORDERS, HatdenNew, HatmeiInput } from './../frmsupply/hatmei.service';
+import { VendsService } from './../mstvendor/vends.service';
+import { firstValueFrom } from 'rxjs';
+import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 import * as Query from './queries.frms';
 // import { ToastrService } from 'ngx-toastr';
@@ -80,6 +84,8 @@ export class JmeitblComponent implements OnInit {
   stcsrv = inject(StockService);
   memsrv = inject(MembsService);
   jmisrv = inject(JyumeiService);
+  private hmisrv = inject(HatmeiService);
+  private vensrv = inject(VendsService);
 
   readonly parentForm = input.required<FormGroup>();
   readonly paginator = viewChild(MatPaginator);
@@ -417,6 +423,107 @@ export class JmeitblComponent implements OnInit {
       })
     this.refresh();
     this.usrsrv.toastInf(i + '件変更しました。まだ、保存されていません。');
+  }
+
+  /**
+   * 受発注の明細（在庫種別 3。商品マスタの「受発注」の商品は品番を入れると 3 になる）のうち、まだ発注していない
+   * （在庫状態詳細に発注伝票番号が無い）ものから、仕入先・倉庫ごとに発注伝票を作る（受注伝票の保存の直前に呼ぶ）。
+   * 受注明細の在庫状態詳細（spdet）に発注伝票番号、発注明細に受注伝票番号・行番号を入れ、受注伝票と同じ処理で保存する。
+   * 原価・税率は発注伝票の画面と同じく単価マスタ（今日より前の最新）から、税区分・通貨は仕入先マスタから取る
+   */
+  async makeOrders(jdenno: number): Promise<AutoOrders> {
+    const rows = this.frmArr.controls.filter(c => {
+      const v = c.getRawValue();
+      return v.spec == '3' && !String(v.spdet ?? '').trim() && String(v.gcode ?? '').trim() && Number(v.suu) > 0;
+    });
+    if (rows.length == 0) {
+      return NO_ORDERS;
+    }
+    const today = this.usrsrv.formatDate(new Date());
+    const gcodes = [...new Set(rows.map(c => String(c.getRawValue().gcode)))];
+    const Get = gql`
+      query get_order_goods($id: smallint!, $gcodes: [String!]!, $day: date!) {
+        msgoods(where: {id: {_eq: $id}, gcode: {_in: $gcodes}}) {
+          gcode
+          msggroup { vcode }
+          msgtankas(limit: 1, where: {day: {_lt: $day}}, order_by: {day: desc_nulls_last}) { genka taxrate }
+        }
+      }`;
+    const res = await firstValueFrom(this.apollo.query<{ msgoods: { gcode: string; msggroup: { vcode: string } | null; msgtankas: { genka: number | null; taxrate: string | null }[] }[] }>({
+      query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, gcodes, day: today }
+    }));
+    if (res.error) {
+      throw res.error;
+    }
+    const goods = new Map((res.data?.msgoods ?? []).map(g => [g.gcode, g]));
+    if (this.vensrv.vends.length == 0) {
+      await this.vensrv.getVendors();
+    }
+    // 仕入先・倉庫ごとにまとめる
+    const groups = new Map<string, AbstractControl[]>();
+    for (const c of rows) {
+      const v = c.getRawValue();
+      const vcode = String(v.vcode ?? goods.get(v.gcode)?.msggroup?.vcode ?? '').trim();
+      if (!vcode) {
+        throw new Error('品番 ' + v.gcode + ' の仕入先が商品グループに登録されていないため、発注伝票を作れません');
+      }
+      const k = vcode + '\t' + (v.scode ?? '');
+      groups.set(k, [...(groups.get(k) ?? []), c]);
+    }
+    const ret: AutoOrders = { hatden: [], hatmei: [], zaiko: [], made: [] };
+    const now = new Date();
+    const by = this.usrsrv.staff.code;
+    for (const [k, cs] of groups) {
+      const [vcode, scode] = k.split('\t');
+      const vend = this.vensrv.getVendor(vcode);
+      const hdno = Number(await this.usrsrv.getNumber('hdenno', 1));
+      const mtax = vend?.mtax ?? '0';
+      let gtotal = 0;
+      let tax = 0;
+      const lines: HatmeiInput[] = cs.map((c, i) => {
+        const v = c.getRawValue();
+        const t = goods.get(v.gcode)?.msgtankas[0];
+        const genka = Number(t?.genka ?? 0);
+        const taxrate = t?.taxrate ?? v.taxrate ?? '10';
+        const money = genka * Number(v.suu);
+        gtotal += money;
+        if (mtax == '0') {
+          tax += money * Number(taxrate) / 100;
+        }
+        return {
+          id: this.usrsrv.compid, denno: hdno, line: i + 1, day: today, inday: null,
+          gcode: v.gcode, gtext: v.gtext ?? '', suu: Number(v.suu), genka, money, taxrate, mmemo: v.mmemo ?? '',
+          spec: null, jdenno, jline: Number(v.line), yday: null, ydaykbn: null, mtax
+        } as unknown as HatmeiInput;
+      });
+      // 受注明細に発注伝票番号を入れる（受注伝票から発注伝票をたどる）
+      cs.forEach(c => c.patchValue({ spdet: String(hdno) }));
+      ret.hatmei.push(...lines);
+      ret.hatden.push({
+        id: this.usrsrv.compid, denno: hdno, vcode, day: today, scode, tcode: by, autoproc: true,
+        dmemo: '受注伝票' + jdenno + 'から自動作成', inmemo: '', gtotal, tax, total: gtotal + tax,
+        currency: vend?.currency ?? 'JPY', created_at: now, created_by: by, updated_at: now, updated_by: by,
+        hdstatus: this.hmisrv.getHdsta(lines)
+      } as unknown as HatdenNew);
+      ret.zaiko.push(...this.hmisrv.hatuOf(scode, today, lines));
+      ret.made.push({ denno: hdno, vcode });
+    }
+    return ret;
+  }
+
+  /** まだ発注していない受発注の明細の行数（保存すると発注伝票を作る） */
+  unordered(): number {
+    return this.frmArr.getRawValue().filter(v => v.spec == '3' && !String(v.spdet ?? '').trim() && String(v.gcode ?? '').trim()).length;
+  }
+
+  /** 受注伝票を保存できなかったとき、makeOrders で入れた発注伝票番号を明細から消す（次の保存で作り直すため） */
+  undoOrders(o: AutoOrders) {
+    const dnos = new Set(o.made.map(m => String(m.denno)));
+    this.frmArr.controls.forEach(c => {
+      if (dnos.has(String(c.getRawValue().spdet ?? ''))) {
+        c.patchValue({ spdet: null });
+      }
+    });
   }
 
   async toFrmsup() {
