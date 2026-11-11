@@ -94,6 +94,9 @@
       <button mat-menu-item (click)="usrsrv.openMst('frmsiji', '' + jmisrv.denno)">
         <mat-icon>content_cut</mat-icon>刺繍指示書（帯）
       </button>
+      <button mat-menu-item (click)="openMoves()" [disabled]="moveBusy">
+        <mat-icon>swap_horiz</mat-icon>在庫不足を他の倉庫から移動（移動伝票）
+      </button>
       <!-- <mat-form-field>
       <mat-label>帳票選択</mat-label>
       <mat-select #mselbun>
@@ -123,6 +126,16 @@
       <mat-icon>fax</mat-icon>キープ表を送る
     </button>
     <button mat-button type="button" (click)="keepSuggest = ''">今は送らない</button>
+  </div>
+}
+@if (moveSuggest.length > 0 && mode == 3 && jmisrv.denno) {
+  <div class="flex flex-row flex-wrap items-center" style="gap: 10px; margin: 6px 12px; padding: 8px 12px; background: #e3f2fd; border-left: 4px solid #1565c0;">
+    <mat-icon style="color: #1565c0;">swap_horiz</mat-icon>
+    <span style="color: #0d47a1; font-weight: bold;">出荷倉庫の在庫が足りない商品が、他の倉庫にあります：{{moveText()}}</span>
+    <button mat-raised-button color="primary" type="button" (click)="openMoves()" [disabled]="moveBusy">
+      <mat-icon>local_shipping</mat-icon>移動伝票を作る
+    </button>
+    <button mat-button type="button" (click)="moveSuggest = []">今は作らない</button>
   </div>
 }
 <form [formGroup]="form" (keydown.enter)="usrsrv.canEnter($event)">

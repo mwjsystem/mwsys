@@ -34,6 +34,7 @@ import { ShipService } from './../frmship/ship.service';
 import { ClosedayService } from './../services/closeday.service';
 import { AutoOrders } from './../frmsupply/hatmei.service';
 import { DenprintComponent, DenprintData } from './denprint.component';
+import { MoveSuggestService, MovesuggestComponent, MovesuggestData, MoveCandidate, ShortRow } from './movesuggest.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -108,6 +109,10 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   /** キープ表を送るよう促すときの理由（受注可能数が少ない商品など）。空なら促さない */
   keepSuggest: string = '';
   keepBusy = false;
+  /** 出荷倉庫の在庫が足りず、他の倉庫に在庫がある明細（保存のあとに調べ、移動伝票を作るよう促す） */
+  moveSuggest: MoveCandidate[] = [];
+  moveBusy = false;
+  private movsgsrv = inject(MoveSuggestService);
   readonly JDST = JDST;
   /** 媒体管理の選択肢（売上報告の Web の判定に使う） */
   readonly bkcodes = [
@@ -410,6 +415,59 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.cdRef.detectChanges();
   }
 
+  /** 移動を勧める明細の表示（品番と、在庫の一番多い倉庫） */
+  moveText(): string {
+    return this.moveSuggest.map(c => c.gcode + '（' + c.stores[0].name + ' ' + c.stores[0].pable + '）').join('、');
+  }
+
+  /** 保存した受注伝票の在庫不足を調べ、他の倉庫に在庫があれば移動伝票を作るよう促す（保存の前に選んだ行） */
+  private async checkMoves(denno: number, rows: ShortRow[]) {
+    if (rows.length == 0) {
+      return;
+    }
+    try {
+      const list = await this.movsgsrv.candidates(denno, rows);
+      if (denno == this.jmisrv.denno) {
+        this.moveSuggest = list;
+        this.cdRef.detectChanges();
+      }
+    } catch (e) {
+      console.log('error check moves', e);
+    }
+  }
+
+  /** 在庫不足を他の倉庫から移動する移動伝票を作る（ダイアログで移動元・数量を選ぶ） */
+  async openMoves() {
+    const denno = this.jmisrv.denno;
+    if (!denno) {
+      return;
+    }
+    let list = this.moveSuggest;
+    if (list.length == 0) {
+      this.moveBusy = true;
+      this.cdRef.detectChanges();
+      try {
+        list = await this.movsgsrv.candidates(denno, this.movsgsrv.shortRows(this.frmArr.getRawValue()));
+      } catch (e) {
+        this.usrsrv.toastErr('在庫を調べられませんでした', (e as Error).message);
+        console.log('error check moves', e);
+      }
+      this.moveBusy = false;
+      this.cdRef.detectChanges();
+      if (list.length == 0) {
+        this.usrsrv.toastInf('他の倉庫から移動できる在庫不足の明細はありません（受注可能数が数量より少なく、他の倉庫に在庫がある在庫品が対象です。移動伝票を作った明細は除きます）');
+        return;
+      }
+    }
+    const data: MovesuggestData = { jdenno: denno, candidates: list };
+    this.dialog.open(MovesuggestComponent, { width: '980px', maxWidth: '98vw', data }).afterClosed().subscribe(made => {
+      if (made && made.length > 0) {
+        this.moveSuggest = [];
+        this.cdRef.detectChanges();
+      }
+    });
+  }
+
   /** 受注可能数が 10 未満の実物の商品（キープ表を送るよう促すため）。保存の前に、入力中の明細から調べる */
   private lowStock(): string[] {
     const mcode = this.form.value.mcode ?? '';
@@ -515,6 +573,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
           this.idenno = result?.idenno ?? null;
           if (denno != this.shownDenno) {
             this.keepSuggest = '';
+            this.moveSuggest = [];
           }
           this.shownDenno = denno;
           this.jdstatus = result?.jdstatus ?? '';
@@ -859,6 +918,7 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.istatus = '';
     this.jdstatus = '';
     this.keepSuggest = '';
+    this.moveSuggest = [];
     this.vnyuzan = { denno: 0, nyuzan: 0 };
     this.paid = false;
     this.savedUday = null;
@@ -1045,8 +1105,11 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     console.log('save jyuden',jyuden);
     // 受注可能数が 10 未満の商品（保存後にキープ表を促す）。保存すると明細を読み直すので、先に調べる
     const low = this.lowStock();
+    // 出荷倉庫の在庫が足りない明細（保存のあとに他の倉庫の在庫を調べ、移動伝票を促す）
+    const shorts = this.movsgsrv.shortRows(this.frmArr.getRawValue());
     const suggest = (st: string) => {
       this.shownDenno = this.jmisrv.denno;
+      this.checkMoves(this.jmisrv.denno, shorts);
       if (st == JDST.KEEP_CHANGED) {
         this.keepSuggest = 'キープ表のFAX後に明細が変わりました。キープ表を送り直してください';
       } else if (st == JDST.TOROKU && low.length > 0) {

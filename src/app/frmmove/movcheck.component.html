@@ -1,0 +1,86 @@
+<div class="pick">
+  @if (dbMismatch) {
+    <div class="msg ng">
+      この伝票は{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}のものですが、このスマホは{{dbMismatch == 'test' ? '本番環境' : 'テスト環境'}}につながっています。
+      <button mat-raised-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
+    </div>
+  }
+
+  <div class="head">
+    @if (doc) {
+      <div class="denno">移動伝票 {{doc.denno}}</div>
+      <div>{{doc.outName}} → {{doc.inName}}　移動日 {{doc.day}}</div>
+      @if (doc.dmemo) {<div class="sub">{{doc.dmemo}}</div>}
+      @if (doc.chk_at) {
+        <div class="sub">確認済 {{chkText(doc.chk_at)}} {{staffName(doc.chk_by)}}　{{doc.chkmemo}}</div>
+      }
+    } @else {
+      <div class="denno">移動伝票の確認</div>
+      <div class="sub">移動伝票・大会リストの右上の QR コードを読んでください</div>
+    }
+  </div>
+
+  <video #video class="video" [class.hidden]="!mode" playsinline muted></video>
+
+  @if (msg) {
+    <div class="msg" [class.ok]="msgType == 'ok'" [class.ng]="msgType == 'ng'">
+      {{msg}}
+      @if (otherDenno) {
+        <button mat-stroked-button type="button" (click)="open(otherDenno)">移動伝票 {{otherDenno}} に切り替える</button>
+      }
+    </div>
+  }
+
+  <div class="buttons">
+    @if (mode) {
+      <button mat-stroked-button type="button" (click)="stop()"><mat-icon>videocam_off</mat-icon>カメラを止める</button>
+    } @else if (doc && !completed) {
+      <button mat-raised-button color="primary" type="button" (click)="start('item')"><mat-icon>document_scanner</mat-icon>商品を読む</button>
+    }
+    @if (!doc && mode != 'qr') {
+      <button mat-raised-button color="primary" type="button" (click)="start('qr')"><mat-icon>qr_code_scanner</mat-icon>QR を読む</button>
+    }
+    @if (doc && !completed) {
+      <button mat-raised-button [color]="diffs.length ? 'warn' : 'accent'" type="button" class="big" (click)="complete()" [disabled]="busy">
+        <mat-icon>task_alt</mat-icon>{{diffs.length ? '数量を確定（' + diffs.length + ' 行を直す）' : '確認完了（伝票どおり）'}}
+      </button>
+    }
+    @if (doc && completed) {
+      <button mat-stroked-button type="button" (click)="next()"><mat-icon>qr_code_scanner</mat-icon>次の伝票</button>
+    }
+  </div>
+
+  <form class="manual" (ngSubmit)="onManual()">
+    <input [(ngModel)]="manual" name="manual" placeholder="バーコードリーダー・手入力（JAN／商品コード）" autocomplete="off" enterkeyhint="done">
+    <button mat-stroked-button type="submit">読む</button>
+  </form>
+
+  @if (doc) {
+    <div class="progress">数えた数 {{countSum}} / 伝票 {{suuSum}}</div>
+    @for (item of items; track item.line) {
+      <div class="item" [class.done]="item.count == item.suu && item.suu > 0">
+        <div class="code">
+          {{item.gcode}}
+          @if (item.tanano) {<span class="tana">棚{{item.tanano}}</span>}
+        </div>
+        <div class="name">{{item.gtext}}@if (item.memo) {<br><span class="memo">{{item.memo}}</span>}</div>
+        <div class="sub">
+          @if (item.stock != null) {
+            {{doc.outName}}の在庫 {{item.stock}}（受注可能 {{item.pable}}）
+          } @else if (item.gskbn == '0') {
+            在庫を読み込み中…
+          }
+        </div>
+        <div class="count">
+          <button mat-stroked-button type="button" (click)="add(item, -1)" [disabled]="completed">−</button>
+          <span class="num" [style.color]="item.count > item.suu ? '#c62828' : ''">{{item.count}} / {{item.suu}}</span>
+          <button mat-stroked-button type="button" (click)="add(item, 1)" [disabled]="completed">＋</button>
+          @if (!completed && item.count != item.suu) {
+            <button mat-stroked-button type="button" (click)="asIs(item)" style="font-size: 13px;">伝票どおり</button>
+          }
+          @if (!item.jan) {<span class="nojan">JANなし</span>}
+        </div>
+      </div>
+    }
+  }
+</div>

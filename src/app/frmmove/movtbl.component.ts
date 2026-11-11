@@ -316,7 +316,10 @@ export class MovtblComponent implements OnInit {
           gcode: this.usrsrv.editFrmval(control, 'gcode'),
           // gtext: this.usrsrv.editFrmval(control, 'gtext'),
           suu: this.usrsrv.editFrmval(control, 'suu'),
-          memo: this.usrsrv.editFrmval(control, 'memo')
+          memo: this.usrsrv.editFrmval(control, 'memo'),
+          // 受注伝票の在庫不足から作った明細は、受注伝票番号・行番号を残す（変更の保存で消さない）
+          jdenno: Number(control.value.jdenno) || null,
+          jline: Number(control.value.jline) || null
         });
       });
     return movmei;

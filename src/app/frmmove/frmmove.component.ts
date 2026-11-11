@@ -8,7 +8,9 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
-import { Zaiko, Movsub, MovingService, MovsubSet, MovsubNew } from './moving.service';
+import { Zaiko, Movsub, MovingService, MovsubSet, MovsubNew, EXTYPE_MOVE } from './moving.service';
+import { MovprintComponent, MovprintData } from './movprint.component';
+import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
 import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
@@ -61,6 +63,8 @@ export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
 
   private shipsrv = inject(ShipService);
   shipBusy = false;
+  /** 倉庫で数量を確認した日時・担当者・内容（スマホで QR → JAN） */
+  chk: { at: string | null; by: string | null; memo: string | null } = { at: null, by: null, memo: null };
 
   readonly movtbl = viewChild.required(MovtblComponent);
   form!: FormGroup;
@@ -155,6 +159,7 @@ export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
       this.movsrv.qryMovden(denno).subscribe(
         result => {
           this.form.reset();
+          this.chk = { at: result?.chk_at ?? null, by: result?.chk_by ?? null, memo: result?.chkmemo ?? null };
           if (result == null) {
             this.usrsrv.toastWar("移動伝票番号" + denno + "は登録されていません");
             history.replaceState('', '', './frmmove');
@@ -277,6 +282,34 @@ export class FrmmoveComponent extends BeforeunloadBase implements OnInit {
     }
     this.shipBusy = false;
     this.cdRef.detectChanges();
+  }
+
+  /** 移動伝票の操作ログ（登録・変更・倉庫での確認）を表示する */
+  opelog() {
+    if (!this.denno) {
+      return;
+    }
+    const data: OpelogParam = { extype: EXTYPE_MOVE, keycode: String(this.denno), title: '移動伝票 ' + this.denno, table: 'trmovsub' };
+    this.dialog.open(OpelogComponent, { width: '900px', maxWidth: '95vw', data: data });
+  }
+
+  /** 帳票（移動伝票・キープ伝票・本社引取・発送依頼・織マーク付け依頼・お渡し依頼・大会リスト） */
+  printMove() {
+    if (!this.denno) {
+      return;
+    }
+    const data: MovprintData = { denno: this.denno };
+    this.dialog.open(MovprintComponent, { width: '640px', maxWidth: '95vw', data });
+  }
+
+  /** 倉庫で確認した日時・担当者 */
+  chkText(): string {
+    if (!this.chk.at) {
+      return '';
+    }
+    const t = new Date(this.chk.at);
+    return (t.getMonth() + 1) + '/' + t.getDate() + ' ' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0')
+      + (this.chk.by ? ' ' + (this.stfsrv.getName(this.chk.by) || this.chk.by) : '');
   }
 
   /** 保存ボタンを押せるか（明細の空の行だけが原因のエラーなら押せる。保存の前にその行を消す） */

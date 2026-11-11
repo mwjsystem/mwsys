@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, firstValueFrom } from 'rxjs';
 import { UserService } from './../services/user.service';
 import { ZAIKO_ZERO } from './../services/jyustock.service';
 import gql from 'graphql-tag';
@@ -70,6 +70,10 @@ export class Movsub {
   created_by!: string;
   updated_at!: Date;
   updated_by!: string;
+  /** 倉庫で数量を確認した日時・担当者・内容（スマホで QR → JAN） */
+  chk_at?: string | null;
+  chk_by?: string | null;
+  chkmemo?: string | null;
   trmovdens!: Movden[];
   constructor(init?: Partial<Movsub>) {
     Object.assign(this, init);
@@ -90,7 +94,13 @@ export type MovsubSet = Pick<Movsub, 'outcode' | 'incode' | 'tcode' | 'hcode' | 
   updated_by: string;
 };
 /** 保存時に移動明細（trmovden）へ渡す値 */
-export interface MovmeiInput { id: number; denno: number; line: number; gcode: string; suu: number; memo: string }
+export interface MovmeiInput { id: number; denno: number; line: number; gcode: string; suu: number; memo: string; jdenno?: number | null; jline?: number | null }
+
+/** 操作ログ（tropelog）の作業区分（msbunrui kubun = extype）: 移動伝票。DB のトリガー（db/20261113_move_check.sql）と同じ値 */
+export const EXTYPE_MOVE = '6';
+
+/** 受注伝票の在庫不足から作る移動 1 件（出庫倉庫 → 入庫倉庫ごとに 1 枚の移動伝票にまとめる） */
+export interface MoveRequest { outcode: string; incode: string; gcode: string; suu: number; jdenno: number; jline: number; memo: string }
 
 /** 新規登録時に移動伝票（trmovsub）へ渡す値 */
 export type MovsubNew = MovsubSet & { id: number; denno: number; created_at: Date; created_by: string };
@@ -137,11 +147,16 @@ export class MovingService {
         created_by
         updated_at
         updated_by
-        trmovdens {
+        chk_at
+        chk_by
+        chkmemo
+        trmovdens(order_by: {line: asc}) {
           line
           gcode
           suu
           memo
+          jdenno
+          jline
           msgood {
             gtext
             unit
@@ -323,6 +338,63 @@ export class MovingService {
       });
     });
   }
+  /**
+   * 受注伝票の在庫不足から移動伝票を作る（出庫倉庫 → 入庫倉庫ごとに 1 枚。移動日は今日）。
+   * 明細に受注伝票番号・行番号を入れ、伝票備考は「受注伝票 n の在庫不足から作成」。在庫品（数量区分 0）だけを渡すこと。
+   * 伝票・明細・在庫の移動数を 1 トランザクションで書き、作った移動伝票（番号・出庫・入庫）を返す
+   */
+  async createMoves(reqs: MoveRequest[]): Promise<{ denno: number; outcode: string; incode: string }[]> {
+    const groups = new Map<string, MoveRequest[]>();
+    for (const r of reqs.filter(e => e.suu > 0 && e.outcode && e.incode && e.outcode != e.incode)) {
+      const k = r.outcode + '\t' + r.incode;
+      groups.set(k, [...(groups.get(k) ?? []), r]);
+    }
+    if (groups.size == 0) {
+      return [];
+    }
+    const id = this.usrsrv.compid;
+    const now = new Date();
+    const by = this.usrsrv.staff?.code;
+    const day = this.usrsrv.formatDate(now);
+    const subs: MovsubNew[] = [];
+    const meis: MovmeiInput[] = [];
+    const zaiko: Zaiko[] = [];
+    const made: { denno: number; outcode: string; incode: string }[] = [];
+    for (const rs of groups.values()) {
+      const denno = Number(await this.usrsrv.getNumber('mdenno', 1));
+      const { outcode, incode } = rs[0];
+      const jdennos = [...new Set(rs.map(r => r.jdenno))];
+      subs.push({
+        id, denno, day, outcode, incode, tcode: by, hcode: null as unknown as string, hday: null, htime: null as unknown as string,
+        okurisuu: null as unknown as number, okurino: null as unknown as number, omemo: null as unknown as string,
+        dmemo: '受注伝票' + jdennos.join('・') + 'の在庫不足から作成', smemo: '', szip: '', sadr: '', sname: '', stel: '',
+        created_at: now, created_by: by, updated_at: now, updated_by: by
+      });
+      rs.forEach((r, i) => {
+        meis.push({ id, denno, line: i + 1, gcode: r.gcode, suu: r.suu, memo: r.memo, jdenno: r.jdenno, jline: r.jline });
+        zaiko.push({ scode: incode, gcode: r.gcode, day, movi: r.suu, movo: 0 }, { scode: outcode, gcode: r.gcode, day, movi: 0, movo: r.suu });
+      });
+      made.push({ denno, outcode, incode });
+    }
+    await this.insMovden(subs, meis, zaiko);
+    return made;
+  }
+
+  /** 受注伝票の明細から作った移動明細（受注伝票の行番号 → 移動伝票番号）。もう移動伝票がある明細には勧めない */
+  async movesOf(jdenno: number): Promise<Map<number, number>> {
+    const Get = gql`
+      query get_jmoves($id: smallint!, $jdno: Int!) {
+        trmovden(where: {id: {_eq: $id}, jdenno: {_eq: $jdno}}) { denno jline }
+      }`;
+    const res = await firstValueFrom(this.apollo.query<{ trmovden: { denno: number; jline: number | null }[] }>({
+      query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, jdno: jdenno }
+    }));
+    if (res.error || !res.data) {
+      throw res.error ?? new Error('移動伝票を読めませんでした');
+    }
+    return new Map(res.data.trmovden.filter(e => e.jline != null).map(e => [Number(e.jline), e.denno]));
+  }
+
   /** 新規登録。伝票・明細・在庫の加算（zaiko）を 1 トランザクションで書く */
   insMovden(movsub: MovsubNew[], movmei: MovmeiInput[], zaiko: Zaiko[]): Promise<InsMovdenResult> {
     const { zinit, zinc } = this.zaikoRows(zaiko);
