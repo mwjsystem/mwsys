@@ -1,0 +1,26 @@
+.bulk { padding: 8px 12px; font-size: 14px; }
+fieldset { border: 1px solid #dddddd; border-radius: 6px; margin: 0 0 8px; padding: 4px 10px 8px; }
+legend { color: #555555; font-size: 13px; }
+.cond, .bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 4px 0;
+  input, select { font-size: 14px; padding: 3px; }
+  label { display: inline-flex; align-items: center; gap: 4px; }
+}
+.file { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; border: 1px solid #999999; border-radius: 4px; padding: 4px 10px; }
+.sub { font-size: 12px; color: #666666; margin: 4px 0; }
+.small { font-size: 12px; }
+.donemark { color: #2e7d32; font-weight: bold; }
+.cand { max-width: 46em; font-size: 13px; }
+.ng { color: #c62828; font-weight: bold; }
+.ok { color: #2e7d32; font-weight: bold; }
+.err { color: #c62828; margin: 4px 0; }
+.msg { color: #2e7d32; margin: 4px 0; font-weight: bold; }
+.tbl {
+  border-collapse: collapse; width: 100%; font-size: 13px;
+  th { background: #eeeeee; font-weight: normal; padding: 4px; border: 1px solid #cccccc; text-align: left; position: sticky; top: 0; }
+  td { padding: 2px 6px; border: 1px solid #dddddd; }
+  .num { text-align: right; white-space: nowrap; }
+  .money { width: 8em; text-align: right; font-size: 13px; }
+  .over { background: #ffebee; }
+  tr.off td { color: #999999; }
+}

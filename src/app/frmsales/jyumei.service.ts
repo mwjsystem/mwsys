@@ -221,7 +221,7 @@ export class JyumeiService {
     const Get = gql`
       query get_paid($id: smallint!, $dno: Int!) {
         vnyuzan(where: {id: {_eq: $id}, denno: {_eq: $dno}}) {
-          trnyusubs(limit: 1) { denno }
+          trnyusubs(where: {_or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, limit: 1) { denno }
         }
       }`;
     try {

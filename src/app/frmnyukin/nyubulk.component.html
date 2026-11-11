@@ -1,0 +1,88 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">一括入金</span>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin"><mat-icon>edit_note</mat-icon>入金伝票</a>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin/bank"><mat-icon>account_balance</mat-icon>入金テキスト読込</a>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin/daibiki"><mat-icon>local_shipping</mat-icon>佐川代引消込</a>
+  </div>
+</mat-toolbar>
+
+<div class="bulk">
+  <fieldset>
+    <legend>検索条件</legend>
+    <div class="cond">
+      <label><input type="radio" name="kubun" [value]="0" [(ngModel)]="kubun" (ngModelChange)="rows = []; loaded = false">都度（受注）</label>
+      <label><input type="radio" name="kubun" [value]="1" [(ngModel)]="kubun" (ngModelChange)="rows = []; loaded = false">掛売（請求伝票）</label>
+    </div>
+    <div class="cond">
+      @if (kubun == 0) {
+        <select [(ngModel)]="dayKind"><option value="nday">入金予定日</option><option value="uday">売上日</option></select>
+      } @else {
+        <span>締め日</span>
+      }
+      <input type="date" [(ngModel)]="from"> ～ <input type="date" [(ngModel)]="to">
+      @if (kubun == 0) {
+        <label>入金方法
+          <select [(ngModel)]="pcode">
+            <option value="">すべて</option>
+            @for (p of kbn('pcode'); track p.value) {<option [value]="p.value">{{p.value}} {{p.viewval}}</option>}
+          </select>
+        </label>
+      }
+      <label>請求先 <input [(ngModel)]="mcode" style="width: 7em;"></label>
+      <label>残高 <input type="number" [(ngModel)]="zanFrom" style="width: 7em;"> ～ <input type="number" [(ngModel)]="zanTo" style="width: 8em;"></label>
+      <button mat-flat-button color="primary" type="button" (click)="search()" [disabled]="busy"><mat-icon>search</mat-icon>検索</button>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>入金情報</legend>
+    <div class="cond">
+      <label>入金日 <input type="date" [(ngModel)]="day"></label>
+      <label>入金方法
+        <select [(ngModel)]="ptype">
+          @for (p of kbn('ptype'); track p.value) {<option [value]="p.value">{{p.value}} {{p.viewval}}</option>}
+        </select>
+      </label>
+      <label>備考 <input [(ngModel)]="memo" placeholder="一括入金" maxlength="40" style="width: 16em;"></label>
+    </div>
+  </fieldset>
+
+  @if (error) {<div class="err">{{error}}</div>}
+  @if (message) {<div class="msg">{{message}}</div>}
+
+  @if (loaded) {
+    <div class="bar">
+      <span>{{rows.length}} 件　印 <b>{{checked.length}}</b> 件　入金額の合計 <b>{{checkedSum | number}}</b></span>
+      <button mat-stroked-button type="button" (click)="setAll(true)">すべてに印</button>
+      <button mat-stroked-button type="button" (click)="setAll(false)">印を外す</button>
+      <button mat-flat-button color="warn" type="button" (click)="create()" [disabled]="busy || checked.length == 0">
+        <mat-icon>task_alt</mat-icon>入金伝票を作る（{{checked.length}} 件）
+      </button>
+    </div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th></th><th>{{kubun == 0 ? '受注伝票' : '請求伝票'}}</th><th>{{kubun == 0 ? '売上日' : '締め日'}}</th>
+          @if (kubun == 0) {<th>入金予定日</th><th>入金方法</th>}
+          <th>請求先</th><th class="num">{{kubun == 0 ? '売上額' : '請求額'}}</th><th class="num">残</th><th>状況</th><th class="num">入金額</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of rows; track r.denno) {
+          <tr [class.off]="!r.on">
+            <td><input type="checkbox" [(ngModel)]="r.on"></td>
+            <td><a href="javascript:void(0)" (click)="open(r)">{{r.denno}}</a></td>
+            <td>{{r.day}}</td>
+            @if (kubun == 0) {<td>{{r.nday}}</td><td>{{kbnName('pcode', r.pcode)}}</td>}
+            <td>{{r.mcode}} {{name(r.mcode)}}</td>
+            <td class="num">{{r.total | number}}</td>
+            <td class="num">{{r.zan | number}}</td>
+            <td>{{state(r)}}</td>
+            <td class="num"><input type="number" class="money" [(ngModel)]="r.money" [class.over]="r.money > r.zan"></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

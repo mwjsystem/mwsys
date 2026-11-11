@@ -39,11 +39,13 @@
   </mat-menu>
   <button mat-button [matMenuTriggerFor]="depo">売上入金</button>
   <mat-menu #depo="matMenu">
-    <a mat-menu-item routerLink="/frmdeposit">受注入金伝票</a>
-    <a mat-menu-item routerLink="/frmclear">請求入金伝票</a>
+    <a mat-menu-item routerLink="/frmnyukin">入金伝票（都度・掛売）</a>
     <a mat-menu-item routerLink="/frminvoice">請求伝票(掛売/合算)</a>
-    <a mat-menu-item>一括入金処理</a>
-    <a mat-menu-item>代引データ読込</a>
+    <a mat-menu-item routerLink="/frmnyukin/bulk">一括入金処理</a>
+    <a mat-menu-item routerLink="/frmnyukin/bank">入金テキスト読込</a>
+    <a mat-menu-item routerLink="/frmnyukin/daibiki">佐川代引消込</a>
+    <a mat-menu-item routerLink="/frmdeposit">（旧）受注入金伝票</a>
+    <a mat-menu-item routerLink="/frmclear">（旧）請求入金伝票</a>
     <!-- <a mat-menu-item>掛売入金</a> -->
     <a mat-menu-item>請求予定一覧表</a>
     <a mat-menu-item>請求書出力</a>
@@ -131,7 +133,7 @@
   </mat-menu>
   <button mat-button [matMenuTriggerFor]="syst">システム</button>
   <mat-menu #syst="matMenu">
-    <a mat-menu-item>入金テキスト読込</a>
+    <a mat-menu-item routerLink="/frmnyukin/bank">入金テキスト読込</a>
     <a mat-menu-item routerLink="/mstholiday">稼働日カレンダ</a>
     <a mat-menu-item routerLink="/mstclose">締め日設定</a>
     <a mat-menu-item routerLink="/repopelog">作業ログ</a>

@@ -1,0 +1,67 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">入金テキスト読込</span>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin"><mat-icon>edit_note</mat-icon>入金伝票</a>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin/bulk"><mat-icon>playlist_add_check</mat-icon>一括入金</a>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin/daibiki"><mat-icon>local_shipping</mat-icon>佐川代引消込</a>
+  </div>
+</mat-toolbar>
+
+<div class="bulk">
+  <div class="cond">
+    <label class="file" matTooltip="銀行の入金明細の CSV（nmr….csv）を選びます" matTooltipClass="ttips">
+      <mat-icon>upload_file</mat-icon>入金明細の CSV を選ぶ
+      <input type="file" accept=".csv,text/csv" (change)="load($event)" [disabled]="busy" style="display: none;">
+    </label>
+    @if (fileName) {<span>{{fileName}}</span>}
+  </div>
+  <div class="sub">振込人名（摘要のカナ）と金額で、入金残のある受注（都度・1 年以内）と請求伝票（掛売）を探します。名前と金額が両方合う候補が 1 つのときは、選んで印を付けます。
+    合わないときは候補から選ぶか、受注伝票番号を入れてください。入金伝票は「入金方法：銀行振込、入金日：勘定日」で作ります。</div>
+
+  @if (error) {<div class="err">{{error}}</div>}
+  @if (message) {<div class="msg">{{message}}</div>}
+
+  @if (rows.length > 0) {
+    <div class="bar">
+      <span>印 <b>{{selected.length}}</b> 件　合計 <b>{{selectedSum | number}}</b></span>
+      <button mat-flat-button color="warn" type="button" (click)="create()" [disabled]="busy || selected.length == 0">
+        <mat-icon>task_alt</mat-icon>入金伝票を作る（{{selected.length}} 件）
+      </button>
+    </div>
+    <table class="tbl">
+      <thead>
+        <tr><th></th><th>番号</th><th>勘定日</th><th class="num">入金額</th><th>振込人（摘要）</th><th>金融機関</th><th>入金先の候補</th><th>受注伝票（手入力）</th></tr>
+      </thead>
+      <tbody>
+        @for (r of rows; track r.ref) {
+          <tr [class.off]="r.done">
+            <td><input type="checkbox" [(ngModel)]="r.on" [disabled]="r.done || (!r.pick && !r.manual)"></td>
+            <td>{{r.no}}</td>
+            <td>{{r.day}}</td>
+            <td class="num">{{r.amount | number}}</td>
+            <td>{{r.payer}}</td>
+            <td class="small">{{r.bank}}</td>
+            <td>
+              @if (r.done) {
+                <span class="donemark">取込済</span>
+              } @else {
+                <select [(ngModel)]="r.pick" (ngModelChange)="pickChanged(r)" class="cand">
+                  <option value="">（作らない）{{r.cands.length ? '' : '　候補なし'}}</option>
+                  @for (c of r.cands; track c.key) {
+                    <option [value]="c.key">{{c.score >= 4 ? '◎' : c.score >= 2 && c.key.startsWith('J') ? '○' : '△'}} {{c.label}}</option>
+                  }
+                </select>
+              }
+            </td>
+            <td>
+              @if (!r.done && !r.pick) {
+                <input [(ngModel)]="r.manual" (ngModelChange)="pickChanged(r)" style="width: 7em;" placeholder="受注伝票番号">
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <div class="sub">◎ 名前と金額が合う、○ 名前か金額のどちらかが合う（受注）、△ そのほか。掛売の入金で請求伝票が合わないときは、入金伝票の画面で入れてください。</div>
+  }
+</div>

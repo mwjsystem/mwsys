@@ -1,0 +1,53 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">佐川代引消込</span>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin"><mat-icon>edit_note</mat-icon>入金伝票</a>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin/bulk"><mat-icon>playlist_add_check</mat-icon>一括入金</a>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin/bank"><mat-icon>account_balance</mat-icon>入金テキスト読込</a>
+  </div>
+</mat-toolbar>
+
+<div class="bulk">
+  <div class="cond">
+    <label class="file" matTooltip="佐川の e-コレクトの明細の CSV（…e-collect_meisai….csv）を選びます" matTooltipClass="ttips">
+      <mat-icon>upload_file</mat-icon>代引の明細の CSV を選ぶ
+      <input type="file" accept=".csv,text/csv" (change)="load($event)" [disabled]="busy" style="display: none;">
+    </label>
+    @if (fileName) {<span>{{fileName}}</span>}
+  </div>
+  <div class="sub">お問い合せNo. と受注の送り状番号を突き合わせ、代引金が入金残と同じものに印を付けます。入金伝票は「入金方法：佐川代引銀、入金日：振込日」で作ります。
+    金額が違うものも、印を付ければ代引金で入金伝票を作ります。</div>
+
+  @if (error) {<div class="err">{{error}}</div>}
+  @if (message) {<div class="msg">{{message}}</div>}
+
+  @if (rows.length > 0) {
+    <div class="bar">
+      <span>印 <b>{{selected.length}}</b> 件　合計 <b>{{selectedSum | number}}</b></span>
+      <button mat-flat-button color="warn" type="button" (click)="create()" [disabled]="busy || selected.length == 0">
+        <mat-icon>task_alt</mat-icon>入金伝票を作る（{{selected.length}} 件）
+      </button>
+    </div>
+    <table class="tbl">
+      <thead>
+        <tr><th></th><th>お問い合せNo.</th><th>発送日</th><th>振込日</th><th class="num">代引金</th><th class="num">手数料</th><th>受注伝票</th><th>請求先</th><th class="num">入金残</th><th>照合</th></tr>
+      </thead>
+      <tbody>
+        @for (r of rows; track r.ref) {
+          <tr [class.off]="r.state == 'done'">
+            <td><input type="checkbox" [(ngModel)]="r.on" [disabled]="!r.order || r.state == 'done'"></td>
+            <td>{{r.okurino}}</td>
+            <td>{{r.sday}}</td>
+            <td>{{r.day}}</td>
+            <td class="num">{{r.amount | number}}</td>
+            <td class="num">{{r.fee | number}}</td>
+            <td>@if (r.order) {<a href="javascript:void(0)" (click)="usrsrv.openMst('frmsales', '' + r.order.denno)">{{r.order.denno}}</a>}</td>
+            <td>@if (r.order) {<span>{{r.order.scde}} {{name(r.order.scde)}}</span>}</td>
+            <td class="num">{{r.order?.nyuzan ?? '' | number}}</td>
+            <td [class.ok]="r.state == 'ok'" [class.ng]="r.state == 'diff' || r.state == 'none'">{{STATE[r.state]}}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

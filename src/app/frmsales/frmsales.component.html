@@ -75,6 +75,12 @@
         <mat-icon matTooltip="受注一覧（出荷指示）でこの伝票の出荷指示フォルダを NAS に作成します。出荷日、納品書ﾀｲﾌﾟ、配送伝票を入力して下さい" matTooltipClass="ttips">local_shipping</mat-icon>出荷指示
       </button>
     }
+    @if (mode==3 && jmisrv.denno && !form.getRawValue().torikbn) {
+      <button mat-flat-button (click)="openNyukin()" [color]="usrsrv.getColor(mode)">
+        <mat-icon matTooltip="この受注の入金伝票を入れます（別のタブ）。入金残：{{nyuzan | number}}" matTooltipClass="ttips">payments</mat-icon>
+        入金{{nyuzan <= 0 ? '済' : ''}}
+      </button>
+    }
     <a id="csv-donwload" data-type="text/csv"></a>
     @if (mode==3 && jmisrv.denno) {
       <button mat-flat-button [matMenuTriggerFor]="papermenu" [color]="usrsrv.getColor(mode)">

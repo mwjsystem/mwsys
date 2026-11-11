@@ -415,6 +415,16 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.cdRef.detectChanges();
   }
 
+  /** 入金残（受注の入金残のビュー。読めていなければ 0） */
+  get nyuzan(): number {
+    return Number((this.vnyuzan as mwI.Vnyuzan | undefined)?.nyuzan ?? 0);
+  }
+
+  /** この受注の入金伝票を入れる（入金伝票の画面を別のタブで開く。受注伝票番号を入れておく） */
+  openNyukin() {
+    window.open(this.router.createUrlTree(['/frmnyukin'], { queryParams: { jdenno: this.jmisrv.denno } }).toString());
+  }
+
   /** 移動を勧める明細の表示（品番と、在庫の一番多い倉庫） */
   moveText(): string {
     return this.moveSuggest.map(c => c.gcode + '（' + c.stores[0].name + ' ' + c.stores[0].pable + '）').join('、');

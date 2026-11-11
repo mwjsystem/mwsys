@@ -1,0 +1,175 @@
+<mat-toolbar [color]="usrsrv.getColor(mode)" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 4px;">
+    @if (mode==3) {
+      <button mat-flat-button (click)="modeToCre(0)" [color]="usrsrv.getColor(mode)"><mat-icon>add_box</mat-icon>新規（都度）</button>
+      <button mat-flat-button (click)="modeToCre(1)" [color]="usrsrv.getColor(mode)"><mat-icon>add_box</mat-icon>新規（掛売）</button>
+    }
+    @if (mode==3 && s.denno && !lockReason) {
+      <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)"><mat-icon>edit</mat-icon>編集</button>
+    }
+    @if (mode==3 && s.denno && (s.del || !lockReason)) {
+      <button mat-flat-button (click)="toggleDel()" [color]="usrsrv.getColor(mode)">
+        <mat-icon>{{s.del ? 'restore' : 'delete'}}</mat-icon>{{s.del ? '取消を戻す' : '取消'}}
+      </button>
+    }
+    @if (editable) {
+      <button mat-flat-button (click)="save()" [disabled]="busy" [color]="usrsrv.getColor(mode)">
+        <mat-icon [matTooltip]="invalid()" matTooltipClass="ttips">save</mat-icon>保存
+      </button>
+      <button mat-flat-button (click)="cancel()" [color]="usrsrv.getColor(mode)"><mat-icon>cancel</mat-icon>中止</button>
+    }
+    <input class="dno" [(ngModel)]="dno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
+      [disabled]="editable" placeholder="入金伝票番号">
+    @if (mode==3) {
+      <button mat-icon-button (click)="dennoHelp()" matTooltip="入金伝票を探す"><mat-icon>find_replace</mat-icon></button>
+    }
+    @if (mode!=1) {
+      <button mat-flat-button (click)="opelog()" [color]="usrsrv.getColor(mode)" [disabled]="!s.denno"><mat-icon>history</mat-icon>操作ログ</button>
+    }
+    <a mat-flat-button [color]="usrsrv.getColor(mode)" routerLink="/frmnyukin/bulk"><mat-icon>playlist_add_check</mat-icon>一括入金</a>
+  </div>
+</mat-toolbar>
+
+<div class="nyu">
+  <div class="head">
+    <span class="title">{{mode == 1 ? '新規' : mode == 2 ? '変更' : '照会'}}入金伝票 {{s.denno || ''}}</span>
+    <span class="kubun" [class.kake]="s.kubun == 1">{{s.kubun == 1 ? '掛売（締め請求）' : '都度（受注）'}}</span>
+    @if (s.del) {<span class="delmark">取消済</span>}
+    @if (message || lockReason) {<span class="lock"><mat-icon>lock</mat-icon>{{message || lockReason}}</span>}
+    @if (s.updated_at) {
+      <span class="stamp">更新 {{s.updated_at.slice(0, 16).replace('T', ' ')}} {{stfsrv.getName(s.updated_by ?? '') || s.updated_by}}</span>
+    }
+  </div>
+
+  <div class="cols">
+    <section class="box">
+      <h3>対象</h3>
+      @if (s.kubun == 0) {
+        <div class="row">
+          <label>受注伝票</label>
+          <input class="code" [ngModel]="s.jdenno" (change)="setJdenno($any($event.target).value)" [disabled]="!editable">
+          @if (s.jdenno) {
+            <button mat-icon-button type="button" (click)="usrsrv.openMst('frmsales', '' + s.jdenno)" matTooltip="受注伝票を開く"><mat-icon>open_in_new</mat-icon></button>
+          }
+        </div>
+        @if (order) {
+          <div class="row"><label>請求先</label><span>{{order.scde}} {{name(order.scde)}}</span></div>
+          <div class="row"><label>受注日</label><span>{{order.day}}</span><label class="l2">売上日</label><span>{{order.uday}}</span></div>
+          <div class="row"><label>入金予定日</label><span>{{order.nday}}</span><label class="l2">入金方法</label><span>{{pcodeName(order.pcode)}}</span></div>
+          @if (order.daibiki) {<div class="row"><label>代引金額</label><span>{{order.daibiki | number}}</span><label class="l2">送り状</label><span>{{order.okurino}}</span></div>}
+        }
+      } @else {
+        <div class="row">
+          <label>請求先</label>
+          <input class="code" [ngModel]="s.mcode" (change)="setMcode($any($event.target).value)" (keydown.f4)="mcdHelp('mcode')" [disabled]="!editable">
+          @if (editable) {<button mat-icon-button type="button" (click)="mcdHelp('mcode')"><mat-icon>find_replace</mat-icon></button>}
+          <span>{{name(s.mcode)}}</span>
+        </div>
+        <div class="row">
+          <label>消込先の請求</label>
+          <select [ngModel]="s.idenno ?? 0" (ngModelChange)="setIdenno($event)" [disabled]="!editable">
+            <option [ngValue]="0">（指定しない）</option>
+            @for (i of invoices; track i.denno) {
+              <option [ngValue]="i.denno">{{i.sday}} 締め　{{i.denno}}　請求 {{i.seikyu | number}}　残 {{i.zan | number}}</option>
+            }
+          </select>
+          @if (s.idenno) {
+            <button mat-icon-button type="button" (click)="usrsrv.openMst('frminvoice', '' + s.idenno)" matTooltip="請求伝票を開く"><mat-icon>open_in_new</mat-icon></button>
+          }
+        </div>
+        @if (s.kdenno) {<div class="row sub">締め処理で請求伝票 {{s.kdenno}} の入金額に計上済</div>}
+        @else if (s.denno) {<div class="row sub">まだ締めに計上していません（入金日の後の最初の締めで計上されます）</div>}
+      }
+      <div class="row">
+        <label>支払先</label>
+        <input class="code" [(ngModel)]="s.code" (ngModelChange)="touch()" (keydown.f4)="mcdHelp('code')" [disabled]="!editable">
+        @if (editable) {<button mat-icon-button type="button" (click)="mcdHelp('code')"><mat-icon>find_replace</mat-icon></button>}
+        <span>{{name(s.code)}}</span>
+      </div>
+    </section>
+
+    <section class="box">
+      <h3>残高</h3>
+      <table class="zan">
+        <tr><th>{{s.kubun == 0 ? '売上額' : '今回請求額'}}</th><td>{{billed ?? '' | number}}</td></tr>
+        <tr><th>この伝票の前の残</th><td>{{zanBefore ?? '' | number}}</td></tr>
+        <tr><th>この伝票の入金</th><td>{{amount | number}}</td></tr>
+        <tr class="after"><th>入金後の残</th><td>{{zanAfter ?? '' | number}}</td></tr>
+      </table>
+      @if (zanAfter != null) {
+        <div class="state" [attr.data-state]="state(billed, zanAfter)">{{state(billed, zanAfter)}}</div>
+      }
+    </section>
+
+    <section class="box">
+      <h3>入金</h3>
+      <div class="row">
+        <label>入金日</label>
+        <input type="date" [(ngModel)]="s.day" (ngModelChange)="touch()" [disabled]="!editable">
+      </div>
+      <div class="row">
+        <label>担当者</label>
+        <select [(ngModel)]="s.tcode" (ngModelChange)="touch()" [disabled]="!editable">
+          <option value=""></option>
+          @for (t of stfsrv.tcds; track t.value) {<option [value]="t.value">{{t.viewval}}</option>}
+        </select>
+      </div>
+      <div class="row">
+        <label>備考</label>
+        <input class="memo" [(ngModel)]="s.memo" (ngModelChange)="touch()" [disabled]="!editable" maxlength="100">
+      </div>
+    </section>
+  </div>
+
+  <table class="mei">
+    <thead>
+      <tr><th class="ln">行</th><th>入金方法</th><th class="num">入金額</th><th class="num">出金額</th><th class="num">調整額</th><th class="num">合計</th><th>備考</th>@if (editable) {<th></th>}</tr>
+    </thead>
+    <tbody>
+      @for (l of s.lines; track $index; let i = $index) {
+        <tr>
+          <td class="ln">{{l.line}}</td>
+          <td>
+            <select [(ngModel)]="l.ptype" (ngModelChange)="touch()" [disabled]="!editable">
+              <option value=""></option>
+              @for (p of ptypes; track p.value) {<option [value]="p.value">{{p.value}} {{p.viewval}}</option>}
+            </select>
+          </td>
+          <td class="num">
+            <input type="number" class="money" [(ngModel)]="l.nmoney" (ngModelChange)="touch()" [disabled]="!editable">
+            @if (editable && zanBefore != null) {<button mat-icon-button type="button" class="sm" (click)="fillZan(i)" matTooltip="残を入れる"><mat-icon>south_west</mat-icon></button>}
+          </td>
+          <td class="num"><input type="number" class="money" [(ngModel)]="l.smoney" (ngModelChange)="touch()" [disabled]="!editable"></td>
+          <td class="num"><input type="number" class="money" [(ngModel)]="l.tmoney" (ngModelChange)="touch()" [disabled]="!editable"></td>
+          <td class="num">{{(+l.nmoney || 0) - (+l.smoney || 0) + (+l.tmoney || 0) | number}}</td>
+          <td><input class="memo" [(ngModel)]="l.mmemo" (ngModelChange)="touch()" [disabled]="!editable" maxlength="40"></td>
+          @if (editable) {
+            <td><button mat-icon-button type="button" class="sm" (click)="delLine(i)" matTooltip="この行を削除"><mat-icon>remove_circle</mat-icon></button></td>
+          }
+        </tr>
+      }
+    </tbody>
+    <tfoot>
+      <tr><th colspan="2">合計</th><td class="num">{{sumOf('nmoney') | number}}</td><td class="num">{{sumOf('smoney') | number}}</td><td class="num">{{sumOf('tmoney') | number}}</td><td class="num"><b>{{amount | number}}</b></td><td></td>@if (editable) {<td></td>}</tr>
+    </tfoot>
+  </table>
+  @if (editable && s.lines.length < 5) {
+    <button mat-stroked-button type="button" (click)="addLine()" class="add"><mat-icon>add</mat-icon>行を追加</button>
+  }
+  <div class="sub">出金額は返金など（残が増える）、調整額は値引き・手数料など（入金と同じく残が減る）。合計 = 入金 − 出金 + 調整。</div>
+
+  @if (others.length > 0) {
+    <h3 class="oh">{{s.kubun == 0 ? 'この受注' : 'この請求先'}}のほかの入金伝票</h3>
+    <table class="list">
+      <tr><th>伝票番号</th><th>入金日</th>@if (s.kubun == 1) {<th>消込先</th><th>締め計上</th>}<th class="num">入金</th><th class="num">出金</th><th class="num">調整</th><th>備考</th></tr>
+      @for (r of others; track r.denno) {
+        <tr [class.del]="r.del">
+          <td><a [routerLink]="['/frmnyukin', 3, r.denno]">{{r.denno}}</a>@if (r.del) {<span class="delmark">取消</span>}</td>
+          <td>{{r.day}}</td>
+          @if (s.kubun == 1) {<td>{{r.idenno ?? ''}}</td><td>{{r.kdenno ?? ''}}</td>}
+          <td class="num">{{r.nmoney | number}}</td><td class="num">{{r.smoney | number}}</td><td class="num">{{r.tmoney | number}}</td><td>{{r.memo}}</td>
+        </tr>
+      }
+    </table>
+  }
+</div>
