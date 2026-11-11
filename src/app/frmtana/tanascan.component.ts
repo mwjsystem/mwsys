@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, viewChild, inject } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, viewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import type { IScannerControls } from '@zxing/browser';
@@ -27,7 +27,7 @@ const KEY = 'MWSYS_TANASCAN';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, MatButton, MatIcon]
 })
-export class TanascanComponent implements OnDestroy {
+export class TanascanComponent implements AfterViewInit, OnDestroy {
   private usrsrv = inject(UserService);
   strsrv = inject(StoreService);
   private tanasrv = inject(TanaService);
@@ -66,8 +66,6 @@ export class TanascanComponent implements OnDestroy {
 
   constructor() {
     this.title.setTitle('棚卸（スマホ）(MWSystem)');
-    // OnPush の画面なので、倉庫の一覧を読み終わったら画面を更新する（しないとプルダウンが空のまま）
-    this.strsrv.getStore().then(() => this.cdRef.detectChanges());
     try {
       const s = JSON.parse(localStorage.getItem(KEY) ?? 'null');
       if (s) {
@@ -81,6 +79,12 @@ export class TanascanComponent implements OnDestroy {
     if (!this.scode) {
       this.scode = this.usrsrv.staff?.scode ?? '';
     }
+  }
+
+  ngAfterViewInit(): void {
+    // OnPush の画面なので、倉庫の一覧を読み終わったら画面を更新する（しないとプルダウンが空のまま）。
+    // 画面ができてから読む（できる前に画面を更新しない）
+    this.strsrv.getStore().then(() => this.cdRef.detectChanges()).catch(e => console.log('error store', e));
   }
 
   ngOnDestroy(): void {
