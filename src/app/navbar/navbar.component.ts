@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectionStrategy, inject, input, output } from '@angular/core';
 import { UserService } from './../services/user.service';
 import { NavmenuService } from './../services/navmenu.service';
 import { DownloadService } from './../services/download.service';
@@ -25,6 +25,10 @@ export class NavbarComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   public db!: string;
+  /** 画面の幅が狭い（スマホで PC 用のメニューにしている） */
+  readonly narrow = input(false);
+  /** スマホ用のメニューに戻す */
+  readonly useMobile = output<void>();
 
   ngOnInit(): void {
     if (localStorage.getItem('MWSYS_DB') == null) {

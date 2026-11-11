@@ -1,4 +1,10 @@
 <mat-toolbar style="height:40px;text-align:center;" class="flex flex-row">
+  @if (narrow()) {
+    <!-- スマホで PC 用のメニューにしているとき、スマホ用のメニューに戻す -->
+    <button mat-icon-button type="button" (click)="useMobile.emit()" title="スマホ用のメニューにする">
+      <mat-icon>smartphone</mat-icon>
+    </button>
+  }
   <a mat-icon-button routerLink="/">
     <mat-icon>dashboard</mat-icon>
   </a>
