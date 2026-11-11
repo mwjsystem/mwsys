@@ -1,9 +1,95 @@
-<mat-card>
+<div class="dash">
+  <mat-card class="card misyu">
     <mat-card-title>
-        <h2>ホーム</h2>
+      <mat-icon>request_quote</mat-icon>未入金のフォロー（自分の担当）
+      <a mat-stroked-button routerLink="/frmnyukin/misyu" class="more">未入金管理を開く</a>
     </mat-card-title>
     <mat-card-content>
-        メニュー＞<mat-icon>settings</mat-icon>設定＞改善要望Excelに記入してください。
-        <p>　</p>
+      @if (misyuBusy) {<div class="sub">読み込んでいます…</div>}
+      @else if (misyuError) {<div class="err">{{misyuError}}</div>}
+      @else {
+        <div class="counts">
+          <a [routerLink]="['/frmnyukin/misyu']" [queryParams]="{ view: 'overdue', tanto: 'mine' }" class="cnt over">支払予定日を過ぎた <b>{{misyuOver}}</b> 件</a>
+          <a [routerLink]="['/frmnyukin/misyu']" [queryParams]="{ view: 'none', tanto: 'mine' }" class="cnt none">未対応 <b>{{misyuNone}}</b> 件</a>
+        </div>
+        @if (misyu.length == 0) {
+          <div class="sub">対応が要る未入金はありません。</div>
+        } @else {
+          <table class="tbl">
+            <tr><th>伝票</th><th>顧客</th><th class="num">残</th><th>入金予定日</th><th>状況</th><th>支払予定日</th></tr>
+            @for (r of misyu; track r.kind + ':' + r.denno) {
+              <tr [class.over]="isOver(r)">
+                <td><a [routerLink]="['/frmnyukin/misyu']" [queryParams]="{ kind: r.kind, denno: r.denno, view: '', tanto: '' }">{{r.kind == 0 ? '受注' : '請求'}}{{r.denno}}</a></td>
+                <td>{{name(r.mcode) || r.mcode}}</td>
+                <td class="num">{{r.zan | number}}</td>
+                <td>{{r.due}}（{{r.late}}日）</td>
+                <td>{{r.last?.status ?? '未対応'}}</td>
+                <td>{{r.last?.yotei ?? ''}}</td>
+              </tr>
+            }
+          </table>
+        }
+      }
     </mat-card-content>
-</mat-card>
+  </mat-card>
+
+  <mat-card class="card">
+    <mat-card-title>
+      <mat-icon>event_available</mat-icon>入荷予定が決まった（2 週間）
+      <label class="opt"><input type="checkbox" [(ngModel)]="yoteiJyuOnly">受注に結び付くものだけ</label>
+    </mat-card-title>
+    <mat-card-content>
+      @if (yoteiBusy) {<div class="sub">読み込んでいます…</div>}
+      @else if (yoteiError) {<div class="err">{{yoteiError}}</div>}
+      @else if (yoteiShown.length == 0) {<div class="sub">ありません。</div>}
+      @else {
+        <table class="tbl">
+          <tr><th>入荷予定日</th><th>商品</th><th class="num">未入荷</th><th>仕入先</th><th>発注</th><th>受注</th></tr>
+          @for (r of yoteiShown; track r.denno + ':' + r.line) {
+            <tr>
+              <td>{{r.yday}}@if (r.ydaykbn == '1') {<span class="kari">仮</span>}</td>
+              <td><b>{{r.gcode}}</b> <span class="small">{{r.gtext}}</span></td>
+              <td class="num">{{r.hatzn | number}}</td>
+              <td class="small">{{vname(r.vcode)}}</td>
+              <td><a href="javascript:void(0)" (click)="open('frmsupply', r.denno)">{{r.denno}}</a></td>
+              <td>@if (r.jdenno) {<a href="javascript:void(0)" (click)="open('frmsales', r.jdenno)">{{r.jdenno}}</a>}</td>
+            </tr>
+          }
+        </table>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card">
+    <mat-card-title>
+      <mat-icon>inventory</mat-icon>入荷した（7 日）
+      <label class="opt"><input type="checkbox" [(ngModel)]="nyukaJyuOnly">受注に結び付くものだけ</label>
+    </mat-card-title>
+    <mat-card-content>
+      @if (nyukaBusy) {<div class="sub">読み込んでいます…</div>}
+      @else if (nyukaError) {<div class="err">{{nyukaError}}</div>}
+      @else if (nyukaShown.length == 0) {<div class="sub">ありません。</div>}
+      @else {
+        <table class="tbl">
+          <tr><th>入荷日</th><th>商品</th><th class="num">数量</th><th>仕入先</th><th>仕入</th><th>受注</th></tr>
+          @for (r of nyukaShown; track r.denno + ':' + r.line) {
+            <tr [class.jyu]="r.jdenno">
+              <td>{{r.inday}}</td>
+              <td><b>{{r.gcode}}</b> <span class="small">{{r.gtext}}</span></td>
+              <td class="num">{{r.suu | number}}</td>
+              <td class="small">{{vname(r.vcode)}}</td>
+              <td><a href="javascript:void(0)" (click)="open('frmsiire', r.denno)">{{r.denno}}</a></td>
+              <td>@if (r.jdenno) {<a href="javascript:void(0)" (click)="open('frmsales', r.jdenno)">{{r.jdenno}}</a>}</td>
+            </tr>
+          }
+        </table>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="card note">
+    <mat-card-content>
+      メニュー＞<mat-icon>settings</mat-icon>設定＞改善要望Excelに記入してください。
+    </mat-card-content>
+  </mat-card>
+</div>

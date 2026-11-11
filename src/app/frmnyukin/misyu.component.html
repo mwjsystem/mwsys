@@ -1,0 +1,106 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">未入金管理</span>
+    <a mat-flat-button color="primary" routerLink="/frmnyukin"><mat-icon>edit_note</mat-icon>入金伝票</a>
+    <button mat-flat-button color="primary" type="button" (click)="exportExcel()" [disabled]="!loaded"><mat-icon>download</mat-icon>Excel</button>
+  </div>
+</mat-toolbar>
+
+<div class="mis">
+  <div class="cond">
+    <select [(ngModel)]="kind" (ngModelChange)="load()">
+      <option value="all">都度と掛売</option><option [ngValue]="0">都度（受注）</option><option [ngValue]="1">掛売（請求）</option>
+    </select>
+    <label>入金予定日 <input type="date" [(ngModel)]="from"> ～ <input type="date" [(ngModel)]="to"></label>
+    <button mat-flat-button color="primary" type="button" (click)="load()" [disabled]="busy"><mat-icon>refresh</mat-icon>読む</button>
+    <label>担当
+      <select [(ngModel)]="tanto">
+        <option value="mine">自分（営業・内勤）</option><option value="">すべて</option>
+        @for (t of stfsrv.tcds; track t.value) {<option [value]="t.value">{{t.viewval}}</option>}
+      </select>
+    </label>
+    <label>表示
+      <select [(ngModel)]="view">
+        <option value="open">対応が要る</option><option value="overdue">支払予定日を過ぎた</option><option value="none">未対応</option>
+        <option value="closed">終えた（協賛処理・完了）</option><option value="">すべて</option>
+      </select>
+    </label>
+    <label>支払方法
+      <select [(ngModel)]="pcode">
+        <option value="">すべて</option>
+        @for (p of pcodes; track p.value) {<option [value]="p.value">{{p.viewval}}</option>}
+      </select>
+    </label>
+  </div>
+  @if (error) {<div class="err">{{error}}</div>}
+
+  <div class="split">
+    <div class="listbox">
+      @if (loaded) {
+        <div class="bar">{{shown.length}} 件　残高の合計 <b>{{sumZan | number}}</b></div>
+        <table class="tbl">
+          <thead>
+            <tr><th>区分</th><th>伝票</th><th>顧客</th><th>入金予定日</th><th class="num">経過</th><th class="num">残高</th><th>支払方法</th><th>担当</th><th>状況</th><th>支払予定日</th><th>最新の経過</th></tr>
+          </thead>
+          <tbody>
+            @for (r of shown; track r.kind + ':' + r.denno) {
+              <tr class="row" [class.sel]="cur === r" [class.over]="overdue(r)" [class.none]="!r.last" (click)="select(r)">
+                <td>{{r.kind == 0 ? '都度' : '掛売'}}</td>
+                <td>{{r.denno}}</td>
+                <td>{{r.mcode}} {{name(r.mcode)}}</td>
+                <td>{{r.due}}</td>
+                <td class="num">{{r.late}}日</td>
+                <td class="num">{{r.zan | number}}</td>
+                <td>{{kbnName('pcode', r.pcode)}}</td>
+                <td class="small">{{staff(r.tcode1)}}@if (r.tcode && r.tcode != r.tcode1) {<br>{{staff(r.tcode)}}}</td>
+                <td>{{r.last?.status ?? '未対応'}}</td>
+                <td>{{r.last?.yotei ?? ''}}</td>
+                <td class="memo">{{r.last?.memo ?? ''}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    @if (cur) {
+      <div class="detail">
+        <h3>{{cur.kind == 0 ? '受注伝票' : '請求伝票'}} <a href="javascript:void(0)" (click)="openSlip(cur)">{{cur.denno}}</a>
+          <button mat-stroked-button type="button" class="close" (click)="cur = null">閉じる</button></h3>
+        <div>{{cur.mcode}} {{name(cur.mcode)}}</div>
+        <div class="nums">請求 {{cur.total | number}}　入金 {{cur.paid | number}}　<b>残 {{cur.zan | number}}</b>　入金予定日 {{cur.due}}（{{cur.late}}日経過）</div>
+        <div class="links">
+          <a [routerLink]="['/frmnyukin']" [queryParams]="cur.kind == 0 ? { jdenno: cur.denno } : { mcode: cur.mcode, idenno: cur.denno }" target="_blank">入金伝票を入れる</a>
+        </div>
+
+        <fieldset>
+          <legend>対応を記録する</legend>
+          <div class="frow"><label>連絡日</label><input type="date" [(ngModel)]="form.renraku"></div>
+          <div class="frow"><label>状況</label>
+            <select [(ngModel)]="form.status">@for (s of STATUS; track s) {<option [value]="s">{{s}}</option>}</select>
+          </div>
+          <div class="frow"><label>支払予定日</label><input type="date" [(ngModel)]="form.yotei"><span class="sub">期限（過ぎるとダッシュボードで知らせます）</span></div>
+          <div class="frow top"><label>経過・内容</label>
+            <textarea [(ngModel)]="form.memo" rows="4" placeholder="期限を必ず書いてください（例：振込日を 2/18 までに連絡いただける）"></textarea>
+          </div>
+          <div class="frow"><label>督促状送付日</label><input type="date" [(ngModel)]="form.tokusoku"></div>
+          <div class="frow"><label>回収可能性</label>
+            <select [(ngModel)]="form.kanou"><option [ngValue]="null"></option>@for (k of KANOU; track k) {<option [value]="k">{{k}}</option>}</select>
+          </div>
+          <div class="sub">「協賛処理」「取引不可設定」にするときは、上長の許可を得た旨も書いてください。</div>
+          <button mat-flat-button color="primary" type="button" (click)="addRec()" [disabled]="busy"><mat-icon>add_comment</mat-icon>記録する</button>
+        </fieldset>
+
+        <h4>対応の記録（{{hist.length}} 件）</h4>
+        @for (h of hist; track h.sequ) {
+          <div class="hist">
+            <div class="hhead"><b>{{h.status}}</b>　連絡日 {{h.renraku ?? ''}}　@if (h.yotei) {支払予定日 <b>{{h.yotei}}</b>}
+              @if (h.tokusoku) {　督促状 {{h.tokusoku}}}　@if (h.kanou) {　回収可能性 {{h.kanou}}}</div>
+            <div class="hmemo">{{h.memo}}</div>
+            <div class="sub">{{staff(h.created_by)}}　{{h.created_at?.slice(0, 16)?.replace('T', ' ')}}</div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

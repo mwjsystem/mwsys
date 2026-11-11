@@ -4,6 +4,7 @@ import { FrmnyukinComponent } from './frmnyukin.component';
 import { NyubulkComponent } from './nyubulk.component';
 import { NyubankComponent } from './nyubank.component';
 import { NyudaibikiComponent } from './nyudaibiki.component';
+import { MisyuComponent } from './misyu.component';
 
 /**
  * 入金（/frmnyukin: 入金伝票、/frmnyukin/{1:新規 2:変更 3:照会}/{伝票番号}、/frmnyukin/bulk: 一括入金、
@@ -14,5 +15,6 @@ export const FRMNYUKIN_ROUTES: Routes = [
   { path: 'bulk', component: NyubulkComponent },
   { path: 'bank', component: NyubankComponent },
   { path: 'daibiki', component: NyudaibikiComponent },
+  { path: 'misyu', component: MisyuComponent },
   { path: ':mode/:denno', component: FrmnyukinComponent, canDeactivate: [BeforeunloadGuard] },
 ];

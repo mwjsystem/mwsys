@@ -44,7 +44,7 @@ export interface NyuSlip {
 /** 受注の入金残（vnyuzan） */
 export interface NyuOrder {
   denno: number; day: string | null; uday: string | null; nday: string | null; mcode: string; scde: string; pcode: string | null;
-  hcode: string | null; okurino: string | null; total: number; torikbn: boolean | null; daibiki: number | null; tcode: string | null;
+  hcode: string | null; okurino: string | null; total: number; torikbn: boolean | null; daibiki: number | null; tcode: string | null; tcode1?: string | null;
   nyukin: number; shukin: number; chosei: number; nyuzan: number;
 }
 
@@ -55,7 +55,11 @@ export interface NyuInvoice { denno: number; mcode: string; sday: string; seikyu
 export interface NyuRow { kubun: number; denno: number; day: string; mcode: string; code: string; jdenno: number | null; idenno: number | null; kdenno: number | null; nmoney: number; smoney: number; tmoney: number; memo: string | null; del: boolean | null; tcode: string }
 
 /** 顧客（名前・カナ） */
-export interface NyuMember { mcode: string; sei: string | null; mei: string | null; kana: string | null }
+export interface NyuMember {
+  mcode: string; sei: string | null; mei: string | null; kana: string | null;
+  /** 内勤担当・営業担当・締め日・入金サイト（分類マスタ site）・入金日 */
+  tcode?: string | null; tcode1?: string | null; sime?: number | null; site?: string | null; inday?: number | null;
+}
 
 /** 入金の状況（請求額と入金済額から） */
 export function nyuState(total: number, zan: number): '未入金' | '一部入金' | '入金済' | '過入金' {
@@ -237,7 +241,7 @@ export class NyukinService {
   }
 
   // ===================== 対象（受注・請求） =====================
-  private readonly orderFields = 'denno day uday nday mcode scde pcode hcode okurino total torikbn daibiki tcode nyukin shukin chosei nyuzan';
+  private readonly orderFields = 'denno day uday nday mcode scde pcode hcode okurino total torikbn daibiki tcode tcode1 nyukin shukin chosei nyuzan';
 
   private normOrder(o: NyuOrder): NyuOrder {
     return { ...o, total: num(o.total), nyukin: num(o.nyukin), shukin: num(o.shukin), chosei: num(o.chosei), nyuzan: num(o.nyuzan), daibiki: o.daibiki == null ? null : num(o.daibiki) };
@@ -302,7 +306,7 @@ export class NyukinService {
   async members(mcodes: string[]): Promise<Map<string, NyuMember>> {
     const list = [...new Set(mcodes.filter(m => m))];
     const map = new Map<string, NyuMember>();
-    const Get = gql`query get_nyumem($id: smallint!, $m: [String!]!) { msmember(where: {id: {_eq: $id}, mcode: {_in: $m}}) { mcode sei mei kana } }`;
+    const Get = gql`query get_nyumem($id: smallint!, $m: [String!]!) { msmember(where: {id: {_eq: $id}, mcode: {_in: $m}}) { mcode sei mei kana tcode tcode1 sime site inday } }`;
     for (let i = 0; i < list.length; i += 1000) {
       const d = await this.q<{ msmember: NyuMember[] }>(Get, { id: this.usrsrv.compid, m: list.slice(i, i + 1000) });
       d.msmember.forEach(e => map.set(e.mcode, e));
