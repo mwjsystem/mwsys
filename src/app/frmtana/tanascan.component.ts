@@ -66,7 +66,8 @@ export class TanascanComponent implements OnDestroy {
 
   constructor() {
     this.title.setTitle('棚卸（スマホ）(MWSystem)');
-    this.strsrv.getStore();
+    // OnPush の画面なので、倉庫の一覧を読み終わったら画面を更新する（しないとプルダウンが空のまま）
+    this.strsrv.getStore().then(() => this.cdRef.detectChanges());
     try {
       const s = JSON.parse(localStorage.getItem(KEY) ?? 'null');
       if (s) {

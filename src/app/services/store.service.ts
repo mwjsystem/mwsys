@@ -19,8 +19,22 @@ export class StoreService {
 
   public scds: mwI.Sval[] = [];
 
-  getStore(): void {
-    if (this.scds.length == 0) {
+  /** 倉庫の一覧（scds）を読む。読み終わったら解決する（OnPush の画面は、解決したあとに画面を更新すること） */
+  private loading?: Promise<void>;
+  getStore(): Promise<void> {
+    if (this.scds.length > 0) {
+      return Promise.resolve();
+    }
+    if (this.loading) {
+      return this.loading;
+    }
+    this.loading = new Promise<void>(resolve => this.getStore0(resolve));
+    this.loading.finally(() => this.loading = undefined);
+    return this.loading;
+  }
+
+  private getStore0(done: () => void): void {
+    {
       const GetMast = gql`
       query get_souko($id: smallint!) {
         msstore(where: {id: {_eq: $id}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]},order_by: {sort: asc}) {
@@ -36,12 +50,21 @@ export class StoreService {
         },
       })
         .valueChanges
-        .subscribe(({ data }) => {
-          (data ? (data as StoreResult).msstore : []).forEach(e => {
-            this.scds.push({ value: e.code, viewval: e.subname });
-          });
+        .subscribe(({ data, error }) => {
+          if (!data) {
+            // Apollo（v4）はエラーを結果の error で返す。待ったままにしない
+            if (error) {
+              console.log('error query get_store', error);
+              done();
+            }
+            return;
+          }
+          // キャッシュの更新でもう一度届いたときに、同じ倉庫が重ならないように入れ直す
+          this.scds.splice(0, this.scds.length, ...(data as StoreResult).msstore.map(e => ({ value: e.code, viewval: e.subname })));
+          done();
         }, (error) => {
           console.log('error query get_store', error);
+          done();
         });
     }
   }
