@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, Validators, AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Router, ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
@@ -16,7 +16,8 @@ import { UserService } from './../services/user.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
 import { VendsService } from './../mstvendor/vends.service';
-import { SiimeiService, SiidenSet, SiidenNew } from './siimei.service';
+import { SiimeiService, SiidenSet, SiidenNew, SiimeiInput, SiiZaiko, EXTYPE_SIIRE } from './siimei.service';
+import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
 import { HatmeiService } from './../frmsupply/hatmei.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
@@ -46,7 +47,7 @@ type SiireField = 'vcode' | 'inday' | 'scode' | 'tcode' | 'currency' | 'dmemo' |
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
     },
-    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatInput, FormsModule, MatIconButton, MatSuffix, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, MatFormField, MatLabel, TmstmpComponent, MatCardContent, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect, MatOption, SimeitblComponent, DecimalPipe, JdatePipe, VcdtxtPipe, ModetxtPipe]
+    imports: [RouterLink, MatToolbar, MatButton, MatIcon, MatTooltip, MatInput, FormsModule, MatIconButton, MatSuffix, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, MatFormField, MatLabel, TmstmpComponent, MatCardContent, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect, MatOption, SimeitblComponent, DecimalPipe, JdatePipe, VcdtxtPipe, ModetxtPipe]
 })
 export class FrmsiireComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
@@ -73,6 +74,9 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
   }
   denno: number = 0;
   hdenno: number = 0;
+  /** 読み込んだときの入荷数の取り消し分（在庫 trzaiko.hnyu）と、結び付いていた発注伝票 */
+  private oldHnyu: SiiZaiko[] = [];
+  private oldHdennos: number[] = [];
   mode: number = 3;
   rows: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
@@ -147,25 +151,28 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
       this.smisrv.qrySiiden(denno).subscribe(
         result => {
           this.form.reset();
+          this.oldHnyu = [];
+          this.oldHdennos = [];
           if (result == null) {
-            this.usrsrv.toastWar("発注伝票番号" + denno + "は登録されていません");
-            history.replaceState('', '', './frmsupply');
+            this.usrsrv.toastWar("仕入伝票番号" + denno + "は登録されていません");
+            history.replaceState('', '', './frmsiire');
           } else {
             let siiden: mwI.Trsiiden = result;
             this.form.patchValue(siiden);
-            // this.form.patchValue(siiden.msvendor[0]);
             this.usrsrv.setTmstmp(siiden);
             this.smisrv.siimei = siiden.trsiimeis;
             this.simeitbl().setSiimei();
-            // this.form.patchValue({mtax:this.vensrv.get_vendor(this.form.getRawValue()['vcode'])?.mtax});
-            // this.denno = denno;
-            // history.replaceState('', '', './frmsupply/' + this.mode + '/' + this.denno);
+            // 読み込んだときの入荷数（変更の保存で在庫から引いてから、今の数を足す）と、結び付いた発注伝票
+            this.oldHnyu = this.smisrv.hnyuOf(siiden.scode, siiden.inday as unknown as string, siiden.trsiimeis, -1);
+            this.oldHdennos = siiden.trsiimeis.map(m => Number(m.hdenno)).filter(n => n > 0);
+            this.denno = denno;
+            history.replaceState('', '', './frmsiire/' + this.mode + '/' + this.denno);
           }
           this.refresh();
           this.overlayRef.detach();
         }, error => {
           console.log('error query Getsiiden', error);
-          this.usrsrv.toastInf("発注伝票番号" + denno + "は登録されていません");
+          this.usrsrv.toastInf("仕入伝票番号" + denno + "は登録されていません");
           // this.form.reset();
           // history.replaceState('', '', './frmsupply');
           this.overlayRef.detach();
@@ -188,9 +195,9 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
             // history.replaceState('', '', './frmsupply');
           } else {
             let hatden: mwI.Trhatden = result;
-            // console.log(result);
             this.form.patchValue(hatden);
-            this.form.patchValue({ inday: hatden.vhatzns[0].yday });
+            // 入荷日は今日、担当者は自分、備考は参照した発注伝票
+            this.form.patchValue({ inday: new Date(), tcode: this.usrsrv.staff?.code, dmemo: '発注伝票' + denno + 'から' });
             // this.usrsrv.setTmstmp(hatden);
             this.smisrv.convHatmei(denno, hatden.vhatzns);
             this.simeitbl().setSiimei();
@@ -210,13 +217,24 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
   }
 
 
-  test(value: unknown) {
-    // this.toastr.info(this.form.value.yday);
-    console.log(this.simeitbl().getSiimei(this.denno));
-    this.refresh();
-    // this.router.navigate(['/mstmember','3',value]);
-    // const url = this.router.createUrlTree(['/mstmember','3',value]);
-    // window.open(url.toString(),null,'top=100,left=100');
+  /** 仕入伝票の操作ログ（登録・変更）を表示する */
+  opelog() {
+    if (!this.denno) {
+      return;
+    }
+    const data: OpelogParam = { extype: EXTYPE_SIIRE, keycode: String(this.denno), title: '仕入伝票 ' + this.denno, table: 'trsiiden' };
+    this.dialog.open(OpelogComponent, { width: '900px', maxWidth: '95vw', data: data });
+  }
+
+  /** 保存のあと、発注明細の入荷済の印と発注伝票の状況を直す（失敗しても仕入伝票は保存済み） */
+  private async afterSave(siimei: SiimeiInput[], inday: string | null) {
+    try {
+      const hd = [...this.oldHdennos, ...siimei.map(m => Number(m.hdenno)).filter(n => n > 0)];
+      await this.smisrv.refreshHatden(hd, inday ?? this.usrsrv.formatDate(new Date()), m => this.hmisrv.getHdsta(m));
+    } catch (e) {
+      console.log('error refreshHatden', e);
+      this.usrsrv.toastWar('仕入伝票は保存しましたが、発注伝票の状況を直せませんでした');
+    }
   }
   get frmArr(): FormArray {
     return this.form.get('mtbl') as FormArray;
@@ -314,9 +332,11 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
 
     if (this.mode == 2) {
       let siimei = this.simeitbl().getSiimei(this.denno);
-      this.smisrv.updSiiden(this.denno, siiden, siimei)
-        .then(result => {
-          // console.log('update_hatden',result);
+      // 在庫の入荷数: 読み込んだときの分を引き、今の倉庫・入荷日・数量で足す
+      const zaiko = [...this.oldHnyu, ...this.smisrv.hnyuOf(siiden.scode, siiden.inday, siimei)];
+      this.smisrv.updSiiden(this.denno, siiden, siimei, zaiko)
+        .then(async result => {
+          await this.afterSave(siimei, siiden.inday);
           this.usrsrv.toastSuc('仕入伝票' + this.denno + 'の変更を保存しました');
           this.form.markAsPristine();
           this.cancel();
@@ -336,8 +356,9 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
         }
         , ...siiden,
       }]
-      this.smisrv.insSiiden(trsiiden, siimei)
-        .then(result => {
+      this.smisrv.insSiiden(trsiiden, siimei, this.smisrv.hnyuOf(siiden.scode, siiden.inday, siimei))
+        .then(async result => {
+          await this.afterSave(siimei, siiden.inday);
           this.usrsrv.toastSuc('仕入伝票' + this.denno + 'を新規登録しました');
           this.form.markAsPristine();
           this.cancel();

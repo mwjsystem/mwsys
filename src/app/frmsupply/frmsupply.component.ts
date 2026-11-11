@@ -219,6 +219,11 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
     let vend = this.vensrv.getVendor(value);
     this.form.patchValue({ mtax: vend?.mtax, currency: vend?.currency });
   }
+  /** この発注伝票の発注残から仕入伝票を作る（仕入一括登録を別のタブで開く） */
+  toSiire() {
+    window.open(this.router.createUrlTree(['/frmsiire/bulk'], { queryParams: { hdenno: this.denno } }).toString());
+  }
+
   /** 帳票（発注書・見積り依頼・在庫確認依頼・海外発注書）。A4 の PDF を開く（印刷）・保存する */
   printHat() {
     if (!this.denno) {

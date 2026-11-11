@@ -32,10 +32,14 @@
       </button>
     }
   <!-- </mat-form-field> -->
-  <button mat-flat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'"
-    [color]="usrsrv.getColor(mode)">
-    <mat-icon>history</mat-icon>操作ログ
-  </button>
+  @if (mode!=1) {
+    <button mat-flat-button (click)="opelog()" [color]="usrsrv.getColor(mode)" [disabled]="!denno">
+      <mat-icon>history</mat-icon>操作ログ
+    </button>
+  }
+  <a mat-flat-button routerLink="/frmsiire/bulk" [color]="usrsrv.getColor(mode)">
+    <mat-icon>playlist_add_check</mat-icon>一括登録（発注番号から）
+  </a>
   <button mat-flat-button [color]="usrsrv.getColor(mode)"><a mat-flat-button
     href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
     target="_blank" [color]="usrsrv.getColor(mode)">
@@ -52,7 +56,7 @@
       @if (mode==1) {
         <mat-form-field>
           <mat-label>参照発注伝票番号</mat-label>
-          <input matInput [(ngModel)]="hdenno" (keydown.f4)="hdennoHelp()" maxlength="10" (blur)="onEnter()"
+          <input matInput [(ngModel)]="hdenno" (keydown.f4)="hdennoHelp()" maxlength="10" (keyup.enter)="getHatden(+hdenno)"
             [ngModelOptions]="{standalone: true}">
           <button mat-icon-button matSuffix (click)="hdennoHelp()">
             <mat-icon>find_replace</mat-icon>

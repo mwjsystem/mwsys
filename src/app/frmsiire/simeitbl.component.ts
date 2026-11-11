@@ -205,7 +205,8 @@ export class SimeitblComponent implements OnInit {
           id: this.usrsrv.compid,
           denno: dno,
           line: this.usrsrv.editFrmval(control, 'line'),
-          inday: this.usrsrv.editFrmday(control, 'inday'),
+          // 明細の入荷日は伝票の入荷日（明細に入荷日の欄は無い）
+          inday: this.usrsrv.editFrmday(this.parentForm(), 'inday'),
           gcode: this.usrsrv.editFrmval(control, 'gcode'),
           suu: this.usrsrv.editFrmval(control, 'suu'),
           genka: this.usrsrv.editFrmval(control, 'genka'),
@@ -213,8 +214,9 @@ export class SimeitblComponent implements OnInit {
           taxrate: this.usrsrv.editFrmval(control, 'taxrate'),
           mmemo: this.usrsrv.editFrmval(control, 'mmemo'),
           spec: this.usrsrv.editFrmval(control, 'spec'),
-          hdenno: this.usrsrv.editFrmval(control, 'jdenno'),
-          hline: this.usrsrv.editFrmval(control, 'jline'),
+          // 発注伝票番号・行番号（以前は無い欄の名前 jdenno / jline で取っていて、発注との結び付きが保存されなかった）
+          hdenno: this.usrsrv.editFrmval(control, 'hdenno'),
+          hline: this.usrsrv.editFrmval(control, 'hline'),
           mtax: this.usrsrv.editFrmval(control, 'mtax')
         });
       });

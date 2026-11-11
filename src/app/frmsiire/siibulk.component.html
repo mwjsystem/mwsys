@@ -1,0 +1,89 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">仕入一括登録</span>
+    <a mat-flat-button color="primary" routerLink="/frmsiire"><mat-icon>edit_note</mat-icon>仕入伝票</a>
+  </div>
+</mat-toolbar>
+
+<div class="bulk">
+  <fieldset>
+    <legend>発注伝票</legend>
+    <div class="cond">
+      <label>発注番号
+        <input class="dnos" [(ngModel)]="dnosText" (keyup.enter)="load()" (keydown.f4)="hdennoHelp()" placeholder="複数は空白・カンマで区切る（F4 で探す）">
+      </label>
+      <button mat-icon-button type="button" (click)="hdennoHelp()" matTooltip="発注伝票を探して足す"><mat-icon>find_replace</mat-icon></button>
+      <button mat-flat-button color="primary" type="button" (click)="load()" [disabled]="busy"><mat-icon>search</mat-icon>発注残を出す</button>
+    </div>
+    <div class="cond">
+      <span class="sub">または</span>
+      <label>仕入先 <input [(ngModel)]="vcode" style="width: 7em;"></label>
+      <span class="sub">{{vcode ? vname(vcode) : ''}}</span>
+      <label>入荷予定日が <input type="date" [(ngModel)]="ydayTo"> まで</label>
+      <button mat-stroked-button type="button" (click)="find()" [disabled]="busy"><mat-icon>manage_search</mat-icon>発注残のある発注伝票を探して足す</button>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>仕入</legend>
+    <div class="cond">
+      <label>入荷日 <input type="date" [(ngModel)]="inday"></label>
+      <label>担当者
+        <select [(ngModel)]="tcode">
+          @for (t of stfsrv.tcds; track t.value) {<option [value]="t.value">{{t.viewval}}</option>}
+        </select>
+      </label>
+      <span class="sub">発注伝票ごとに 1 枚の仕入伝票を作ります（倉庫・仕入先・通貨は発注伝票から）。在庫の入荷数を足します。</span>
+    </div>
+  </fieldset>
+
+  @if (error) {<div class="err">{{error}}</div>}
+  @if (message) {<div class="msg">{{message}}</div>}
+  @if (made.length > 0) {
+    <div class="made">作った仕入伝票：
+      @for (m of made; track m.denno) {
+        <a href="javascript:void(0)" (click)="open('frmsiire', m.denno)">{{m.denno}}</a>（発注 {{m.hdenno}}）
+      }
+    </div>
+  }
+
+  @if (groups.length > 0) {
+    <div class="bar">
+      <span>仕入伝票 <b>{{checkedGroups.length}}</b> 枚　明細 <b>{{checkedLines.length}}</b> 行</span>
+      <button mat-flat-button color="warn" type="button" (click)="create()" [disabled]="busy || checkedLines.length == 0">
+        <mat-icon>task_alt</mat-icon>仕入伝票を作る（{{checkedGroups.length}} 枚）
+      </button>
+    </div>
+    @for (g of groups; track g.head.denno) {
+      <div class="group">
+        <div class="ghead">
+          <label><input type="checkbox" [checked]="g.lines.every(l => l.on)" (change)="setGroup(g, $any($event.target).checked)"></label>
+          発注伝票 <a href="javascript:void(0)" (click)="open('frmsupply', g.head.denno)"><b>{{g.head.denno}}</b></a>
+          　発注日 {{g.head.day}}　仕入先 {{g.head.vcode}} {{vname(g.head.vcode)}}　倉庫 {{storeName(g.head.scode)}}
+          @if (g.head.currency && g.head.currency != 'JPY') {　{{g.head.currency}}}
+          <span class="gsum">商品計 {{groupTotal(g).gtotal | number}}　消費税 {{groupTotal(g).tax | number}}</span>
+        </div>
+        <table class="tbl">
+          <thead><tr><th></th><th>行</th><th>商品</th><th class="num">発注数</th><th class="num">発注残</th><th>入荷予定日</th><th class="num">入荷数</th><th class="num">原価</th><th class="num">金額</th><th>受注</th><th>備考</th></tr></thead>
+          <tbody>
+            @for (l of g.lines; track l.line) {
+              <tr [class.off]="!l.on">
+                <td><input type="checkbox" [(ngModel)]="l.on"></td>
+                <td>{{l.line}}</td>
+                <td><b>{{l.gcode}}</b> <span class="small">{{l.gtext}}</span></td>
+                <td class="num">{{l.suu | number}}</td>
+                <td class="num">{{l.hatzn | number}}</td>
+                <td>{{l.yday?.slice(0, 10)}}@if (l.ydaykbn == '1') {<span class="kari">仮</span>}</td>
+                <td class="num"><input type="number" min="0" class="recv" [(ngModel)]="l.recv" [class.over]="l.recv > l.hatzn"></td>
+                <td class="num">{{l.genka | number}}</td>
+                <td class="num">{{money(l) | number}}</td>
+                <td>@if (l.jdenno) {<a href="javascript:void(0)" (click)="open('frmsales', l.jdenno)">{{l.jdenno}}</a>}</td>
+                <td class="small">{{l.mmemo}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

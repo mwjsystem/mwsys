@@ -35,6 +35,11 @@
       </button>
     }
   <!-- </mat-form-field> -->
+  @if (mode==3 && denno) {
+    <button mat-flat-button (click)="toSiire()" [color]="usrsrv.getColor(mode)">
+      <mat-icon matTooltip="この発注伝票の発注残から仕入伝票を作ります（仕入一括登録を別のタブで開く）" matTooltipClass="ttips">move_to_inbox</mat-icon>仕入登録
+    </button>
+  }
   @if (mode==3) {
     <button mat-flat-button (click)="printHat()" [color]="usrsrv.getColor(mode)" [disabled]="!denno">
       <mat-icon>description</mat-icon>帳票
