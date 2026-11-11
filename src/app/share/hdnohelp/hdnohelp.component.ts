@@ -151,22 +151,27 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
 
     // console.log(this.fhdst,varWh);
 
-    const GetTran = gql`
+    this.runQuery(varWh, true);
+  }
+
+  /**
+   * 検索する。fax = true は FAX の流れの列（ofax_at など）も読む。
+   * その列が読めない（列が無い・Hasura の権限に入っていない）ときは、列を除いて検索し直す。
+   * エラーのときも読み込み中の表示を消す（以前は Apollo v4 がエラーを結果の error で返すと、読み込み中のまま止まった）
+   */
+  private runQuery(varWh: HasuraWhere, fax: boolean) {
+    const GetTran = fax ? gql`
     query get_hatden($where:trhatden_bool_exp!) {
       trhatden(where:$where, order_by:{denno: asc}) {
-        denno
-        day
-        scode
-        vcode
-        tcode 
-        updated_at
-        updated_by
-        ofax_at
-        refax_at
-        sfax_at
-        trhatmeis(where:{line:{_eq:1}}){
-          gcode
-        }
+        denno day scode vcode tcode updated_at updated_by
+        ofax_at refax_at sfax_at
+        trhatmeis(where:{line:{_eq:1}}){ gcode }
+      }
+    }` : gql`
+    query get_hatden_nofax($where:trhatden_bool_exp!) {
+      trhatden(where:$where, order_by:{denno: asc}) {
+        denno day scode vcode tcode updated_at updated_by
+        trhatmeis(where:{line:{_eq:1}}){ gcode }
       }
     }`;
     if (!this.overlayRef.hasAttached()) {
@@ -175,12 +180,26 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
     this.querySub?.unsubscribe();
     this.querySub = this.apollo.watchQuery<HatdenResult>({
       query: GetTran,
-      variables: varWh
+      variables: varWh,
+      fetchPolicy: 'network-only'
     })
       .valueChanges
-      .subscribe(({ data }) => {
-        // console.log(data);
+      .subscribe(({ data, error }) => {
         if (!data) {
+          if (error) {
+            const msg = String((error as Error).message ?? error);
+            console.log('error query get_hatden', error);
+            if (fax && /ofax_at|refax_at|sfax_at/.test(msg)) {
+              // FAX の流れの列が読めない環境では、列を除いて検索し直す（FAX状況の絞り込みも外す）
+              this.ffax = '';
+              varWh.where._and = varWh.where._and.filter(c => !JSON.stringify(c).match(/ofax_at|refax_at|sfax_at/));
+              this.runQuery(varWh, false);
+              return;
+            }
+            this.overlayRef.detach();
+            this.usrsrv.toastErr('発注伝票を検索できませんでした', msg);
+            this.cdRef.detectChanges();
+          }
           return;
         }
         const result = data as HatdenResult;
