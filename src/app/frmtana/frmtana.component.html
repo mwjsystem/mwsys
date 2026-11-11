@@ -1,0 +1,69 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">棚卸処理</span>
+    <a mat-flat-button color="primary" routerLink="/frmtana/sum"><mat-icon>summarize</mat-icon>棚卸集計・一括確定</a>
+    <a mat-flat-button color="primary" routerLink="/frmtana/scan" target="_blank"
+      matTooltip="スマホで開くと、商品のバーコードを読んで棚卸数を入れられます" matTooltipClass="ttips"><mat-icon>smartphone</mat-icon>スマホの棚卸</a>
+    <button mat-flat-button color="primary" (click)="opelog()" [disabled]="!goods"><mat-icon>history</mat-icon>操作ログ</button>
+  </div>
+</mat-toolbar>
+
+<div class="tana">
+  <div class="row">
+    <label>倉庫</label>
+    <select [(ngModel)]="scode" (ngModelChange)="reload()">
+      <option value=""></option>
+      @for (s of strsrv.scds; track s.value) {
+        <option [value]="s.value">{{s.value}} {{s.viewval}}</option>
+      }
+    </select>
+  </div>
+  <div class="row">
+    <label>日付</label>
+    <input type="date" [(ngModel)]="day" (ngModelChange)="reload()">
+    <span class="sub">この日の終わりの在庫として登録します</span>
+  </div>
+  <div class="row auto">
+    <label>自動表示</label>
+    <label class="r"><input type="radio" name="auto" value="none" [(ngModel)]="auto">なし</label>
+    <label class="r"><input type="radio" name="auto" value="tanano" [(ngModel)]="auto">棚番号順</label>
+    <label class="r"><input type="radio" name="auto" value="gcode" [(ngModel)]="auto">商品番号順</label>
+    @if (auto != 'none') {
+      <button mat-stroked-button type="button" (click)="next()">{{goods ? '次の商品' : '最初の商品'}}</button>
+    }
+  </div>
+  <div class="row">
+    <label>商品</label>
+    <input #gcodeInput class="gcode" [ngModel]="code" (change)="setCode($any($event.target).value)" (keydown.f4)="gcdHelp()"
+      placeholder="商品コード・JAN" maxlength="20" autofocus>
+    <button mat-icon-button type="button" (click)="gcdHelp()" matTooltip="商品を探す（F4）"><mat-icon>find_replace</mat-icon></button>
+    <span class="gtext">{{goods?.gtext}}</span>
+  </div>
+  <div class="row">
+    <label>在庫数</label>
+    <span class="num stock">{{stock ?? ''}}</span>
+    <label class="l2">棚番号</label>
+    <span class="tanano">{{goods?.tanano}}</span>
+  </div>
+  <div class="row">
+    <label>棚卸数</label>
+    <input #tanaInput type="number" min="0" class="num" [(ngModel)]="tana" (keydown.enter)="ok()" [disabled]="!goods">
+    @if (diff != null && diff != 0) {
+      <span class="diff" [class.minus]="diff < 0">在庫との差 {{diff > 0 ? '+' : ''}}{{diff}}</span>
+    }
+    @if (rec) {
+      <span class="sub">この日は登録済（{{rec.tana}}。OK で上書き）</span>
+    }
+  </div>
+  <div class="row">
+    <label>備考</label>
+    <input class="memo" [(ngModel)]="memo" maxlength="100" [disabled]="!goods" (keydown.enter)="ok()">
+  </div>
+  @if (message) {
+    <div class="msg">{{message}}</div>
+  }
+  <div class="buttons">
+    <button mat-flat-button color="primary" type="button" (click)="ok()" [disabled]="busy || !goods || tana == null">OK</button>
+    <button mat-stroked-button type="button" (click)="cancel()">キャンセル</button>
+  </div>
+</div>

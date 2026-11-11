@@ -69,7 +69,12 @@
     <a mat-menu-item routerLink="/frmmove">移動伝票</a>
     <a mat-menu-item routerLink="/frmtenkai">展開伝票</a>
     <a mat-menu-item routerLink="/frmchosei">在庫調整伝票（破棄）</a>
-    <a mat-menu-item>棚卸処理</a>
+    <button mat-menu-item [matMenuTriggerFor]="tana">棚卸処理</button>
+    <mat-menu #tana="matMenu">
+      <a mat-menu-item routerLink="/frmtana">棚卸（単票）</a>
+      <a mat-menu-item routerLink="/frmtana/scan">棚卸（スマホ）</a>
+      <a mat-menu-item routerLink="/frmtana/sum">棚卸集計・一括確定</a>
+    </mat-menu>
     <button mat-menu-item [matMenuTriggerFor]="zaip">在庫印刷</button>
     <mat-menu #zaip="matMenu">
       <a mat-menu-item>在庫一覧表</a>

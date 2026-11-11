@@ -1,0 +1,95 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">棚卸集計・一括確定</span>
+    <a mat-flat-button color="primary" routerLink="/frmtana"><mat-icon>edit_note</mat-icon>棚卸（単票）</a>
+    <a mat-flat-button color="primary" routerLink="/frmtana/scan" target="_blank"><mat-icon>smartphone</mat-icon>スマホの棚卸</a>
+  </div>
+</mat-toolbar>
+
+<div class="sum">
+  <div class="cond">
+    <label>倉庫
+      <select [(ngModel)]="scode">
+        <option value=""></option>
+        @for (s of strsrv.scds; track s.value) {
+          <option [value]="s.value">{{s.value}} {{s.viewval}}</option>
+        }
+      </select>
+    </label>
+    <label>日付 <input type="date" [(ngModel)]="day"></label>
+    <label><input type="checkbox" [(ngModel)]="withStock"> 数えていない在庫ありの商品も出す</label>
+    <button mat-flat-button color="primary" type="button" (click)="load()" [disabled]="busy"><mat-icon>refresh</mat-icon>集計</button>
+    <label class="file" matTooltip="現行の投入データの CSV（倉庫, 日付, 商品コード, 空欄, 数）を、選んでいる倉庫・日付の下書きに取り込みます" matTooltipClass="ttips">
+      <mat-icon>upload_file</mat-icon>CSV 取込
+      <input type="file" accept=".csv,text/csv" (change)="importCsv($event)" [disabled]="busy">
+    </label>
+  </div>
+
+  @if (error) {
+    <div class="err">{{error}}</div>
+  }
+  @if (message) {
+    <div class="msg">{{message}}</div>
+  }
+
+  @if (loaded) {
+    <div class="bar">
+      <span>数えた商品 <b>{{counted}}</b>　数えていない商品 <b>{{uncounted}}</b>　確定の印 <b>{{checkedCount}}</b></span>
+      <label><input type="checkbox" [(ngModel)]="diffOnly"> 差異のある商品だけ</label>
+      <label>並び
+        <select [(ngModel)]="sort">
+          <option value="diff">差異の大きい順</option>
+          <option value="tanano">棚番順</option>
+          <option value="gcode">商品コード順</option>
+        </select>
+      </label>
+      <button mat-stroked-button type="button" (click)="setAll(true)">表示中に印</button>
+      <button mat-stroked-button type="button" (click)="setAll(false)">印を外す</button>
+      @if (uncounted > 0) {
+        <button mat-stroked-button type="button" (click)="checkUncounted()"
+          matTooltip="数えていない（在庫あり）の商品にも印を付けます。一括確定で棚卸数 0 になります" matTooltipClass="ttips">数えていない商品を 0 で確定</button>
+      }
+      <button mat-stroked-button type="button" (click)="exportExcel()"><mat-icon>download</mat-icon>Excel</button>
+      <button mat-flat-button color="warn" type="button" (click)="confirmAll()" [disabled]="busy || checkedCount == 0">
+        <mat-icon>task_alt</mat-icon>一括確定（{{checkedCount}} 件）
+      </button>
+    </div>
+
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th></th><th>商品コード</th><th>商品名</th><th>棚番</th><th class="num">棚卸数</th><th class="num">システム在庫</th>
+          <th class="num">差異</th><th class="num">登録済</th><th>内訳（場所:数）</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of shown; track r.gcode) {
+          <tr [class.nocount]="r.count == null" [class.off]="!r.on">
+            <td><input type="checkbox" [(ngModel)]="r.on"></td>
+            <td class="gc">{{r.gcode}}</td>
+            <td>{{r.gtext}}</td>
+            <td>{{r.tanano}}</td>
+            <td class="num"><b>{{r.count ?? '未カウント'}}</b></td>
+            <td class="num">{{r.stock}}</td>
+            <td class="num diff" [class.plus]="diffOf(r) > 0" [class.minus]="diffOf(r) < 0">{{diffOf(r) > 0 ? '+' : ''}}{{diffOf(r)}}</td>
+            <td class="num">{{r.done ?? ''}}</td>
+            <td class="locs">
+              @if (r.ents.length) {
+                <a href="javascript:void(0)" (click)="r.open = !r.open">{{locs(r)}}</a>
+                @if (r.open) {
+                  @for (e of r.ents; track e.sequ) {
+                    <div class="ent">
+                      {{e.loc || '－'}}：{{e.suu}}　{{stfsrv.getName(e.created_by ?? '') || e.created_by}} {{e.created_at.slice(11, 16)}}
+                      @if (e.done_at) {<span class="done">確定済</span>}
+                      <button mat-stroked-button type="button" class="del" (click)="delEnt(r, e)">消す</button>
+                    </div>
+                  }
+                }
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

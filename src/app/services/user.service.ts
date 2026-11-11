@@ -644,9 +644,10 @@ export class UserService {
       // case "発注外入荷":
       //   // color = 'green';
       //   break;
-      // case "棚卸":
-      //   // color = 'magenta';
-      //   break;
+      case typ == "棚卸":
+        // 棚卸は伝票番号が無いので、単票の画面を開く
+        window.open(this.router.createUrlTree(['/frmtana']).toString());
+        return;
       default:
       // color = 'black';
     }

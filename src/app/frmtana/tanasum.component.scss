@@ -1,0 +1,26 @@
+.sum { padding: 8px 12px; font-size: 14px; }
+.cond, .bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 6px 0;
+  select, input[type=date] { font-size: 14px; padding: 3px; }
+}
+.file {
+  display: inline-flex; align-items: center; gap: 4px; cursor: pointer; border: 1px solid #999999; border-radius: 4px; padding: 4px 10px;
+  input { display: none; }
+}
+.err { color: #c62828; margin: 4px 0; }
+.msg { color: #2e7d32; margin: 4px 0; font-weight: bold; }
+.tbl {
+  border-collapse: collapse; width: 100%; font-size: 13px;
+  th { background: #eeeeee; font-weight: normal; padding: 4px; border: 1px solid #cccccc; text-align: left; position: sticky; top: 0; }
+  td { padding: 2px 6px; border: 1px solid #dddddd; vertical-align: top; }
+  .num { text-align: right; white-space: nowrap; }
+  .gc { white-space: nowrap; }
+  .diff.plus { color: #1565c0; font-weight: bold; }
+  .diff.minus { color: #c62828; font-weight: bold; }
+  tr.nocount td { background: #fff8e1; }
+  tr.off td { color: #999999; }
+  .locs { font-size: 12px; }
+  .ent { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+  .done { color: #2e7d32; }
+  .del { min-height: 24px; line-height: 22px; font-size: 12px; padding: 0 6px; }
+}

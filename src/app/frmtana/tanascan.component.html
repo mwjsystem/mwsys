@@ -1,0 +1,84 @@
+<div class="pick">
+  <div class="head">
+    <div class="denno">棚卸（スマホ）</div>
+    <div class="setting">
+      <select [(ngModel)]="scode" (ngModelChange)="remember()">
+        <option value="">倉庫を選ぶ</option>
+        @for (s of strsrv.scds; track s.value) {
+          <option [value]="s.value">{{s.viewval}}</option>
+        }
+      </select>
+      <input type="date" [(ngModel)]="day" (ngModelChange)="remember()">
+    </div>
+    <div class="setting kinds">
+      <label><input type="radio" name="kind" value="draft" [(ngModel)]="kind" (ngModelChange)="remember()">一斉棚卸（場所ごとに足す）</label>
+      <label><input type="radio" name="kind" value="direct" [(ngModel)]="kind" (ngModelChange)="remember()">すぐ登録</label>
+    </div>
+    @if (kind == 'draft') {
+      <div class="setting">
+        <input class="loc" [(ngModel)]="loc" (change)="remember()" placeholder="数えている場所（例：棚1・コンテナ2）" maxlength="30">
+      </div>
+      <div class="sub">数えた数は下書きに貯まります。PC の「棚卸集計」で合計して在庫と比べ、一括確定します。</div>
+    } @else {
+      <div class="sub">登録すると、その日の棚卸数としてすぐ在庫に反映します（同じ日の同じ商品は上書き）。</div>
+    }
+  </div>
+
+  <video #video class="video" [class.hidden]="!scanning" playsinline muted></video>
+
+  @if (msg) {
+    <div class="msg" [class.ok]="msgType == 'ok'" [class.ng]="msgType == 'ng'">{{msg}}</div>
+  }
+
+  <div class="buttons">
+    @if (scanning) {
+      <button mat-stroked-button type="button" (click)="stop()"><mat-icon>videocam_off</mat-icon>カメラを止める</button>
+    } @else {
+      <button mat-raised-button color="primary" type="button" (click)="start()" [disabled]="!scode"><mat-icon>document_scanner</mat-icon>商品を読む</button>
+    }
+  </div>
+
+  <form class="manual" (ngSubmit)="onManual()">
+    <input [(ngModel)]="manual" name="manual" placeholder="バーコードリーダー・手入力（JAN／商品コード）" autocomplete="off" enterkeyhint="done">
+    <button mat-stroked-button type="submit">読む</button>
+  </form>
+
+  @if (goods) {
+    <div class="item card">
+      <div class="code">{{goods.gcode}}@if (goods.tanano) {<span class="tana">棚{{goods.tanano}}</span>}</div>
+      <div class="name">{{goods.gtext}}</div>
+      <div class="stockrow">システム在庫 <b>{{stock ?? '…'}}</b>{{goods.unit}}
+        @if (kind == 'direct' && done != null) {<span class="sub">（この日は登録済 {{done}}）</span>}
+      </div>
+      @if (kind == 'draft') {
+        <div class="ents">
+          この日に数えた分：合計 <b>{{entSum}}</b>
+          @for (e of ents; track e.sequ) {
+            <div class="ent">{{e.loc || '（場所なし）'}}　{{e.suu}}
+              @if (e.done_at) {<span class="sub">確定済</span>}
+              <button mat-stroked-button type="button" class="del" (click)="delEnt(e)">消す</button>
+            </div>
+          }
+        </div>
+      }
+      <div class="count">
+        <input #suuInput type="number" min="0" inputmode="numeric" class="suu" [(ngModel)]="suu" placeholder="数" (keydown.enter)="save()">
+        <button mat-raised-button color="accent" type="button" class="big" (click)="save()" [disabled]="busy || suu == null">
+          <mat-icon>task_alt</mat-icon>{{kind == 'draft' ? '足す' : '登録'}}
+        </button>
+      </div>
+      @if (diff != null) {
+        <div class="diff" [class.zero]="diff == 0" [class.minus]="diff < 0">
+          {{kind == 'draft' ? '合計すると' : '登録すると'}}在庫との差 {{diff > 0 ? '+' : ''}}{{diff}}
+        </div>
+      }
+    </div>
+  }
+
+  @if (history.length > 0) {
+    <div class="progress">このスマホで入れた分</div>
+    @for (h of history; track $index) {
+      <div class="hist">{{h.at}}　{{h.gcode}}　{{h.loc ? h.loc + '　' : ''}}{{h.suu}}{{h.draft ? '（下書き）' : '（登録）'}}</div>
+    }
+  }
+</div>

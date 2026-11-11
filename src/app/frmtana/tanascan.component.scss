@@ -1,0 +1,26 @@
+.setting {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0;
+  select, input { font-size: 16px; padding: 6px; border: 1px solid #bbbbbb; border-radius: 4px; }
+  .loc { flex: 1; }
+  &.kinds label { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; }
+}
+.card { background: #fafafa; }
+.stockrow { font-size: 17px; margin-top: 4px; b { font-size: 22px; } }
+.ents {
+  margin-top: 6px;
+  font-size: 15px;
+  .ent { display: flex; align-items: center; gap: 8px; margin: 3px 0 3px 8px; }
+  .del { min-height: 30px; font-size: 13px; }
+}
+.count {
+  .suu { width: 6em; font-size: 26px; padding: 6px; text-align: right; border: 2px solid #1565c0; border-radius: 6px; }
+}
+.diff {
+  font-size: 18px; font-weight: bold; color: #1565c0; margin-top: 6px;
+  &.minus { color: #c62828; }
+  &.zero { color: #2e7d32; }
+}
+.hist { font-size: 14px; border-bottom: 1px solid #eeeeee; padding: 3px 0; }
