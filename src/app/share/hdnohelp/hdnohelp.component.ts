@@ -24,6 +24,7 @@ import { CdkScrollable } from '@angular/cdk/scrolling';
 import { DatePipe } from '@angular/common';
 import { StaffPipe } from '../../core/pipes/staff.pipe';
 import { VcdtxtPipe } from '../../core/pipes/vcdtxt.pipe';
+import { faxLabel } from '../../frmsupply/hat-forms';
 
 interface Hatden {
   denno: number;
@@ -36,6 +37,11 @@ interface Hatden {
   updated_at: Date;
   updated_by: string;
   gcode: string;
+  ofax_at?: string | null;
+  refax_at?: string | null;
+  sfax_at?: string | null;
+  /** FAX の流れ（済んだ一番後の段階） */
+  fax?: string;
 }
 
 /** get_hatden クエリの行。発注明細（1 行目）の商品コードが入れ子で付く */
@@ -75,6 +81,7 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
     'vcode',
     'scode',
     'tcode',
+    'fax',
     // 'del',
     'updated_at',
     'updated_by',
@@ -84,6 +91,8 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
   fvcd: string = "";
   fday: Date = new Date();
   ftcd: string = "";
+  /** FAX の流れ: '' すべて / ofax ①発注先へFAX がまだ / refax ②Refax がまだ / sfax ③倉庫へFAX がまだ */
+  ffax: '' | 'ofax' | 'refax' | 'sfax' = '';
   // fhdst = ["1", "2", "3", "4"];
   private querySub?: Subscription;
 
@@ -131,6 +140,14 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
     if (this.ftcd) {
       varWh.where._and.push({ "tcode": { "_eq": this.ftcd } });
     }
+    // FAX の流れで、その段階がまだのもの（前の段階は済）
+    if (this.ffax == 'ofax') {
+      varWh.where._and.push({ "ofax_at": { "_is_null": true } });
+    } else if (this.ffax == 'refax') {
+      varWh.where._and.push({ "ofax_at": { "_is_null": false } }, { "refax_at": { "_is_null": true } });
+    } else if (this.ffax == 'sfax') {
+      varWh.where._and.push({ "refax_at": { "_is_null": false } }, { "sfax_at": { "_is_null": true } });
+    }
 
     // console.log(this.fhdst,varWh);
 
@@ -144,7 +161,10 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
         tcode 
         updated_at
         updated_by
-        trhatmeis(where:{line:{_eq:1}}){ 
+        ofax_at
+        refax_at
+        sfax_at
+        trhatmeis(where:{line:{_eq:1}}){
           gcode
         }
       }
@@ -170,8 +190,8 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
           let srcdata: Hatden[] = [];
           result.trhatden.forEach(element => {
             let { trhatmeis, ...rest } = element;
-            let gcd = { gcode: trhatmeis[0].gcode };
-            srcdata.push({ ...rest, ...gcd });
+            let gcd = { gcode: trhatmeis[0]?.gcode ?? '' };
+            srcdata.push({ ...rest, ...gcd, fax: faxLabel(rest) });
           });
           this.dataSource = new MatTableDataSource<Hatden>(srcdata);
           this.dataSource.paginator = this.paginator() ?? null;

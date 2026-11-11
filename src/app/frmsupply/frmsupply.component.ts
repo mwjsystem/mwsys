@@ -16,8 +16,9 @@ import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
 import { VendsService } from './../mstvendor/vends.service';
-import { DownloadService } from './../services/download.service';
 import { HatmeiService, HatdenSet, HatdenNew, HatuZaiko, EXTYPE_HATDEN } from './hatmei.service';
+import { HatprintComponent, HatprintData } from './hatprint.component';
+import { FAX_EMPTY, FAX_STEPS, FaxStatus, FaxStep } from './hat-forms';
 import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
 import { filter } from 'rxjs/operators';
 import { MatToolbar } from '@angular/material/toolbar';
@@ -25,7 +26,6 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatSuffix, MatFormField, MatLabel, MatInput } from '@angular/material/input';
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
 import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
@@ -44,11 +44,18 @@ type SupplyField = 'vcode' | 'day' | 'scode' | 'tcode' | 'autoproc' | 'mtax' | '
     selector: 'app-frmsupply',
     templateUrl: './frmsupply.component.html',
     styleUrls: ['./../app.component.scss'],
+    styles: [`
+      .faxflow { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin: 0 12px; }
+      .faxstep { height: auto; min-height: 32px; padding: 2px 10px; }
+      .faxstep.done { background: #e8f5e9; border-color: #2e7d32; color: #1b5e20; }
+      .faxat { font-size: 11px; margin-left: 6px; color: #333333; }
+      .faxarrow { color: #888888; }
+    `],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
     },
-    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, MatSuffix, MatMenuTrigger, MatMenu, MatMenuItem, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, MatDatepickerInput, TabDirective, MatDatepickerToggle, MatDatepicker, MatCheckbox, MatSelect, MatOption, HmeitblComponent, DecimalPipe, JdatePipe, VcdtxtPipe, ModetxtPipe]
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, MatSuffix, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, MatDatepickerInput, TabDirective, MatDatepickerToggle, MatDatepicker, MatCheckbox, MatSelect, MatOption, HmeitblComponent, DecimalPipe, JdatePipe, VcdtxtPipe, ModetxtPipe]
 })
 export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
@@ -58,7 +65,6 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
   private router = inject(Router);
   private elementRef = inject(ElementRef);
   private dialog = inject(MatDialog);
-  dwlsrv = inject(DownloadService);
   bunsrv = inject(BunruiService);
   strsrv = inject(StoreService);
   stfsrv = inject(StaffService);
@@ -77,6 +83,9 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
   mode: number = 3;
   /** 読み込んだときの発注数の取り消し分（在庫 trzaiko.hatu。変更の保存で引いてから、今の発注数を足す） */
   private oldHatu: HatuZaiko[] = [];
+  /** FAX の流れ（① 発注先へFAX・② Refax受領・③ 倉庫へFAX）。手で更新する */
+  fax: FaxStatus = { ...FAX_EMPTY };
+  readonly faxSteps = FAX_STEPS;
   rows: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
     hasBackdrop: true,
@@ -165,6 +174,7 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
       this.hmisrv.qryHatden(denno).subscribe(
         result => {
           this.form.reset();
+          this.fax = { ...FAX_EMPTY };
           if (result == null) {
             this.usrsrv.toastWar("発注伝票番号" + denno + "は登録されていません");
             history.replaceState('', '', './frmsupply');
@@ -173,6 +183,8 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
             this.form.patchValue(hatden);
             this.form.patchValue(hatden.msvendor[0]);
             this.usrsrv.setTmstmp(hatden);
+            const f = result as mwI.Trhatden & Partial<FaxStatus>;
+            this.fax = { ofax_at: f.ofax_at ?? null, ofax_by: f.ofax_by ?? null, refax_at: f.refax_at ?? null, refax_by: f.refax_by ?? null, sfax_at: f.sfax_at ?? null, sfax_by: f.sfax_by ?? null };
             this.hmisrv.hatmei = hatden.vhatzns;
             this.hmeitbl().setHatmei();
             // 読み込んだときの発注数（変更の保存で、在庫の発注数からいったん引く）
@@ -207,42 +219,57 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
     let vend = this.vensrv.getVendor(value);
     this.form.patchValue({ mtax: vend?.mtax, currency: vend?.currency });
   }
-  test(value: unknown) {
-    this.usrsrv.toastInf(this.form.value.yday);
-    // this.usrsrv.getNumber('denno',2).subscribe(value => {
-    //   console.log(value);
-    // });
-    console.log(this.hmeitbl().getHatmei(this.denno));
-    this.refresh();
-    // this.router.navigate(['/mstmember','3',value]);
-    // const url = this.router.createUrlTree(['/mstmember','3',value]);
-    // window.open(url.toString(),null,'top=100,left=100');
+  /** 帳票（発注書・見積り依頼・在庫確認依頼・海外発注書）。A4 の PDF を開く（印刷）・保存する */
+  printHat() {
+    if (!this.denno) {
+      return;
+    }
+    const data: HatprintData = { denno: this.denno };
+    this.dialog.open(HatprintComponent, { width: '640px', maxWidth: '95vw', data });
   }
 
-  async downloadCsv(format: string) {
-    let head = this.dwlsrv.pickObj(this.form.getRawValue(), ['day', 'vcode', 'scode', 'memo']);
-    // head['tcdnm0'] = this.stfsrv.get_name(this.form.getRawValue().tcode);
-    const vend = this.vensrv.getVendor(this.form.getRawValue().vcode);
-    head['adrname'] = vend.name;
-    head['tel'] = vend.tel;
-    head['fax'] = vend.fax;
-    const store = await this.strsrv.getStradr(this.form.getRawValue().scode);
-    if (store === null) {
-      throw new Error('倉庫の住所が取得できません');
+  /** FAX の流れの段階が済か */
+  faxDone(step: FaxStep): boolean {
+    return !!this.fax[`${step}_at`];
+  }
+
+  /** FAX の流れの表示（済んだ日時と担当者） */
+  faxText(step: FaxStep): string {
+    const at = this.fax[`${step}_at`];
+    if (!at) {
+      return '';
     }
-    head['sname'] = store.name;
-    head['szip'] = store.zip;
-    head['sregion'] = store.region;
-    head['slocal'] = store.local;
-    head['sstreet'] = store.street;
-    head['sextend'] = store.extend;
-    head['stel'] = store.tel;
-    head['sfax'] = store.fax;
-    const det = this.dwlsrv.pickObjArr(this.form.getRawValue().mtbl, ['line', 'gcode', 'gtext', 'suu', 'unit', 'jdenno', 'mmemou']);
-    this.dwlsrv.dlPng('staff/', this.form.getRawValue().tcode.toString() + ".png", this.denno + format + ".png");
-    this.dwlsrv.dlCsv(head, this.denno + format + "H.csv");
-    this.dwlsrv.dlCsv(det, this.denno + format + "M.csv");
-    this.dwlsrv.dlKick(this.usrsrv.system.urischema + format + "_" + this.denno, this.elementRef);
+    const by = this.fax[`${step}_by`];
+    const t = new Date(at);
+    return (t.getMonth() + 1) + '/' + t.getDate() + ' ' + String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0')
+      + (by ? ' ' + (this.stfsrv.getName(by) || by) : '');
+  }
+
+  /** FAX の流れの段階を済にする（済のときは取り消す） */
+  async toggleFax(step: FaxStep) {
+    if (!this.denno || this.mode == 1) {
+      return;
+    }
+    const s = FAX_STEPS.find(e => e.key == step)!;
+    const on = !this.faxDone(step);
+    if (!on && !confirm(s.no + s.name + ' を取り消しますか？')) {
+      return;
+    }
+    if (on) {
+      // 前の段階が済んでいないときは確かめる（順番どおりでなくても入れられる）
+      const before = FAX_STEPS.slice(0, FAX_STEPS.indexOf(s)).filter(e => !this.faxDone(e.key));
+      if (before.length && !confirm(before.map(e => e.no + e.name).join('・') + ' が済んでいません。' + s.no + s.name + ' を済にしますか？')) {
+        return;
+      }
+    }
+    try {
+      this.fax = await this.hmisrv.setFax(this.denno, step, on);
+      this.usrsrv.toastSuc('発注伝票' + this.denno + '：' + s.no + s.name + (on ? ' 済' : ' を取り消しました'));
+    } catch (e) {
+      this.usrsrv.toastErr('データベースエラー', s.no + s.name + ' を更新できませんでした');
+      console.log('error upd_hatfax', e);
+    }
+    this.cdRef.detectChanges();
   }
 
   get frmArr(): FormArray {
@@ -304,6 +331,7 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
     this.mode = 1;
     this.form.reset();
     this.denno = 0;
+    this.fax = { ...FAX_EMPTY };
     this.ctl.tcode.setValue(this.usrsrv.staff?.code);
     this.ctl.day.setValue(new Date());
     this.ctl.scode.setValue(this.usrsrv.staff.scode);

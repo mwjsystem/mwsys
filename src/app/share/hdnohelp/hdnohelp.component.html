@@ -18,6 +18,21 @@
   </div>
 
   <div class="jdh-group">
+    <h2 class="jdh-group-title">FAX状況</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>FAX状況</mat-label>
+        <mat-select [(ngModel)]="ffax">
+          <mat-option value="">すべて</mat-option>
+          <mat-option value="ofax">①発注先へFAX がまだ</mat-option>
+          <mat-option value="refax">②Refax受領 がまだ</mat-option>
+          <mat-option value="sfax">③倉庫へFAX がまだ</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="jdh-group">
     <h2 class="jdh-group-title">日付</h2>
     <div class="jdh-fields">
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
@@ -76,6 +91,10 @@
     <ng-container matColumnDef="tcode">
       <th mat-header-cell *matHeaderCellDef>担当者</th>
       <td mat-cell *matCellDef="let row">{{row.tcode | staff}}</td>
+    </ng-container>
+    <ng-container matColumnDef="fax">
+      <th mat-header-cell *matHeaderCellDef>FAX状況</th>
+      <td mat-cell *matCellDef="let row">{{row.fax}}</td>
     </ng-container>
     <ng-container matColumnDef="updated_at">
       <th mat-header-cell *matHeaderCellDef>更新日時</th>

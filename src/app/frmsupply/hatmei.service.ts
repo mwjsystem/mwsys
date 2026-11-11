@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, firstValueFrom } from 'rxjs';
+import { FaxStatus, FaxStep } from './hat-forms';
 import { UserService } from './../services/user.service';
 import { ZAIKO_ZERO } from './../services/jyustock.service';
 import gql from 'graphql-tag';
@@ -77,6 +78,12 @@ export class HatmeiService {
         updated_at
         updated_by
         currency
+        ofax_at
+        ofax_by
+        refax_at
+        refax_by
+        sfax_at
+        sfax_by
         msvendor {
           mtax
         }
@@ -264,6 +271,30 @@ export class HatmeiService {
       });
     });
   }
+  /**
+   * FAX の流れ（① 発注先へFAX・② Refax受領・③ 倉庫へFAX）を済にする（on = false は取り消し）。
+   * 伝票の更新日時は変えない（操作ログは DB のトリガーで残る）。更新後の状態を返す
+   */
+  async setFax(denno: number, step: FaxStep, on: boolean): Promise<FaxStatus> {
+    const Upd = gql`
+      mutation upd_hatfax($id: smallint!, $dno: Int!, $set: trhatden_set_input!) {
+        update_trhatden_by_pk(pk_columns: {id: $id, denno: $dno}, _set: $set) {
+          ofax_at ofax_by refax_at refax_by sfax_at sfax_by
+        }
+      }`;
+    const set = on
+      ? { [step + '_at']: new Date(), [step + '_by']: this.usrsrv.staff.code }
+      : { [step + '_at']: null, [step + '_by']: this.usrsrv.staff.code };
+    const res = await firstValueFrom(this.apollo.mutate<{ update_trhatden_by_pk: FaxStatus | null }>({
+      mutation: Upd,
+      variables: { id: this.usrsrv.compid, dno: denno, set }
+    }));
+    if (res.error || !res.data?.update_trhatden_by_pk) {
+      throw res.error ?? new Error('発注伝票 ' + denno + ' が見つかりません');
+    }
+    return res.data.update_trhatden_by_pk;
+  }
+
   getHdsta(hmei: Pick<mwI.Hatmei, 'inday' | 'yday' | 'ydaykbn'>[]): string {
     let flg0: boolean = false;//発注済
     let flg1: boolean = false;//入荷予定あり

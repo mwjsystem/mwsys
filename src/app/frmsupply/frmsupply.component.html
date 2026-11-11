@@ -35,20 +35,11 @@
       </button>
     }
   <!-- </mat-form-field> -->
-  <button mat-flat-button (click)="test(1)" [style.display]="mode==1 ? 'none' : 'inline-block'"
-    [color]="usrsrv.getColor(mode)">
-    <mat-icon>history</mat-icon>操作ログ
-  </button>
-  <a id="csv-donwload" data-type="text/csv"></a>
   @if (mode==3) {
-    <button mat-flat-button [matMenuTriggerFor]="papermenu" [color]="usrsrv.getColor(mode)">
+    <button mat-flat-button (click)="printHat()" [color]="usrsrv.getColor(mode)" [disabled]="!denno">
       <mat-icon>description</mat-icon>帳票
     </button>
   }
-  <mat-menu #papermenu="matMenu">
-    <button mat-menu-item (click)="downloadCsv('FRM-SUPPLY')">発注書</button>
-    <button mat-menu-item (click)="downloadCsv('KEEP')">在庫確認票</button>
-  </mat-menu>
   <button mat-flat-button><a mat-flat-button
     href="https://mwj001-my.sharepoint.com/:x:/g/personal/asago00_mwj001_onmicrosoft_com/EdJVQxKeKFRCr0sV1ebScewBQX6bPjCc8acDLL5VzwsIJQ?e=5HEIZ5"
     target="_blank">
@@ -70,6 +61,23 @@
         </mat-option>
       </mat-select>
     </mat-form-field> -->
+    @if (mode!=1 && denno) {
+      <div class="faxflow" aria-label="FAX の流れ">
+        @for (s of faxSteps; track s.key) {
+          <button type="button" mat-stroked-button class="faxstep" [class.done]="faxDone(s.key)" (click)="toggleFax(s.key)"
+            [matTooltip]="faxDone(s.key) ? 'もう一度押すと取り消します' : '押すと済にします（日時と担当者を記録）'">
+            <mat-icon>{{faxDone(s.key) ? 'check_circle' : 'radio_button_unchecked'}}</mat-icon>
+            {{s.no}}{{s.name}}
+            @if (faxDone(s.key)) {
+              <span class="faxat">{{faxText(s.key)}}</span>
+            }
+          </button>
+          @if (!$last) {
+            <mat-icon class="faxarrow">arrow_forward</mat-icon>
+          }
+        }
+      </div>
+    }
     <app-tmstmp></app-tmstmp>
   </mat-card-header>
   <mat-card-content class="flex flex-column">
