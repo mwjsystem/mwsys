@@ -13,6 +13,7 @@ import { StaffService } from './../services/staff.service';
 import { EXTYPE_HATDEN } from './../frmsupply/hatmei.service';
 import { EXTYPE_MOVE } from './../frmmove/moving.service';
 import { EXTYPE_TENKAI } from './../frmtenkai/tenkai.service';
+import { EXTYPE_CHOSEI } from './../frmchosei/chosei.service';
 import { BunruiService } from './../services/bunrui.service';
 
 /** 操作ログの 1 行 */
@@ -30,7 +31,7 @@ interface LogRow {
 const LIMIT = 1000;
 
 /** 種別（extype）ごとの伝票の画面（キーの欄から伝票を開く） */
-const LINKS: Record<string, string> = { '1': 'frmsales', [EXTYPE_HATDEN]: 'frmsupply', '5': 'frminvoice', [EXTYPE_MOVE]: 'frmmove', [EXTYPE_TENKAI]: 'frmtenkai' };
+const LINKS: Record<string, string> = { '1': 'frmsales', [EXTYPE_HATDEN]: 'frmsupply', '5': 'frminvoice', [EXTYPE_MOVE]: 'frmmove', [EXTYPE_TENKAI]: 'frmtenkai', [EXTYPE_CHOSEI]: 'frmchosei' };
 
 /**
  * 作業ログ（システム → 作業ログ）。操作ログ（tropelog。DB のトリガーで記録）を、期間・種別・伝票番号・担当者・内容で探して表示する。

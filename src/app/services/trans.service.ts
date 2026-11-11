@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { MembsService } from './../mstmember/membs.service';
 import { BunruiService } from './bunrui.service';
 import { StockService } from './stock.service';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, firstValueFrom } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import gql from 'graphql-tag';
 
@@ -411,8 +411,31 @@ export class TransService {
           console.log('error query get_trans', error);
         });
     })
+    // 在庫調整伝票（破棄。trchoden）。別に問い合わせ、失敗しても履歴の表示は止めない
+    // （数量は減らした数。原因不明で増やしたときは負の数）
+    const GetCho = gql`
+      query get_trans_cho($id: smallint!, $gcd: String!, $scd: String!, $day: date!, $today: date!) {
+        trchoden(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, day: {_gt: $day, _lte: $today}, scode: {_eq: $scd}}) {
+          day denno line memo suu chokbn tcode
+        }
+      }`;
+    const lcprms3: Promise<Trans[]> = firstValueFrom(this.apollo.query<{ trchoden: { day: string; denno: number; line: number; memo: string | null; suu: number; chokbn: string | null; tcode: string }[] }>({
+      query: GetCho, fetchPolicy: 'network-only',
+      variables: { id: this.usrsrv.compid, gcd, scd, day: lcmago, today: new Date() }
+    })).then(res => (res.data?.trchoden ?? []).map(e => {
+      const n = Number(e.suu ?? 0);
+      return {
+        sday: e.day, ttype: n < 0 ? '調整増' : '破棄', denno: e.denno, line: e.line,
+        biko: [e.chokbn ? this.bunsrv.getName(e.chokbn, 'hakikbn') : '', e.memo ?? ''].filter(s => s).join(' '),
+        tcode: e.tcode, yday: null, aitec: null, aiten: null,
+        insuu: n < 0 ? -n : null, ousuu: n > 0 ? n : null, zaisu: null, yotei: null, wait: null, srtdy: e.day
+      } as Trans;
+    })).catch(e => {
+      console.log('error query get_trans_cho', e);
+      return [];
+    });
     return new Promise(resolve => {
-      Promise.all([lcprms1, lcprms2]).then(result => {
+      Promise.all([lcprms1, lcprms2, lcprms3]).then(result => {
         let trans: Trans[] = [];
         result.forEach(element => {
           // console.log('Promise.all',element);

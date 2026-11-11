@@ -63,6 +63,9 @@ export class TrantblComponent implements OnInit {
       case "移動出庫":
         color = 'royalblue';
         break;
+      case "調整増":
+        color = 'darkgreen';
+        break;
       case "破棄":
         color = 'red';
         break;

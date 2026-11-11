@@ -637,9 +637,10 @@ export class UserService {
       case typ == "移動出庫":
         func = "/frmmove";
         break;
-      // case "破棄":
-      //   // color = 'red';
-      //   break;
+      case typ == "破棄":
+      case typ == "調整増":
+        func = "/frmchosei";
+        break;
       // case "発注外入荷":
       //   // color = 'green';
       //   break;
