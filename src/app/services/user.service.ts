@@ -641,9 +641,9 @@ export class UserService {
       case typ == "調整増":
         func = "/frmchosei";
         break;
-      // case "発注外入荷":
-      //   // color = 'green';
-      //   break;
+      case typ == "発注外入荷":
+        func = "/frmhgnden";
+        break;
       case typ == "棚卸":
         // 棚卸は伝票番号が無いので、単票の画面を開く
         window.open(this.router.createUrlTree(['/frmtana']).toString());

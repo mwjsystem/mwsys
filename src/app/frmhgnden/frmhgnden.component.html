@@ -1,0 +1,96 @@
+<mat-toolbar [color]="usrsrv.getColor(mode)" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 4px;">
+    @if (mode==3) {
+      <button mat-flat-button (click)="modeToCre()" [color]="usrsrv.getColor(mode)"><mat-icon>add_box</mat-icon>新規</button>
+    }
+    @if (mode==3 && den.denno) {
+      <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)"><mat-icon>edit</mat-icon>編集</button>
+    }
+    @if (editable) {
+      <button mat-flat-button (click)="save()" [disabled]="busy" [color]="usrsrv.getColor(mode)">
+        <mat-icon [matTooltip]="invalid()" matTooltipClass="ttips">save</mat-icon>保存
+      </button>
+      <button mat-flat-button (click)="cancel()" [color]="usrsrv.getColor(mode)"><mat-icon>cancel</mat-icon>中止</button>
+    }
+    <input class="dno" [(ngModel)]="dno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
+      [disabled]="editable" placeholder="発注外入荷伝票番号">
+    @if (mode==3) {
+      <button mat-icon-button (click)="dennoHelp()" matTooltip="発注外入荷伝票を探す"><mat-icon>find_replace</mat-icon></button>
+    }
+    @if (mode!=1) {
+      <button mat-flat-button (click)="opelog()" [color]="usrsrv.getColor(mode)" [disabled]="!den.denno">
+        <mat-icon>history</mat-icon>操作ログ
+      </button>
+    }
+  </div>
+</mat-toolbar>
+
+<div class="tenkai">
+  <div class="head">
+    <span class="title">{{mode == 1 ? '新規' : mode == 2 ? '変更' : '照会'}}発注外入荷伝票 {{den.denno || ''}}</span>
+    <label>日付
+      <input type="date" [(ngModel)]="den.day" (ngModelChange)="touch()" [disabled]="!editable">
+    </label>
+    <label>倉庫
+      <select [ngModel]="den.scode" (ngModelChange)="setScode($event)" [disabled]="!editable">
+        <option value=""></option>
+        @for (s of strsrv.scds; track s.value) {
+          <option [value]="s.value">{{s.value}} {{s.viewval}}</option>
+        }
+      </select>
+    </label>
+    <label>担当者
+      <select [(ngModel)]="den.tcode" (ngModelChange)="touch()" [disabled]="!editable">
+        <option value=""></option>
+        @for (s of stfsrv.tcds; track s.value) {
+          <option [value]="s.value">{{s.viewval}}</option>
+        }
+      </select>
+    </label>
+    @if (den.updated_at) {
+      <span class="stamp">更新 {{den.updated_at.slice(0, 16).replace('T', ' ')}} {{stfsrv.getName(den.updated_by ?? '') || den.updated_by}}</span>
+    }
+  </div>
+
+  <table class="mei">
+    <thead>
+      <tr>
+        <th class="ln">行</th><th class="gc">商品コード</th><th>商品名称</th><th class="num">在庫数</th>
+        <th class="num">数量</th><th class="un">単位</th><th class="mm">備考</th>
+        @if (editable) {<th class="ops"></th>}
+      </tr>
+    </thead>
+    <tbody>
+      @for (l of den.lines; track $index; let i = $index) {
+        <tr>
+          <td class="ln">{{l.line}}</td>
+          <td class="gc">
+            <input [ngModel]="l.gcode" (change)="setGcode(l, $any($event.target).value)" (keydown.f4)="gcdHelp(l)"
+              [disabled]="!editable" maxlength="20" [class.bad]="l.bad">
+            @if (editable) {
+              <button mat-icon-button class="sm" (click)="gcdHelp(l)" matTooltip="商品を探す"><mat-icon>find_replace</mat-icon></button>
+            }
+          </td>
+          <td>{{l.gtext}}</td>
+          <td class="num">{{l.stock ?? ''}}</td>
+          <td class="num"><input type="number" min="1" class="suu" [(ngModel)]="l.suu" (ngModelChange)="touch()" [disabled]="!editable"></td>
+          <td class="un">{{l.unit}}</td>
+          <td class="mm"><input [(ngModel)]="l.memo" (ngModelChange)="touch()" [disabled]="!editable" maxlength="100"></td>
+          @if (editable) {
+            <td class="ops">
+              <button mat-icon-button class="sm" (click)="insRow(i + 1)" matTooltip="下に行を追加"><mat-icon>add_circle</mat-icon></button>
+              <button mat-icon-button class="sm" (click)="delRow(i)" matTooltip="この行を削除"><mat-icon>remove_circle</mat-icon></button>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+  <div class="foot">
+    @if (editable) {
+      <button mat-stroked-button type="button" (click)="insRow(den.lines.length)"><mat-icon>add</mat-icon>行を追加</button>
+    }
+    <span>数量計 <b>{{total}}</b></span>
+    <span class="hint">発注伝票の無い入荷（サンプル・無償提供・返却品など）を入れます。保存すると、その日の在庫に入荷数を足します。発注伝票のある入荷は仕入伝票で入れてください。</span>
+  </div>
+</div>

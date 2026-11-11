@@ -434,8 +434,26 @@ export class TransService {
       console.log('error query get_trans_cho', e);
       return [];
     });
+    // 発注外入荷伝票（trhgnden）。別に問い合わせ、失敗しても履歴の表示は止めない
+    const GetHgn = gql`
+      query get_trans_hgn($id: smallint!, $gcd: String!, $scd: String!, $day: date!, $today: date!) {
+        trhgnden(where: {id: {_eq: $id}, gcode: {_eq: $gcd}, day: {_gt: $day, _lte: $today}, scode: {_eq: $scd}}) {
+          day denno line memo suu tcode
+        }
+      }`;
+    const lcprms4: Promise<Trans[]> = firstValueFrom(this.apollo.query<{ trhgnden: { day: string; denno: number; line: number; memo: string | null; suu: number; tcode: string }[] }>({
+      query: GetHgn, fetchPolicy: 'network-only',
+      variables: { id: this.usrsrv.compid, gcd, scd, day: lcmago, today: new Date() }
+    })).then(res => (res.data?.trhgnden ?? []).map(e => ({
+      sday: e.day, ttype: '発注外入荷', denno: e.denno, line: e.line, biko: e.memo ?? '',
+      tcode: e.tcode, yday: null, aitec: null, aiten: null,
+      insuu: Number(e.suu ?? 0), ousuu: null, zaisu: null, yotei: null, wait: null, srtdy: e.day
+    } as Trans))).catch(e => {
+      console.log('error query get_trans_hgn', e);
+      return [];
+    });
     return new Promise(resolve => {
-      Promise.all([lcprms1, lcprms2, lcprms3]).then(result => {
+      Promise.all([lcprms1, lcprms2, lcprms3, lcprms4]).then(result => {
         let trans: Trans[] = [];
         result.forEach(element => {
           // console.log('Promise.all',element);
