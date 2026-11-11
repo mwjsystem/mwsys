@@ -240,13 +240,19 @@ export class SiimeiService {
     };
   }
 
-  /** 発注残のある発注伝票を探す（仕入先・入荷予定日。一括登録の画面） */
-  async findOpen(vcode: string, ydayTo: string): Promise<number[]> {
+  /**
+   * 発注残のある発注伝票を探す（一括登録の画面）。仕入先・入荷予定日（この日まで）・発注日（この日から）で絞る。
+   * 古い発注残（移行データ）まで出ないよう、発注日の範囲は必ず指定する
+   */
+  async findOpen(vcode: string, ydayTo: string, dayFrom: string): Promise<number[]> {
     const and: object[] = [{ id: { _eq: this.usrsrv.compid } }, { hatzn: { _gt: 0 } }];
     if (ydayTo) {
       and.push({ yday: { _lte: ydayTo } });
     }
-    const Get = gql`query find_siiopen($where: vhatzn_bool_exp!) { vhatzn(where: $where, limit: 2000) { denno } }`;
+    if (dayFrom) {
+      and.push({ day: { _gte: dayFrom } });
+    }
+    const Get = gql`query find_siiopen($where: vhatzn_bool_exp!) { vhatzn(where: $where, limit: 5000) { denno } }`;
     const res = await firstValueFrom(this.apollo.query<{ vhatzn: { denno: number }[] }>({
       query: Get, fetchPolicy: 'network-only', variables: { where: { _and: and } }
     }));
@@ -254,9 +260,20 @@ export class SiimeiService {
       throw res.error ?? new Error('発注伝票を探せませんでした');
     }
     let dennos = [...new Set(res.data.vhatzn.map(e => e.denno))];
-    if (vcode && dennos.length) {
-      const GetH = gql`query find_siiopenh($id: smallint!, $d: [Int!]!, $v: String!) { trhatden(where: {id: {_eq: $id}, denno: {_in: $d}, vcode: {_eq: $v}}) { denno } }`;
-      const h = await firstValueFrom(this.apollo.query<{ trhatden: { denno: number }[] }>({ query: GetH, variables: { id: this.usrsrv.compid, d: dennos, v: vcode } }));
+    if (dennos.length) {
+      // 仕入先・発注日は発注伝票で確かめる
+      const w: object[] = [{ id: { _eq: this.usrsrv.compid } }, { denno: { _in: dennos } }];
+      if (vcode) {
+        w.push({ vcode: { _eq: vcode } });
+      }
+      if (dayFrom) {
+        w.push({ day: { _gte: dayFrom } });
+      }
+      const GetH = gql`query find_siiopenh($where: trhatden_bool_exp!) { trhatden(where: $where) { denno } }`;
+      const h = await firstValueFrom(this.apollo.query<{ trhatden: { denno: number }[] }>({ query: GetH, variables: { where: { _and: w } } }));
+      if (h.error) {
+        throw h.error;
+      }
       dennos = (h.data?.trhatden ?? []).map(e => e.denno);
     }
     return dennos.sort((a, b) => a - b);

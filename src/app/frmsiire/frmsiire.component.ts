@@ -352,10 +352,13 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
           id: this.usrsrv.compid,
           denno: this.denno,
           created_at: new Date(),
-          created_by: this.usrsrv.staff.code
+          created_by: this.usrsrv.staff.code,
+          // 送料・手数料（空を許さない列。この画面に欄が無いので 0）
+          soryo: 0,
+          tesuu: 0
         }
         , ...siiden,
-      }]
+      } as SiidenNew]
       this.smisrv.insSiiden(trsiiden, siimei, this.smisrv.hnyuOf(siiden.scode, siiden.inday, siimei))
         .then(async result => {
           await this.afterSave(siimei, siiden.inday);

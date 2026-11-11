@@ -20,6 +20,7 @@
       <label>仕入先 <input [(ngModel)]="vcode" style="width: 7em;"></label>
       <span class="sub">{{vcode ? vname(vcode) : ''}}</span>
       <label>入荷予定日が <input type="date" [(ngModel)]="ydayTo"> まで</label>
+      <label>発注日が <input type="date" [(ngModel)]="dayFrom"> から</label>
       <button mat-stroked-button type="button" (click)="find()" [disabled]="busy"><mat-icon>manage_search</mat-icon>発注残のある発注伝票を探して足す</button>
     </div>
   </fieldset>

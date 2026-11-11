@@ -17,6 +17,9 @@ import { HatmeiService } from './../frmsupply/hatmei.service';
 import { HdnohelpComponent } from './../share/hdnohelp/hdnohelp.component';
 import { HatHead, OpenLine, SiidenNew, SiimeiInput, SiimeiService, SiiZaiko } from './siimei.service';
 
+/** 探して足す発注伝票の上限（多すぎると間違えて大量の仕入伝票を作りかねないため） */
+const MAX_FOUND = 50;
+
 /** 1 行（発注明細と、入荷する数） */
 interface BulkLine extends OpenLine { on: boolean; recv: number }
 /** 発注伝票ごとのまとまり */
@@ -51,6 +54,8 @@ export class SiibulkComponent implements AfterViewInit {
   dnosText = '';
   vcode = '';
   ydayTo = '';
+  /** 探すときの発注日（この日から）。初期値は 6 か月前 */
+  dayFrom = (() => { const d = new Date(); d.setMonth(d.getMonth() - 6); return this.usrsrv.formatDate(d); })();
   inday = this.usrsrv.formatDate(new Date());
   tcode = this.usrsrv.staff?.code ?? '';
   groups: BulkGroup[] = [];
@@ -127,13 +132,27 @@ export class SiibulkComponent implements AfterViewInit {
     });
   }
 
-  /** 仕入先・入荷予定日で、発注残のある発注伝票を探して足す */
+  /** 仕入先・入荷予定日・発注日で、発注残のある発注伝票を探して足す */
   async find() {
+    if (!this.vcode.trim() && !this.ydayTo) {
+      this.error = '仕入先か入荷予定日を入れてから探してください';
+      return;
+    }
+    if (!this.dayFrom) {
+      this.error = '発注日（この日から）を入れてください（古い発注残まで出ないように）';
+      return;
+    }
     this.busy = true;
     this.error = '';
     this.cdRef.detectChanges();
     try {
-      const found = await this.smisrv.findOpen(this.vcode.trim(), this.ydayTo);
+      const found = await this.smisrv.findOpen(this.vcode.trim(), this.ydayTo, this.dayFrom);
+      if (found.length > MAX_FOUND) {
+        this.error = '発注残のある発注伝票が ' + found.length + ' 枚あります。' + MAX_FOUND + ' 枚以下になるよう条件を絞ってください';
+        this.busy = false;
+        this.cdRef.detectChanges();
+        return;
+      }
       if (found.length == 0) {
         this.message = '発注残のある発注伝票はありません';
       } else {
@@ -231,6 +250,8 @@ export class SiibulkComponent implements AfterViewInit {
         heads.push({
           id, denno, vcode: g.head.vcode, scode: g.head.scode, tcode: this.tcode, inday: this.inday, currency: g.head.currency,
           dmemo: '発注伝票' + g.head.denno + 'から一括登録', gtotal: t.gtotal, tax: t.tax, total: t.gtotal + t.tax,
+          // 送料・手数料（空を許さない列。一括登録では 0。必要なら仕入伝票の画面で直す）
+          soryo: 0, tesuu: 0,
           created_at: now, created_by: by, updated_at: now, updated_by: by
         } as unknown as SiidenNew);
         lines.forEach((l, k) => meis.push({
