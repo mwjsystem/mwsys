@@ -163,8 +163,8 @@ export class TransService {
         suu
         tcode
       } 
-      tensaki:trtenden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},day: {_gt: $day,_lte: $today}, scode: {_eq: $scd}, kubun: {_eq: 0}}) {
-        day
+      tensaki:trtenden(where: {id: {_eq: $id}, gcode: {_eq: $gcd},cday: {_gt: $day,_lte: $today}, scode: {_eq: $scd}, kubun: {_eq: 0}}) {
+        day: cday
         denno
         line
         memo
@@ -335,6 +335,7 @@ export class TransService {
             };
             trans.push(tran);
           });
+          // 展開先（入庫）は展開完了日（cday。クエリで day という名前にしている）に在庫へ入る
           rows.tensaki.forEach(e => {
             const tran: Trans = {
               sday: e.day,

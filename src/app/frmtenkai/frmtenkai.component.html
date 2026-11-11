@@ -1,0 +1,119 @@
+<mat-toolbar [color]="usrsrv.getColor(mode)" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 4px;">
+    @if (mode==3) {
+      <button mat-flat-button (click)="modeToCre()" [color]="usrsrv.getColor(mode)"><mat-icon>add_box</mat-icon>新規</button>
+    }
+    @if (mode==3 && den.denno) {
+      <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)"><mat-icon>edit</mat-icon>編集</button>
+    }
+    @if (editable) {
+      <button mat-flat-button (click)="save()" [disabled]="busy" [color]="usrsrv.getColor(mode)">
+        <mat-icon [matTooltip]="invalid()" matTooltipClass="ttips">save</mat-icon>保存
+      </button>
+      <button mat-flat-button (click)="cancel()" [color]="usrsrv.getColor(mode)"><mat-icon>cancel</mat-icon>中止</button>
+    }
+    <input class="dno" [(ngModel)]="dno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
+      [disabled]="editable" placeholder="展開伝票番号">
+    @if (mode==3) {
+      <button mat-icon-button (click)="dennoHelp()" matTooltip="展開伝票を探す"><mat-icon>find_replace</mat-icon></button>
+    }
+    @if (mode!=1) {
+      <button mat-flat-button (click)="opelog()" [color]="usrsrv.getColor(mode)" [disabled]="!den.denno">
+        <mat-icon>history</mat-icon>操作ログ
+      </button>
+    }
+    @if (mode==3 && den.denno && !den.cday) {
+      <button mat-flat-button (click)="complete()" [disabled]="busy" [color]="usrsrv.getColor(mode)">
+        <mat-icon matTooltip="展開完了日を今日にして、入庫（展開先）の在庫を足します" matTooltipClass="ttips">task_alt</mat-icon>展開完了
+      </button>
+    }
+    @if (mode==3 && den.denno) {
+      <button mat-flat-button (click)="print()" [color]="usrsrv.getColor(mode)">
+        <mat-icon>description</mat-icon>展開指示書
+      </button>
+    }
+  </div>
+</mat-toolbar>
+
+<div class="tenkai">
+  <div class="head">
+    <span class="title">{{mode == 1 ? '新規' : mode == 2 ? '変更' : '照会'}}展開伝票 {{den.denno || ''}}</span>
+    <label matTooltip="出庫（展開元）の在庫をこの日に減らします" matTooltipClass="ttips">展開依頼日
+      <input type="date" [(ngModel)]="den.day" (ngModelChange)="touch()" [disabled]="!editable">
+    </label>
+    <label matTooltip="入庫（展開先）の在庫をこの日に増やします。空なら未完了（入庫はまだ足しません）" matTooltipClass="ttips">展開完了日
+      <input type="date" [ngModel]="den.cday ?? ''" (ngModelChange)="den.cday = $event || null; touch()" [disabled]="!editable">
+    </label>
+    @if (den.denno && mode == 3) {
+      <span class="state" [class.done]="den.cday">{{den.cday ? '展開完了' : '未完了（入庫は完了日に在庫へ足します）'}}</span>
+    }
+    <label>倉庫
+      <select [ngModel]="den.scode" (ngModelChange)="setScode($event)" [disabled]="!editable">
+        <option value=""></option>
+        @for (s of strsrv.scds; track s.value) {
+          <option [value]="s.value">{{s.value}} {{s.viewval}}</option>
+        }
+      </select>
+    </label>
+    <label>担当者
+      <select [(ngModel)]="den.tcode" (ngModelChange)="touch()" [disabled]="!editable">
+        <option value=""></option>
+        @for (s of stfsrv.tcds; track s.value) {
+          <option [value]="s.value">{{s.viewval}}</option>
+        }
+      </select>
+    </label>
+    @if (den.updated_at) {
+      <span class="stamp">更新 {{den.updated_at.slice(0, 16).replace('T', ' ')}} {{stfsrv.getName(den.updated_by ?? '') || den.updated_by}}</span>
+    }
+  </div>
+
+  <table class="mei">
+    <thead>
+      <tr>
+        <th class="ln">行</th><th class="kb">区分</th><th class="gc">商品コード</th><th>商品名称</th><th class="tn">棚番</th>
+        <th class="num">在庫数</th><th class="num">数量</th><th class="un">単位</th><th class="mm">備考</th>
+        @if (editable) {<th class="ops"></th>}
+      </tr>
+    </thead>
+    <tbody>
+      @for (l of den.lines; track $index; let i = $index) {
+        <tr [class.out]="l.kubun == KUBUN_OUT" [class.in]="l.kubun == KUBUN_IN">
+          <td class="ln">{{l.line}}</td>
+          <td class="kb">
+            <select [(ngModel)]="l.kubun" (ngModelChange)="touch()" [disabled]="!editable">
+              <option [ngValue]="KUBUN_OUT">出庫</option>
+              <option [ngValue]="KUBUN_IN">入庫</option>
+            </select>
+          </td>
+          <td class="gc">
+            <input [ngModel]="l.gcode" (change)="setGcode(l, $any($event.target).value)" (keydown.f4)="gcdHelp(l)"
+              [disabled]="!editable" maxlength="20" [class.bad]="l.bad">
+            @if (editable) {
+              <button mat-icon-button class="sm" (click)="gcdHelp(l)" matTooltip="商品を探す"><mat-icon>find_replace</mat-icon></button>
+            }
+          </td>
+          <td>{{l.gtext}}</td>
+          <td class="tn">{{l.tanano}}</td>
+          <td class="num">{{l.stock ?? ''}}</td>
+          <td class="num"><input type="number" min="1" class="suu" [(ngModel)]="l.suu" (ngModelChange)="touch()" [disabled]="!editable"></td>
+          <td class="un">{{l.unit}}</td>
+          <td class="mm"><input [(ngModel)]="l.memo" (ngModelChange)="touch()" [disabled]="!editable" maxlength="100"></td>
+          @if (editable) {
+            <td class="ops">
+              <button mat-icon-button class="sm" (click)="insRow(i + 1)" matTooltip="下に行を追加"><mat-icon>add_circle</mat-icon></button>
+              <button mat-icon-button class="sm" (click)="delRow(i)" matTooltip="この行を削除"><mat-icon>remove_circle</mat-icon></button>
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+  <div class="foot">
+    @if (editable) {
+      <button mat-stroked-button type="button" (click)="addPair()"><mat-icon>add</mat-icon>出庫・入庫の組を追加</button>
+    }
+    <span>出庫計 <b>{{sumOf(KUBUN_OUT)}}</b>　入庫計 <b>{{sumOf(KUBUN_IN)}}</b></span>
+    <span class="hint">出庫（展開元）の商品を、同じ倉庫で入庫（展開先）の商品に作り替えます。保存すると、出庫は展開依頼日に在庫から減らし、入庫は展開完了日に在庫へ足します。</span>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+.dno { width: 9em; font-size: 15px; padding: 3px 6px; margin-left: 8px; }
+.tenkai { padding: 8px 12px; }
+.head {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin: 6px 0 10px;
+  .title { font-size: 18px; font-weight: bold; }
+  input, select { font-size: 14px; padding: 3px; }
+  .stamp { font-size: 12px; color: #666666; }
+  .state { font-size: 13px; font-weight: bold; color: #e65100; &.done { color: #1b5e20; } }
+}
+.mei {
+  border-collapse: collapse; width: 100%; font-size: 13px;
+  th { background: #eeeeee; font-weight: normal; padding: 4px; border: 1px solid #cccccc; text-align: left; }
+  td { padding: 2px 4px; border: 1px solid #dddddd; }
+  .num { text-align: right; width: 5em; }
+  .ln { width: 2.5em; text-align: right; }
+  .kb { width: 5em; }
+  .gc { width: 14em; white-space: nowrap; input { width: 10em; } }
+  .tn { width: 5em; }
+  .un { width: 3em; }
+  .mm { width: 16em; input { width: 100%; } }
+  .ops { width: 5.5em; white-space: nowrap; }
+  input, select { font-size: 13px; padding: 2px; border: 1px solid #cccccc; }
+  input:disabled, select:disabled { border-color: transparent; background: transparent; color: #000000; }
+  .suu { width: 4.5em; text-align: right; }
+  .bad { background: #ffcdd2; }
+  tr.out td.kb select { color: #bf360c; font-weight: bold; }
+  tr.in td.kb select { color: #1565c0; font-weight: bold; }
+  .sm { width: 28px; height: 28px; padding: 2px; line-height: 24px; mat-icon { font-size: 18px; width: 18px; height: 18px; } }
+}
+.foot {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 8px;
+  .hint { font-size: 12px; color: #666666; }
+}

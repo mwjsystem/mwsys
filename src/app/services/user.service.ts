@@ -627,12 +627,10 @@ export class UserService {
       // case "仕入返品":
       //   // color = 'navy';
       //   break;
-      // case "展開先":
-      //   // color = 'darkorange';
-      //   break;
-      // case "展開元":
-      //   // color = 'orange';
-      //   break;
+      case typ == "展開先":
+      case typ == "展開元":
+        func = "/frmtenkai";
+        break;
       case typ == "移動入庫":
         func = "/frmmove";
         break;
