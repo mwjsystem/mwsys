@@ -58,6 +58,14 @@
   <!-- <button mat-button (click)="refresh()"> -->
   <mat-icon>autorenew</mat-icon>再表示
 </button>
+@if (mode==3 && gdssrv.grpcd) {
+  <button mat-flat-button (click)="opelog()" [color]="usrsrv.getColor(mode)" matTooltip="商品マスタの変更の履歴">
+    <mat-icon>history</mat-icon>操作ログ
+  </button>
+  <button mat-flat-button (click)="tankaHistory()" [color]="usrsrv.getColor(mode)" matTooltip="有効開始日ごとの単価・特別単価">
+    <mat-icon>price_change</mat-icon>単価の履歴
+  </button>
+}
 <button mat-flat-button [color]="usrsrv.getColor(mode)"><a mat-flat-button
   href="{{usrsrv.manurl + '&ActiveCell=%27goods%27!A1'}}" target="_blank" [color]="usrsrv.getColor(mode)">
   <mat-icon>help</mat-icon>ヘルプ

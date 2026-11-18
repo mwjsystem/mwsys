@@ -1,0 +1,84 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">掛率表</span>
+    <a mat-flat-button color="primary" routerLink="/mstprice"><mat-icon>price_change</mat-icon>価格改定取込</a>
+    <a mat-flat-button color="primary" routerLink="/mstgoods"><mat-icon>inventory_2</mat-icon>商品マスタ</a>
+  </div>
+</mat-toolbar>
+
+<div class="page">
+  <fieldset>
+    <legend>条件</legend>
+    <div class="cond">
+      <label>基準日 <input type="date" [(ngModel)]="day" (ngModelChange)="setHead()"></label>
+      <span class="sub">この日の単価（この日以前で一番新しい有効開始日）で作ります</span>
+    </div>
+    <div class="cond">
+      <label><input type="radio" name="tg" value="kbn" [(ngModel)]="target" (ngModelChange)="setHead()"> 単価区分</label>
+      <select [(ngModel)]="key" (ngModelChange)="setHead()" [disabled]="target != 'kbn'">
+        @for (k of kinds; track k) {<option [value]="k">{{tankaName(k)}}</option>}
+      </select>
+      <label><input type="radio" name="tg" value="member" [(ngModel)]="target" (ngModelChange)="setHead()"> 顧客を指定</label>
+      <input [(ngModel)]="mcode" (keyup.enter)="findMember()" (change)="findMember()" (keydown.f4)="mcdHelp()" [disabled]="target != 'member'"
+        placeholder="顧客コード（F4 で探す）" style="width: 10em;">
+      @if (target == 'member') {
+        <button mat-icon-button type="button" (click)="mcdHelp()" matTooltip="顧客を探す"><mat-icon>find_replace</mat-icon></button>
+      }
+      @if (target == 'member' && member) {
+        <span><b>{{member.name}}</b>　単価区分：{{useKey ? tankaName(useKey) : '（無し）'}}
+          　特別単価区分：{{member.sptnkbn ? member.sptnkbn + ' ' + spName(member.sptnkbn) : '（無し）'}}</span>
+      }
+    </div>
+    <div class="cond">
+      <label><input type="radio" name="mg" [value]="true" [(ngModel)]="merge" (ngModelChange)="rows = []"> まとめ（印刷用。同じ価格のサイズをまとめる）</label>
+      <label><input type="radio" name="mg" [value]="false" [(ngModel)]="merge" (ngModelChange)="rows = []"> 明細（商品ごと）</label>
+      <label><input type="checkbox" [(ngModel)]="paged"> 頁のある（カタログに載っている）商品だけ</label>
+      <label><input type="checkbox" [(ngModel)]="noEnd"> 廃盤を除く</label>
+      @if (target == 'member') {
+        <label><input type="checkbox" [(ngModel)]="onlySpecial"> 特別単価のある商品だけ</label>
+      }
+    </div>
+    <div class="cond">
+      <label>見出し <input [(ngModel)]="head" style="width: 26em;"></label>
+      <label>右上 <input [(ngModel)]="sub" style="width: 14em;"></label>
+    </div>
+    <div class="cond">
+      <label style="align-items: flex-start; display: flex; gap: 6px;">注記 <textarea [(ngModel)]="notes" rows="2" cols="90"></textarea></label>
+    </div>
+    <div class="cond">
+      <button mat-flat-button color="primary" type="button" (click)="make()" [disabled]="busy"><mat-icon>table_view</mat-icon>表を作る</button>
+      <button mat-flat-button color="primary" type="button" (click)="exportExcel()" [disabled]="busy || rows.length == 0"><mat-icon>download</mat-icon>Excel に出す</button>
+    </div>
+  </fieldset>
+
+  @if (error) {<div class="err">{{error}}</div>}
+  @if (message) {<div class="msg">{{message}}</div>}
+
+  @if (rows.length > 0) {
+    <div class="scroll">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>頁</th><th>品番</th><th>{{merge ? 'サイズ/重さ' : '品番詳細'}}</th>@if (!merge) {<th>サイズ/色</th>}<th>商品名</th>
+            <th class="num">定価（税込）</th><th class="num">{{priceLabel}}</th><th class="num">掛率</th><th>送料</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of rows; track $index) {
+            <tr [class.sp]="r.special">
+              <td>{{r.first ? r.page : ''}}</td>
+              <td>{{r.first ? r.code : ''}}</td>
+              <td>{{merge ? r.size : r.gcode}}</td>
+              @if (!merge) {<td>{{r.size}}</td>}
+              <td class="small">{{r.first || !merge ? r.name : ''}}</td>
+              <td class="num">{{r.teika | number}}</td>
+              <td class="num">{{r.price == null ? '－' : (r.price | number)}}@if (r.special) {<span class="mark">特別</span>}</td>
+              <td class="num">{{r.rate == null ? '' : (r.rate | percent)}}</td>
+              <td>{{r.send}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

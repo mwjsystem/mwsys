@@ -1,0 +1,116 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">価格改定取込</span>
+    <a mat-flat-button color="primary" routerLink="/mstprice/kake"><mat-icon>table_view</mat-icon>掛率表</a>
+    <a mat-flat-button color="primary" routerLink="/mstgoods"><mat-icon>inventory_2</mat-icon>商品マスタ</a>
+  </div>
+</mat-toolbar>
+
+<div class="page">
+  <fieldset>
+    <legend>1. 全情報リストの Excel</legend>
+    <div class="cond">
+      <input #xls type="file" accept=".xlsx,.xlsm" hidden (change)="onFile($event)">
+      <button mat-flat-button color="primary" type="button" (click)="xls.click()" [disabled]="busy"><mat-icon>upload_file</mat-icon>Excel を選ぶ</button>
+      <span>{{fileName}}</span>
+      @if (usableSheets.length > 0) {
+        <label>シート
+          <select [ngModel]="sheet" (ngModelChange)="selectSheet($event)">
+            @for (s of usableSheets; track s.name) {<option [value]="s.name">{{s.name}}</option>}
+          </select>
+        </label>
+      }
+    </div>
+    @if (headers.length > 0) {
+      <div class="cols">
+        @for (c of colKeys; track c) {
+          <label>{{colLabels[c]}}
+            <select [(ngModel)]="cols[c]">
+              <option [ngValue]="-1">（無し）</option>
+              @for (h of headers; track $index; let i = $index) {
+                @if (h) {<option [ngValue]="i">{{colText(i)}}</option>}
+              }
+            </select>
+          </label>
+        }
+      </div>
+    }
+  </fieldset>
+
+  <fieldset>
+    <legend>2. 単価の決め方</legend>
+    <div class="rules">
+      @for (k of usedKeys; track k) {
+        <label>{{tankaName(k)}}
+          <select [(ngModel)]="rules[k]" (ngModelChange)="rebuild()">
+            @if (k == 'tanka1') {<option value="teika">新定価（税抜）× 1.1</option>}
+            <option value="dojo">道場卸価格の列</option>
+            <option value="hojin">法人卸価格の列</option>
+            <option value="fc">FC卸価格の列</option>
+            <option value="rate">今の掛率で計算し直す</option>
+            <option value="keep">今の値のまま</option>
+          </select>
+        </label>
+      }
+    </div>
+    <div class="cond">
+      <label>適用開始日 <input type="date" [(ngModel)]="day"></label>
+      <label><input type="checkbox" [(ngModel)]="setPage"> カタログの頁を商品グループに入れる</label>
+      <button mat-flat-button color="primary" type="button" (click)="check()" [disabled]="busy || cols.gcode < 0"><mat-icon>compare_arrows</mat-icon>商品マスタと突き合わせる</button>
+    </div>
+    <div class="sub">{{tankaName('tanka1')}}は税込、ほかの単価は税抜です。「今の掛率で計算し直す」は、今の単価 ÷ 今の定価（税抜）の掛率を新定価（税抜）に掛けます（円未満は四捨五入）。</div>
+  </fieldset>
+
+  @if (error) {<div class="err">{{error}}</div>}
+  @if (message) {<div class="msg">{{message}}</div>}
+  @if (busy && done > 0) {<div class="msg">{{done}} / {{checked.length}} 商品を書きました…</div>}
+
+  @if (rows.length > 0) {
+    <div class="bar">
+      <label><input type="radio" name="flt" value="chg" [(ngModel)]="filter"> 変わる商品</label>
+      <label><input type="radio" name="flt" value="missing" [(ngModel)]="filter"> マスタに無い・新定価なし</label>
+      <label><input type="radio" name="flt" value="same" [(ngModel)]="filter"> 変更なし</label>
+      <label><input type="radio" name="flt" value="" [(ngModel)]="filter"> すべて</label>
+      <button mat-stroked-button type="button" (click)="setAll(true)">表示中をすべて選ぶ</button>
+      <button mat-stroked-button type="button" (click)="setAll(false)">表示中を外す</button>
+      <span>選んだ商品 <b>{{checked.length}}</b></span>
+      <button mat-flat-button color="warn" type="button" (click)="save()" [disabled]="busy || checked.length == 0">
+        <mat-icon>task_alt</mat-icon>単価を入れる（{{checked.length}} 商品）
+      </button>
+    </div>
+    <div class="scroll">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th></th><th>行</th><th>頁</th><th>商品コード</th><th>商品名</th><th>状態</th>
+            <th class="num">{{tankaName('tanka1')}}</th>
+            @for (k of shownKeys; track k) {<th class="num">{{tankaName(k)}}</th>}
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of shown; track r.src.gcode) {
+            <tr [class.off]="!r.on" [class]="'st-' + r.status">
+              <td><input type="checkbox" [(ngModel)]="r.on" [disabled]="!r.next"></td>
+              <td>{{r.src.row}}</td>
+              <td>{{r.src.page}}</td>
+              <td><b>{{r.src.gcode}}</b></td>
+              <td class="small">{{r.m?.gtext || r.src.name}}</td>
+              <td class="small">{{statusText[r.status]}}@if (r.m?.same) {<span class="warn">同日あり</span>}</td>
+              <td class="num" [class.chg]="diff(r, 'tanka1')">
+                @if (r.m?.cur; as c) {<span class="old">{{c.tanka1 | number}}</span>}
+                @if (r.next) {→ <b>{{r.next.tanka1 | number}}</b>}
+              </td>
+              @for (k of shownKeys; track k) {
+                <td class="num" [class.chg]="diff(r, k)">
+                  @if (r.m?.cur; as c) {<span class="old">{{c[k] | number}}</span>}
+                  @if (r.next) {→ <b>{{r.next[k] | number}}</b>}
+                  @if (rate(r, k, 'next'); as rt) {<span class="rate">{{rt | percent}}</span>}
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

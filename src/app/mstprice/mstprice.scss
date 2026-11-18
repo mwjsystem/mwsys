@@ -1,0 +1,25 @@
+.page { padding: 8px 12px; }
+fieldset { border: 1px solid #cccccc; border-radius: 4px; margin: 0 0 10px; padding: 6px 10px; }
+legend { font-weight: bold; padding: 0 4px; }
+.cond, .cols, .rules, .bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 4px 0; }
+.cols label, .rules label { display: flex; flex-direction: column; font-size: 12px; color: #555555; }
+input, select { font-size: 14px; padding: 2px; }
+.sub { font-size: 12px; color: #666666; margin-top: 4px; }
+.err { color: #c62828; margin: 6px 0; white-space: pre-wrap; }
+.msg { color: #1b5e20; margin: 6px 0; }
+.scroll { overflow: auto; max-height: calc(100vh - 330px); }
+.tbl {
+  border-collapse: collapse; font-size: 12px;
+  th { position: sticky; top: 0; background: #eeeeee; font-weight: normal; z-index: 1; }
+  th, td { border-bottom: 1px solid #dddddd; padding: 3px 6px; text-align: left; white-space: nowrap; }
+  .num { text-align: right; }
+  .small { font-size: 11px; white-space: normal; max-width: 22em; }
+  .old { color: #888888; margin-right: 2px; }
+  .chg b { color: #c62828; }
+  .rate { margin-left: 4px; color: #1565c0; font-size: 11px; }
+  .warn { margin-left: 4px; font-size: 10px; color: #ffffff; background: #ef6c00; padding: 0 3px; border-radius: 3px; }
+  tr.off td { color: #aaaaaa; }
+  tr.st-missing td, tr.st-noprice td { background: #fff3e0; }
+  tr.sp td { background: #fffde7; }
+  .mark { font-size: 10px; color: #ffffff; background: #ad1457; padding: 0 3px; border-radius: 3px; }
+}

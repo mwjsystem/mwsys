@@ -31,6 +31,9 @@ import { TabDirective } from '../core/directives/tabidx/tab.directive';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { VcdtxtPipe } from '../core/pipes/vcdtxt.pipe';
 import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
+import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
+import { GtnkhisComponent } from './gtnkhis.component';
+import { EXTYPE_GOODS } from './goods-const';
 
 /** get_grpcode クエリの結果 */
 interface GgroupCodeResult { msggroup: { code: string }[] }
@@ -108,6 +111,23 @@ export class MstgoodsComponent extends BeforeunloadBase implements OnInit, After
   constructor() {
     super();
     this.title.setTitle('商品マスタ(MWSystem)');
+  }
+
+  /** 商品マスタの変更の履歴（グループ・商品・単価・特別単価・セット構成） */
+  opelog() {
+    if (!this.gdssrv.grpcd) {
+      return;
+    }
+    const data: OpelogParam = { extype: EXTYPE_GOODS, keycode: this.gdssrv.grpcd, title: '商品マスタ ' + this.gdssrv.grpcd };
+    this.dialog.open(OpelogComponent, { width: '1000px', maxWidth: '95vw', data });
+  }
+
+  /** 有効開始日ごとの単価・特別単価 */
+  tankaHistory() {
+    if (!this.gdssrv.grpcd) {
+      return;
+    }
+    this.dialog.open(GtnkhisComponent, { width: '1200px', maxWidth: '98vw', maxHeight: '90vh', data: { grpcd: this.gdssrv.grpcd } });
   }
 
   ngOnInit(): void {
