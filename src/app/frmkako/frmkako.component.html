@@ -1,0 +1,208 @@
+<mat-toolbar [color]="usrsrv.getColor(mode)" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 4px;">
+    @if (mode==3) {
+      <button mat-flat-button (click)="modeToCre(den.jdenno ?? 0)" [color]="usrsrv.getColor(mode)"
+        [matTooltip]="den.jdenno ? '同じ受注伝票（' + den.jdenno + '）で、もう 1 枚作ります' : ''"><mat-icon>add_box</mat-icon>新規</button>
+    }
+    @if (mode==3 && den.kno) {
+      <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)"><mat-icon>edit</mat-icon>編集</button>
+    }
+    @if (editable) {
+      <button mat-flat-button (click)="save()" [disabled]="busy" [color]="usrsrv.getColor(mode)">
+        <mat-icon [matTooltip]="invalid()" matTooltipClass="ttips">save</mat-icon>保存
+      </button>
+      <button mat-flat-button (click)="cancel()" [color]="usrsrv.getColor(mode)"><mat-icon>cancel</mat-icon>中止</button>
+    }
+    <input class="dno" [(ngModel)]="kno" (keyup.enter)="onEnter()" maxlength="10" [disabled]="editable" placeholder="加工指示番号">
+    @if (mode!=1 && den.kno) {
+      <button mat-flat-button (click)="print()" [color]="usrsrv.getColor(mode)"><mat-icon>print</mat-icon>指示書</button>
+      <button mat-flat-button (click)="opelog()" [color]="usrsrv.getColor(mode)"><mat-icon>history</mat-icon>操作ログ</button>
+    }
+    <a mat-flat-button routerLink="/frmkako/list" [color]="usrsrv.getColor(mode)"><mat-icon>list</mat-icon>一覧</a>
+  </div>
+</mat-toolbar>
+
+<div class="kako">
+  <div class="head">
+    <span class="title">{{mode == 1 ? '新規' : mode == 2 ? '変更' : '照会'}}加工指示 {{den.kno || ''}}</span>
+    @if (den.renban) {<span class="renban">連番 {{den.renban}}</span>}
+    @if (den.del) {<span class="delmark">取消</span>}
+    @if (den.updated_at) {
+      <span class="stamp">更新 {{den.updated_at | date:'yyyy/MM/dd HH:mm'}} {{stfsrv.getName(den.updated_by ?? '') || den.updated_by}}</span>
+    }
+  </div>
+
+  <div class="grid">
+    <label>受注伝票
+      @if (mode == 1) {
+        <input #jd [value]="den.jdenno ?? ''" (change)="setJdenno(jd.value)" (keyup.enter)="setJdenno(jd.value)" style="width: 7em;">
+      } @else {
+        <a href="javascript:void(0)" (click)="openOrder()"><b>{{den.jdenno}}</b></a>
+      }
+    </label>
+    <label>顧客 <span><b>{{den.mcode}}</b> {{den.mname}}</span></label>
+    <label>種類
+      <select [(ngModel)]="den.kind" (ngModelChange)="touch()" [disabled]="!editable">
+        @for (k of kinds; track k.value) {<option [value]="k.value">{{k.name}}</option>}
+      </select>
+    </label>
+    <label>加工先
+      <select [ngModel]="destKey" (ngModelChange)="setDest($event)" [disabled]="!editable">
+        <option value=""></option>
+        <optgroup label="倉庫（QR で状態を進める）">
+          @for (s of strsrv.scds; track s.value) {<option [value]="'S:' + s.value">{{s.viewval}}</option>}
+        </optgroup>
+        <optgroup label="仕入先（パソコンで状態を進める）">
+          @for (v of vendorDests; track v.code) {<option [value]="'V:' + v.code">{{v.name}}</option>}
+        </optgroup>
+      </select>
+      @if (editable) {
+        <button mat-icon-button type="button" (click)="otherVendor()" matTooltip="ほかの仕入先を加工先にする"><mat-icon>find_replace</mat-icon></button>
+      }
+    </label>
+    <label>納品場所
+      <select [(ngModel)]="den.rscode" (ngModelChange)="touch()" [disabled]="!editable">
+        <option value=""></option>
+        @for (s of strsrv.scds; track s.value) {<option [value]="s.value">{{s.viewval}}</option>}
+      </select>
+    </label>
+    <label>内勤
+      <select [(ngModel)]="den.tcode" (ngModelChange)="touch()" [disabled]="!editable">
+        @for (s of stfsrv.tcds; track s.value) {<option [value]="s.value">{{s.viewval}}</option>}
+      </select>
+    </label>
+    <label>依頼日 <input type="date" [ngModel]="den.reqday" (ngModelChange)="setReqday($event)" [disabled]="!editable"></label>
+    <label>希望納期 <input type="date" [(ngModel)]="den.wishday" (ngModelChange)="touch()" [disabled]="!editable"></label>
+    <label>予定納期 <span><b>{{dueDay}}</b>@if (!den.wishday) {<span class="sub">（依頼日から 5 営業日）</span>}</span></label>
+    <label><input type="checkbox" [(ngModel)]="den.doukon" (ngModelChange)="touch()" [disabled]="!editable"> 同梱あり</label>
+  </div>
+
+  <!-- 状態 -->
+  @if (den.kno) {
+    <div class="steps">
+      @for (s of steps; track $index; let i = $index) {
+        <div class="step" [class.done]="den.status >= i + 1" [class.cur]="den.status == i + 1">
+          <div class="sname">{{i + 1}}. {{s}}</div>
+          <div class="sat">
+            @if (i == 0) {<span>{{den.reqday}}</span>} @else if (stepAt(i + 1)) {<span>{{stepAt(i + 1) | date:'M/d HH:mm'}} {{stepBy(i + 1)}}</span>}
+          </div>
+          @if (mode == 3 && !den.del) {
+            @if (den.status == i) {
+              <button mat-flat-button color="primary" type="button" (click)="setStatus(i + 1)" [disabled]="busy">にする</button>
+            } @else if (den.status > i + 1 && den.status - 1 == i + 1) {
+              <button mat-stroked-button type="button" (click)="setStatus(i + 1)" [disabled]="busy">ここに戻す</button>
+            } @else if (den.status < i) {
+              <button mat-button type="button" (click)="setStatus(i + 1)" [disabled]="busy" class="skip">飛ばして</button>
+            }
+          }
+        </div>
+      }
+    </div>
+    @if (den.dtype == 'S') {
+      <div class="sub">加工先が倉庫なので、指示書の QR を各拠点のスマホで読んで状態を進められます。</div>
+    } @else {
+      <div class="sub">加工先が仕入先なので、状態はこの画面で進めてください。</div>
+    }
+  }
+
+  <div class="cols">
+    <!-- 商品 -->
+    <fieldset>
+      <legend>加工する商品（{{totalSuu}} 点）</legend>
+      @if (editable && order) {
+        <div class="sub">受注伝票 {{order.denno}} の明細から選んでください（刺繍依頼・プリントの明細を選んであります）。</div>
+        <table class="tbl">
+          <tr><th></th><th>行</th><th>商品</th><th class="num">数量</th><th>区分</th></tr>
+          @for (l of order.lines; track l.line) {
+            <tr [class.on]="picked[l.line]" (click)="togglePick(l.line)" class="clk">
+              <td><input type="checkbox" [checked]="picked[l.line]"></td>
+              <td>{{l.line}}</td><td><b>{{l.gcode}}</b> <span class="small">{{l.gtext}}</span></td>
+              <td class="num">{{l.suu}}</td><td class="small">{{specName(l.spec)}}</td>
+            </tr>
+          }
+        </table>
+      }
+      <table class="tbl">
+        <tr><th>行</th><th>品番/号数</th><th>商品名</th><th class="num">数</th><th>備考</th>@if (editable) {<th></th>}</tr>
+        @for (l of den.lines; track $index; let i = $index) {
+          <tr>
+            <td>{{l.line}}</td>
+            <td>
+              @if (editable && !l.jline) {
+                <input [(ngModel)]="l.gcode" (ngModelChange)="touch()" style="width: 9em;">
+                <button mat-icon-button class="sm" type="button" (click)="gcdHelp(i)"><mat-icon>find_replace</mat-icon></button>
+              } @else {<b>{{l.gcode}}</b>}
+            </td>
+            <td class="small">{{l.gtext}}</td>
+            <td class="num">@if (editable) {<input type="number" min="0" [(ngModel)]="l.suu" (ngModelChange)="touch()" class="suu">} @else {<span>{{l.suu}}</span>}</td>
+            <td>@if (editable) {<input [(ngModel)]="l.memo" (ngModelChange)="touch()" style="width: 10em;">} @else {<span>{{l.memo}}</span>}</td>
+            @if (editable) {<td><button mat-icon-button class="sm" type="button" (click)="delLine(i)"><mat-icon>remove_circle</mat-icon></button></td>}
+          </tr>
+        }
+      </table>
+      @if (editable) {
+        <button mat-stroked-button type="button" (click)="addLine()"><mat-icon>add</mat-icon>受注に無い商品を足す</button>
+      }
+    </fieldset>
+
+    <!-- 位置と内容 -->
+    <fieldset>
+      <legend>加工の位置と内容</legend>
+      <div class="naiyo">
+        <label>加工内容 <input [(ngModel)]="den.naiyo" (ngModelChange)="touch()" [disabled]="!editable" style="width: 24em;" placeholder="例：胸刺繍/オリ付/ネーム"></label>
+        @if (editable) {
+          <div class="words">
+            @for (w of naiyoWords; track w) {<button type="button" class="word" (click)="addWord(w)">{{w}}</button>}
+          </div>
+        }
+      </div>
+      <datalist id="kako-posi">@for (p of posiWords; track p) {<option [value]="p"></option>}</datalist>
+      <table class="tbl">
+        <tr><th>位置</th><th>文字・内容（刺繍データ番号など）</th><th>書体</th><th>糸色</th><th>サイズ</th><th>備考</th>@if (editable) {<th></th>}</tr>
+        @for (p of den.posis; track $index; let i = $index) {
+          <tr>
+            <td><input list="kako-posi" [(ngModel)]="p.posi" (ngModelChange)="touch()" [disabled]="!editable" style="width: 5em;"></td>
+            <td><input [(ngModel)]="p.naiyo" (ngModelChange)="touch()" [disabled]="!editable" style="width: 14em;"></td>
+            <td><input [(ngModel)]="p.shotai" (ngModelChange)="touch()" [disabled]="!editable" style="width: 6em;"></td>
+            <td><input [(ngModel)]="p.color" (ngModelChange)="touch()" [disabled]="!editable" style="width: 5em;"></td>
+            <td><input [(ngModel)]="p.size" (ngModelChange)="touch()" [disabled]="!editable" style="width: 6em;"></td>
+            <td><input [(ngModel)]="p.memo" (ngModelChange)="touch()" [disabled]="!editable" style="width: 8em;"></td>
+            @if (editable) {
+              <td class="ops">
+                <button mat-icon-button class="sm" type="button" (click)="addPosi(i + 1)"><mat-icon>add_circle</mat-icon></button>
+                <button mat-icon-button class="sm" type="button" (click)="delPosi(i)"><mat-icon>remove_circle</mat-icon></button>
+              </td>
+            }
+          </tr>
+        }
+      </table>
+      @if (editable && den.posis.length == 0) {
+        <button mat-stroked-button type="button" (click)="addPosi(0)"><mat-icon>add</mat-icon>位置を足す</button>
+      }
+      <label class="memo">備考（指示書の備考欄）
+        <textarea [(ngModel)]="den.memo" (ngModelChange)="touch()" [disabled]="!editable" rows="3"></textarea>
+      </label>
+    </fieldset>
+  </div>
+
+  @if (siblings.length > 0) {
+    <fieldset>
+      <legend>同じ受注伝票（{{den.jdenno}}）の加工指示</legend>
+      <table class="tbl">
+        <tr><th>加工指示</th><th>連番</th><th>加工先</th><th>商品</th><th class="num">数</th><th>加工内容</th><th>状態</th></tr>
+        @for (s of siblings; track s.kno) {
+          <tr class="clk" (click)="open(s.kno)">
+            <td><b>{{s.kno}}</b>@if (s.del) {<span class="delmark">取消</span>}</td><td>{{s.renban}}</td><td>{{destName(s.dtype, s.dcode)}}</td>
+            <td>{{s.gcodes}}</td><td class="num">{{s.suu}}</td><td>{{s.naiyo}}</td><td>{{stepName(s.status)}}</td>
+          </tr>
+        }
+      </table>
+    </fieldset>
+  }
+
+  @if (mode == 3 && den.kno) {
+    <div class="foot">
+      <button mat-stroked-button color="warn" type="button" (click)="toggleDel()">{{den.del ? '取消を元に戻す' : 'この加工指示を取り消す'}}</button>
+    </div>
+  }
+</div>

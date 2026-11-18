@@ -1,0 +1,70 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">加工指示一覧</span>
+    <a mat-flat-button color="primary" routerLink="/frmkako"><mat-icon>edit_note</mat-icon>加工指示</a>
+    <button mat-flat-button color="primary" type="button" (click)="exportExcel()" [disabled]="rows.length == 0"><mat-icon>download</mat-icon>Excel</button>
+  </div>
+</mat-toolbar>
+
+<div class="kako">
+  <div class="grid">
+    <label>依頼日 <input type="date" [(ngModel)]="f.from"> ～ <input type="date" [(ngModel)]="f.to"></label>
+    <label>加工先
+      <select [(ngModel)]="f.dest">
+        <option value="">すべて</option>
+        <optgroup label="倉庫">@for (s of strsrv.scds; track s.value) {<option [value]="'S:' + s.value">{{s.viewval}}</option>}</optgroup>
+        <optgroup label="仕入先">@for (v of vendorDests; track v.code) {<option [value]="'V:' + v.code">{{v.name}}</option>}</optgroup>
+      </select>
+    </label>
+    <label>内勤
+      <select [(ngModel)]="f.tcode">
+        <option value="">すべて</option>
+        @for (s of stfsrv.tcds; track s.value) {@if (s.value) {<option [value]="s.value">{{s.viewval}}</option>}}
+      </select>
+    </label>
+    <label>状態
+      <select [(ngModel)]="f.status">
+        <option [ngValue]="null">すべて</option>
+        @for (s of steps; track $index; let i = $index) {<option [ngValue]="i + 1">{{i + 1}}. {{s}}</option>}
+      </select>
+    </label>
+    <label><input type="checkbox" [(ngModel)]="f.open"> 出荷済・取消を除く</label>
+    <label>伝票番号・顧客・連番 <input [(ngModel)]="f.text" (keyup.enter)="find()" style="width: 10em;"></label>
+    <button mat-flat-button color="primary" type="button" (click)="find()" [disabled]="busy"><mat-icon>search</mat-icon>検索</button>
+  </div>
+
+  @if (error) {<div class="err">{{error}}</div>}
+  @if (message) {<div class="sub">{{message}}</div>}
+
+  <div class="totals">
+    <span>{{rows.length}} 件</span>
+    @for (t of totals; track t.name) {<span>{{t.name}} <b>{{t.all}}</b>（未完成 <b>{{t.open}}</b>）</span>}
+    @if (lateCount) {<span class="lt">予定納期を過ぎて未完成 <b>{{lateCount}}</b> 件</span>}
+  </div>
+
+  <table class="tbl list">
+    <tr>
+      <th>依頼日</th><th>伝票番号</th><th>顧客</th><th>内勤</th><th>商品</th><th class="num">数量</th><th>加工内容</th><th>希望納期</th>
+      <th>同梱</th><th>連番</th><th>加工先</th><th>倉庫から発送</th><th>加工済・発送</th><th>予定納期</th><th>状態</th>
+    </tr>
+    @for (r of rows; track r.kno) {
+      <tr class="clk" [class.late]="late(r)" [class.done]="r.status >= 4" [class.del]="r.del" (click)="open(r)">
+        <td>{{r.reqday | date:'M/d'}}</td>
+        <td><a href="javascript:void(0)" (click)="openOrder(r, $event)">{{r.jdenno}}</a></td>
+        <td>{{r.mname}}</td>
+        <td>{{stfsrv.getName(r.tcode) || r.tcode}}</td>
+        <td>{{r.gcodes}}</td>
+        <td class="num">{{r.suu}}</td>
+        <td class="small">{{kindName(r.kind) == '刺繍' ? '' : kindName(r.kind) + ' '}}{{r.naiyo}}</td>
+        <td>{{r.wishday | date:'M/d'}}</td>
+        <td>{{r.doukon ? '有' : '無'}}</td>
+        <td><b>{{r.renban}}</b></td>
+        <td>{{destName(r.dtype, r.dcode)}}</td>
+        <td>{{stepAt(r, 2) | date:'M/d'}}</td>
+        <td>{{stepAt(r, 4) | date:'M/d'}}</td>
+        <td>{{due(r) | date:'M/d'}}</td>
+        <td>@if (r.del) {<span class="delmark">取消</span>} @else {<span>{{stepName(r.status)}}</span>}</td>
+      </tr>
+    }
+  </table>
+</div>

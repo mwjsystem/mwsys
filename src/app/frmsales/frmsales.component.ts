@@ -425,6 +425,11 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     window.open(this.router.createUrlTree(['/frmnyukin'], { queryParams: { jdenno: this.jmisrv.denno } }).toString());
   }
 
+  /** この受注の加工指示（刺繍・プリント）を作る（加工指示の画面を別のタブで開く。受注伝票番号を入れておく） */
+  openKako() {
+    window.open(this.router.createUrlTree(['/frmkako'], { queryParams: { jdenno: this.jmisrv.denno } }).toString());
+  }
+
   /** 移動を勧める明細の表示（品番と、在庫の一番多い倉庫） */
   moveText(): string {
     return this.moveSuggest.map(c => c.gcode + '（' + c.stores[0].name + ' ' + c.stores[0].pable + '）').join('、');

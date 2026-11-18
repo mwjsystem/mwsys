@@ -35,7 +35,7 @@ interface LogRow {
 const LIMIT = 1000;
 
 /** 種別（extype）ごとの伝票の画面（キーの欄から伝票を開く） */
-const LINKS: Record<string, string> = { '1': 'frmsales', [EXTYPE_NYUKIN]: 'frmnyukin', [EXTYPE_HATDEN]: 'frmsupply', [EXTYPE_SIIRE]: 'frmsiire', '5': 'frminvoice', [EXTYPE_MOVE]: 'frmmove', [EXTYPE_TENKAI]: 'frmtenkai', [EXTYPE_CHOSEI]: 'frmchosei', [EXTYPE_HGN]: 'frmhgnden', [EXTYPE_GOODS]: 'mstgoods' };
+const LINKS: Record<string, string> = { '1': 'frmsales', [EXTYPE_NYUKIN]: 'frmnyukin', [EXTYPE_HATDEN]: 'frmsupply', [EXTYPE_SIIRE]: 'frmsiire', '5': 'frminvoice', [EXTYPE_MOVE]: 'frmmove', [EXTYPE_TENKAI]: 'frmtenkai', [EXTYPE_CHOSEI]: 'frmchosei', [EXTYPE_HGN]: 'frmhgnden', [EXTYPE_GOODS]: 'mstgoods', '9': 'frmkako' };
 
 /**
  * 作業ログ（システム → 作業ログ）。操作ログ（tropelog。DB のトリガーで記録）を、期間・種別・伝票番号・担当者・内容で探して表示する。
