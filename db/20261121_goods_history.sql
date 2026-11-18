@@ -65,6 +65,8 @@ DECLARE
   v_what text;
   v_memo text;
   v_by text;
+  v_o text;
+  v_n text;
   v_skip text[] := ARRAY['id', 'code', 'gcode', 'created_at', 'created_by', 'updated_at', 'updated_by'];
 BEGIN
   IF TG_OP = 'DELETE' THEN
@@ -98,9 +100,13 @@ BEGIN
     o := to_jsonb(OLD);
     FOR k IN SELECT jsonb_object_keys(r) ORDER BY 1 LOOP
       CONTINUE WHEN k = ANY (v_skip);
-      IF (r->k) IS DISTINCT FROM (o->k) THEN
-        parts := parts || (msgoods_label(v_id, k) || ' ' || coalesce(o->>k, '(空)') || '→' || coalesce(r->>k, '(空)'));
-      END IF;
+      v_o := nullif(o->>k, '');
+      v_n := nullif(r->>k, '');
+      CONTINUE WHEN v_o IS NOT DISTINCT FROM v_n;
+      -- 数の列は 空 と 0、8250 と 8250.00 を同じとみなす（画面の保存が 0 を空にするため）
+      CONTINUE WHEN (v_o IS NULL OR v_o ~ '^-?[0-9]+(\.[0-9]+)?$') AND (v_n IS NULL OR v_n ~ '^-?[0-9]+(\.[0-9]+)?$')
+                AND coalesce(v_o::numeric, 0) = coalesce(v_n::numeric, 0);
+      parts := parts || (msgoods_label(v_id, k) || ' ' || coalesce(v_o, '(空)') || '→' || coalesce(v_n, '(空)'));
     END LOOP;
     IF array_length(parts, 1) IS NULL THEN
       RETURN NULL;  -- 保存し直しただけで、何も変わっていない

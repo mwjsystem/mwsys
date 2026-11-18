@@ -429,21 +429,23 @@ export class MstgoodsComponent extends BeforeunloadBase implements OnInit, After
     let tnk: TankaInput[] = [];
     this.frmArr2.controls
       .forEach(control => {
+        // 単価・原価の 0 を空（NULL）にしない（0 の単価が保存のたびに空に変わり、商品マスタの操作ログに残るため）
+        const int0 = (k: string) => this.usrsrv.editInt(control, k) ?? '0';
         tnk.push({
           id: this.usrsrv.compid,
           gcode: this.usrsrv.editFrmval(control, 'gcode'),
           day: this.usrsrv.editDay(control, 'day'),
-          tanka1: this.usrsrv.editInt(control, 'tanka1'),
-          tanka2: this.usrsrv.editInt(control, 'tanka2'),
-          tanka3: this.usrsrv.editInt(control, 'tanka3'),
-          tanka4: this.usrsrv.editInt(control, 'tanka4'),
-          tanka5: this.usrsrv.editInt(control, 'tanka5'),
-          tanka6: this.usrsrv.editInt(control, 'tanka6'),
-          tanka7: this.usrsrv.editInt(control, 'tanka7'),
-          tanka8: this.usrsrv.editInt(control, 'tanka8'),
-          tanka9: this.usrsrv.editInt(control, 'tanka9'),
-          cost: this.usrsrv.editInt(control, 'cost'),
-          genka: this.usrsrv.editInt(control, 'genka'),
+          tanka1: int0('tanka1'),
+          tanka2: int0('tanka2'),
+          tanka3: int0('tanka3'),
+          tanka4: int0('tanka4'),
+          tanka5: int0('tanka5'),
+          tanka6: int0('tanka6'),
+          tanka7: int0('tanka7'),
+          tanka8: int0('tanka8'),
+          tanka9: int0('tanka9'),
+          cost: int0('cost'),
+          genka: int0('genka'),
           taxrate: this.usrsrv.editFrmval(control, 'taxrate'),
           currency: this.usrsrv.editFrmval(control, 'currency')
         });
