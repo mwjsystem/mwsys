@@ -28,6 +28,10 @@ interface SptnkRow { gcode: string; sptnkbn: string; day: string; sptanka: numbe
   template: `
     <h2 mat-dialog-title>単価の履歴 {{data.grpcd}}</h2>
     <mat-dialog-content>
+      <div class="legend">
+        <span class="chg">赤字</span>：同じ商品のすぐ下の行（一つ前の有効開始日の単価）から変わった単価です（{{label('tanka1')}}〜{{label('tanka9')}}。原価・税率には色を付けません）。
+        <span class="now">現在</span>：今日の受注で使われる単価　<span class="fut">予定</span>：これから有効になる単価
+      </div>
       @if (loading) {<div>読み込み中…</div>}
       @if (error) {<div class="err">{{error}}</div>}
       <table class="tbl">
@@ -60,7 +64,7 @@ interface SptnkRow { gcode: string; sptnkbn: string; day: string; sptanka: numbe
           </tbody>
         </table>
       }
-      <div class="hint">通販定価は税込、ほかの単価は税抜です。色の付いた数字は、一つ前の有効開始日から変わった単価です。</div>
+      <div class="hint">{{label('tanka1')}}は税込、ほかの単価は税抜です。一番下の行（一番古い単価）は比べる行が無いので色を付けません。</div>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button type="button" (click)="ref.close()">閉じる</button>
@@ -78,6 +82,8 @@ interface SptnkRow { gcode: string; sptnkbn: string; day: string; sptanka: numbe
     .now { margin-left: 4px; font-size: 11px; color: #ffffff; background: #2e7d32; padding: 0 4px; border-radius: 3px; }
     .fut { margin-left: 4px; font-size: 11px; color: #ffffff; background: #1565c0; padding: 0 4px; border-radius: 3px; }
     .hint { font-size: 12px; color: #666666; }
+    .legend { font-size: 12px; color: #444444; margin-bottom: 6px; line-height: 1.8; }
+    .legend .chg { color: #c62828; font-weight: bold; }
     h3 { font-size: 14px; margin: 8px 0 4px; }
   `],
   changeDetection: ChangeDetectionStrategy.Eager,
