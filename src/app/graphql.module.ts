@@ -120,18 +120,33 @@ const schemaSwitchLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
+/** 終わっていない問い合わせ（「データを読み込んでいます」が消えないときに調べる） */
+const pendingOps = new Set<{ name: string; at: string }>();
+(window as unknown as { mwsysPending: () => string[] }).mwsysPending = () => [...pendingOps].map(o => o.name + ' ' + o.at);
+
 /** データベースを読み書きしているあいだ「処理中」を出すリンク */
 function createBusyLink(busy: BusyService): ApolloLink {
   return new ApolloLink((operation, forward) => {
     const mutation = operation.query.definitions.some(d => d.kind === Kind.OPERATION_DEFINITION && d.operation === 'mutation');
     return new Observable(observer => {
-      const end = busy.begin(mutation ? '保存しています…' : 'データを読み込んでいます…');
-      const sub = forward(operation).subscribe({
-        next: v => observer.next(v),
-        error: e => { end(); observer.error(e); },
-        complete: () => { end(); observer.complete(); }
-      });
-      return () => { end(); sub.unsubscribe(); };
+      const end0 = busy.begin(mutation ? '保存しています…' : 'データを読み込んでいます…');
+      // 調べる用：終わっていない問い合わせの名前（開発者ツールのコンソールで mwsysPending() と打つと出る）
+      const tag = { name: operation.operationName || '(名前なし)', at: new Date().toLocaleTimeString() };
+      pendingOps.add(tag);
+      const end = () => { pendingOps.delete(tag); end0(); };
+      let sub: { unsubscribe(): void } | undefined;
+      try {
+        sub = forward(operation).subscribe({
+          next: v => observer.next(v),
+          error: e => { end(); observer.error(e); },
+          complete: () => { end(); observer.complete(); }
+        });
+      } catch (e) {
+        // 送る前に失敗したときも「処理中」を終える
+        end();
+        observer.error(e);
+      }
+      return () => { end(); sub?.unsubscribe(); };
     });
   });
 }
