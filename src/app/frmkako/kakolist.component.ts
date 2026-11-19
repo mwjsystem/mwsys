@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
@@ -13,7 +13,7 @@ import { StoreService } from './../services/store.service';
 import { VendsService } from './../mstvendor/vends.service';
 import { loadExcelJs, excelBuffer } from './../services/busy.service';
 import { KAKO_KINDS, KAKO_STEPS, KakoFilter, KakoRow, KakoService, stepName } from './kako.service';
-import { KAKO_VENDOR_MARKS } from './frmkako.component';
+import { KAKO_VENDOR_MARKS, loadMasters } from './frmkako.component';
 
 /**
  * 加工指示の一覧（受注関連 → 加工指示一覧。養父刺繍依頼一覧.xlsx の置き換え）。
@@ -27,7 +27,7 @@ import { KAKO_VENDOR_MARKS } from './frmkako.component';
   changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FormsModule, RouterLink, MatToolbar, MatButton, MatIcon, DatePipe]
 })
-export class KakolistComponent {
+export class KakolistComponent implements AfterViewInit {
   usrsrv = inject(UserService);
   stfsrv = inject(StaffService);
   strsrv = inject(StoreService);
@@ -50,11 +50,11 @@ export class KakolistComponent {
     const d = new Date();
     d.setMonth(d.getMonth() - 2);
     this.f.from = this.usrsrv.formatDate(d);
-    this.strsrv.getStore().then(() => this.cdRef.detectChanges());
-    this.vensrv.getVendors().then(() => this.cdRef.detectChanges());
-    if (this.stfsrv.tcds.length == 0) {
-      this.stfsrv.getStaff().then(() => this.cdRef.detectChanges());
-    }
+  }
+
+  ngAfterViewInit(): void {
+    // 倉庫・仕入先・担当者・一覧は、ログインの情報（会社）が入ってから読む
+    loadMasters(this.strsrv, this.vensrv, this.stfsrv, () => this.cdRef.detectChanges());
     this.find();
   }
 

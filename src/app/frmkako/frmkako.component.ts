@@ -24,7 +24,23 @@ import { KakoprintComponent } from './kakoprint.component';
 /** 加工先にする仕入先（名前にこの文字があれば、加工先の選択肢に出す。ほかの仕入先は「ほかの仕入先」から選ぶ） */
 export const KAKO_VENDOR_MARKS = ['堀商店', '小西マーク', '豊岡縫製'];
 
-const emptyPosi = (line: number): KakoPosi => ({ line, posi: '', naiyo: '', shotai: '', color: '', size: '', memo: '' });
+/**
+ * 加工指示の画面で使う倉庫・仕入先・担当者を読む（足りないときだけ）。
+ * 担当者は、会社が入る前に読むと空の 1 行だけになるので、1 行以下なら読み直す
+ */
+export function loadMasters(strsrv: StoreService, vensrv: VendsService, stfsrv: StaffService, done: () => void) {
+  if (strsrv.scds.length == 0) {
+    strsrv.getStore().then(done);
+  }
+  if (vensrv.vends.length == 0) {
+    vensrv.getVendors().then(done);
+  }
+  if (stfsrv.tcds.length <= 1) {
+    stfsrv.getStaff().then(done);
+  }
+}
+
+const emptyPosi =(line: number): KakoPosi => ({ line, posi: '', naiyo: '', shotai: '', color: '', size: '', memo: '' });
 
 /**
  * 加工指示（受注関連 → 加工指示。刺繍・プリント）。受注伝票から伝票番号・顧客・内勤・商品・数量を引き継いで作り、
@@ -74,14 +90,11 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
 
   constructor() {
     this.title.setTitle('加工指示(MWSystem)');
-    this.strsrv.getStore().then(() => this.cdRef.detectChanges());
-    this.vensrv.getVendors().then(() => this.cdRef.detectChanges());
-    if (this.stfsrv.tcds.length == 0) {
-      this.stfsrv.getStaff().then(() => this.cdRef.detectChanges());
-    }
   }
 
   ngAfterViewInit(): void {
+    // 倉庫・仕入先・担当者は、ログインの情報（会社）が入ってから読む（別のタブで直接開いたとき、コンストラクタでは早すぎて空になる）
+    loadMasters(this.strsrv, this.vensrv, this.stfsrv, () => this.cdRef.detectChanges());
     this.route.paramMap.subscribe((p: ParamMap) => {
       const mode = Number(p.get('mode') ?? 3);
       const kno = Number(p.get('kno') ?? 0);

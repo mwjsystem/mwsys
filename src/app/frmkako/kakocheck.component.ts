@@ -89,13 +89,14 @@ export class KakocheckComponent implements AfterViewInit {
 
   constructor() {
     this.title.setTitle('加工の状態(MWSystem)');
-    this.strsrv.getStore().then(() => this.cdRef.detectChanges());
-    if (this.stfsrv.tcds.length == 0) {
-      this.stfsrv.getStaff().then(() => this.cdRef.detectChanges());
-    }
   }
 
   ngAfterViewInit(): void {
+    // 倉庫・担当者は、ログインの情報（会社）が入ってから読む
+    this.strsrv.getStore().then(() => this.cdRef.detectChanges());
+    if (this.stfsrv.tcds.length <= 1) {
+      this.stfsrv.getStaff().then(() => this.cdRef.detectChanges());
+    }
     const db = this.route.snapshot.queryParamMap.get('db');
     const isTest = localStorage.getItem('MWSYS_DB') != null;
     if ((db == 'test') != isTest) {
