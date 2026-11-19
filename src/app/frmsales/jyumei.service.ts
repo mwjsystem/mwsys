@@ -220,18 +220,17 @@ export class JyumeiService {
   async isPaid(denno: number): Promise<boolean> {
     const Get = gql`
       query get_paid($id: smallint!, $dno: Int!) {
-        vnyuzan(where: {id: {_eq: $id}, denno: {_eq: $dno}}) {
-          trnyusubs(where: {_or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, limit: 1) { denno }
-        }
+        trnyusub(where: {id: {_eq: $id}, jdenno: {_eq: $dno}, _or: [{del: {_is_null: true}}, {del: {_eq: false}}]}, limit: 1) { denno }
       }`;
+    // 入金伝票（trnyusub）を受注伝票番号（jdenno）で直接読む。vnyuzan → trnyusubs のリレーションは本番（public）の Hasura に無いため
     try {
-      const res = await firstValueFrom(this.apollo.query<{ vnyuzan: { trnyusubs: { denno: number }[] }[] }>({
+      const res = await firstValueFrom(this.apollo.query<{ trnyusub: { denno: number }[] }>({
         query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, dno: denno }, errorPolicy: 'all'
       }));
       if (res.error) {
         throw res.error;
       }
-      return ((res.data as { vnyuzan: { trnyusubs: { denno: number }[] }[] } | undefined)?.vnyuzan[0]?.trnyusubs?.length ?? 0) > 0;
+      return ((res.data as { trnyusub: { denno: number }[] } | undefined)?.trnyusub?.length ?? 0) > 0;
     } catch (e) {
       console.log('error query get_paid', e);
       return false;
