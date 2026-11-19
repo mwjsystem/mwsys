@@ -772,7 +772,6 @@ export class JmeitblComponent implements OnInit {
         id: this.usrsrv.compid,
         gds: val,
         day: this.parentForm().value.day,
-        mcd: this.parentForm().value.mcode,
         sptnk: this.jmisrv.sptnkbn
       },
     })

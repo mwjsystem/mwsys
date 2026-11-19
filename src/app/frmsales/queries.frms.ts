@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 export const GetGood = gql`
-query get_good($id: smallint!,$gds:String!,$day: date!,$mcd:String!,$sptnk:String) {
+query get_good($id: smallint!,$gds:String!,$day: date!,$sptnk:String) {
   msgoods_by_pk(gcode: $gds, id: $id){
     msggroup {
       code
