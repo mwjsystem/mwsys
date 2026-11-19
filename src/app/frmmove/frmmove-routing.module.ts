@@ -5,7 +5,7 @@ import { BeforeunloadGuard } from './../beforeunload.guard';
 import { MovcheckComponent } from './movcheck.component';
 
 const routes: Routes = [
-  { path: '', component: FrmmoveComponent },
+  { path: '', component: FrmmoveComponent, canDeactivate: [BeforeunloadGuard] },
   // 倉庫のスマホで移動伝票・大会リストの QR を読んで、数量を確認する
   { path: 'check', component: MovcheckComponent },
   { path: 'check/:denno', component: MovcheckComponent },

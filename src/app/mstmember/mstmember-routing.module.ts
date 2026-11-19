@@ -5,7 +5,7 @@ import { BeforeunloadGuard } from './../beforeunload.guard';
 
 
 const routes: Routes = [
-  { path: '', component: MstmemberComponent },
+  { path: '', component: MstmemberComponent, canDeactivate: [BeforeunloadGuard] },
   { path: ':mode/:mcd', component: MstmemberComponent, canDeactivate: [BeforeunloadGuard] }
 ];
 

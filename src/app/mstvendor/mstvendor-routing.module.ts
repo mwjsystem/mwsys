@@ -4,7 +4,7 @@ import { MstvendorComponent } from './mstvendor.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 
 const routes: Routes = [
-  { path: '', component: MstvendorComponent},
+  { path: '', component: MstvendorComponent, canDeactivate: [BeforeunloadGuard] },
   { path: ':mode/:vcd', component: MstvendorComponent, canDeactivate: [BeforeunloadGuard] }
 ];
 @NgModule({

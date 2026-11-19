@@ -4,7 +4,7 @@ import { MstgoodsComponent } from './mstgoods.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 
 const routes: Routes = [
-  { path: '', component: MstgoodsComponent },
+  { path: '', component: MstgoodsComponent, canDeactivate: [BeforeunloadGuard] },
   { path: ':mode', component: MstgoodsComponent, canDeactivate: [BeforeunloadGuard] },
   { path: ':mode/:grpcd', component: MstgoodsComponent, canDeactivate: [BeforeunloadGuard] },
 ];

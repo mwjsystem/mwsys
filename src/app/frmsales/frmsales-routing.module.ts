@@ -4,7 +4,7 @@ import { FrmsalesComponent } from './frmsales.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 
 const routes: Routes = [
-  { path: '', component: FrmsalesComponent },
+  { path: '', component: FrmsalesComponent, canDeactivate: [BeforeunloadGuard] },
   { path: ':mode/:denno', component: FrmsalesComponent, canDeactivate: [BeforeunloadGuard] },
 ];
 

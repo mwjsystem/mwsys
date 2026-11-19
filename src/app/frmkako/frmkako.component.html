@@ -9,8 +9,11 @@
     }
     @if (editable) {
       <button mat-flat-button (click)="save()" [disabled]="busy" [color]="usrsrv.getColor(mode)">
-        <mat-icon [matTooltip]="invalid()" matTooltipClass="ttips">save</mat-icon>保存
+        <mat-icon>save</mat-icon>保存
       </button>
+      @if (invalid(); as why) {
+        <div [matTooltip]="why" matTooltipClass="ttips">修正が必要！</div>
+      }
       <button mat-flat-button (click)="cancel()" [color]="usrsrv.getColor(mode)"><mat-icon>cancel</mat-icon>中止</button>
     }
     <input class="dno" [(ngModel)]="kno" (keyup.enter)="onEnter()" maxlength="10" [disabled]="editable" placeholder="加工指示番号">

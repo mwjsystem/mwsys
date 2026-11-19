@@ -13,8 +13,11 @@
     @if (mode!=3) {
       <button mat-flat-button (click)="save()" [disabled]="form.invalid"
         [color]="usrsrv.getColor(mode)">
-        <mat-icon matTooltip="{{getInvalid()}}" matTooltipClass="ttips">save</mat-icon>保存
+        <mat-icon>save</mat-icon>保存
       </button>
+    }
+    @if ((mode==1 || mode==2) && form.invalid) {
+      <div matTooltip="{{getInvalid()}}" matTooltipClass="ttips">修正が必要！</div>
     }
     @if (mode!=3) {
       <button mat-flat-button (click)="cancel()" [color]="usrsrv.getColor(mode)">

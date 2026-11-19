@@ -5,7 +5,7 @@ import { BeforeunloadGuard } from './../beforeunload.guard';
 import { SiibulkComponent } from './siibulk.component';
 
 const routes: Routes = [
-  { path: '', component: FrmsiireComponent },
+  { path: '', component: FrmsiireComponent, canDeactivate: [BeforeunloadGuard] },
   // 発注番号を指定して、仕入伝票を一括で作る
   { path: 'bulk', component: SiibulkComponent },
   { path: ':mode/:denno', component: FrmsiireComponent, canDeactivate: [BeforeunloadGuard] },
