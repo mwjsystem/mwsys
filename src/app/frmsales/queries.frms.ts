@@ -107,28 +107,6 @@ query get_nymat($id: smallint!,$gcd: String!){
     mbiko
   }
 }`;
-// export const GetMadr = gql`
-// query get_member($id: smallint!,$mcode:Int!) {
-//   msmadr(where: {id: {_eq: $id,}, mcode: {_eq: $mcode}}, order_by: {eda: asc}) {
-//     eda
-//     zip
-//     region
-//     local
-//     street
-//     extend
-//     tel
-//     fax
-//     tel2
-//     tel3
-//     extend2
-//     adrname
-//     adrbikou
-//     adrinbikou
-//     adrokrbko
-//     del
-//   } 
-// }`;
-
 // export const GetMast1 = gql`
 // query get_denno($id: smallint!,$maxdno: Int){
 //   trjyuden_aggregate(where: {id: {_eq: $id}, denno: {_lt: $maxdno}}) {

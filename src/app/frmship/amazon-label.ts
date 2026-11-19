@@ -64,11 +64,6 @@ export function amazonLabels(docs: ShipDoc[]): AmazonLabel[] {
   return labels;
 }
 
-/** 次に使う開始位置（印刷したあとの続き） */
-export function nextStart(start: number, count: number): number {
-  return (start - 1 + count) % LABEL_COUNT + 1;
-}
-
 /** 位置 pos（0 から。シートをまたいで通し）のシールの左上（pt） */
 function origin(pos: number, opt: LabelOption): { page: number; x: number; y: number } {
   const p = pos % LABEL_COUNT;

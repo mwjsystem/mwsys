@@ -121,22 +121,6 @@ query get_bunrui($id: smallint!){
     memo
   }
 }`;
-export const GetMast3 = gql`
-query get_staff($id: smallint!){
-  msstaff(where: {id: {_eq: $id}}) {
-    code
-    name
-    mail
-  }
-}`;
-export const GetMast4 = gql`
-query get_system($id: smallint!){
-  mssystem(where: {id: {_eq: $id}}) {
-    name
-    subname
-    maxmcd
-  }
-}`;
 export const GetMast6 = gql`
 query get_eda($id: smallint!,$mcd: String!){
   msmadr_aggregate(where: {id: {_eq: $id}, mcode: {_eq: $mcd}}) {
