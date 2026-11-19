@@ -30,7 +30,7 @@ export const stepName = (s: number) => KAKO_STEPS[s - 1] ?? String(s);
 export const NAIYO_WORDS = ['胸刺繍', '袖刺繍', '背中', '左袖', '右袖', '右足', '左足', 'ネーム', 'オリ付', 'ワッペン', 'モール', '帯表', '帯裏'];
 
 /** 位置の候補（指示書の図に印を付けられる位置。kakofig.ts の POSI_SPOTS と同じ名前。ほかの名前も入れられるが、図には出ない） */
-export const POSI_WORDS = ['胸', '右胸', '右袖', '左袖', '背中', '襟', 'オリマーク', '右足', '左足', 'A表', 'A裏', 'B表', 'B裏', 'ネーム'];
+export const POSI_WORDS = ['胸', '右胸', '右袖', '左袖', '背中', '襟', '左裾', '右足', '左足', 'A表', 'A裏', 'B表', 'B裏', 'ネーム'];
 
 /** 加工指示の QR コードの URL（加工先・倉庫のスマホで読むと、状態を進める画面が開く。テスト環境は ?db=test を付ける） */
 export function kakoCheckUrl(kno: number): string {

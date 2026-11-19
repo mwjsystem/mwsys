@@ -31,7 +31,8 @@ export const POSI_SPOTS: Record<string, Spot> = {
   '右胸': { panel: 'front', x: 112, y: 58, w: 56, h: 62 },
   '右袖': { panel: 'front', x: 22, y: 64, w: 76, h: 76 },
   '左袖': { panel: 'front', x: 302, y: 64, w: 76, h: 76 },
-  'オリマーク': { panel: 'front', x: 248, y: 252, w: 40, h: 40 },
+  // 前の下（着る人の左の裾）。オリマークなどを付ける場所（オリマークは位置ではなく内容に入れる）
+  '左裾': { panel: 'front', x: 248, y: 252, w: 40, h: 40 },
   '背中': { panel: 'back', x: 125, y: 78, w: 150, h: 150 },
   '襟': { panel: 'back', x: 160, y: 48, w: 80, h: 24 },
   '右足': { panel: 'pants', x: 34, y: 60, w: 60, h: 120 },

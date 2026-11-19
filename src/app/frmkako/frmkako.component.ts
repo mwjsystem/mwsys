@@ -473,6 +473,20 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
   }
 
   // ===================== 位置・加工内容 =====================
+  /** 位置を選んだとき。「その他（入力）…」は、候補にない位置を入れてもらう（やめたら元の位置に戻す） */
+  setPosi(p: KakoPosi, v: string, sel: HTMLSelectElement) {
+    if (v == '__other') {
+      const s = prompt('位置を入れてください（候補にない位置は、指示書の図には出ません）', p.posi);
+      if (s == null || !s.trim()) {
+        sel.value = p.posi;
+        return;
+      }
+      v = s.trim();
+    }
+    p.posi = v;
+    this.touch();
+  }
+
   addPosi(i: number) {
     this.den.posis.splice(i, 0, emptyPosi(i + 1));
     this.den.posis.forEach((p, k) => p.line = k + 1);

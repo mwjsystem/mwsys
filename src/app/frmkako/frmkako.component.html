@@ -208,14 +208,18 @@
           </div>
         }
       </div>
-      <datalist id="kako-posi">@for (p of posiWords; track p) {<option [value]="p"></option>}</datalist>
       <table class="tbl">
         <tr><th>番号</th><th>位置</th><th>文字・内容（刺繍データ番号など）</th><th>書体</th><th>糸色</th><th>サイズ</th><th>備考</th><th>刺繍の図</th>@if (editable) {<th></th>}</tr>
         @for (p of den.posis; track $index; let i = $index) {
           <tr>
             <td class="num">{{i + 1}}</td>
             <td>
-              <input list="kako-posi" [(ngModel)]="p.posi" (ngModelChange)="touch()" [disabled]="!editable" style="width: 5em;">
+              <select #psel [ngModel]="p.posi" (ngModelChange)="setPosi(p, $event, psel)" [disabled]="!editable" style="width: 6.5em;">
+                <option value=""></option>
+                @for (w of posiWords; track w) {<option [value]="w">{{w}}</option>}
+                @if (p.posi && !posiWords.includes(p.posi)) {<option [value]="p.posi">{{p.posi}}</option>}
+                <option value="__other">その他（入力）…</option>
+              </select>
               @if (p.posi && !onFig(p)) {<span class="nofig" matTooltip="この位置は図に場所がないので、図には出ません（表には出ます）">図なし</span>}
             </td>
             <td><input [(ngModel)]="p.naiyo" (ngModelChange)="touch()" [disabled]="!editable" style="width: 14em;"></td>
