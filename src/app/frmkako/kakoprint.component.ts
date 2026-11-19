@@ -25,7 +25,10 @@ const grid = {
   paddingLeft: () => 3, paddingRight: () => 3, paddingTop: () => 3, paddingBottom: () => 3
 };
 
-const jpDay = (d: string) => {
+/** 指示書の用紙の向き（'1' なら A4 横）を覚えておく localStorage のキー */
+const LAND_KEY = 'MWSYS_KAKO_LAND';
+
+const jpDay =(d: string) => {
   if (!d) {
     return '';
   }
@@ -43,6 +46,11 @@ const jpDay = (d: string) => {
     <h2 mat-dialog-title>加工指示書（加工指示 {{data.den.kno}}・連番 {{data.den.renban}}）</h2>
     <mat-dialog-content>
       <div class="hint">加工先・納期・商品・位置と内容・備考を 1 枚にまとめます。@if (data.den.dtype == 'S') {右上の QR を各拠点のスマホで読むと、状態を進められます。}</div>
+      <div class="orient">
+        用紙の向き
+        <label><input type="radio" name="kako-orient" [checked]="!land" (change)="setLand(false)"> A4 縦</label>
+        <label><input type="radio" name="kako-orient" [checked]="land" (change)="setLand(true)"> A4 横（左に表、右に図）</label>
+      </div>
       @if (message) {<div class="msg">{{message}}</div>}
       @if (error) {<div class="err">{{error}}</div>}
     </mat-dialog-content>
@@ -56,6 +64,7 @@ const jpDay = (d: string) => {
   `,
   styles: [`
     .hint { font-size: 13px; color: #555555; }
+    .orient { margin-top: 10px; font-size: 13px; display: flex; gap: 14px; align-items: center; }
     .msg { color: #2e7d32; margin-top: 8px; font-weight: bold; }
     .err { color: #c62828; margin-top: 8px; }
   `],
@@ -77,6 +86,25 @@ export class KakoprintComponent {
   busy = false;
   error = '';
   message = '';
+  /** A4 横で出す（前に選んだ向きを覚えておく） */
+  land = this.loadLand();
+
+  private loadLand(): boolean {
+    try {
+      return localStorage.getItem(LAND_KEY) == '1';
+    } catch {
+      return false;
+    }
+  }
+
+  setLand(v: boolean) {
+    this.land = v;
+    try {
+      localStorage.setItem(LAND_KEY, v ? '1' : '0');
+    } catch {
+      // 覚えられなくても出すのには困らない
+    }
+  }
 
   async run(to: 'open' | 'save' | 'fax') {
     const win = to == 'open' ? window.open('', '_blank') : null;
@@ -92,7 +120,7 @@ export class KakoprintComponent {
         await this.vensrv.getVendors();
       }
       const fig = await kakoFigure(d.posis, d.lines.map(l => l.gcode));
-      const blob = await this.pdfsrv.createPdf(this.doc(d, fig));
+      const blob = await this.pdfsrv.createPdf(this.doc(d, fig, this.land));
       const name = d.kno + '加工指示書_' + d.renban + '_' + (d.mname || d.mcode).replace(/[\\/:*?"<>|\s]/g, '') + '.pdf';
       if (root) {
         const sei = await this.staffSei(d.tcode);
@@ -131,7 +159,11 @@ export class KakoprintComponent {
     return d.dtype == 'V' ? (this.vensrv.getVcdtxt(d.dcode) || d.dcode) : (this.strsrv.scds.find(s => s.value == d.dcode)?.viewval ?? d.dcode);
   }
 
-  private doc(d: KakoDen, fig: KakoFigure | null): TDocumentDefinitions {
+  /**
+   * 指示書。縦（A4 縦）は上から 見出し・情報・商品・図・位置と内容・備考・状態の欄。
+   * 横（A4 横）は 見出しの下を左右に分け、左に 情報・商品・位置と内容、右に 図・備考・状態の欄
+   */
+  private doc(d: KakoDen, fig: KakoFigure | null, land: boolean): TDocumentDefinitions {
     const kind = KAKO_KINDS.find(k => k.value == d.kind)?.name ?? '加工';
     const staff = this.stfsrv.getName(d.tcode) || d.tcode;
     const rs = d.rscode ? (this.strsrv.scds.find(s => s.value == d.rscode)?.viewval ?? d.rscode) : '';
@@ -146,7 +178,7 @@ export class KakoprintComponent {
       { text: l.memo, fontSize: 8 }
     ]);
     // 図があるときは、空の行を減らして 1 枚に収める
-    while (goods.length < (fig ? 3 : 6)) {
+    while (goods.length < (land ? 4 : fig ? 3 : 6)) {
       goods.push(['', '', '', '']);
     }
     // 位置と内容（番号は図の札の番号。図に場所のない位置の刺繍の図は、表の右に小さく貼る）
@@ -160,7 +192,7 @@ export class KakoprintComponent {
       { text: p.memo, fontSize: 8 },
       p.img && !spotOf(p.posi) ? { image: p.img, fit: [56, 34], alignment: 'center' } : ''
     ]);
-    while (posis.length < (fig ? 3 : 7)) {
+    while (posis.length < (land ? 6 : fig ? 3 : 7)) {
       posis.push(['', '', '', '', '', '', '', '']);
     }
     const info: TableCell[][] = [
@@ -183,19 +215,18 @@ export class KakoprintComponent {
       },
       layout: grid
     };
-    return {
-      pageSize: 'A4',
-      pageMargins: [28, 28, 28, 28],
-      info: { title: kind + '指示書 ' + d.kno },
-      defaultStyle: { fontSize: 9, lineHeight: 1.1 },
-      content: [
-        {
+    const head: Content = {
           columns: [
             {
               width: '*', stack: [
                 { text: this.destName(d) + '　御中', fontSize: 15, bold: true, decoration: 'underline', margin: [0, 0, 0, 4] },
                 { text: kind + '　指　示　書', fontSize: 20, bold: true },
-                { text: '加工指示 No.' + d.kno + (d.del ? '　【取消】' : ''), fontSize: 9, margin: [0, 4, 0, 0], color: d.del ? '#c62828' : '#000000' }
+                {
+                  text: [
+                    ...(d.del ? [{ text: '【取消】　', color: '#c62828', bold: true }] : []),
+                    { text: '（株）マーシャルワールドジャパン　' + staff }
+                  ], fontSize: 9, margin: [0, 4, 0, 0]
+                }
               ]
             },
             {
@@ -208,28 +239,68 @@ export class KakoprintComponent {
           ],
           columnGap: 10,
           margin: [0, 0, 0, 8]
+    };
+    const infoTbl: Content = { table: { widths: [52, '*', 52, land ? 100 : 120], body: info }, layout: grid, margin: [0, 0, 0, 8] };
+    const goodsTbl: Content[] = [
+      { text: '加工する商品', fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
+      {
+        table: { headerRows: 1, widths: land ? [96, '*', 30, 80] : [110, '*', 34, 120], body: [[th('品番/号数'), th('商品名'), th('数'), th('備考')], ...goods] },
+        layout: grid, margin: [0, 0, 0, 8]
+      }
+    ];
+    const posiTbl: Content[] = [
+      { text: '位置と内容', fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
+      {
+        table: {
+          headerRows: 1, widths: land ? [14, 38, '*', 44, 44, 40, 50, 44] : [16, 44, '*', 56, 52, 56, 70, 60],
+          body: [[th('No'), th('位置'), th('文字・内容'), th('書体'), th('糸色'), th('サイズ'), th('備考'), th('刺繍の図')], ...posis]
         },
-        { table: { widths: [52, '*', 52, 120], body: info }, layout: grid, margin: [0, 0, 0, 8] },
-        { text: '加工する商品', fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
-        {
-          table: { headerRows: 1, widths: [110, '*', 34, 120], body: [[th('品番/号数'), th('商品名'), th('数'), th('備考')], ...goods] },
-          layout: grid, margin: [0, 0, 0, 8]
-        },
-        ...(fig ? [{ image: fig.url, fit: [539, 215], alignment: 'center', margin: [0, 0, 0, 6] } as Content] : []),
-        { text: '位置と内容', fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
-        {
-          table: {
-            headerRows: 1, widths: [16, 44, '*', 56, 52, 56, 70, 60],
-            body: [[th('No'), th('位置'), th('文字・内容'), th('書体'), th('糸色'), th('サイズ'), th('備考'), th('刺繍の図')], ...posis]
-          },
-          layout: grid, margin: [0, 0, 0, 8]
-        },
-        {
-          table: { widths: ['*'], heights: [fig ? 44 : 70], body:[[{ stack: [{ text: '備考', fontSize: 8, color: '#555555' }, { text: d.memo, fontSize: 11 }] }]] },
-          layout: grid, margin: [0, 0, 0, 8]
-        },
-        stepBox,
-        { text: '（株）マーシャルワールドジャパン　' + staff, alignment: 'right', fontSize: 9, margin: [0, 8, 0, 0] }
+        layout: grid, margin: [0, 0, 0, 8]
+      }
+    ];
+    const memoBox = (h: number): Content => ({
+      table: { widths: ['*'], heights: [h], body: [[{ stack: [{ text: '備考', fontSize: 8, color: '#555555' }, { text: d.memo, fontSize: 11 }] }]] },
+      layout: grid, margin: [0, 0, 0, 8]
+    });
+    const base = {
+      pageSize: 'A4' as const,
+      pageMargins: [28, 28, 28, 28] as [number, number, number, number],
+      info: { title: kind + '指示書 ' + d.renban },
+      defaultStyle: { fontSize: 9, lineHeight: 1.1 }
+    };
+    if (land) {
+      // A4 横（842 × 595。中は 786 × 539）。左 400、右 376
+      return {
+        ...base,
+        pageOrientation: 'landscape',
+        content: [
+          head,
+          {
+            columns: [
+              { width: 400, stack: [infoTbl, ...goodsTbl, ...posiTbl] },
+              {
+                width: '*', stack: [
+                  ...(fig ? [{ image: fig.url, fit: [376, 250], alignment: 'center', margin: [0, 0, 0, 6] } as Content] : []),
+                  memoBox(fig ? 60 : 250),
+                  stepBox
+                ]
+              }
+            ],
+            columnGap: 10
+          }
+        ]
+      };
+    }
+    return {
+      ...base,
+      content: [
+        head,
+        infoTbl,
+        ...goodsTbl,
+        ...(fig ? [{ image: fig.url, fit: [539, 195], alignment: 'center', margin: [0, 0, 0, 4] } as Content] : []),
+        ...posiTbl,
+        memoBox(fig ? 44 : 70),
+        stepBox
       ]
     };
   }
