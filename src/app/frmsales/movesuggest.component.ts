@@ -51,7 +51,7 @@ export class MoveSuggestService {
     for (const r of targets) {
       const list = await Promise.all(stores.filter(s => s.value != r.scode).map(async s => {
         const st = (await this.stcsrv.getStock(r.gcode, '0', String(s.value)))[0];
-        const pable = st ? Number(st.stock ?? 0) - Number(st.hikat ?? 0) - Number(st.keepd ?? 0) : 0;
+        const pable = st ? Number(st.stock ?? 0) - Number(st.hikat ?? 0) - Number(st.keepd ?? 0) - Number(st.kakod ?? 0) : 0;
         return { scode: String(s.value), name: s.viewval, pable };
       }));
       const have = list.filter(s => s.pable > 0).sort((a, b) => b.pable - a.pable);

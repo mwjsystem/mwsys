@@ -147,7 +147,7 @@
           <div>
             <mat-form-field style="width:4em;font-size:larger;font-weight:bolder;">
               <mat-label>受注可能数</mat-label>
-              <input matInput numberInput value="{{stcsrv.stc.stock - stcsrv.stc.hikat - stcsrv.stc.keepd}}" disabled
+              <input matInput numberInput value="{{stcsrv.stc.stock - stcsrv.stc.hikat - stcsrv.stc.keepd - stcsrv.stc.kakod}}" disabled
                 class="i_num">
             </mat-form-field>
             <mat-form-field style="width:4em">
@@ -164,6 +164,10 @@
             <mat-form-field style="width:4em">
               <mat-label>キープ済</mat-label>
               <input matInput numberInput [value]="stcsrv.stc.keepd" disabled class="i_num">
+            </mat-form-field>
+            <mat-form-field style="width:4em">
+              <mat-label>加工依頼中</mat-label>
+              <input matInput numberInput [value]="stcsrv.stc.kakod" disabled class="i_num">
             </mat-form-field>
             <div class="flex flex-row">
               <mat-form-field style="width:4em">

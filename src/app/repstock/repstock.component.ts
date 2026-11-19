@@ -125,6 +125,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       this.stcsrv.stc.juzan = 0;
       this.stcsrv.stc.today = 0;
       this.stcsrv.stc.keepd = 0;
+      this.stcsrv.stc.kakod = 0;
       this.stcsrv.stc.hikat = 0;
       this.stcsrv.stc.tommo = 0;
     }
@@ -212,6 +213,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           this.stcsrv.stc.juzan = this.stcsrv.stcs[i].juzan;
           this.stcsrv.stc.today = this.stcsrv.stcs[i].today;
           this.stcsrv.stc.keepd = this.stcsrv.stcs[i].keepd;
+          this.stcsrv.stc.kakod = this.stcsrv.stcs[i].kakod;
           this.stcsrv.stc.hikat = this.stcsrv.stcs[i].hikat;
           this.stcsrv.stc.tommo = this.stcsrv.stcs[i].tommo;
         } else {
@@ -219,6 +221,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
           this.stcsrv.stc.juzan = 0;
           this.stcsrv.stc.today = 0;
           this.stcsrv.stc.keepd = 0;
+          this.stcsrv.stc.kakod = 0;
           this.stcsrv.stc.hikat = 0;
           this.stcsrv.stc.tommo = 0;
         }
@@ -233,6 +236,7 @@ export class RepstockComponent implements OnInit, AfterViewInit {
             this.stcsrv.stc.juzan = result[0]?.juzan;
             this.stcsrv.stc.today = result[0]?.today;
             this.stcsrv.stc.keepd = result[0]?.keepd;
+            this.stcsrv.stc.kakod = result[0]?.kakod ?? 0;
             this.stcsrv.stc.hikat = result[0]?.hikat;
             this.stcsrv.stc.tommo = result[0]?.tommo;
             this.cdRef.detectChanges();

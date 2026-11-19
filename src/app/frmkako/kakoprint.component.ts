@@ -196,7 +196,7 @@ export class KakoprintComponent {
       posis.push(['', '', '', '', '', '', '', '']);
     }
     const info: TableCell[][] = [
-      [th('受注伝票'), { text: String(d.jdenno ?? ''), fontSize: 11, bold: true }, th('依頼日'), { text: jpDay(d.reqday), fontSize: 10 }],
+      [th(d.tdenno ? '展開伝票' : '受注伝票'), { text: String(d.tdenno ?? d.jdenno ?? ''), fontSize: 11, bold: true }, th('依頼日'), { text: jpDay(d.reqday), fontSize: 10 }],
       [th('お客様'), { text: (d.mcode ? d.mcode + ' ' : '') + d.mname, fontSize: 10 }, th(d.wishday ? '希望納期' : '予定納期'), { text: jpDay(due), fontSize: 13, bold: true, color: '#c62828' }],
       [th('内勤'), { text: staff, fontSize: 10 }, th('納品場所'), { text: rs, fontSize: 12, bold: true }],
       [th('加工内容'), { text: d.naiyo, fontSize: 11, bold: true }, th('同梱'), { text: d.doukon ? '有' : '無', fontSize: 12, bold: true, alignment: 'center' }]

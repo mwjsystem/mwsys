@@ -50,7 +50,7 @@
     @for (r of rows; track r.kno) {
       <tr class="clk" [class.late]="late(r)" [class.done]="r.status >= 4" [class.del]="r.del" (click)="open(r)">
         <td>{{r.reqday | date:'M/d'}}</td>
-        <td><a href="javascript:void(0)" (click)="openOrder(r, $event)">{{r.jdenno}}</a></td>
+        <td><a href="javascript:void(0)" (click)="openOrder(r, $event)">@if (r.tdenno) {<span class="small">展開</span>}{{r.tdenno || r.jdenno}}</a></td>
         <td>{{r.mname}}</td>
         <td>{{stfsrv.getName(r.tcode) || r.tcode}}</td>
         <td>{{r.gcodes}}</td>

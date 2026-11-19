@@ -62,6 +62,11 @@ export class FrmtenkaiComponent implements AfterViewInit, OnBeforeunload {
   dirty = false;
   busy = false;
 
+  /** この展開伝票の加工指示（刺繍・プリント）を作る（加工指示の画面を別のタブで開く。展開元の商品が入る） */
+  openKako() {
+    window.open('/frmkako?tdenno=' + this.den.denno);
+  }
+
   constructor() {
     this.title.setTitle('展開伝票(MWSystem)');
     this.strsrv.getStore();

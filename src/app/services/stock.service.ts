@@ -27,6 +27,8 @@ export class Stcbs {
   stock!: number;
   hikat!: number;
   keepd!: number;
+  /** 加工依頼中（在庫種別が刺繍依頼〈6〉・プリント〈7〉の受注残） */
+  kakod!: number;
   yday!: Date;
   suu!: number;
   htzan!: number;
@@ -44,6 +46,8 @@ export class Stock {
   juzan: number = 0;
   today: number = 0;
   keepd: number = 0;
+  /** 加工依頼中（在庫種別が刺繍依頼〈6〉・プリント〈7〉の受注残）。受注可能数 = 在庫 − 引当済 − キープ済 − 加工依頼中 */
+  kakod: number = 0;
   tommo: number = 0;
   constructor(init?: Partial<Stock>) {
     Object.assign(this, init);
@@ -100,9 +104,9 @@ interface GtanaResult { trgtana: { scode: string; gcode: string; tana: number | 
 /** get_zaiko クエリの結果（入出庫の合計のみ） */
 interface ZaikoSumResult { trzaiko_aggregate: ZaikoAgg }
 /** get_zaiko クエリの結果（getZaiko） */
-interface ZaikoResult extends ZaikoSumResult { today: SuuAgg; keepd: SuuAgg; hikat: SuuAgg; juzan: SuuAgg; tommo: SuuAgg }
+interface ZaikoResult extends ZaikoSumResult { today: SuuAgg; keepd: SuuAgg; hikat: SuuAgg; kakod: SuuAgg; juzan: SuuAgg; tommo: SuuAgg }
 /** get_zaiko クエリの結果（getZaiko1: 内訳用） */
-interface Zaiko1Result extends ZaikoSumResult { hikat: SuuAgg; keepd: SuuAgg; vhatzn: { yday: Date; hatzn: number }[]; vhatzn_aggregate: HatznAgg }
+interface Zaiko1Result extends ZaikoSumResult { hikat: SuuAgg; keepd: SuuAgg; kakod: SuuAgg; vhatzn: { yday: Date; hatzn: number }[]; vhatzn_aggregate: HatznAgg }
 @Injectable({
   providedIn: 'root'
 })
@@ -569,7 +573,9 @@ export class StockService {
         aggregate { sum { suu }}}
       keepd:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
-      hikat:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in:["1","4","5","6"]},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+      hikat:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in:["1","4","5"]},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+        aggregate { sum { suu }}}
+      kakod:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in:["6","7"]},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
       juzan:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},trjyuden: {del: {_eq: false}}, _or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}} 
@@ -612,8 +618,9 @@ export class StockService {
           }
           const data = raw as ZaikoResult;
           const kpchk = await keepPromise;
-          // キープ済 = 倉庫でキープを確認して確保できた数（キープ表）。引当済 = それ以外の引当
-          // （受注可能数 = 在庫 − 引当済 − キープ済 は、今までの引当〈引当区分 1,4,5,6〉＋キープ〈2〉の合計と同じ）
+          // キープ済 = 倉庫でキープを確認して確保できた数（キープ表）。引当済 = それ以外の引当。
+          // 加工依頼中 = 在庫種別が刺繍依頼〈6〉・プリント〈7〉の受注残（キープと同じく別枠で出す）
+          // （受注可能数 = 在庫 − 引当済 − キープ済 − 加工依頼中 は、引当〈引当区分 1,4,5〉＋キープ〈2〉＋加工〈6,7〉の合計を引いたもの）
           const alloc = (data.hikat.aggregate.sum.suu || 0) + (data.keepd.aggregate.sum.suu || 0);
           const kept = Math.min(kpchk, alloc);
           // console.log(this.usrsrv.getNextday(tdy), data);
@@ -633,6 +640,7 @@ export class StockService {
             juzan: data.juzan.aggregate.sum.suu || 0,
             today: data.today.aggregate.sum.suu || 0,
             keepd: kept,
+            kakod: data.kakod.aggregate.sum.suu || 0,
             tommo: data.tommo.aggregate.sum.suu || 0
           }
           // console.log(lcstcs);
@@ -664,6 +672,8 @@ export class StockService {
       hikat:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in: ["0","1"]},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}  
       keepd:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_eq: "2"},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
+        aggregate { sum { suu }}}
+      kakod:vjmeizai_aggregate(where:{_and:{id:{_eq:$id},gcode:{_eq:$gcode},scode:{_eq:$scode},spec:{_in: ["6","7"]},del:{_is_null:true},_or:[{sday:{_gt:$today}}, {sday:{_is_null:true}}]}}) {
         aggregate { sum { suu }}}
       vhatzn(where: {hatzn: {_gt: 0}, id: {_eq: $id}, gcode: {_eq: $gcode}}, order_by: {inday: asc_nulls_last}) {
         yday
@@ -712,6 +722,7 @@ export class StockService {
               - (data.trzaiko_aggregate.aggregate.sum.haki || 0),
             hikat: data.hikat.aggregate.sum.suu || 0,
             keepd: data.keepd.aggregate.sum.suu || 0,
+            kakod: data.kakod.aggregate.sum.suu || 0,
             yday: data.vhatzn[0]?.yday,
             suu: data.vhatzn[0]?.hatzn,
             htzan: data.vhatzn_aggregate.aggregate.sum.hatzn
@@ -727,7 +738,7 @@ export class StockService {
   getPaabl(stcbs: StcbsZai[]): number {
     let paabl: number = 9999;
     for (let i = 0; i < stcbs.length; i++) {
-      const wAble = Math.floor((stcbs[i].stock - stcbs[i].hikat - stcbs[i].keepd) / Number(stcbs[i].irisu));
+      const wAble = Math.floor((stcbs[i].stock - stcbs[i].hikat - stcbs[i].keepd - (stcbs[i].kakod ?? 0)) / Number(stcbs[i].irisu));
       if (wAble < paabl) {
         paabl = wAble;
       }

@@ -28,7 +28,7 @@ import { KakoFigure, kakoFigure } from './kakofig';
         <div class="denno">連番 {{den?.renban ?? ''}}　<span class="sub">加工指示 {{den?.kno ?? kno}}</span></div>
         @if (den) {
           <div>{{kindName}}　加工先 <b>{{destName}}</b></div>
-          <div>受注 {{den.jdenno}}　{{den.mname}}</div>
+          <div>{{den.tdenno ? '展開 ' + den.tdenno : '受注 ' + den.jdenno}}　{{den.mname}}</div>
           <div class="sub">内勤 {{stfsrv.getName(den.tcode) || den.tcode}}　依頼日 {{den.reqday}}　{{den.wishday ? '希望納期' : '予定納期'}} <b>{{den.wishday || den.planday}}</b>　同梱{{den.doukon ? '有' : '無'}}</div>
         }
       </div>

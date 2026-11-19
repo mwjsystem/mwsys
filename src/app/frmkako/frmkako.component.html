@@ -1,8 +1,8 @@
 <mat-toolbar [color]="usrsrv.getColor(mode)" class="toolbar mat-elevation-z8">
   <div class="flex flex-nowrap items-center" style="gap: 4px;">
     @if (mode==3) {
-      <button mat-flat-button (click)="modeToCre(den.jdenno ?? 0)" [color]="usrsrv.getColor(mode)"
-        [matTooltip]="den.jdenno ? '同じ受注伝票（' + den.jdenno + '）で、もう 1 枚作ります' : ''"><mat-icon>add_box</mat-icon>新規</button>
+      <button mat-flat-button (click)="modeToCre(den.jdenno ?? 0, den.tdenno ?? 0)" [color]="usrsrv.getColor(mode)"
+        [matTooltip]="den.jdenno || den.tdenno ? '同じ' + srcName + '（' + (den.tdenno || den.jdenno) + '）で、もう 1 枚作ります' : ''"><mat-icon>add_box</mat-icon>新規</button>
     }
     @if (mode==3 && den.kno) {
       <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)"><mat-icon>edit</mat-icon>編集</button>
@@ -33,13 +33,18 @@
   </div>
 
   <div class="grid">
-    <label>受注伝票
-      @if (mode == 1) {
-        <input #jd [value]="den.jdenno ?? ''" (change)="setJdenno(jd.value)" (keyup.enter)="setJdenno(jd.value)" style="width: 7em;">
-      } @else {
-        <a href="javascript:void(0)" (click)="openOrder()"><b>{{den.jdenno}}</b></a>
-      }
-    </label>
+    @if (mode == 1) {
+      <label>受注伝票
+        <input #jd [value]="den.jdenno ?? ''" (change)="setSrcDenno('J', jd.value)" (keyup.enter)="setSrcDenno('J', jd.value)" style="width: 7em;">
+      </label>
+      <label>または展開伝票
+        <input #td [value]="den.tdenno ?? ''" (change)="setSrcDenno('T', td.value)" (keyup.enter)="setSrcDenno('T', td.value)" style="width: 7em;">
+      </label>
+    } @else {
+      <label>{{srcName}}
+        <a href="javascript:void(0)" (click)="openOrder()"><b>{{den.tdenno || den.jdenno}}</b></a>
+      </label>
+    }
     <label>顧客 <span><b>{{den.mcode}}</b> {{den.mname}}</span></label>
     <label>種類
       <select [(ngModel)]="den.kind" (ngModelChange)="touch()" [disabled]="!editable">
@@ -110,7 +115,11 @@
     <fieldset>
       <legend>加工する商品（{{totalSuu}} 点）</legend>
       @if (editable && order) {
-        <div class="sub">受注伝票 {{order.denno}} の明細から選んでください（刺繍依頼・プリントの明細を選んであります）。</div>
+        @if (order.src == 'T') {
+          <div class="sub">展開伝票 {{order.denno}} の展開元（出庫）の商品から選んでください。</div>
+        } @else {
+          <div class="sub">受注伝票 {{order.denno}} の明細から選んでください（在庫種別が{{specName(den.kind)}}の明細を選んであります）。</div>
+        }
         <table class="tbl">
           <tr><th></th><th>行</th><th>商品</th><th class="num">数量</th><th>区分</th></tr>
           @for (l of order.lines; track l.line) {
@@ -129,7 +138,7 @@
             <td>{{l.line}}</td>
             <td>
               @if (editable && !l.jline) {
-                <input [(ngModel)]="l.gcode" (ngModelChange)="touch()" style="width: 9em;">
+                <input [(ngModel)]="l.gcode" (ngModelChange)="touch()" (change)="refreshPatterns()" style="width: 9em;">
                 <button mat-icon-button class="sm" type="button" (click)="gcdHelp(i)"><mat-icon>find_replace</mat-icon></button>
               } @else {<b>{{l.gcode}}</b>}
             </td>
@@ -148,6 +157,43 @@
     <!-- 位置と内容 -->
     <fieldset>
       <legend>加工の位置と内容</legend>
+      <!-- 加工マスタ（商品グループ・顧客・パターンごと） -->
+      @if (patterns.length > 0 || (editable && den.mcode && lineGroups.length > 0)) {
+        <div class="master">
+          <div class="mhead">加工マスタ（{{den.mcode}} {{den.mname}}）</div>
+          @if (patterns.length > 0) {
+            <div class="mlist">
+              @for (p of patterns; track p.grpcode + ':' + p.ptn) {
+                <span class="mptn">
+                  @if (editable) {
+                    <button mat-stroked-button type="button" (click)="applyPattern(p)" [matTooltip]="(p.naiyo || '') + '（' + p.posis.length + ' か所）を入れます'">{{patternLabel(p)}}</button>
+                    <button mat-icon-button class="sm" type="button" (click)="delMaster(p)" matTooltip="このパターンをマスタから消す"><mat-icon>delete</mat-icon></button>
+                  } @else {
+                    <span class="sub">{{patternLabel(p)}}</span>
+                  }
+                </span>
+              }
+            </div>
+          } @else {
+            <div class="sub">この商品グループ・顧客の加工マスタはまだありません。</div>
+          }
+          @if (editable && den.mcode && lineGroups.length > 0) {
+            <div class="mreg">
+              いまの内容を
+              <select [(ngModel)]="mstGrp" (ngModelChange)="setMstPtn('0')">
+                @for (g of lineGroups; track g) {<option [value]="g">{{g}}</option>}
+              </select>
+              の
+              <select [ngModel]="mstPtn" (ngModelChange)="setMstPtn($event)">
+                <option [value]="0">新しいパターン</option>
+                @for (p of mstPatterns; track p.ptn) {<option [value]="p.ptn">パターン{{p.ptn}}{{p.ptname ? '「' + p.ptname + '」' : ''}}に上書き</option>}
+              </select>
+              <input [(ngModel)]="mstName" placeholder="パターンの名前（例：名前入り）" style="width: 12em;">
+              <button mat-flat-button color="primary" type="button" (click)="saveMaster()" [disabled]="busy"><mat-icon>bookmark_add</mat-icon>マスタに登録</button>
+            </div>
+          }
+        </div>
+      }
       <div class="naiyo">
         <label>加工内容 <input [(ngModel)]="den.naiyo" (ngModelChange)="touch()" [disabled]="!editable" style="width: 24em;" placeholder="例：胸刺繍/オリ付/ネーム"></label>
         @if (editable) {
@@ -211,7 +257,7 @@
 
   @if (siblings.length > 0) {
     <fieldset>
-      <legend>同じ受注伝票（{{den.jdenno}}）の加工指示</legend>
+      <legend>同じ{{srcName}}（{{den.tdenno || den.jdenno}}）の加工指示</legend>
       <table class="tbl">
         <tr><th>加工指示</th><th>連番</th><th>加工先</th><th>商品</th><th class="num">数</th><th>加工内容</th><th>状態</th></tr>
         @for (s of siblings; track s.kno) {

@@ -65,6 +65,15 @@ legend { font-weight: bold; padding: 0 4px; }
   tr.done td { color: #2e7d32; }
   tr.del td { color: #9e9e9e; text-decoration: line-through; }
 }
+.master {
+  border: 1px solid #b39ddb; background: #f6f2fc; border-radius: 4px; padding: 4px 8px; margin-bottom: 8px; font-size: 13px;
+  .mhead { font-weight: bold; color: #4527a0; margin-bottom: 2px; }
+  .mlist { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+  .mptn { display: inline-flex; align-items: center; }
+  .mptn button[mat-stroked-button] { line-height: 26px; }
+  .sm { width: 26px; height: 26px; padding: 1px; line-height: 22px; mat-icon { font-size: 18px; width: 18px; height: 18px; } }
+  .mreg { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 4px; select, input { font-size: 13px; padding: 2px; } }
+}
 .nofig { font-size: 11px; color: #9e9e9e; margin-left: 4px; }
 .imgcell {
   white-space: nowrap;

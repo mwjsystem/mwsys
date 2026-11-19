@@ -15,6 +15,7 @@ import { MembsService } from './../mstmember/membs.service';
 import { JyumeiService, TrjyumeiRow } from './jyumei.service';
 import { HatmeiService, AutoOrders, NO_ORDERS, HatdenNew, HatmeiInput } from './../frmsupply/hatmei.service';
 import { VendsService } from './../mstvendor/vends.service';
+import { KakoService } from './../frmkako/kako.service';
 import { firstValueFrom } from 'rxjs';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
@@ -49,7 +50,7 @@ type GoodTanka = { cost: number; currency: string; day: string; genka: number; t
 interface GoodRow {
   gcode: string; gtext: string; unit: string; koguchi: number | null; max: number | null; ordering: boolean;
   send: string | null; gskbn: string; hgcode: string | null;
-  msggroup: { code: string; gkbn: string; vcode: string; msprocesses: { prcno: number; prcname: string }[] };
+  msggroup: { code: string; gkbn: string; vcode: string };
   msgtankas: GoodTanka[];
   msgsptnks: { sptnkbn: string; sptanka: number }[];
   msgzais: GzaiRef[];
@@ -86,6 +87,7 @@ export class JmeitblComponent implements OnInit {
   jmisrv = inject(JyumeiService);
   private hmisrv = inject(HatmeiService);
   private vensrv = inject(VendsService);
+  private kakosrv = inject(KakoService);
 
   readonly parentForm = input.required<FormGroup>();
   readonly paginator = viewChild(MatPaginator);
@@ -739,7 +741,7 @@ export class JmeitblComponent implements OnInit {
     this.getMtbl(i, 'trjyumzais').controls.forEach(e => {
       let j: number = this.setZai[i].findIndex(obj => obj.gcode == e.value.gcode);
       if (j > -1) {
-        lcdata.push({ eda: e.value.eda, gcode: e.value.gcode, suu: e.value.suu, spec: e.value.spec, spdet: e.value.spdet, pable: (this.setZai[i][j]?.stock - this.setZai[i][j]?.hikat - this.setZai[i][j]?.keepd) });
+        lcdata.push({ eda: e.value.eda, gcode: e.value.gcode, suu: e.value.suu, spec: e.value.spec, spdet: e.value.spdet, pable: (this.setZai[i][j]?.stock - this.setZai[i][j]?.hikat - this.setZai[i][j]?.keepd - (this.setZai[i][j]?.kakod ?? 0)) });
       }
     });
 
@@ -829,6 +831,8 @@ export class JmeitblComponent implements OnInit {
 
             // });
 
+          } else {
+            this.setKakoSpec(i, val, msgds.msggroup?.code ?? '');
           }
           this.getMtbl(i, 'msgzais').clear(); // 商品コードを変えたとき、前の商品の構成品を残さない
           this.getMtbl(i, 'trjyumzais').clear();
@@ -861,6 +865,30 @@ export class JmeitblComponent implements OnInit {
       });
   }
 
+  /**
+   * 商品グループ・受注の顧客で加工マスタがあれば、在庫種別をマスタの種類（6 刺繍依頼 / 7 プリント）にする。
+   * 受発注（3）・キープ（2）などを手で選んであるときは変えない（空・通常〈0〉・引当〈1〉のときだけ）
+   */
+  private setKakoSpec(i: number, gcd: string, grpcode: string) {
+    const mcode = String(this.parentForm().value.mcode ?? '');
+    if (!grpcode || !mcode) {
+      return;
+    }
+    this.kakosrv.kindOf(grpcode, mcode).then(kind => {
+      const ctl = this.frmArr.controls[i];
+      if (!kind || !ctl || ctl.getRawValue().gcode != gcd) {
+        return;
+      }
+      const spec = ctl.getRawValue().spec;
+      if (spec == null || spec == '0' || spec == '1') {
+        ctl.patchValue({ spec: kind });
+        rowCtl<RowField>(ctl).spec.setErrors(null);
+        this.jmisrv.subject.next(true);
+        this.cdRef.markForCheck();
+      }
+    });
+  }
+
   setPable(i: number, gcd: string, msgzais: GzaiRef[]) {
     // console.log(gcd, this.frmArr.controls[i].value.gskbn);
     this.frmArr.controls[i].patchValue({ pable: null });
@@ -868,7 +896,7 @@ export class JmeitblComponent implements OnInit {
     if (this.frmArr.controls[i].value.gskbn == "0") {
       this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.frmArr.controls[i].value.scode).then(result => {
         // console.log(result);
-        let lcpable = (result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0;
+        let lcpable = (result[0]?.stock - result[0]?.hikat - result[0]?.keepd - (result[0]?.kakod ?? 0)) || 0;
         this.frmArr.controls[i].patchValue({ pable: lcpable });
         if (lcpable > 0 && this.frmArr.getRawValue()[i]['spec'] == '3') {
           this.usrsrv.toastWar('品番' + gcd + 'は受発注商品ですが、受注可能数が' + lcpable + 'です');

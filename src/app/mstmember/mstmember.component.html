@@ -55,11 +55,6 @@
     <mat-icon>local_shipping</mat-icon>別納先
   </button>
 }
-@if (mode==3 && this.mcd) {
-  <button mat-flat-button (click)="diaProc()" [color]="usrsrv.getColor(mode)">
-    <mat-icon>scanner</mat-icon>加工マスタ
-  </button>
-}
 <!-- <button mat-button (click)="test(1)" *ngIf="mode!=1">
 <mat-icon>question_answer</mat-icon>
 <span fxHide fxShow.gt-sm>問合せ</span>

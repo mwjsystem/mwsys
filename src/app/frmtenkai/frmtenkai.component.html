@@ -31,6 +31,9 @@
       <button mat-flat-button (click)="print()" [color]="usrsrv.getColor(mode)">
         <mat-icon>description</mat-icon>展開指示書
       </button>
+      <button mat-flat-button (click)="openKako()" [color]="usrsrv.getColor(mode)">
+        <mat-icon matTooltip="この展開伝票の展開元の商品で、加工指示（刺繍・プリント）を作ります（別のタブ）" matTooltipClass="ttips">brush</mat-icon>加工指示
+      </button>
     }
   </div>
 </mat-toolbar>

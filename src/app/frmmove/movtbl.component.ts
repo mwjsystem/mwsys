@@ -192,13 +192,13 @@ export class MovtblComponent implements OnInit {
     if (this.frmArr.controls[i].value.gskbn == "0") {
       this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentCtl().outcode.value).then(result => {
         // console.log(result);
-        this.frmArr.controls[i].patchValue({ pable: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
+        this.frmArr.controls[i].patchValue({ pable: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd - (result[0]?.kakod ?? 0)) || 0) });
         // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });
       this.stcsrv.getStock(gcd, this.frmArr.controls[i].value.gskbn, this.parentCtl().incode.value).then(result => {
         // console.log(result);
-        this.frmArr.controls[i].patchValue({ stock: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd) || 0) });
+        this.frmArr.controls[i].patchValue({ stock: ((result[0]?.stock - result[0]?.hikat - result[0]?.keepd - (result[0]?.kakod ?? 0)) || 0) });
         // console.log(this.frmArr);
         this.movsrv.subject.next(true);
       });

@@ -126,7 +126,6 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   rows: FormArray = this.fb.array([]);
   getden!: number;
   gdsttl: number = 0;
-  proc: mwI.Proc[] = [];
   nskVal: mwI.Sval[] = [];
   iskVal: mwI.Sval[] = [];
   overlayRef = this.overlay.create({
@@ -812,7 +811,6 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
           this.jmisrv.sptnkbn = member.sptnkbn ?? "";
           this.jmisrv.ntype = member.ntype;
           this.jmisrv.tntype = member.tntype;
-          this.proc = member.msprocesses;
           let msmadrs: mwI.Adrs[] = member.msmadrs;
           this.memsrv.mcode = mcode;
           this.memsrv.edas = [];

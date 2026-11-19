@@ -19,7 +19,6 @@ import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { BeforeunloadBase } from '../beforeunload-base';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { AddressComponent } from './../share/address/address.component';
-import { MsprocComponent } from './../share/msproc/msproc.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -205,18 +204,6 @@ export class MstmemberComponent extends BeforeunloadBase implements OnInit, Afte
         flg: false
       };
       let dialogRef = this.dialog.open(AdredaComponent, dialogConfig);
-    }
-  }
-
-  diaProc(): void {
-    if (this.checkMcode(this.mcd)) {
-      let dialogConfig = new MatDialogConfig();
-      dialogConfig.autoFocus = true;
-      dialogConfig.data = {
-        mcode: this.mcd + '(' + this.memsrv.getMcdtxt(this.mcd) + ')',
-        mode: this.mode
-      };
-      let dialogRef = this.dialog.open(MsprocComponent, dialogConfig);
     }
   }
 

@@ -4,6 +4,11 @@ import gql from 'graphql-tag';
 import { firstValueFrom } from 'rxjs';
 import { UserService } from './../services/user.service';
 import { JDST } from './../frmship/ship-forms';
+import { KUBUN_OUT, TenkaiService } from './../frmtenkai/tenkai.service';
+
+/** 展開伝票から作る加工指示・加工マスタの顧客コード（ダミー。顧客マスタには登録しない） */
+export const TENKAI_MCODE = 'TENKAI';
+export const TENKAI_MNAME = '展開用';
 
 /** 操作ログ（tropelog）の作業区分（msbunrui kubun = extype）: 加工依頼。DB のトリガー（db/20261123_kako.sql）と同じ値 */
 export const EXTYPE_KAKO = '9';
@@ -41,6 +46,8 @@ export interface KakoStep { at: string | null; by: string | null }
 export interface KakoDen {
   kno: number;
   jdenno: number | null;
+  /** 展開伝票から作ったときの展開伝票番号 */
+  tdenno: number | null;
   mcode: string;
   mname: string;
   kind: string;
@@ -67,15 +74,23 @@ export interface KakoDen {
   posis: KakoPosi[];
 }
 
-/** 受注伝票から引き継ぐもの */
+/** 受注伝票・展開伝票から引き継ぐもの（src: J 受注伝票 / T 展開伝票。展開伝票は展開元〈出庫〉の商品だけ） */
 export interface KakoOrder {
+  src: 'J' | 'T';
   denno: number; mcode: string; mname: string; tcode: string; scode: string; jdstatus: string | null;
   lines: { line: number; gcode: string; gtext: string; suu: number; spec: string | null; mmemo: string }[];
 }
 
+/** 加工マスタ（商品グループ・顧客・パターンごと）。ptn = 0 は新しいパターン */
+export interface KakoPattern {
+  grpcode: string; mcode: string; ptn: number; ptname: string; kind: string; dtype: string; dcode: string;
+  naiyo: string; memo: string; posis: KakoPosi[];
+  updated_at?: string | null; updated_by?: string | null;
+}
+
 /** 一覧の 1 行 */
 export interface KakoRow {
-  kno: number; renban: string; jdenno: number | null; mcode: string; mname: string; kind: string; dtype: string; dcode: string;
+  kno: number; renban: string; jdenno: number | null; tdenno: number | null; mcode: string; mname: string; kind: string; dtype: string; dcode: string;
   tcode: string; reqday: string; wishday: string; planday: string; doukon: boolean; naiyo: string; memo: string; status: number;
   steps: Record<number, KakoStep>; del: boolean; gcodes: string; suu: number;
 }
@@ -84,7 +99,7 @@ export interface KakoFilter {
   from: string; to: string; dest: string; tcode: string; open: boolean; status: number | null; text: string;
 }
 
-const HEAD = `kno jdenno mcode mname kind dtype dcode rscode renban tcode reqday wishday planday doukon naiyo memo status
+const HEAD = `kno jdenno tdenno mcode mname kind dtype dcode rscode renban tcode reqday wishday planday doukon naiyo memo status
   s2_at s2_by s3_at s3_by s4_at s4_by s5_at s5_by s6_at s6_by del created_at created_by updated_at updated_by`;
 
 type HeadDb = Record<string, unknown>;
@@ -104,6 +119,7 @@ const stepsOf = (h: HeadDb): Record<number, KakoStep> => {
 export class KakoService {
   private apollo = inject(Apollo);
   private usrsrv = inject(UserService);
+  private tensrv = inject(TenkaiService);
 
   /** 加工先の表示用の値（倉庫は 'S:01'、仕入先は 'V:1234'） */
   static destKey(dtype: string, dcode: string): string {
@@ -145,9 +161,21 @@ export class KakoService {
       return null;
     }
     return {
-      denno: j.denno, mcode: j.mcode, mname: ((j.msmember?.sei ?? '') + ' ' + (j.msmember?.mei ?? '')).trim(),
+      src: 'J', denno: j.denno, mcode: j.mcode, mname: ((j.msmember?.sei ?? '') + ' ' + (j.msmember?.mei ?? '')).trim(),
       tcode: j.tcode ?? '', scode: j.scode ?? '', jdstatus: j.jdstatus,
       lines: j.trjyumeis.map(l => ({ line: l.line, gcode: l.gcode, gtext: l.gtext ?? '', suu: Number(l.suu ?? 0), spec: l.spec, mmemo: l.mmemo ?? '' }))
+    };
+  }
+
+  /** 展開伝票（展開元〈出庫〉の商品。顧客は展開用のダミー） */
+  async tenkai(tdenno: number): Promise<KakoOrder | null> {
+    const t = await this.tensrv.load(tdenno);
+    if (!t) {
+      return null;
+    }
+    return {
+      src: 'T', denno: t.denno, mcode: TENKAI_MCODE, mname: TENKAI_MNAME, tcode: t.tcode, scode: t.scode, jdstatus: null,
+      lines: t.lines.filter(l => l.kubun == KUBUN_OUT).map(l => ({ line: l.line, gcode: l.gcode, gtext: l.gtext, suu: l.suu, spec: null, mmemo: l.memo }))
     };
   }
 
@@ -183,7 +211,8 @@ export class KakoService {
 
   private head(h: HeadDb) {
     return {
-      kno: Number(h['kno']), jdenno: h['jdenno'] == null ? null : Number(h['jdenno']), mcode: (h['mcode'] as string) ?? '',
+      kno: Number(h['kno']), jdenno: h['jdenno'] == null ? null : Number(h['jdenno']),
+      tdenno: h['tdenno'] == null ? null : Number(h['tdenno']), mcode: (h['mcode'] as string) ?? '',
       mname: (h['mname'] as string) ?? '', kind: (h['kind'] as string) ?? '6', dtype: ((h['dtype'] as string) ?? 'S') as 'S' | 'V',
       dcode: (h['dcode'] as string) ?? '', renban: (h['renban'] as string) ?? '', tcode: (h['tcode'] as string) ?? '',
       reqday: d10(h['reqday']), wishday: d10(h['wishday']), planday: d10(h['planday']), doukon: !!h['doukon'],
@@ -205,7 +234,7 @@ export class KakoService {
       }
     }
     const head = {
-      jdenno: d.jdenno || null, mcode: d.mcode || null, mname: d.mname || null, kind: d.kind, dtype: d.dtype, dcode: d.dcode,
+      jdenno: d.jdenno || null, tdenno: d.tdenno || null, mcode: d.mcode || null, mname: d.mname || null, kind: d.kind, dtype: d.dtype, dcode: d.dcode,
       rscode: d.rscode || null, tcode: d.tcode, reqday: d.reqday, wishday: d.wishday || null, planday: d.planday || null,
       doukon: d.doukon, naiyo: d.naiyo || null, memo: d.memo || null, updated_at: now, updated_by: by
     };
@@ -317,7 +346,7 @@ export class KakoService {
     if (t) {
       const or: object[] = [{ mname: { _ilike: '%' + t + '%' } }, { mcode: { _eq: t } }, { renban: { _eq: t } }];
       if (/^\d+$/.test(t)) {
-        or.push({ jdenno: { _eq: Number(t) } }, { kno: { _eq: Number(t) } });
+        or.push({ jdenno: { _eq: Number(t) } }, { tdenno: { _eq: Number(t) } }, { kno: { _eq: Number(t) } });
       }
       and.push({ _or: or });
     }
@@ -341,17 +370,18 @@ export class KakoService {
     }));
   }
 
-  /** 受注伝票の加工指示（受注伝票の画面・加工指示の画面で、同じ受注の指示を並べる） */
-  async ofOrder(jdenno: number): Promise<KakoRow[]> {
+  /** 受注伝票（展開伝票）の加工指示（受注伝票の画面・加工指示の画面で、同じ伝票の指示を並べる）。ten = true は展開伝票番号 */
+  async ofOrder(denno: number, ten = false): Promise<KakoRow[]> {
     const Get = gql`
-      query kako_of_order($id: smallint!, $dno: Int!) {
-        trkako(where: {id: {_eq: $id}, jdenno: {_eq: $dno}}, order_by: {kno: asc}) {
+      query kako_of_order($where: trkako_bool_exp!) {
+        trkako(where: $where, order_by: {kno: asc}) {
           ${HEAD}
           trkakomeis(order_by: {line: asc}) { gcode suu }
         }
       }`;
+    const where = { id: { _eq: this.usrsrv.compid }, [ten ? 'tdenno' : 'jdenno']: { _eq: denno } };
     const res = await firstValueFrom(this.apollo.query<{ trkako: (HeadDb & { trkakomeis: { gcode: string; suu: number }[] })[] }>({
-      query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, dno: jdenno }
+      query: Get, fetchPolicy: 'network-only', variables: { where }
     }));
     if (res.error || !res.data) {
       throw res.error ?? new Error('加工指示を読めませんでした');
@@ -361,6 +391,135 @@ export class KakoService {
       gcodes: [...new Set(h.trkakomeis.map(m => m.gcode))].join('/'),
       suu: h.trkakomeis.reduce((a, m) => a + Number(m.suu ?? 0), 0)
     }));
+  }
+
+  // ===================== 加工マスタ =====================
+  /** 商品コード → 商品グループコード */
+  async groupsOf(gcodes: string[]): Promise<Map<string, string>> {
+    const list = [...new Set(gcodes.filter(g => g))];
+    if (list.length == 0) {
+      return new Map();
+    }
+    const Get = gql`
+      query kako_groups($id: smallint!, $gcodes: [String!]!) {
+        msgoods(where: {id: {_eq: $id}, gcode: {_in: $gcodes}}) { gcode msggroup { code } }
+      }`;
+    const res = await firstValueFrom(this.apollo.query<{ msgoods: { gcode: string; msggroup: { code: string } | null }[] }>({
+      query: Get, variables: { id: this.usrsrv.compid, gcodes: list }
+    }));
+    if (res.error || !res.data) {
+      throw res.error ?? new Error('商品マスタを読めませんでした');
+    }
+    return new Map(res.data.msgoods.filter(g => g.msggroup?.code).map(g => [g.gcode, g.msggroup!.code]));
+  }
+
+  /** 加工マスタ（商品グループ〈複数〉・顧客のパターン全部。商品グループ・パターン番号の順） */
+  async patterns(grpcodes: string[], mcode: string): Promise<KakoPattern[]> {
+    const list = [...new Set(grpcodes.filter(g => g))];
+    if (list.length == 0 || !mcode) {
+      return [];
+    }
+    const Get = gql`
+      query kako_patterns($id: smallint!, $grps: [String!]!, $mcode: String!) {
+        mskako(where: {id: {_eq: $id}, grpcode: {_in: $grps}, mcode: {_eq: $mcode}}, order_by: [{grpcode: asc}, {ptn: asc}]) {
+          grpcode mcode ptn ptname kind dtype dcode naiyo memo updated_at updated_by
+          mskakoposis(order_by: {line: asc}) { line posi naiyo shotai color size memo img }
+        }
+      }`;
+    type PosiDb = { line: number; posi: string | null; naiyo: string | null; shotai: string | null; color: string | null; size: string | null; memo: string | null; img: string | null };
+    const res = await firstValueFrom(this.apollo.query<{ mskako: (Record<string, string | number | null> & { mskakoposis: PosiDb[] })[] }>({
+      query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, grps: list, mcode }
+    }));
+    if (res.error || !res.data) {
+      throw res.error ?? new Error('加工マスタを読めませんでした');
+    }
+    const s = (v: unknown) => (v as string | null) ?? '';
+    return res.data.mskako.map(m => ({
+      grpcode: s(m['grpcode']), mcode: s(m['mcode']), ptn: Number(m['ptn']), ptname: s(m['ptname']), kind: s(m['kind']) || '6',
+      dtype: s(m['dtype']), dcode: s(m['dcode']), naiyo: s(m['naiyo']), memo: s(m['memo']),
+      updated_at: m['updated_at'] as string | null, updated_by: m['updated_by'] as string | null,
+      posis: m.mskakoposis.map(p => ({ line: p.line, posi: p.posi ?? '', naiyo: p.naiyo ?? '', shotai: p.shotai ?? '', color: p.color ?? '', size: p.size ?? '', memo: p.memo ?? '', img: p.img ?? '' }))
+    }));
+  }
+
+  /**
+   * 受注明細の在庫種別の初期値（商品グループ・顧客の加工マスタがあれば、その種類 6 刺繍依頼 / 7 プリント。なければ null）。
+   * 読めなかったとき（Hasura の設定前など）も null
+   */
+  async kindOf(grpcode: string, mcode: string): Promise<string | null> {
+    if (!grpcode || !mcode) {
+      return null;
+    }
+    const Get = gql`
+      query kako_kind_of($id: smallint!, $grp: String!, $mcode: String!) {
+        mskako(where: {id: {_eq: $id}, grpcode: {_eq: $grp}, mcode: {_eq: $mcode}}, order_by: {ptn: asc}, limit: 1) { kind }
+      }`;
+    try {
+      const res = await firstValueFrom(this.apollo.query<{ mskako: { kind: string }[] }>({
+        query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, grp: grpcode, mcode }
+      }));
+      return res.data?.mskako[0]?.kind ?? null;
+    } catch (e) {
+      console.log('error query kako_kind_of', e);
+      return null;
+    }
+  }
+
+  /** 加工マスタを保存する（ptn = 0 は新しいパターン番号を付けて登録、それ以外は上書き）。パターン番号を返す */
+  async saveMaster(p: KakoPattern): Promise<number> {
+    const id = this.usrsrv.compid;
+    const by = this.usrsrv.staff?.code ?? '';
+    const now = new Date();
+    let ptn = p.ptn;
+    if (!ptn) {
+      const Max = gql`
+        query kako_ptn_max($id: smallint!, $grp: String!, $mcode: String!) {
+          mskako_aggregate(where: {id: {_eq: $id}, grpcode: {_eq: $grp}, mcode: {_eq: $mcode}}) { aggregate { max { ptn } } }
+        }`;
+      const r = await firstValueFrom(this.apollo.query<{ mskako_aggregate: { aggregate: { max: { ptn: number | null } } } }>({
+        query: Max, fetchPolicy: 'network-only', variables: { id, grp: p.grpcode, mcode: p.mcode }
+      }));
+      if (r.error || !r.data) {
+        throw r.error ?? new Error('パターン番号を付けられませんでした');
+      }
+      ptn = Number(r.data.mskako_aggregate.aggregate.max.ptn ?? 0) + 1;
+    }
+    const key = { id, grpcode: p.grpcode, mcode: p.mcode, ptn };
+    const head = {
+      ptname: p.ptname || null, kind: p.kind, dtype: p.dcode ? p.dtype : null, dcode: p.dcode || null,
+      naiyo: p.naiyo || null, memo: p.memo || null, updated_at: now, updated_by: by
+    };
+    const posis = p.posis.filter(x => x.posi || x.naiyo || x.img).map((x, i) => ({
+      ...key, line: i + 1, posi: x.posi || null, naiyo: x.naiyo || null, shotai: x.shotai || null, color: x.color || null,
+      size: x.size || null, memo: x.memo || null, img: x.img || null
+    }));
+    // 見出しは登録（あれば上書き）、位置は消してから入れ直す（1 トランザクション）
+    const Save = gql`
+      mutation kako_master_save($head: mskako_insert_input!, $id: smallint!, $grp: String!, $mcode: String!, $ptn: smallint!, $posis: [mskakoposi_insert_input!]!) {
+        insert_mskako_one(object: $head, on_conflict: {constraint: mskako_pkey, update_columns: [ptname, kind, dtype, dcode, naiyo, memo, updated_at, updated_by]}) { ptn }
+        delete_mskakoposi(where: {id: {_eq: $id}, grpcode: {_eq: $grp}, mcode: {_eq: $mcode}, ptn: {_eq: $ptn}}) { affected_rows }
+        insert_mskakoposi(objects: $posis) { affected_rows }
+      }`;
+    const res = await firstValueFrom(this.apollo.mutate({
+      mutation: Save,
+      variables: { head: { ...key, ...head, created_at: now, created_by: by }, id, grp: p.grpcode, mcode: p.mcode, ptn, posis }
+    }));
+    if (res.error) {
+      throw res.error;
+    }
+    return ptn;
+  }
+
+  /** 加工マスタのパターンを消す */
+  async delMaster(grpcode: string, mcode: string, ptn: number): Promise<void> {
+    const Del = gql`
+      mutation kako_master_del($id: smallint!, $grp: String!, $mcode: String!, $ptn: smallint!) {
+        delete_mskako_by_pk(id: $id, grpcode: $grp, mcode: $mcode, ptn: $ptn) { ptn }
+      }`;
+    const res = await firstValueFrom(this.apollo.mutate({ mutation: Del, variables: { id: this.usrsrv.compid, grp: grpcode, mcode, ptn } }));
+    if (res.error) {
+      throw res.error;
+    }
   }
 
   /**

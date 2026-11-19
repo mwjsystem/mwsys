@@ -9,8 +9,6 @@ import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { AddressComponent } from './../share/address/address.component';
 import { AdredaComponent } from './../share/adreda/adreda.component';
 import { EdahelpComponent } from './../share/adreda/edahelp.component';
-import { MsprcprtComponent } from '../share/msprcprt/msprcprt.component';
-import { MsprocComponent } from '../share/msproc/msproc.component';
 import { PartshelpComponent } from '../share/partshelp/partshelp.component';
 import { BeforeunloadGuard } from './../beforeunload.guard';
 
@@ -59,8 +57,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
         AdredaComponent,
         McdhelpComponent,
         EdahelpComponent,
-        MsprcprtComponent,
-        MsprocComponent,
         PartshelpComponent
     ]
 })

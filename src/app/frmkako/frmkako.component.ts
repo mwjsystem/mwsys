@@ -17,7 +17,7 @@ import { GcdhelpComponent } from './../share/gcdhelp/gcdhelp.component';
 import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
 import { OnBeforeunload } from './../beforeunload.guard';
 import {
-  EXTYPE_KAKO, KAKO_KINDS, KAKO_STEPS, KakoDen, KakoOrder, KakoPosi, KakoRow, KakoService, NAIYO_WORDS, POSI_WORDS, stepName
+  EXTYPE_KAKO, KAKO_KINDS, KAKO_STEPS, KakoDen, KakoOrder, KakoPattern, KakoPosi, KakoRow, KakoService, NAIYO_WORDS, POSI_WORDS, stepName
 } from './kako.service';
 import { KakoprintComponent } from './kakoprint.component';
 import { KakoFigure, kakoFigure, shrinkImage, spotOf } from './kakofig';
@@ -100,8 +100,9 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
       const mode = Number(p.get('mode') ?? 3);
       const kno = Number(p.get('kno') ?? 0);
       const jdenno = Number(this.route.snapshot.queryParamMap.get('jdenno') ?? 0);
-      if (mode == 1 || (!kno && jdenno)) {
-        this.modeToCre(jdenno);
+      const tdenno = Number(this.route.snapshot.queryParamMap.get('tdenno') ?? 0);
+      if (mode == 1 || (!kno && (jdenno || tdenno))) {
+        this.modeToCre(jdenno, tdenno);
       } else if (kno > 0) {
         this.open(kno, mode == 2 ? 2 : 3);
       }
@@ -111,7 +112,7 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
   private blank(): KakoDen {
     const today = this.usrsrv.formatDate(new Date());
     return {
-      kno: 0, jdenno: null, mcode: '', mname: '', kind: '6', dtype: 'S', dcode: '', rscode: '', renban: '',
+      kno: 0, jdenno: null, tdenno: null, mcode: '', mname: '', kind: '6', dtype: 'S', dcode: '', rscode: '', renban: '',
       tcode: this.usrsrv.staff?.code ?? '', reqday: today, wishday: '', planday: this.kakosrv.planDay(today),
       doukon: false, naiyo: '', memo: '', status: 1, steps: {}, del: false,
       created_at: null, created_by: null, updated_at: null, updated_by: null, lines: [], posis: [emptyPosi(1), emptyPosi(2), emptyPosi(3)]
@@ -272,10 +273,11 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
         this.dirty = false;
         this.order = null;
         history.replaceState('', '', './frmkako/' + mode + '/' + kno);
-        if (mode == 2 && d.jdenno) {
-          await this.loadOrder(d.jdenno, false);
+        if (mode == 2 && (d.jdenno || d.tdenno)) {
+          await this.loadOrder(d.tdenno ? 'T' : 'J', (d.tdenno || d.jdenno)!, false);
         }
         await this.loadSiblings();
+        await this.loadPatterns(false);
       }
     } catch (e) {
       this.usrsrv.toastErr('加工指示を読めませんでした', (e as Error).message);
@@ -293,32 +295,43 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
   }
 
   private async loadSiblings() {
-    this.siblings = this.den.jdenno ? (await this.kakosrv.ofOrder(this.den.jdenno)).filter(s => s.kno != this.den.kno) : [];
+    const d = this.den;
+    this.siblings = d.tdenno || d.jdenno ? (await this.kakosrv.ofOrder((d.tdenno || d.jdenno)!, !!d.tdenno)).filter(s => s.kno != d.kno) : [];
   }
 
-  /** 受注伝票を読む。fill = true は顧客・内勤・刺繍/プリントの明細を加工指示に入れる */
-  private async loadOrder(jdenno: number, fill: boolean) {
-    const o = await this.kakosrv.order(jdenno);
+  /** 元の伝票の名前（受注伝票 / 展開伝票） */
+  get srcName(): string {
+    return this.den.tdenno || this.order?.src == 'T' ? '展開伝票' : '受注伝票';
+  }
+
+  /**
+   * 受注伝票（src = 'J'）・展開伝票（src = 'T'）を読む。fill = true は顧客・内勤・商品を加工指示に入れる。
+   * 受注伝票は、在庫種別が加工指示の種類（刺繍依頼 / プリント）の明細だけを選んでおく。展開伝票は展開元の商品を全部選んでおく
+   */
+  private async loadOrder(src: 'J' | 'T', denno: number, fill: boolean) {
+    const o = src == 'T' ? await this.kakosrv.tenkai(denno) : await this.kakosrv.order(denno);
     this.order = o;
     if (!o) {
-      this.usrsrv.toastWar('受注伝票' + jdenno + 'が見つかりません');
+      this.usrsrv.toastWar((src == 'T' ? '展開伝票' : '受注伝票') + denno + 'が見つかりません');
       return;
     }
     this.picked = {};
     if (fill) {
-      this.den.jdenno = o.denno;
+      this.den.jdenno = src == 'J' ? o.denno : null;
+      this.den.tdenno = src == 'T' ? o.denno : null;
       this.den.mcode = o.mcode;
       this.den.mname = o.mname;
       this.den.tcode = o.tcode || this.den.tcode;
       this.den.rscode = o.scode;
-      const kako = o.lines.filter(l => l.spec == '6' || l.spec == '7');
-      if (kako.length) {
-        this.den.kind = kako[0].spec!;
+      if (src == 'T') {
+        o.lines.forEach(l => this.picked[l.line] = true);
+      } else {
+        const kako = o.lines.filter(l => l.spec == '6' || l.spec == '7');
+        this.den.kind = kako.find(l => l.spec == '6')?.spec ?? kako[0]?.spec ?? '6';
+        o.lines.filter(l => l.spec == this.den.kind).forEach(l => this.picked[l.line] = true);
       }
-      // 刺繍依頼・プリントの明細を選んでおく（無ければ、加工の付属品でない商品を全部）
-      const base = kako.length ? kako : o.lines;
-      base.forEach(l => this.picked[l.line] = true);
       this.syncLines();
+      await this.loadPatterns(true);
     } else {
       this.den.lines.forEach(l => {
         if (l.jline) {
@@ -328,7 +341,8 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     }
   }
 
-  async modeToCre(jdenno = 0) {
+  /** 新規（jdenno: 受注伝票から、tdenno: 展開伝票から） */
+  async modeToCre(jdenno = 0, tdenno = 0) {
     if (!this.usrsrv.confirmCan(this.shouldConfirmOnBeforeunload())) {
       return;
     }
@@ -339,24 +353,25 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     this.kno = 0;
     this.order = null;
     this.siblings = [];
+    this.patterns = [];
     this.dirty = false;
-    history.replaceState('', '', './frmkako/1/0' + (jdenno ? '?jdenno=' + jdenno : ''));
-    if (jdenno) {
+    history.replaceState('', '', './frmkako/1/0' + (tdenno ? '?tdenno=' + tdenno : jdenno ? '?jdenno=' + jdenno : ''));
+    if (jdenno || tdenno) {
       this.busy = true;
       this.cdRef.detectChanges();
       try {
-        await this.loadOrder(jdenno, true);
+        await this.loadOrder(tdenno ? 'T' : 'J', tdenno || jdenno, true);
         await this.loadSiblings();
       } catch (e) {
-        this.usrsrv.toastErr('受注伝票を読めませんでした', (e as Error).message);
+        this.usrsrv.toastErr((tdenno ? '展開伝票' : '受注伝票') + 'を読めませんでした', (e as Error).message);
       }
       this.busy = false;
     }
     this.cdRef.detectChanges();
   }
 
-  /** 受注伝票番号を入れたとき（新規） */
-  async setJdenno(v: string) {
+  /** 受注伝票番号・展開伝票番号を入れたとき（新規） */
+  async setSrcDenno(src: 'J' | 'T', v: string) {
     const n = Number(v);
     if (!n) {
       return;
@@ -364,11 +379,11 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     this.busy = true;
     this.cdRef.detectChanges();
     try {
-      await this.loadOrder(n, true);
+      await this.loadOrder(src, n, true);
       await this.loadSiblings();
       this.touch();
     } catch (e) {
-      this.usrsrv.toastErr('受注伝票を読めませんでした', (e as Error).message);
+      this.usrsrv.toastErr((src == 'T' ? '展開伝票' : '受注伝票') + 'を読めませんでした', (e as Error).message);
     }
     this.busy = false;
     this.cdRef.detectChanges();
@@ -377,8 +392,9 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
   modeToUpd() {
     this.mode = 2;
     history.replaceState('', '', './frmkako/2/' + this.den.kno);
-    if (this.den.jdenno && !this.order) {
-      this.loadOrder(this.den.jdenno, false).then(() => this.cdRef.detectChanges()).catch(() => undefined);
+    const d = this.den;
+    if ((d.jdenno || d.tdenno) && !this.order) {
+      this.loadOrder(d.tdenno ? 'T' : 'J', (d.tdenno || d.jdenno)!, false).then(() => this.cdRef.detectChanges()).catch(() => undefined);
     }
   }
 
@@ -417,6 +433,7 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     this.picked[line] = !this.picked[line];
     this.syncLines();
     this.touch();
+    this.refreshPatterns();
   }
 
   addLine() {
@@ -445,6 +462,7 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
         this.den.lines[i].gcode = data.gcode;
         this.den.lines[i].gtext = data.gtext ?? this.den.lines[i].gtext;
         this.touch();
+        this.refreshPatterns();
         this.cdRef.detectChanges();
       }
     });
@@ -474,6 +492,146 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     }
     this.den.naiyo = parts.join('/');
     this.touch();
+  }
+
+  // ===================== 加工マスタ =====================
+  /** 加工する商品の商品コード → 商品グループコード */
+  groups = new Map<string, string>();
+  /** 加工する商品の商品グループ・この顧客の加工マスタ */
+  patterns: KakoPattern[] = [];
+  /** マスタに登録する商品グループ・パターン（0 は新しいパターン）・パターンの名前 */
+  mstGrp = '';
+  mstPtn = 0;
+  mstName = '';
+
+  /** 加工する商品の商品グループ（重ならないように） */
+  get lineGroups(): string[] {
+    return [...new Set(this.den.lines.map(l => this.groups.get(l.gcode) ?? '').filter(g => g))];
+  }
+
+  /** マスタに登録する商品グループの今のパターン */
+  get mstPatterns(): KakoPattern[] {
+    return this.patterns.filter(p => p.grpcode == this.mstGrp);
+  }
+
+  /**
+   * 商品グループと加工マスタを読む。apply = true（受注伝票・展開伝票から新しく作るとき）は、
+   * パターンが 1 つだけならそれを入れる（2 つ以上なら選んでもらう）
+   */
+  async loadPatterns(apply: boolean) {
+    try {
+      this.groups = await this.kakosrv.groupsOf(this.den.lines.map(l => l.gcode));
+      this.patterns = await this.kakosrv.patterns(this.lineGroups, this.den.mcode);
+    } catch (e) {
+      // 加工マスタが無い（Hasura の設定前など）ときも、加工指示は作れるようにする
+      this.patterns = [];
+      console.log('error kako patterns', e);
+    }
+    if (!this.lineGroups.includes(this.mstGrp)) {
+      this.mstGrp = this.lineGroups[0] ?? '';
+      this.mstPtn = 0;
+    }
+    if (apply) {
+      if (this.patterns.length == 1) {
+        this.applyPattern(this.patterns[0], false);
+        this.usrsrv.toastSuc('加工マスタ（' + this.patternLabel(this.patterns[0]) + '）の内容を入れました');
+      } else if (this.patterns.length > 1) {
+        this.usrsrv.toastWar('加工マスタにパターンが ' + this.patterns.length + ' つあります。「加工マスタ」から選んでください');
+      }
+    }
+    this.cdRef.detectChanges();
+  }
+
+  patternLabel(p: KakoPattern): string {
+    return p.grpcode + ' パターン' + p.ptn + (p.ptname ? '「' + p.ptname + '」' : '');
+  }
+
+  /** 加工マスタの内容（種類・加工先・加工内容・位置と内容・備考）を入れる */
+  applyPattern(p: KakoPattern, ask = true) {
+    const filled = this.den.posis.some(x => x.posi || x.naiyo || x.img);
+    if (ask && filled && !confirm('いま入っている位置と内容を、' + this.patternLabel(p) + ' に置き換えます。よろしいですか？')) {
+      return;
+    }
+    this.den.kind = p.kind || this.den.kind;
+    if (p.dcode) {
+      this.den.dtype = (p.dtype as 'S' | 'V') || 'S';
+      this.den.dcode = p.dcode;
+    }
+    this.den.naiyo = p.naiyo;
+    if (p.memo) {
+      this.den.memo = p.memo;
+    }
+    this.den.posis = p.posis.length ? structuredClone(p.posis) : [emptyPosi(1)];
+    this.mstGrp = p.grpcode;
+    this.mstPtn = p.ptn;
+    this.mstName = p.ptname;
+    this.touch();
+  }
+
+  /** いまの種類・加工先・加工内容・位置と内容・備考を、加工マスタに登録する（新しいパターン、または上書き） */
+  async saveMaster() {
+    if (!this.den.mcode) {
+      this.usrsrv.toastWar('顧客がありません。受注伝票か展開伝票から作った加工指示で登録してください');
+      return;
+    }
+    if (!this.mstGrp) {
+      this.usrsrv.toastWar('商品グループを選んでください');
+      return;
+    }
+    if (!this.den.posis.some(x => x.posi || x.naiyo || x.img)) {
+      this.usrsrv.toastWar('位置と内容を入れてから登録してください');
+      return;
+    }
+    const old = this.mstPatterns.find(p => p.ptn == this.mstPtn);
+    const what = this.mstGrp + '・' + this.den.mcode + ' の' + (old ? ' ' + this.patternLabel(old) + ' に上書き' : '新しいパターン') + 'で';
+    if (!confirm('いまの位置と内容を、加工マスタ（' + what + '）に登録します。よろしいですか？')) {
+      return;
+    }
+    this.busy = true;
+    this.cdRef.detectChanges();
+    try {
+      const ptn = await this.kakosrv.saveMaster({
+        grpcode: this.mstGrp, mcode: this.den.mcode, ptn: old ? old.ptn : 0, ptname: this.mstName.trim(), kind: this.den.kind,
+        dtype: this.den.dtype, dcode: this.den.dcode, naiyo: this.den.naiyo, memo: this.den.memo, posis: this.den.posis
+      });
+      await this.loadPatterns(false);
+      this.mstPtn = ptn;
+      this.usrsrv.toastSuc('加工マスタに登録しました（' + this.mstGrp + ' パターン' + ptn + '）');
+    } catch (e) {
+      this.usrsrv.toastErr('加工マスタに登録できませんでした', (e as Error).message);
+      console.log('error save kako master', e);
+    }
+    this.busy = false;
+    this.cdRef.detectChanges();
+  }
+
+  async delMaster(p: KakoPattern) {
+    if (!confirm('加工マスタの ' + this.patternLabel(p) + ' を消します。よろしいですか？')) {
+      return;
+    }
+    try {
+      await this.kakosrv.delMaster(p.grpcode, p.mcode, p.ptn);
+      this.mstPtn = 0;
+      await this.loadPatterns(false);
+      this.usrsrv.toastSuc(this.patternLabel(p) + ' を消しました');
+    } catch (e) {
+      this.usrsrv.toastErr('加工マスタを消せませんでした', (e as Error).message);
+    }
+    this.cdRef.detectChanges();
+  }
+
+  setMstPtn(v: string) {
+    this.mstPtn = Number(v) || 0;
+    this.mstName = this.mstPatterns.find(p => p.ptn == this.mstPtn)?.ptname ?? '';
+  }
+
+  /** 商品を変えたあと、商品グループと加工マスタを読み直す */
+  refreshPatterns() {
+    const missing = this.den.lines.some(l => l.gcode && !this.groups.has(l.gcode));
+    const shown = new Set(this.patterns.map(p => p.grpcode));
+    if (missing || this.lineGroups.some(g => !shown.has(g))) {
+      this.loadPatterns(false);
+    }
   }
 
   // ===================== 保存 =====================
@@ -584,7 +742,9 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
   }
 
   openOrder() {
-    if (this.den.jdenno) {
+    if (this.den.tdenno) {
+      this.usrsrv.openMst('frmtenkai', String(this.den.tdenno));
+    } else if (this.den.jdenno) {
       this.usrsrv.openMst('frmsales', String(this.den.jdenno));
     }
   }

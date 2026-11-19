@@ -98,29 +98,6 @@ declare namespace mwI {
     region: string;
     local: string;
   }
-  interface Proc {
-    // mcode: string;
-    prcno: number;
-    // seq: number;
-    // prcpat: string;
-    // vcode: string;
-    // memo: string;
-    // tanka: number;
-    // genka: number;
-    prcname: string;
-    code: string;
-    // posi01: number;
-    // posi02: number;
-    // posi03: number;
-    // posi04: number;
-    // posi05: number;
-    // posi06: number;
-    // posi07: number;
-    // posi08: number;
-    // posi09: number;
-    // posi10: number;
-  }
-
   interface Edahlp {
     eda: number;
     zip: string;
@@ -200,7 +177,6 @@ declare namespace mwI {
     mtgt5: boolean;
     gadr: string;
     msmadrs: Adrs[];
-    msprocesses: Proc[];
   }
   interface Gtanka {
     gcode: string;

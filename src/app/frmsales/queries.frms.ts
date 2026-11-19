@@ -7,10 +7,6 @@ query get_good($id: smallint!,$gds:String!,$day: date!,$mcd:String!,$sptnk:Strin
       code
       gkbn
       vcode
-      msprocesses(where: {mcode: {_eq: $mcd}}) {
-        prcno
-        prcname
-      }
     }
     gcode
     gtext
@@ -94,12 +90,7 @@ query get_member($id: smallint!,$mcode:String!) {
       smemo
       omemo
       del
-    } 
-    msprocesses {
-      prcno
-      prcname
-      code
-    } 
+    }
   }
 }`;
 export const GetTran = gql`

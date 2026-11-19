@@ -226,7 +226,7 @@ export class MovcheckComponent implements AfterViewInit, OnDestroy {
         const st = r[0];
         if (st && this.doc === d) {
           it.stock = Number(st.stock ?? 0);
-          it.pable = Number(st.stock ?? 0) - Number(st.hikat ?? 0) - Number(st.keepd ?? 0);
+          it.pable = Number(st.stock ?? 0) - Number(st.hikat ?? 0) - Number(st.keepd ?? 0) - Number(st.kakod ?? 0);
           this.cdRef.detectChanges();
         }
       }).catch(e => console.log('error movcheck stock', e));

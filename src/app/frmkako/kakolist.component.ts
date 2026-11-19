@@ -128,7 +128,9 @@ export class KakolistComponent implements AfterViewInit {
 
   openOrder(r: KakoRow, ev: Event) {
     ev.stopPropagation();
-    if (r.jdenno) {
+    if (r.tdenno) {
+      this.usrsrv.openMst('frmtenkai', String(r.tdenno));
+    } else if (r.jdenno) {
       this.usrsrv.openMst('frmsales', String(r.jdenno));
     }
   }
@@ -142,7 +144,7 @@ export class KakolistComponent implements AfterViewInit {
       ws.addRow(['依頼日', '伝票番号', '顧客', '内勤', '商品', '数量', '加工内容', '希望納期', '同梱', '連番', '加工先', '倉庫から発送', '加工先で受取', '加工済・発送', '倉庫で受取', '予定納期', '状態', '加工指示', '備考']);
       const day = (s: string) => (s ? s.slice(0, 10) : '');
       for (const r of this.rows) {
-        ws.addRow([r.reqday, r.jdenno ?? '', r.mname, this.stfsrv.getName(r.tcode) || r.tcode, r.gcodes, r.suu, r.naiyo, r.wishday,
+        ws.addRow([r.reqday, r.tdenno ? '展開' + r.tdenno : r.jdenno ?? '', r.mname, this.stfsrv.getName(r.tcode) || r.tcode, r.gcodes, r.suu, r.naiyo, r.wishday,
           r.doukon ? '有' : '無', r.renban, this.destName(r.dtype, r.dcode), day(this.stepAt(r, 2)), day(this.stepAt(r, 3)),
           day(this.stepAt(r, 4)), day(this.stepAt(r, 5)), this.due(r), (r.del ? '取消 ' : '') + stepName(r.status), r.kno, r.memo]);
       }
