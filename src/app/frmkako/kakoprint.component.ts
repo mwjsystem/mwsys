@@ -178,13 +178,14 @@ export class KakoprintComponent {
       { text: l.memo, fontSize: 8 }
     ]);
     // 図があるときは、空の行を減らして 1 枚に収める
-    while (goods.length < (land ? 4 : fig || d.photo ? 3 : 6)) {
+    while (goods.length < (land ? 3 : fig || d.photo ? 3 : 6)) {
       goods.push(['', '', '', '']);
     }
     // 位置と内容（番号は図の札の番号。図に場所のない位置の刺繍の図は、表の右に小さく貼る）
     const posis: TableCell[][] = d.posis.map((p, i) => [
       { text: String(i + 1), fontSize: 11, bold: true, alignment: 'center', color: '#ffffff', fillColor: '#000000' },
-      { text: p.posi, fontSize: 12, bold: true, alignment: 'center' },
+      // 長い位置（例：ベルトの真ん中）は小さくして、行が高くなりすぎないようにする
+      { text: p.posi, fontSize: p.posi.length > 3 ? 9 : 12, bold: true, alignment: 'center' },
       { text: p.naiyo, fontSize: 13 },
       { text: p.shotai, fontSize: 9 },
       { text: p.color, fontSize: 10 },
@@ -192,8 +193,8 @@ export class KakoprintComponent {
       { text: p.memo, fontSize: 8 },
       p.img && !spotOf(p.posi) ? { image: p.img, fit: [56, 34], alignment: 'center' } : ''
     ]);
-    // 横は左の欄がページの下まで届くので、空の行を 5 にする（6 だと下の余白で白紙の 2 ページ目ができた）
-    while (posis.length < (land ? 5 : fig || d.photo ? 3 : 7)) {
+    // 横は左の欄がページの下まで届くので、空の行は合わせて 4 行まで（内容の行が高いと 2 ページ目にはみ出すため）
+    while (posis.length < (land ? 4 : fig || d.photo ? 3 : 7)) {
       posis.push(['', '', '', '', '', '', '', '']);
     }
     const info: TableCell[][] = [
@@ -253,7 +254,7 @@ export class KakoprintComponent {
       { text: '位置と内容', fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
       {
         table: {
-          headerRows: 1, widths: land ? [14, 38, '*', 44, 44, 40, 50, 44] : [16, 44, '*', 56, 52, 56, 70, 60],
+          headerRows: 1, widths: land ? [14, 52, '*', 40, 36, 36, 44, 44] : [16, 56, '*', 52, 48, 52, 66, 60],
           body: [[th('No'), th('位置'), th('文字・内容'), th('書体'), th('糸色'), th('サイズ'), th('備考'), th('刺繍の図')], ...posis]
         },
         // 横は左の欄の最後なので、下の余白を付けない（余白だけで 2 ページ目にならないように）
