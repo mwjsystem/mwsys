@@ -122,7 +122,10 @@ const schemaSwitchLink = new ApolloLink((operation, forward) => {
 
 /** 終わっていない問い合わせ（「データを読み込んでいます」が消えないときに調べる） */
 const pendingOps = new Set<{ name: string; at: string }>();
-(window as unknown as { mwsysPending: () => string[] }).mwsysPending = () => [...pendingOps].map(o => o.name + ' ' + o.at);
+(window as unknown as { mwsysPending: () => unknown }).mwsysPending = () => ({
+  ops: [...pendingOps].map(o => o.name + ' ' + o.at),
+  busy: BusyService.current?.debug(),
+});
 
 /** データベースを読み書きしているあいだ「処理中」を出すリンク */
 function createBusyLink(busy: BusyService): ApolloLink {

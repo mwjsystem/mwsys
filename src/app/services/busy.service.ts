@@ -15,6 +15,7 @@ export class BusyService {
 
   constructor() {
     BusyService.current = this;
+    BusyService.count++;
   }
   private running: string[] = [];
   private timer?: ReturnType<typeof setTimeout>;
@@ -48,6 +49,12 @@ export class BusyService {
       }
     };
   }
+
+  /** 調べる用：今の状態 */
+  debug() {
+    return { running: [...this.running], active: this.active(), label: this.label(), instances: BusyService.count };
+  }
+  static count = 0;
 
   /** 処理（Promise を返す関数）のあいだ出す */
   async run<T>(label: string, fn: () => Promise<T>): Promise<T> {
