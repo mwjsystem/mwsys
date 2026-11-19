@@ -62,6 +62,8 @@ export interface KakoDen {
   doukon: boolean;
   naiyo: string;
   memo: string;
+  /** 商品の写真（加工する場所が分かるもの。画像の data URL。なければ ''）。道着・帯の絵がない商品の指示書用 */
+  photo: string;
   status: number;
   /** steps[2]〜steps[6] */
   steps: Record<number, KakoStep>;
@@ -84,7 +86,7 @@ export interface KakoOrder {
 /** 加工マスタ（商品グループ・顧客・パターンごと）。ptn = 0 は新しいパターン */
 export interface KakoPattern {
   grpcode: string; mcode: string; ptn: number; ptname: string; kind: string; dtype: string; dcode: string;
-  naiyo: string; memo: string; posis: KakoPosi[];
+  naiyo: string; memo: string; photo: string; posis: KakoPosi[];
   updated_at?: string | null; updated_by?: string | null;
 }
 
@@ -183,7 +185,7 @@ export class KakoService {
     const Get = gql`
       query kako_load($id: smallint!, $kno: Int!) {
         trkako_by_pk(id: $id, kno: $kno) {
-          ${HEAD}
+          ${HEAD} photo
           trkakomeis(order_by: {line: asc}) { line jline gcode gtext suu memo }
           trkakoposis(order_by: {line: asc}) { line posi naiyo shotai color size memo img }
         }
@@ -202,6 +204,7 @@ export class KakoService {
     return {
       ...this.head(h),
       rscode: (h['rscode'] as string | null) ?? '',
+      photo: (h['photo'] as string | null) ?? '',
       created_at: h['created_at'] as string, created_by: h['created_by'] as string,
       updated_at: h['updated_at'] as string, updated_by: h['updated_by'] as string,
       lines: h.trkakomeis.map(l => ({ line: l.line, jline: l.jline, gcode: l.gcode, gtext: l.gtext ?? '', suu: Number(l.suu ?? 0), memo: l.memo ?? '' })),
@@ -236,7 +239,7 @@ export class KakoService {
     const head = {
       jdenno: d.jdenno || null, tdenno: d.tdenno || null, mcode: d.mcode || null, mname: d.mname || null, kind: d.kind, dtype: d.dtype, dcode: d.dcode,
       rscode: d.rscode || null, tcode: d.tcode, reqday: d.reqday, wishday: d.wishday || null, planday: d.planday || null,
-      doukon: d.doukon, naiyo: d.naiyo || null, memo: d.memo || null, updated_at: now, updated_by: by
+      doukon: d.doukon, naiyo: d.naiyo || null, memo: d.memo || null, photo: d.photo || null, updated_at: now, updated_by: by
     };
     const meis = d.lines.filter(l => l.gcode).map((l, i) => ({
       id, kno, line: i + 1, jline: l.jline, gcode: l.gcode, gtext: l.gtext || null, suu: Number(l.suu) || 0, memo: l.memo || null
@@ -422,7 +425,7 @@ export class KakoService {
     const Get = gql`
       query kako_patterns($id: smallint!, $grps: [String!]!, $mcode: String!) {
         mskako(where: {id: {_eq: $id}, grpcode: {_in: $grps}, mcode: {_eq: $mcode}}, order_by: [{grpcode: asc}, {ptn: asc}]) {
-          grpcode mcode ptn ptname kind dtype dcode naiyo memo updated_at updated_by
+          grpcode mcode ptn ptname kind dtype dcode naiyo memo photo updated_at updated_by
           mskakoposis(order_by: {line: asc}) { line posi naiyo shotai color size memo img }
         }
       }`;
@@ -436,7 +439,7 @@ export class KakoService {
     const s = (v: unknown) => (v as string | null) ?? '';
     return res.data.mskako.map(m => ({
       grpcode: s(m['grpcode']), mcode: s(m['mcode']), ptn: Number(m['ptn']), ptname: s(m['ptname']), kind: s(m['kind']) || '6',
-      dtype: s(m['dtype']), dcode: s(m['dcode']), naiyo: s(m['naiyo']), memo: s(m['memo']),
+      dtype: s(m['dtype']), dcode: s(m['dcode']), naiyo: s(m['naiyo']), memo: s(m['memo']), photo: s(m['photo']),
       updated_at: m['updated_at'] as string | null, updated_by: m['updated_by'] as string | null,
       posis: m.mskakoposis.map(p => ({ line: p.line, posi: p.posi ?? '', naiyo: p.naiyo ?? '', shotai: p.shotai ?? '', color: p.color ?? '', size: p.size ?? '', memo: p.memo ?? '', img: p.img ?? '' }))
     }));
@@ -513,7 +516,7 @@ export class KakoService {
     const key = { id, grpcode: p.grpcode, mcode: p.mcode, ptn };
     const head = {
       ptname: p.ptname || null, kind: p.kind, dtype: p.dcode ? p.dtype : null, dcode: p.dcode || null,
-      naiyo: p.naiyo || null, memo: p.memo || null, updated_at: now, updated_by: by
+      naiyo: p.naiyo || null, memo: p.memo || null, photo: p.photo || null, updated_at: now, updated_by: by
     };
     const posis = p.posis.filter(x => x.posi || x.naiyo || x.img).map((x, i) => ({
       ...key, line: i + 1, posi: x.posi || null, naiyo: x.naiyo || null, shotai: x.shotai || null, color: x.color || null,
@@ -522,7 +525,7 @@ export class KakoService {
     // 見出しは登録（あれば上書き）、位置は消してから入れ直す（1 トランザクション）
     const Save = gql`
       mutation kako_master_save($head: mskako_insert_input!, $id: smallint!, $grp: String!, $mcode: String!, $ptn: smallint!, $posis: [mskakoposi_insert_input!]!) {
-        insert_mskako_one(object: $head, on_conflict: {constraint: mskako_pkey, update_columns: [ptname, kind, dtype, dcode, naiyo, memo, updated_at, updated_by]}) { ptn }
+        insert_mskako_one(object: $head, on_conflict: {constraint: mskako_pkey, update_columns: [ptname, kind, dtype, dcode, naiyo, memo, photo, updated_at, updated_by]}) { ptn }
         delete_mskakoposi(where: {id: {_eq: $id}, grpcode: {_eq: $grp}, mcode: {_eq: $mcode}, ptn: {_eq: $ptn}}) { affected_rows }
         insert_mskakoposi(objects: $posis) { affected_rows }
       }`;

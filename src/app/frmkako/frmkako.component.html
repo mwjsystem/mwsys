@@ -194,7 +194,7 @@
               <input [(ngModel)]="mstName" placeholder="パターンの名前（例：名前入り）" style="width: 12em;">
               <button mat-flat-button color="primary" type="button" (click)="saveMaster()" [disabled]="busy"><mat-icon>bookmark_add</mat-icon>マスタに登録</button>
               <span class="sub" [class.warn]="!den.dcode">
-                （種類「{{kindName(den.kind)}}」・加工先「{{den.dcode ? destName(den.dtype, den.dcode) : '未選択'}}」・加工内容・位置と内容を登録します{{den.dcode ? '' : '。加工先も覚えるときは、先に上の加工先を選んでください'}}）
+                （種類「{{kindName(den.kind)}}」・加工先「{{den.dcode ? destName(den.dtype, den.dcode) : '未選択'}}」・加工内容・位置と内容{{den.photo ? '・商品の写真' : ''}}を登録します{{den.dcode ? '' : '。加工先も覚えるときは、先に上の加工先を選んでください'}}）
               </span>
             </div>
           }
@@ -251,6 +251,24 @@
       @if (editable && den.posis.length == 0) {
         <button mat-stroked-button type="button" (click)="addPosi(0)"><mat-icon>add</mat-icon>位置を足す</button>
       }
+      <!-- 商品の写真（道着・帯の絵がない商品で、加工する場所が分かるもの） -->
+      <div class="photobox">
+        <div class="fighint">商品の写真（ファールカップ・スポーツブラなど道着・帯の絵がない商品は、加工する場所が分かる写真を入れてください。指示書に出ます）</div>
+        @if (den.photo) {
+          <div class="photo">
+            <img [src]="den.photo" alt="商品の写真">
+            @if (editable) {
+              <button mat-icon-button class="sm" type="button" (click)="delPhoto()" matTooltip="商品の写真を外す"><mat-icon>close</mat-icon></button>
+            }
+          </div>
+        } @else if (editable) {
+          <input #upphoto type="file" accept="image/*" hidden (change)="pickPhoto($event)">
+          <button mat-stroked-button type="button" (click)="upphoto.click()"><mat-icon>add_photo_alternate</mat-icon>写真を選ぶ</button>
+          <span class="paste big" tabindex="0" (paste)="pastePhoto($event)" matTooltip="ここを押してから Ctrl+V で、コピーした画像を貼り付け">ここを押して Ctrl+V で貼付</span>
+        } @else {
+          <span class="sub">なし</span>
+        }
+      </div>
       @if (fig) {
         <div class="figbox">
           <div class="fighint">指示書の図（位置と内容から描きます。黒い四角の数字が上の表の番号。刺繍の図があればその画像、なければ文字を描きます）</div>

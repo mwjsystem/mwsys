@@ -45,6 +45,9 @@ import { KakoFigure, kakoFigure } from './kakofig';
             <div class="name"><b>{{l.gcode}}</b> × {{l.suu}}<br><span class="memo">{{l.gtext}}</span></div>
           }
         </div>
+        @if (den.photo) {
+          <img [src]="den.photo" alt="商品の写真" style="width: 100%; border: 1px solid #dddddd; margin: 4px 0;">
+        }
         @if (fig) {
           <img [src]="fig.url" alt="指示書の図" style="width: 100%; border: 1px solid #dddddd; margin: 4px 0;">
         }

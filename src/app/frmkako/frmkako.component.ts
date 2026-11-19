@@ -114,7 +114,7 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     return {
       kno: 0, jdenno: null, tdenno: null, mcode: '', mname: '', kind: '6', dtype: 'S', dcode: '', rscode: '', renban: '',
       tcode: this.usrsrv.staff?.code ?? '', reqday: today, wishday: '', planday: this.kakosrv.planDay(today),
-      doukon: false, naiyo: '', memo: '', status: 1, steps: {}, del: false,
+      doukon: false, naiyo: '', memo: '', photo: '', status: 1, steps: {}, del: false,
       created_at: null, created_by: null, updated_at: null, updated_by: null, lines: [], posis: [emptyPosi(1), emptyPosi(2), emptyPosi(3)]
     };
   }
@@ -239,6 +239,45 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
 
   delImg(p: KakoPosi) {
     p.img = '';
+    this.touch();
+  }
+
+  // ===================== 商品の写真 =====================
+  /** 商品の写真（道着・帯の絵がない商品で、加工する場所が分かるもの）をファイルから選んだとき */
+  async pickPhoto(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const f = input.files?.[0];
+    input.value = '';
+    if (f) {
+      await this.setPhoto(f);
+    }
+  }
+
+  /** 商品の写真を貼り付けたとき */
+  async pastePhoto(ev: ClipboardEvent) {
+    const item = [...(ev.clipboardData?.items ?? [])].find(i => i.type.startsWith('image/'));
+    const f = item?.getAsFile();
+    if (!f) {
+      this.usrsrv.toastWar('貼り付けたものに画像がありません');
+      return;
+    }
+    ev.preventDefault();
+    await this.setPhoto(f);
+  }
+
+  private async setPhoto(f: Blob) {
+    try {
+      // 指示書で大きめに出すので、刺繍の図より大きく残す
+      this.den.photo = await shrinkImage(f, 1000);
+      this.touch();
+    } catch (e) {
+      this.usrsrv.toastErr('商品の写真を入れられませんでした', (e as Error).message);
+    }
+    this.cdRef.detectChanges();
+  }
+
+  delPhoto() {
+    this.den.photo = '';
     this.touch();
   }
 
@@ -580,6 +619,9 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     if (p.memo) {
       this.den.memo = p.memo;
     }
+    if (p.photo) {
+      this.den.photo = p.photo;
+    }
     this.den.posis = p.posis.length ? structuredClone(p.posis) : [emptyPosi(1)];
     this.mstGrp = p.grpcode;
     this.mstPtn = p.ptn;
@@ -597,14 +639,14 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
       this.usrsrv.toastWar('商品グループを選んでください');
       return;
     }
-    if (!this.den.posis.some(x => x.posi || x.naiyo || x.img)) {
-      this.usrsrv.toastWar('位置と内容を入れてから登録してください');
+    if (!this.den.posis.some(x => x.posi || x.naiyo || x.img) && !this.den.photo) {
+      this.usrsrv.toastWar('位置と内容（または商品の写真）を入れてから登録してください');
       return;
     }
     const old = this.mstPatterns.find(p => p.ptn == this.mstPtn);
     const what = this.mstGrp + '・' + this.den.mcode + ' の' + (old ? ' ' + this.patternLabel(old) + ' に上書き' : '新しいパターン') + 'で';
     const dest = this.den.dcode ? '加工先「' + this.destName(this.den.dtype, this.den.dcode) + '」' : '加工先なし（加工先が選ばれていません）';
-    if (!confirm('いまの種類・' + dest + '・加工内容・位置と内容を、加工マスタ（' + what + '）に登録します。よろしいですか？')) {
+    if (!confirm('いまの種類・' + dest + '・加工内容・位置と内容' + (this.den.photo ? '・商品の写真' : '') + 'を、加工マスタ（' + what + '）に登録します。よろしいですか？')) {
       return;
     }
     this.busy = true;
@@ -612,7 +654,7 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     try {
       const ptn = await this.kakosrv.saveMaster({
         grpcode: this.mstGrp, mcode: this.den.mcode, ptn: old ? old.ptn : 0, ptname: this.mstName.trim(), kind: this.den.kind,
-        dtype: this.den.dtype, dcode: this.den.dcode, naiyo: this.den.naiyo, memo: this.den.memo, posis: this.den.posis
+        dtype: this.den.dtype, dcode: this.den.dcode, naiyo: this.den.naiyo, memo: this.den.memo, photo: this.den.photo, posis: this.den.posis
       });
       await this.loadPatterns(false);
       this.mstPtn = ptn;

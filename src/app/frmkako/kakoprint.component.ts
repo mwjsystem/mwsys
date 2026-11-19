@@ -178,7 +178,7 @@ export class KakoprintComponent {
       { text: l.memo, fontSize: 8 }
     ]);
     // 図があるときは、空の行を減らして 1 枚に収める
-    while (goods.length < (land ? 4 : fig ? 3 : 6)) {
+    while (goods.length < (land ? 4 : fig || d.photo ? 3 : 6)) {
       goods.push(['', '', '', '']);
     }
     // 位置と内容（番号は図の札の番号。図に場所のない位置の刺繍の図は、表の右に小さく貼る）
@@ -192,7 +192,7 @@ export class KakoprintComponent {
       { text: p.memo, fontSize: 8 },
       p.img && !spotOf(p.posi) ? { image: p.img, fit: [56, 34], alignment: 'center' } : ''
     ]);
-    while (posis.length < (land ? 6 : fig ? 3 : 7)) {
+    while (posis.length < (land ? 6 : fig || d.photo ? 3 : 7)) {
       posis.push(['', '', '', '', '', '', '', '']);
     }
     const info: TableCell[][] = [
@@ -262,6 +262,22 @@ export class KakoprintComponent {
       table: { widths: ['*'], heights: [h], body: [[{ stack: [{ text: '備考', fontSize: 8, color: '#555555' }, { text: d.memo, fontSize: 11 }] }]] },
       layout: grid, margin: [0, 0, 0, 8]
     });
+    // 図の欄：商品の写真（道着・帯の絵がない商品）と、道着・帯の図。両方あれば並べる
+    const photo = d.photo || '';
+    const visual = (w: number, h: number, stacked: boolean): Content[] => {
+      if (photo && fig) {
+        return stacked
+          ? [{ image: photo, fit: [w, h / 2 - 3], alignment: 'center', margin: [0, 0, 0, 6] } as Content,
+             { image: fig.url, fit: [w, h / 2 - 3], alignment: 'center', margin: [0, 0, 0, 6] } as Content]
+          : [{ columns: [
+              { width: Math.round(w * 0.4), image: photo, fit: [Math.round(w * 0.4), h], alignment: 'center' },
+              { width: '*', image: fig.url, fit: [w - Math.round(w * 0.4) - 8, h], alignment: 'center' }
+            ], columnGap: 8, margin: [0, 0, 0, 4] } as Content];
+      }
+      const url = photo || fig?.url;
+      return url ? [{ image: url, fit: [w, h], alignment: 'center', margin: [0, 0, 0, stacked ? 6 : 4] } as Content] : [];
+    };
+    const hasVisual = !!(photo || fig);
     const base = {
       pageSize: 'A4' as const,
       pageMargins: [28, 28, 28, 28] as [number, number, number, number],
@@ -280,8 +296,8 @@ export class KakoprintComponent {
               { width: 400, stack: [infoTbl, ...goodsTbl, ...posiTbl] },
               {
                 width: '*', stack: [
-                  ...(fig ? [{ image: fig.url, fit: [376, 250], alignment: 'center', margin: [0, 0, 0, 6] } as Content] : []),
-                  memoBox(fig ? 60 : 250),
+                  ...visual(376, 250, true),
+                  memoBox(hasVisual ? 60 : 250),
                   stepBox
                 ]
               }
@@ -297,9 +313,9 @@ export class KakoprintComponent {
         head,
         infoTbl,
         ...goodsTbl,
-        ...(fig ? [{ image: fig.url, fit: [539, 195], alignment: 'center', margin: [0, 0, 0, 4] } as Content] : []),
+        ...visual(539, 195, false),
         ...posiTbl,
-        memoBox(fig ? 44 : 70),
+        memoBox(hasVisual ? 44 : 70),
         stepBox
       ]
     };
