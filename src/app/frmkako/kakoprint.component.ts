@@ -192,7 +192,8 @@ export class KakoprintComponent {
       { text: p.memo, fontSize: 8 },
       p.img && !spotOf(p.posi) ? { image: p.img, fit: [56, 34], alignment: 'center' } : ''
     ]);
-    while (posis.length < (land ? 6 : fig || d.photo ? 3 : 7)) {
+    // 横は左の欄がページの下まで届くので、空の行を 5 にする（6 だと下の余白で白紙の 2 ページ目ができた）
+    while (posis.length < (land ? 5 : fig || d.photo ? 3 : 7)) {
       posis.push(['', '', '', '', '', '', '', '']);
     }
     const info: TableCell[][] = [
@@ -255,7 +256,8 @@ export class KakoprintComponent {
           headerRows: 1, widths: land ? [14, 38, '*', 44, 44, 40, 50, 44] : [16, 44, '*', 56, 52, 56, 70, 60],
           body: [[th('No'), th('位置'), th('文字・内容'), th('書体'), th('糸色'), th('サイズ'), th('備考'), th('刺繍の図')], ...posis]
         },
-        layout: grid, margin: [0, 0, 0, 8]
+        // 横は左の欄の最後なので、下の余白を付けない（余白だけで 2 ページ目にならないように）
+        layout: grid, margin: [0, 0, 0, land ? 0 : 8]
       }
     ];
     const memoBox = (h: number): Content => ({
@@ -267,8 +269,8 @@ export class KakoprintComponent {
     const visual = (w: number, h: number, stacked: boolean): Content[] => {
       if (photo && fig) {
         return stacked
-          ? [{ image: photo, fit: [w, h / 2 - 3], alignment: 'center', margin: [0, 0, 0, 6] } as Content,
-             { image: fig.url, fit: [w, h / 2 - 3], alignment: 'center', margin: [0, 0, 0, 6] } as Content]
+          ? [{ image: photo, fit: [w, h / 2 - 6], alignment: 'center', margin: [0, 0, 0, 6] } as Content,
+             { image: fig.url, fit: [w, h / 2 - 6], alignment: 'center', margin: [0, 0, 0, 6] } as Content]
           : [{ columns: [
               { width: Math.round(w * 0.4), image: photo, fit: [Math.round(w * 0.4), h], alignment: 'center' },
               { width: '*', image: fig.url, fit: [w - Math.round(w * 0.4) - 8, h], alignment: 'center' }
