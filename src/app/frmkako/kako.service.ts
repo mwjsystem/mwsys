@@ -472,17 +472,18 @@ export class KakoService {
     const now = new Date();
     let ptn = p.ptn;
     if (!ptn) {
+      // いちばん大きいパターン番号（集計の権限が要らないよう、並べて 1 件だけ読む）
       const Max = gql`
         query kako_ptn_max($id: smallint!, $grp: String!, $mcode: String!) {
-          mskako_aggregate(where: {id: {_eq: $id}, grpcode: {_eq: $grp}, mcode: {_eq: $mcode}}) { aggregate { max { ptn } } }
+          mskako(where: {id: {_eq: $id}, grpcode: {_eq: $grp}, mcode: {_eq: $mcode}}, order_by: {ptn: desc}, limit: 1) { ptn }
         }`;
-      const r = await firstValueFrom(this.apollo.query<{ mskako_aggregate: { aggregate: { max: { ptn: number | null } } } }>({
+      const r = await firstValueFrom(this.apollo.query<{ mskako: { ptn: number }[] }>({
         query: Max, fetchPolicy: 'network-only', variables: { id, grp: p.grpcode, mcode: p.mcode }
       }));
       if (r.error || !r.data) {
         throw r.error ?? new Error('パターン番号を付けられませんでした');
       }
-      ptn = Number(r.data.mskako_aggregate.aggregate.max.ptn ?? 0) + 1;
+      ptn = Number(r.data.mskako[0]?.ptn ?? 0) + 1;
     }
     const key = { id, grpcode: p.grpcode, mcode: p.mcode, ptn };
     const head = {
