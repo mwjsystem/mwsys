@@ -8,6 +8,7 @@ import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
 import { VendsService } from './../mstvendor/vends.service';
 import { KAKO_KINDS, KAKO_STEPS, KakoDen, KakoService, stepName } from './kako.service';
+import { KakoFigure, kakoFigure } from './kakofig';
 
 /**
  * 加工指示の状態（各拠点のスマホ）。加工指示書の QR コードを読むと開く。
@@ -44,6 +45,9 @@ import { KAKO_KINDS, KAKO_STEPS, KakoDen, KakoService, stepName } from './kako.s
             <div class="name"><b>{{l.gcode}}</b> × {{l.suu}}<br><span class="memo">{{l.gtext}}</span></div>
           }
         </div>
+        @if (fig) {
+          <img [src]="fig.url" alt="指示書の図" style="width: 100%; border: 1px solid #dddddd; margin: 4px 0;">
+        }
         @for (s of steps; track $index; let i = $index) {
           <div class="item" [class.done]="den.status >= i + 1">
             <div class="code">{{den.status >= i + 1 ? '☑' : '☐'}} {{i + 1}}. {{s}}</div>
@@ -82,6 +86,8 @@ export class KakocheckComponent implements AfterViewInit {
   readonly stepName = stepName;
   kno = 0;
   den?: KakoDen;
+  /** 指示書の図（位置と内容から描く） */
+  fig: KakoFigure | null = null;
   msg = '';
   msgType: 'ok' | 'ng' | 'info' = 'info';
   dbMismatch = '';
@@ -146,6 +152,7 @@ export class KakocheckComponent implements AfterViewInit {
         this.show('加工指示 ' + this.kno + ' が見つかりません', 'ng');
       } else {
         this.den = d;
+        this.fig = await kakoFigure(d.posis, d.lines.map(l => l.gcode));
         if (d.dtype == 'V' && this.vensrv.vends.length == 0) {
           await this.vensrv.getVendors();
         }

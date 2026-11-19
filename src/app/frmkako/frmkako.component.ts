@@ -20,6 +20,7 @@ import {
   EXTYPE_KAKO, KAKO_KINDS, KAKO_STEPS, KakoDen, KakoOrder, KakoPosi, KakoRow, KakoService, NAIYO_WORDS, POSI_WORDS, stepName
 } from './kako.service';
 import { KakoprintComponent } from './kakoprint.component';
+import { KakoFigure, kakoFigure, shrinkImage, spotOf } from './kakofig';
 
 /** 加工先にする仕入先（名前にこの文字があれば、加工先の選択肢に出す。ほかの仕入先は「ほかの仕入先」から選ぶ） */
 export const KAKO_VENDOR_MARKS = ['堀商店', '小西マーク', '豊岡縫製'];
@@ -40,7 +41,7 @@ export function loadMasters(strsrv: StoreService, vensrv: VendsService, stfsrv: 
   }
 }
 
-const emptyPosi =(line: number): KakoPosi => ({ line, posi: '', naiyo: '', shotai: '', color: '', size: '', memo: '' });
+const emptyPosi = (line: number): KakoPosi => ({ line, posi: '', naiyo: '', shotai: '', color: '', size: '', memo: '', img: '' });
 
 /**
  * 加工指示（受注関連 → 加工指示。刺繍・プリント）。受注伝票から伝票番号・顧客・内勤・商品・数量を引き継いで作り、
@@ -178,6 +179,66 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
 
   touch() {
     this.dirty = true;
+    this.refreshFig();
+  }
+
+  // ===================== 指示書の図 =====================
+  /** 指示書の図の見本（位置と内容から描く。図に出る位置がなければ null） */
+  fig: KakoFigure | null = null;
+  private figTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** 図を描き直す（打つたびに描かないよう、少し待ってから） */
+  refreshFig() {
+    if (this.figTimer) {
+      clearTimeout(this.figTimer);
+    }
+    this.figTimer = setTimeout(async () => {
+      this.figTimer = null;
+      this.fig = await kakoFigure(this.den.posis, this.den.lines.map(l => l.gcode));
+      this.cdRef.detectChanges();
+    }, 300);
+  }
+
+  /** 位置の場所が図にあるか（ない位置は、図には出ず表だけに出る） */
+  onFig(p: KakoPosi): boolean {
+    return !!spotOf(p.posi);
+  }
+
+  /** 刺繍の図（画像ファイル）を選んだとき */
+  async pickImg(p: KakoPosi, ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const f = input.files?.[0];
+    input.value = '';
+    if (f) {
+      await this.setImg(p, f);
+    }
+  }
+
+  /** 刺繍の図を貼り付けたとき（Excel・ペイントなどでコピーした画像） */
+  async pasteImg(p: KakoPosi, ev: ClipboardEvent) {
+    const item = [...(ev.clipboardData?.items ?? [])].find(i => i.type.startsWith('image/'));
+    const f = item?.getAsFile();
+    if (!f) {
+      this.usrsrv.toastWar('貼り付けたものに画像がありません');
+      return;
+    }
+    ev.preventDefault();
+    await this.setImg(p, f);
+  }
+
+  private async setImg(p: KakoPosi, f: Blob) {
+    try {
+      p.img = await shrinkImage(f);
+      this.touch();
+    } catch (e) {
+      this.usrsrv.toastErr('刺繍の図を入れられませんでした', (e as Error).message);
+    }
+    this.cdRef.detectChanges();
+  }
+
+  delImg(p: KakoPosi) {
+    p.img = '';
+    this.touch();
   }
 
   setReqday(v: string) {
@@ -204,6 +265,7 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
         history.replaceState('', '', './frmkako');
       } else {
         this.den = d;
+        this.refreshFig();
         this.saved = structuredClone(d);
         this.kno = kno;
         this.mode = mode;
@@ -272,6 +334,7 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     }
     this.mode = 1;
     this.den = this.blank();
+    this.fig = null;
     this.saved = null;
     this.kno = 0;
     this.order = null;
@@ -333,6 +396,7 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
       this.den.posis = [];
       history.replaceState('', '', './frmkako');
     }
+    this.refreshFig();
   }
 
   // ===================== 商品 =====================

@@ -14,6 +14,7 @@ import { StaffService } from './../services/staff.service';
 import { VendsService } from './../mstvendor/vends.service';
 import { NAS_FAX } from './../share/nasfolder/nasfolder.component';
 import { KAKO_KINDS, KakoDen, kakoCheckUrl } from './kako.service';
+import { KakoFigure, kakoFigure, spotOf } from './kakofig';
 
 export interface KakoprintData {
   den: KakoDen;
@@ -90,7 +91,8 @@ export class KakoprintComponent {
       if (this.vensrv.vends.length == 0) {
         await this.vensrv.getVendors();
       }
-      const blob = await this.pdfsrv.createPdf(this.doc(d));
+      const fig = await kakoFigure(d.posis, d.lines.map(l => l.gcode));
+      const blob = await this.pdfsrv.createPdf(this.doc(d, fig));
       const name = d.kno + '加工指示書_' + d.renban + '_' + (d.mname || d.mcode).replace(/[\\/:*?"<>|\s]/g, '') + '.pdf';
       if (root) {
         const sei = await this.staffSei(d.tcode);
@@ -129,7 +131,7 @@ export class KakoprintComponent {
     return d.dtype == 'V' ? (this.vensrv.getVcdtxt(d.dcode) || d.dcode) : (this.strsrv.scds.find(s => s.value == d.dcode)?.viewval ?? d.dcode);
   }
 
-  private doc(d: KakoDen): TDocumentDefinitions {
+  private doc(d: KakoDen, fig: KakoFigure | null): TDocumentDefinitions {
     const kind = KAKO_KINDS.find(k => k.value == d.kind)?.name ?? '加工';
     const staff = this.stfsrv.getName(d.tcode) || d.tcode;
     const rs = d.rscode ? (this.strsrv.scds.find(s => s.value == d.rscode)?.viewval ?? d.rscode) : '';
@@ -143,20 +145,23 @@ export class KakoprintComponent {
       { text: String(l.suu), fontSize: 13, bold: true, alignment: 'right' },
       { text: l.memo, fontSize: 8 }
     ]);
-    while (goods.length < 6) {
+    // 図があるときは、空の行を減らして 1 枚に収める
+    while (goods.length < (fig ? 3 : 6)) {
       goods.push(['', '', '', '']);
     }
-    // 位置と内容
-    const posis: TableCell[][] = d.posis.map(p => [
+    // 位置と内容（番号は図の札の番号。図に場所のない位置の刺繍の図は、表の右に小さく貼る）
+    const posis: TableCell[][] = d.posis.map((p, i) => [
+      { text: String(i + 1), fontSize: 11, bold: true, alignment: 'center', color: '#ffffff', fillColor: '#000000' },
       { text: p.posi, fontSize: 12, bold: true, alignment: 'center' },
       { text: p.naiyo, fontSize: 13 },
       { text: p.shotai, fontSize: 9 },
       { text: p.color, fontSize: 10 },
       { text: p.size, fontSize: 9 },
-      { text: p.memo, fontSize: 8 }
+      { text: p.memo, fontSize: 8 },
+      p.img && !spotOf(p.posi) ? { image: p.img, fit: [56, 34], alignment: 'center' } : ''
     ]);
-    while (posis.length < 7) {
-      posis.push(['', '', '', '', '', '']);
+    while (posis.length < (fig ? 3 : 7)) {
+      posis.push(['', '', '', '', '', '', '', '']);
     }
     const info: TableCell[][] = [
       [th('受注伝票'), { text: String(d.jdenno ?? ''), fontSize: 11, bold: true }, th('依頼日'), { text: jpDay(d.reqday), fontSize: 10 }],
@@ -210,16 +215,17 @@ export class KakoprintComponent {
           table: { headerRows: 1, widths: [110, '*', 34, 120], body: [[th('品番/号数'), th('商品名'), th('数'), th('備考')], ...goods] },
           layout: grid, margin: [0, 0, 0, 8]
         },
+        ...(fig ? [{ image: fig.url, fit: [539, 215], alignment: 'center', margin: [0, 0, 0, 6] } as Content] : []),
         { text: '位置と内容', fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
         {
           table: {
-            headerRows: 1, widths: [44, '*', 60, 56, 60, 80],
-            body: [[th('位置'), th('文字・内容'), th('書体'), th('糸色'), th('サイズ'), th('備考')], ...posis]
+            headerRows: 1, widths: [16, 44, '*', 56, 52, 56, 70, 60],
+            body: [[th('No'), th('位置'), th('文字・内容'), th('書体'), th('糸色'), th('サイズ'), th('備考'), th('刺繍の図')], ...posis]
           },
           layout: grid, margin: [0, 0, 0, 8]
         },
         {
-          table: { widths: ['*'], heights: [70], body: [[{ stack: [{ text: '備考', fontSize: 8, color: '#555555' }, { text: d.memo, fontSize: 11 }] }]] },
+          table: { widths: ['*'], heights: [fig ? 44 : 70], body:[[{ stack: [{ text: '備考', fontSize: 8, color: '#555555' }, { text: d.memo, fontSize: 11 }] }]] },
           layout: grid, margin: [0, 0, 0, 8]
         },
         stepBox,

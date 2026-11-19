@@ -24,8 +24,8 @@ export const stepName = (s: number) => KAKO_STEPS[s - 1] ?? String(s);
 /** 加工内容の決まり文句（押すと加工内容に足す） */
 export const NAIYO_WORDS = ['胸刺繍', '袖刺繍', '背中', '左袖', '右袖', '右足', '左足', 'ネーム', 'オリ付', 'ワッペン', 'モール', '帯表', '帯裏'];
 
-/** 位置の候補 */
-export const POSI_WORDS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', '胸', '背中', '右袖', '左袖', '右足', '左足', '帯表', '帯裏', 'ネーム', 'オリマーク'];
+/** 位置の候補（指示書の図に印を付けられる位置。kakofig.ts の POSI_SPOTS と同じ名前。ほかの名前も入れられるが、図には出ない） */
+export const POSI_WORDS = ['胸', '右胸', '右袖', '左袖', '背中', '襟', 'オリマーク', '右足', '左足', 'A表', 'A裏', 'B表', 'B裏', 'ネーム'];
 
 /** 加工指示の QR コードの URL（加工先・倉庫のスマホで読むと、状態を進める画面が開く。テスト環境は ?db=test を付ける） */
 export function kakoCheckUrl(kno: number): string {
@@ -33,7 +33,8 @@ export function kakoCheckUrl(kno: number): string {
 }
 
 export interface KakoLine { line: number; jline: number | null; gcode: string; gtext: string; suu: number; memo: string }
-export interface KakoPosi { line: number; posi: string; naiyo: string; shotai: string; color: string; size: string; memo: string }
+/** img: 刺繍の図（画像の data URL。なければ ''） */
+export interface KakoPosi { line: number; posi: string; naiyo: string; shotai: string; color: string; size: string; memo: string; img: string }
 /** 段階ごとの日時・担当（2〜6） */
 export interface KakoStep { at: string | null; by: string | null }
 
@@ -156,12 +157,12 @@ export class KakoService {
         trkako_by_pk(id: $id, kno: $kno) {
           ${HEAD}
           trkakomeis(order_by: {line: asc}) { line jline gcode gtext suu memo }
-          trkakoposis(order_by: {line: asc}) { line posi naiyo shotai color size memo }
+          trkakoposis(order_by: {line: asc}) { line posi naiyo shotai color size memo img }
         }
       }`;
     const res = await firstValueFrom(this.apollo.query<{ trkako_by_pk: (HeadDb & {
       trkakomeis: { line: number; jline: number | null; gcode: string; gtext: string | null; suu: number; memo: string | null }[];
-      trkakoposis: { line: number; posi: string | null; naiyo: string | null; shotai: string | null; color: string | null; size: string | null; memo: string | null }[];
+      trkakoposis: { line: number; posi: string | null; naiyo: string | null; shotai: string | null; color: string | null; size: string | null; memo: string | null; img: string | null }[];
     }) | null }>({ query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, kno } }));
     if (res.error) {
       throw res.error;
@@ -176,7 +177,7 @@ export class KakoService {
       created_at: h['created_at'] as string, created_by: h['created_by'] as string,
       updated_at: h['updated_at'] as string, updated_by: h['updated_by'] as string,
       lines: h.trkakomeis.map(l => ({ line: l.line, jline: l.jline, gcode: l.gcode, gtext: l.gtext ?? '', suu: Number(l.suu ?? 0), memo: l.memo ?? '' })),
-      posis: h.trkakoposis.map(p => ({ line: p.line, posi: p.posi ?? '', naiyo: p.naiyo ?? '', shotai: p.shotai ?? '', color: p.color ?? '', size: p.size ?? '', memo: p.memo ?? '' }))
+      posis: h.trkakoposis.map(p => ({ line: p.line, posi: p.posi ?? '', naiyo: p.naiyo ?? '', shotai: p.shotai ?? '', color: p.color ?? '', size: p.size ?? '', memo: p.memo ?? '', img: p.img ?? '' }))
     };
   }
 
@@ -211,9 +212,9 @@ export class KakoService {
     const meis = d.lines.filter(l => l.gcode).map((l, i) => ({
       id, kno, line: i + 1, jline: l.jline, gcode: l.gcode, gtext: l.gtext || null, suu: Number(l.suu) || 0, memo: l.memo || null
     }));
-    const posis = d.posis.filter(p => p.posi || p.naiyo).map((p, i) => ({
+    const posis = d.posis.filter(p => p.posi || p.naiyo || p.img).map((p, i) => ({
       id, kno, line: i + 1, posi: p.posi || null, naiyo: p.naiyo || null, shotai: p.shotai || null, color: p.color || null,
-      size: p.size || null, memo: p.memo || null
+      size: p.size || null, memo: p.memo || null, img: p.img || null
     }));
     if (isNew) {
       const Ins = gql`

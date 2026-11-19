@@ -158,15 +158,31 @@
       </div>
       <datalist id="kako-posi">@for (p of posiWords; track p) {<option [value]="p"></option>}</datalist>
       <table class="tbl">
-        <tr><th>位置</th><th>文字・内容（刺繍データ番号など）</th><th>書体</th><th>糸色</th><th>サイズ</th><th>備考</th>@if (editable) {<th></th>}</tr>
+        <tr><th>番号</th><th>位置</th><th>文字・内容（刺繍データ番号など）</th><th>書体</th><th>糸色</th><th>サイズ</th><th>備考</th><th>刺繍の図</th>@if (editable) {<th></th>}</tr>
         @for (p of den.posis; track $index; let i = $index) {
           <tr>
-            <td><input list="kako-posi" [(ngModel)]="p.posi" (ngModelChange)="touch()" [disabled]="!editable" style="width: 5em;"></td>
+            <td class="num">{{i + 1}}</td>
+            <td>
+              <input list="kako-posi" [(ngModel)]="p.posi" (ngModelChange)="touch()" [disabled]="!editable" style="width: 5em;">
+              @if (p.posi && !onFig(p)) {<span class="nofig" matTooltip="この位置は図に場所がないので、図には出ません（表には出ます）">図なし</span>}
+            </td>
             <td><input [(ngModel)]="p.naiyo" (ngModelChange)="touch()" [disabled]="!editable" style="width: 14em;"></td>
             <td><input [(ngModel)]="p.shotai" (ngModelChange)="touch()" [disabled]="!editable" style="width: 6em;"></td>
             <td><input [(ngModel)]="p.color" (ngModelChange)="touch()" [disabled]="!editable" style="width: 5em;"></td>
             <td><input [(ngModel)]="p.size" (ngModelChange)="touch()" [disabled]="!editable" style="width: 6em;"></td>
             <td><input [(ngModel)]="p.memo" (ngModelChange)="touch()" [disabled]="!editable" style="width: 8em;"></td>
+            <td class="imgcell">
+              @if (p.img) {
+                <img [src]="p.img" class="thumb" alt="刺繍の図">
+                @if (editable) {
+                  <button mat-icon-button class="sm" type="button" (click)="delImg(p)" matTooltip="刺繍の図を外す"><mat-icon>close</mat-icon></button>
+                }
+              } @else if (editable) {
+                <input #upimg type="file" accept="image/*" hidden (change)="pickImg(p, $event)">
+                <button mat-icon-button class="sm" type="button" (click)="upimg.click()" matTooltip="画像ファイルを選ぶ"><mat-icon>image</mat-icon></button>
+                <span class="paste" tabindex="0" (paste)="pasteImg(p, $event)" matTooltip="ここを押してから Ctrl+V で、コピーした画像を貼り付け">貼付</span>
+              }
+            </td>
             @if (editable) {
               <td class="ops">
                 <button mat-icon-button class="sm" type="button" (click)="addPosi(i + 1)"><mat-icon>add_circle</mat-icon></button>
@@ -178,6 +194,14 @@
       </table>
       @if (editable && den.posis.length == 0) {
         <button mat-stroked-button type="button" (click)="addPosi(0)"><mat-icon>add</mat-icon>位置を足す</button>
+      }
+      @if (fig) {
+        <div class="figbox">
+          <div class="fighint">指示書の図（位置と内容から描きます。黒い四角の数字が上の表の番号。刺繍の図があればその画像、なければ文字を描きます）</div>
+          <img [src]="fig.url" [style.max-width.px]="fig.width" alt="指示書の図">
+        </div>
+      } @else if (editable) {
+        <div class="fighint">位置に「胸・右袖・背中・右足・A表」などを選ぶと、指示書に道着・帯の図が付きます</div>
       }
       <label class="memo">備考（指示書の備考欄）
         <textarea [(ngModel)]="den.memo" (ngModelChange)="touch()" [disabled]="!editable" rows="3"></textarea>
