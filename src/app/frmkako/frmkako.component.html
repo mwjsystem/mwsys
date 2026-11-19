@@ -6,6 +6,9 @@
     }
     @if (mode==3 && den.kno) {
       <button mat-flat-button (click)="modeToUpd()" [color]="usrsrv.getColor(mode)"><mat-icon>edit</mat-icon>編集</button>
+      <button mat-flat-button (click)="toggleDel()" [color]="usrsrv.getColor(mode)">
+        <mat-icon>{{den.del ? 'restore' : 'delete'}}</mat-icon>{{den.del ? '取消を戻す' : '取消'}}
+      </button>
     }
     @if (editable) {
       <button mat-flat-button (click)="save()" [disabled]="busy" [color]="usrsrv.getColor(mode)">
@@ -301,9 +304,5 @@
     </fieldset>
   }
 
-  @if (mode == 3 && den.kno) {
-    <div class="foot">
-      <button mat-stroked-button color="warn" type="button" (click)="toggleDel()">{{den.del ? '取消を元に戻す' : 'この加工指示を取り消す'}}</button>
-    </div>
-  }
+
 </div>

@@ -26,11 +26,11 @@
     }
     <!-- <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar"> -->
     <!-- <mat-label>仕入票番号</mat-label> -->
-    <input matInput [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
+    <input class="dno" [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
       (blur)="onEnter()" [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)"
-      placeholder="仕入票番号">
+      placeholder="仕入伝票番号">
     @if (mode==3) {
-      <button mat-icon-button matSuffix (click)="dennoHelp()">
+      <button mat-icon-button (click)="dennoHelp()" matTooltip="仕入伝票を探す">
         <mat-icon>find_replace</mat-icon>
       </button>
     }
@@ -54,7 +54,7 @@
   <mat-card>
     <mat-card-header class="flex flex-row flex-wrap justify-between" style="margin-bottom: 10px;">
       <mat-card-title>
-        {{mode|modetxt}}
+        {{mode|modetxt}}仕入伝票 {{denno || ''}}
       </mat-card-title>
       @if (mode==1) {
         <mat-form-field>

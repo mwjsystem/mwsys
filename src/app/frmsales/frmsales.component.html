@@ -29,7 +29,7 @@
     @if (mode==4 && this.jmisrv.denno && !idenno) {
       <button mat-flat-button (click)="modeToDel(false,3)"
         [color]="usrsrv.getColor(mode)">
-        <mat-icon>restore</mat-icon>取消解除
+        <mat-icon>restore</mat-icon>取消を戻す
       </button>
     }
     @if (mode==1 || mode==2) {
@@ -53,13 +53,11 @@
         <mat-icon>cancel</mat-icon>中止
       </button>
     }
-    <mat-form-field appearance="fill" subscriptSizing="dynamic" class="mwj-field w-40">
-      <input matInput [(ngModel)]="jmisrv.denno" tabIndex="1" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()"
-        maxlength="10" (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
-        [disabled]="mode==1 || (mode==2 && form.dirty)">
-    </mat-form-field>
+    <input class="dno" [(ngModel)]="jmisrv.denno" tabIndex="1" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()"
+      maxlength="10" (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
+      [disabled]="mode==1 || (mode==2 && form.dirty)" placeholder="受注伝票番号">
     @if (mode==3) {
-      <button mat-icon-button matSuffix (click)="dennoHelp()">
+      <button mat-icon-button (click)="dennoHelp()" matTooltip="受注伝票を探す">
         <mat-icon>find_replace</mat-icon>
       </button>
     }
@@ -151,7 +149,7 @@
   <!-- <mat-card> -->
   <div class="flex justify-between items-center space-x-4 p-3">
     <span class="inline-block align-middle">
-      {{mode|modetxt}}基本情報
+      {{mode|modetxt}}受注伝票 {{jmisrv.denno || ''}}@if (mode==4) {<span class="mw-delmark">取消済</span>}
     </span>
     <!-- <mat-form-field>
     <mat-label>受注伝票ステータス</mat-label>

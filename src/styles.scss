@@ -135,3 +135,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .align-middle { vertical-align: middle; }
 .text-black { color: #000; }
 .text-xs { font-size: 0.75rem; line-height: 1rem; }
+
+/* 古い画面のカードの見出しに付ける「取消済」の印（新しい画面の .delmark と同じ見た目） */
+.mw-delmark { color: #c62828; font-weight: bold; margin-left: 8px; font-size: 12px; }
+
+/* ツールバーの番号欄（伝票番号・コード）。新しい画面（frmnyukin など）と同じ見た目にそろえる */
+.mat-toolbar input.dno { width: 9em; font-size: 15px; padding: 3px 6px; margin-left: 8px; }

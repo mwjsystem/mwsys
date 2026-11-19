@@ -12,12 +12,12 @@
     }
     @if (mode==3 && this.mcd) {
       <button mat-flat-button (click)="modeToDel(true,4)" [color]="usrsrv.getColor(mode)">
-        <mat-icon>delete</mat-icon>削除
+        <mat-icon>delete</mat-icon>取消
       </button>
     }
     @if (mode==4 && this.mcd) {
       <button mat-flat-button (click)="modeToDel(false,3)" [color]="usrsrv.getColor(mode)">
-        <mat-icon>restore</mat-icon>削除取消
+        <mat-icon>restore</mat-icon>取消を戻す
       </button>
     }
     @if (mode!=3) {
@@ -35,7 +35,7 @@
     }
     <!-- <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar"> -->
     <!-- <label>顧客コード</label> -->
-    <input [(ngModel)]="mcd" (keyup.enter)="getMember(this.mcd)" maxlength="12" (keydown.f4)="mcdHelp()"
+    <input class="dno" [(ngModel)]="mcd" (keyup.enter)="getMember(this.mcd)" maxlength="12" (keydown.f4)="mcdHelp()"
       (blur)="getMember(this.mcd)" [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)"
       placeholder="顧客コード">
     <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" *ngIf="mode==3">
@@ -45,7 +45,7 @@
     <mat-icon>keyboard_arrow_down</mat-icon>
   </button> -->
   @if (mode==3) {
-    <button mat-icon-button matSuffix (click)="mcdHelp()">
+    <button mat-icon-button (click)="mcdHelp()" matTooltip="顧客を探す">
       <mat-icon>find_replace</mat-icon>
     </button>
   }
@@ -78,7 +78,7 @@
   <mat-card>
     <mat-card-header class="flex justify-between">
       <mat-card-title>
-        {{mode|modetxt}}顧客マスタ
+        {{mode|modetxt}}顧客マスタ {{mcd || ''}}@if (mode==4) {<span class="mw-delmark">取消済</span>}
       </mat-card-title>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>

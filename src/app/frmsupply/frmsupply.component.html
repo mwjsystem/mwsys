@@ -25,10 +25,10 @@
     }
     <!-- <mat-form-field fxFlex="0 0 12em" fxFlexAlign="end" class="frm-fld-in-bar">
     <mat-label>発注伝票番号</mat-label> -->
-    <input [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10" (blur)="onEnter()"
-      [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)">
+    <input class="dno" [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10" (blur)="onEnter()"
+      [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)" placeholder="発注伝票番号">
     @if (mode==3) {
-      <button mat-icon-button matSuffix (click)="dennoHelp()">
+      <button mat-icon-button (click)="dennoHelp()" matTooltip="発注伝票を探す">
         <mat-icon>find_replace</mat-icon>
       </button>
     }
@@ -59,7 +59,7 @@
   <mat-card>
     <mat-card-header class="flex justify-between">
       <mat-card-title>
-        {{mode|modetxt}}基本情報
+        {{mode|modetxt}}発注伝票 {{denno || ''}}
       </mat-card-title>
       <!-- <mat-form-field>
       <mat-label>発注伝票ステータス</mat-label>

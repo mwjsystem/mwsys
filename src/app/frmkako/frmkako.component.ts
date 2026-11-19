@@ -775,11 +775,12 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
 
   async toggleDel() {
     const del = !this.den.del;
-    if (!confirm(del ? 'この加工指示を取り消します。よろしいですか？' : '取消を元に戻します。よろしいですか？')) {
+    if (!confirm('加工指示' + this.den.kno + (del ? ' を取り消しますか？' : ' の取消を戻しますか？'))) {
       return;
     }
     try {
       await this.kakosrv.setDel(this.den.kno, del);
+      this.usrsrv.toastSuc('加工指示' + this.den.kno + (del ? 'を取り消しました' : 'の取消を戻しました'));
       await this.open(this.den.kno);
     } catch (e) {
       this.usrsrv.toastErr('取消できませんでした', (e as Error).message);

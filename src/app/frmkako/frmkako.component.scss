@@ -52,7 +52,6 @@ legend { font-weight: bold; padding: 0 4px; }
   .word:hover { background: #ede7f6; }
 }
 .memo { display: flex; flex-direction: column; font-size: 13px; textarea { width: 100%; min-width: 30em; font-size: 13px; } }
-.foot { margin-top: 8px; }
 .err { color: #c62828; margin: 6px 0; }
 .totals {
   display: flex; flex-wrap: wrap; gap: 16px; margin: 6px 0; font-size: 13px;

@@ -437,7 +437,7 @@ export class JyumeiService {
           },
         }],
     }).subscribe(({ data }) => {
-      this.usrsrv.toastSuc('受注伝票' + denno + 'を変更しました');
+      this.usrsrv.toastSuc('受注伝票' + denno + (flg ? 'を取り消しました' : 'の取消を戻しました'));
       // trzaiko は読込時の在庫内訳を「符号反転」したもの。取消(flg=true)ではそのまま適用し、
       // 取消解除(flg=false)では符号を戻して加算する。元データは書き換えない（後続の保存で再利用されるため）
       this.trzaiko.forEach(e => {

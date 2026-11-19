@@ -23,18 +23,9 @@
         <mat-icon>cancel</mat-icon>中止
       </button>
     }
-    <mat-form-field>
-      <!-- <mat-label>商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ</mat-label> -->
-      <input [ngModel]="gdssrv.grpcd" matInput (change)="convUpper($event)" (keydown.f4)="grpcdHelp()"
-        [disabled]="mode==2 && form.dirty" (keyup.enter)="getGgroup(gdssrv.grpcd)" (blur)="refresh()"
-        [ngModelOptions]="{standalone: true}" placeholder="商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ">
-      <!-- <button mat-button mat-icon-button matSuffix (click)="setNext()" [style.display]="mode==3 ? 'inline-block' : 'none'">
-      <mat-icon>keyboard_arrow_up</mat-icon>
-    </button>
-    <button mat-button mat-icon-button matSuffix (click)="setPrev()" [style.display]="mode==3 ? 'inline-block' : 'none'">
-      <mat-icon>keyboard_arrow_down</mat-icon>
-    </button> -->
-  </mat-form-field>
+    <input class="dno" [ngModel]="gdssrv.grpcd" (change)="convUpper($event)" (keydown.f4)="grpcdHelp()"
+      [disabled]="mode==2 && form.dirty" (keyup.enter)="getGgroup(gdssrv.grpcd)" (blur)="refresh()"
+      [ngModelOptions]="{standalone: true}" placeholder="商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ">
   @if (mode==3) {
     <button mat-icon-button matSuffix (click)="grpcdHelp()" matTooltip="ｸﾞﾙｰﾌﾟｺｰﾄﾞ検索">
       <mat-icon>find_replace</mat-icon>
@@ -80,7 +71,7 @@
   <mat-card class="flex flex-wrap">
     <mat-card-header class="flex flex-wrap">
       <mat-card-title>
-        {{mode|modetxt}}基本情報
+        {{mode|modetxt}}商品マスタ {{gdssrv.grpcd || ''}}
       </mat-card-title>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>

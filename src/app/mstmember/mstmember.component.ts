@@ -23,7 +23,7 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { MatSuffix, MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
 import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
 import { TabDirective } from '../core/directives/tabidx/tab.directive';
@@ -66,7 +66,7 @@ class Sval {
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
     },
-    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, MatSuffix, RouterLink, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, TabDirective, MatSelect, MatOption, MatCheckbox, AddressComponent_1, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, McdtxtPipe, ModetxtPipe]
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, RouterLink, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, TabDirective, MatSelect, MatOption, MatCheckbox, AddressComponent_1, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, McdtxtPipe, ModetxtPipe]
 })
 export class MstmemberComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
@@ -422,8 +422,8 @@ export class MstmemberComponent extends BeforeunloadBase implements OnInit, Afte
   }
 
   modeToDel(flg: boolean, mode: number): void {
-    let lctxt: string = (flg ? '削除' : '削除取消');
-    if (window.confirm(lctxt + 'してもよろしいですか？')) {
+    const lctxt: string = (flg ? '取消' : '取消を戻すこと');
+    if (window.confirm('顧客コード' + this.mcd + (flg ? ' を取り消しますか？' : ' の取消を戻しますか？'))) {
 
       this.apollo.mutate<UpdMemberResult>({
         mutation: Query.DeleteMast,
@@ -443,7 +443,7 @@ export class MstmemberComponent extends BeforeunloadBase implements OnInit, Afte
             },
           }],
       }).subscribe(({ data }) => {
-        this.usrsrv.toastSuc('顧客コード' + this.mcd + 'を' + lctxt + 'しました');
+        this.usrsrv.toastSuc('顧客コード' + this.mcd + (flg ? 'を取り消しました' : 'の取消を戻しました'));
       }, (error) => {
         this.usrsrv.toastErr('データベースエラー', '顧客コード' + this.mcd + 'の' + lctxt + 'ができませんでした');
         console.log('error del_jyuen', error);

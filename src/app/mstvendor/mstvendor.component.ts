@@ -15,7 +15,8 @@ import { BeforeunloadBase } from '../beforeunload-base';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { MatSuffix, MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
 import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
 import { MatSelect, MatOption } from '@angular/material/select';
@@ -37,7 +38,7 @@ interface VendorResult { msvendor_by_pk: mwI.Vendor & { created_at: Date; update
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
     },
-    imports: [MatToolbar, MatButton, MatIcon, FormsModule, MatIconButton, MatSuffix, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, MatSelect, MatOption, MatCheckbox, CdkTextareaAutosize, MatExpansionPanel, MatExpansionPanelHeader, ModetxtPipe]
+    imports: [MatToolbar, MatButton, MatIcon, FormsModule, MatIconButton, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, MatSelect, MatOption, MatCheckbox, CdkTextareaAutosize, MatExpansionPanel, MatExpansionPanelHeader, ModetxtPipe, MatTooltip]
 })
 export class MstvendorComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);

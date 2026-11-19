@@ -22,10 +22,10 @@
     }
     <!-- <mat-form-field style="background-color: transparent;"> -->
     <!-- <label class="text-xs">仕入先コード</label> -->
-    <input [(ngModel)]="vcd" (keydown.enter)="refresh()" maxlength="12" (keydown.f4)="vcdHelp()" (blur)="refresh()"
+    <input class="dno" [(ngModel)]="vcd" (keyup.enter)="refresh()" maxlength="12" (keydown.f4)="vcdHelp()" (blur)="refresh()"
       [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)" placeholder="仕入先コード">
     @if (mode==3) {
-      <button mat-icon-button matSuffix (click)="vcdHelp()">
+      <button mat-icon-button (click)="vcdHelp()" matTooltip="仕入先を探す">
         <mat-icon>find_replace</mat-icon>
       </button>
     }
@@ -41,7 +41,7 @@
   <mat-card>
     <mat-card-header class="flex flex-wrap content-between">
       <mat-card-title>
-        {{mode|modetxt}}仕入先マスタ
+        {{mode|modetxt}}仕入先マスタ {{vcd || ''}}
       </mat-card-title>
       <app-tmstmp></app-tmstmp>
     </mat-card-header>

@@ -978,12 +978,12 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   }
 
   modeToDel(flg: boolean, mode: number): void {
-    let lctxt: string = (flg ? '取消' : '取消解除');
+    let lctxt: string = (flg ? '取消' : '取消を戻すこと');
     if (this.idenno) {
-      this.usrsrv.toastWar('受注伝票' + this.jmisrv.denno + 'は請求済（請求伝票' + this.idenno + '）のため' + lctxt + 'できません');
+      this.usrsrv.toastWar('受注伝票' + this.jmisrv.denno + 'は請求済（請求伝票' + this.idenno + '）のため' + lctxt + 'ができません');
       return;
     }
-    if (window.confirm(lctxt + 'してもよろしいですか？')) {
+    if (window.confirm('受注伝票' + this.jmisrv.denno + (flg ? ' を取り消しますか？' : ' の取消を戻しますか？'))) {
       this.jmisrv.delJyuden(this.jmisrv.denno, flg);
       this.mode = mode;
       this.refresh();
