@@ -954,6 +954,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       const r = c.getRawValue();
       tbl.setPable(i, r.gcode, r.msgzais ?? []);
     });
+    // 加工マスタ（商品グループ・顧客）がある明細は、在庫種別を刺繍依頼・プリントにする
+    tbl.setKakoSpecs().then(() => this.cdRef.detectChanges());
     tbl.refresh();
     this.form.markAsDirty();
     history.replaceState('', '', './frmsales/1');

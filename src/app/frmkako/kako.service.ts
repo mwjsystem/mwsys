@@ -465,6 +465,31 @@ export class KakoService {
     }
   }
 
+  /**
+   * 受注明細の在庫種別の初期値をまとめて（商品グループ → 種類。顧客の加工マスタの、いちばん小さいパターン番号のもの）。
+   * 読めなかったときは空
+   */
+  async kindsOf(grpcodes: string[], mcode: string): Promise<Map<string, string>> {
+    const list = [...new Set(grpcodes.filter(g => g))];
+    if (list.length == 0 || !mcode) {
+      return new Map();
+    }
+    const Get = gql`
+      query kako_kinds_of($id: smallint!, $grps: [String!]!, $mcode: String!) {
+        mskako(where: {id: {_eq: $id}, grpcode: {_in: $grps}, mcode: {_eq: $mcode}}, order_by: [{grpcode: asc}, {ptn: desc}]) { grpcode kind }
+      }`;
+    try {
+      const res = await firstValueFrom(this.apollo.query<{ mskako: { grpcode: string; kind: string }[] }>({
+        query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, grps: list, mcode }
+      }));
+      // パターン番号の大きい順に入れて、小さいもので上書きする
+      return new Map((res.data?.mskako ?? []).map(m => [m.grpcode, m.kind]));
+    } catch (e) {
+      console.log('error query kako_kinds_of', e);
+      return new Map();
+    }
+  }
+
   /** 加工マスタを保存する（ptn = 0 は新しいパターン番号を付けて登録、それ以外は上書き）。パターン番号を返す */
   async saveMaster(p: KakoPattern): Promise<number> {
     const id = this.usrsrv.compid;

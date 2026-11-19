@@ -888,6 +888,37 @@ export class JmeitblComponent implements OnInit {
     });
   }
 
+  /**
+   * 全部の明細について、加工マスタがあれば在庫種別をマスタの種類にする（参照登録で明細を写したとき）。
+   * 変える条件は setKakoSpec と同じ（空・通常〈0〉・引当〈1〉のときだけ）
+   */
+  async setKakoSpecs() {
+    const mcode = String(this.parentForm().value.mcode ?? '');
+    const gcodes = this.frmArr.getRawValue().map(r => String(r.gcode ?? '')).filter(g => g);
+    if (!mcode || gcodes.length == 0) {
+      return;
+    }
+    try {
+      const groups = await this.kakosrv.groupsOf(gcodes);
+      const kinds = await this.kakosrv.kindsOf([...groups.values()], mcode);
+      if (kinds.size == 0) {
+        return;
+      }
+      this.frmArr.controls.forEach(ctl => {
+        const r = ctl.getRawValue();
+        const kind = kinds.get(groups.get(String(r.gcode ?? '')) ?? '');
+        if (kind && (r.spec == null || r.spec == '0' || r.spec == '1')) {
+          ctl.patchValue({ spec: kind });
+          rowCtl<RowField>(ctl).spec.setErrors(null);
+        }
+      });
+      this.jmisrv.subject.next(true);
+      this.cdRef.markForCheck();
+    } catch (e) {
+      console.log('error kako specs', e);
+    }
+  }
+
   setPable(i: number, gcd: string, msgzais: GzaiRef[]) {
     // console.log(gcd, this.frmArr.controls[i].value.gskbn);
     this.frmArr.controls[i].patchValue({ pable: null });
