@@ -1,4 +1,4 @@
-// 伝票番号検索系ダイアログ（jdnohelp / ndnohelp / hdnohelp / sdnohelp / mdnohelp）で共通の見た目。
+// 伝票番号検索系ダイアログ（jdnohelp / hdnohelp / sdnohelp / mdnohelp）で共通の見た目。
 // jdnohelp.component.scss のレイアウトを共有化したもの。Material 3 のシステムトークン（--mat-sys-*）を使う。
 // ダイアログ全体はスクロールさせず、検索結果（.jdh-content）だけをスクロールさせる。
 // 両方がスクロールすると、外側を動かしたときに見出しの行（sticky）が表と一緒に動き、ずれて見える
