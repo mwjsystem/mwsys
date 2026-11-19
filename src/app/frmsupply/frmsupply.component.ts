@@ -17,6 +17,7 @@ import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
 import { VendsService } from './../mstvendor/vends.service';
 import { HatmeiService, HatdenSet, HatdenNew, HatuZaiko, EXTYPE_HATDEN } from './hatmei.service';
+import { NyuhikService } from './../services/nyuhik.service';
 import { HatprintComponent, HatprintData } from './hatprint.component';
 import { FAX_EMPTY, FAX_STEPS, FaxStatus, FaxStep } from './hat-forms';
 import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
@@ -69,6 +70,7 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
   strsrv = inject(StoreService);
   stfsrv = inject(StaffService);
   hmisrv = inject(HatmeiService);
+  private nyuhik = inject(NyuhikService);
   private vensrv = inject(VendsService);
   private overlay = inject(Overlay);
   private cdRef = inject(ChangeDetectorRef);
@@ -399,8 +401,10 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
       // 在庫の発注数: 読み込んだときの分を引き、今の倉庫・発注日・数量で足す
       const zaiko = [...this.oldHatu, ...this.hmisrv.hatuOf(hatden.scode, hatden.day, hatmei)];
       this.hmisrv.updHatden(this.denno, hatden, hatmei, zaiko)
-        .then(result => {
+        .then(async result => {
           // console.log('update_hatden',result);
+          // 入荷日を確定した発注明細に、発注入荷待ち（在庫種別 8）の受注明細を古い順に結び付ける
+          await this.nyuhik.linkAndNotify(this.denno, hatden.scode);
           this.usrsrv.toastSuc('発注伝票' + this.denno + 'の変更を保存しました');
           this.form.markAsPristine();
           this.cancel();
@@ -424,8 +428,9 @@ export class FrmsupplyComponent extends BeforeunloadBase implements OnInit, Afte
       }]
       // console.log(trhatden);
       this.hmisrv.insHatden(trhatden, hatmei, this.hmisrv.hatuOf(hatden.scode, hatden.day, hatmei))
-        .then(result => {
+        .then(async result => {
           // console.log('insert_trhat',result);
+          await this.nyuhik.linkAndNotify(this.denno, hatden.scode);
           this.usrsrv.toastSuc('発注伝票' + this.denno + 'を新規登録しました');
           this.form.markAsPristine();
           this.cancel();
