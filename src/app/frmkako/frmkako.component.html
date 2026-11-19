@@ -166,10 +166,13 @@
               @for (p of patterns; track p.grpcode + ':' + p.ptn) {
                 <span class="mptn">
                   @if (editable) {
-                    <button mat-stroked-button type="button" (click)="applyPattern(p)" [matTooltip]="(p.naiyo || '') + '（' + p.posis.length + ' か所）を入れます'">{{patternLabel(p)}}</button>
+                    <button mat-stroked-button type="button" (click)="applyPattern(p)"
+                      [matTooltip]="(patternDest(p) ? '加工先「' + patternDest(p) + '」・' : '') + (p.naiyo || '') + '（' + p.posis.length + ' か所）を入れます'">
+                      {{patternLabel(p)}}@if (patternDest(p)) {<span class="mdest">→ {{patternDest(p)}}</span>}
+                    </button>
                     <button mat-icon-button class="sm" type="button" (click)="delMaster(p)" matTooltip="このパターンをマスタから消す"><mat-icon>delete</mat-icon></button>
                   } @else {
-                    <span class="sub">{{patternLabel(p)}}</span>
+                    <span class="sub">{{patternLabel(p)}}@if (patternDest(p)) {<span class="mdest">→ {{patternDest(p)}}</span>}</span>
                   }
                 </span>
               }
@@ -190,6 +193,9 @@
               </select>
               <input [(ngModel)]="mstName" placeholder="パターンの名前（例：名前入り）" style="width: 12em;">
               <button mat-flat-button color="primary" type="button" (click)="saveMaster()" [disabled]="busy"><mat-icon>bookmark_add</mat-icon>マスタに登録</button>
+              <span class="sub" [class.warn]="!den.dcode">
+                （種類「{{kindName(den.kind)}}」・加工先「{{den.dcode ? destName(den.dtype, den.dcode) : '未選択'}}」・加工内容・位置と内容を登録します{{den.dcode ? '' : '。加工先も覚えるときは、先に上の加工先を選んでください'}}）
+              </span>
             </div>
           }
         </div>

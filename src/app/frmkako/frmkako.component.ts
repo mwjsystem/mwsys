@@ -546,6 +546,11 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     return p.grpcode + ' パターン' + p.ptn + (p.ptname ? '「' + p.ptname + '」' : '');
   }
 
+  /** パターンの加工先の名前（なければ ''） */
+  patternDest(p: KakoPattern): string {
+    return p.dcode ? this.destName(p.dtype || 'S', p.dcode) : '';
+  }
+
   /** 加工マスタの内容（種類・加工先・加工内容・位置と内容・備考）を入れる */
   applyPattern(p: KakoPattern, ask = true) {
     const filled = this.den.posis.some(x => x.posi || x.naiyo || x.img);
@@ -584,7 +589,8 @@ export class FrmkakoComponent implements AfterViewInit, OnBeforeunload {
     }
     const old = this.mstPatterns.find(p => p.ptn == this.mstPtn);
     const what = this.mstGrp + '・' + this.den.mcode + ' の' + (old ? ' ' + this.patternLabel(old) + ' に上書き' : '新しいパターン') + 'で';
-    if (!confirm('いまの位置と内容を、加工マスタ（' + what + '）に登録します。よろしいですか？')) {
+    const dest = this.den.dcode ? '加工先「' + this.destName(this.den.dtype, this.den.dcode) + '」' : '加工先なし（加工先が選ばれていません）';
+    if (!confirm('いまの種類・' + dest + '・加工内容・位置と内容を、加工マスタ（' + what + '）に登録します。よろしいですか？')) {
       return;
     }
     this.busy = true;
