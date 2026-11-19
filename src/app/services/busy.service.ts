@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, untracked } from '@angular/core';
 
 /**
  * 処理中の表示（画面上部の「処理中…」とバー）。
@@ -15,7 +15,6 @@ export class BusyService {
 
   constructor() {
     BusyService.current = this;
-    BusyService.count++;
   }
   private running: string[] = [];
   private timer?: ReturnType<typeof setTimeout>;
@@ -24,10 +23,29 @@ export class BusyService {
   /** 出している文言（いちばん新しく始めた処理のもの） */
   readonly label = signal('');
 
+  /**
+   * 表示（signal）を書き換える。
+   * 画面を描いている最中（テンプレートの中から読み込みが始まったときなど）は、Angular が signal の書き換えを禁止しているため、
+   * untracked で書き換え、それでもだめなら描き終わってから書き換える（ここで失敗すると「処理中」が消えなくなる）
+   */
+  private apply() {
+    const set = () => untracked(() => {
+      this.label.set(this.running.at(-1) ?? '');
+      if (this.running.length == 0) {
+        this.active.set(false);
+      }
+    });
+    try {
+      set();
+    } catch {
+      queueMicrotask(set);
+    }
+  }
+
   /** 処理を始める。返した関数を呼ぶと終わる（何回呼んでもよい） */
   begin(label = '処理中…'): () => void {
     this.running.push(label);
-    this.label.set(label);
+    this.apply();
     if (this.running.length == 1) {
       clearTimeout(this.timer);
       this.timer = setTimeout(() => this.active.set(this.running.length > 0), BusyService.DELAY);
@@ -42,19 +60,17 @@ export class BusyService {
       if (i >= 0) {
         this.running.splice(i, 1);
       }
-      this.label.set(this.running.at(-1) ?? '');
       if (this.running.length == 0) {
         clearTimeout(this.timer);
-        this.active.set(false);
       }
+      this.apply();
     };
   }
 
-  /** 調べる用：今の状態 */
+  /** 調べる用：今の状態（開発者ツールのコンソールで mwsysPending() と打つと出る） */
   debug() {
-    return { running: [...this.running], active: this.active(), label: this.label(), instances: BusyService.count };
+    return { running: [...this.running], active: this.active(), label: this.label() };
   }
-  static count = 0;
 
   /** 処理（Promise を返す関数）のあいだ出す */
   async run<T>(label: string, fn: () => Promise<T>): Promise<T> {
