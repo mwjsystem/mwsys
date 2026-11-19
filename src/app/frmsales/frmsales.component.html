@@ -54,7 +54,7 @@
       </button>
     }
     <input class="dno" [(ngModel)]="jmisrv.denno" tabIndex="1" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()"
-      maxlength="10" (blur)="onEnter()" [ngModelOptions]="{standalone: true}"
+      maxlength="10" [ngModelOptions]="{standalone: true}"
       [disabled]="mode==1 || (mode==2 && form.dirty)" placeholder="受注伝票番号">
     @if (mode==3) {
       <button mat-icon-button (click)="dennoHelp()" matTooltip="受注伝票を探す">

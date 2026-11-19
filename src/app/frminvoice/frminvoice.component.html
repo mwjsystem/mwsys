@@ -3,7 +3,7 @@
     <mat-form-field class="frm-fld-in-bar" style="flex: 0 0 12em; align-self: end;">
       <mat-label>請求伝票番号</mat-label>
       <input matInput [(ngModel)]="denno" (keyup.enter)="onEnter()" (keydown.f4)="dennoHelp()" maxlength="10"
-        (blur)="onEnter()" [ngModelOptions]="{standalone: true}">
+        [ngModelOptions]="{standalone: true}">
       <button mat-icon-button matSuffix (click)="dennoHelp()">
         <mat-icon>find_replace</mat-icon>
       </button>

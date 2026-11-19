@@ -22,7 +22,7 @@
     }
     <!-- <mat-form-field style="background-color: transparent;"> -->
     <!-- <label class="text-xs">仕入先コード</label> -->
-    <input class="dno" [(ngModel)]="vcd" (keyup.enter)="refresh()" maxlength="12" (keydown.f4)="vcdHelp()" (blur)="refresh()"
+    <input class="dno" [(ngModel)]="vcd" (keyup.enter)="onEnter()" maxlength="12" (keydown.f4)="vcdHelp()"
       [ngModelOptions]="{standalone: true}" [disabled]="mode==1 || (mode==2 && form.dirty)" placeholder="仕入先コード">
     @if (mode==3) {
       <button mat-icon-button (click)="vcdHelp()" matTooltip="仕入先を探す">

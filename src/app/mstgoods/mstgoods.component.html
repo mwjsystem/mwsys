@@ -24,7 +24,7 @@
       </button>
     }
     <input class="dno" [ngModel]="gdssrv.grpcd" (change)="convUpper($event)" (keydown.f4)="grpcdHelp()"
-      [disabled]="mode==2 && form.dirty" (keyup.enter)="getGgroup(gdssrv.grpcd)" (blur)="refresh()"
+      [disabled]="mode==2 && form.dirty" (keyup.enter)="getGgroup(gdssrv.grpcd)"
       [ngModelOptions]="{standalone: true}" placeholder="商品(ｸﾞﾙｰﾌﾟ)ｺｰﾄﾞ">
   @if (mode==3) {
     <button mat-icon-button matSuffix (click)="grpcdHelp()" matTooltip="ｸﾞﾙｰﾌﾟｺｰﾄﾞ検索">

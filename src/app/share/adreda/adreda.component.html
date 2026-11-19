@@ -29,7 +29,7 @@
   </div>
   <!-- <mat-form-field class="flex items-end"> -->
   <label>枝番</label>
-  <input [(ngModel)]="eda" (keyup.enter)="onEnter()" (keydown.f4)="edaHelp()" (blur)="refresh()"
+  <input [(ngModel)]="eda" (keyup.enter)="onEnter()" (keydown.f4)="edaHelp()"
     [ngModelOptions]="{standalone: true}" disabled>
   <!-- <div [style.display]="edasrv.adrs.length>0 ? 'inline' : 'none'"> -->
   <button mat-icon-button matSuffix (click)="setNext()">
