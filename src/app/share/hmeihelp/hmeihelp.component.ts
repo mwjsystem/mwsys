@@ -16,7 +16,7 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
-import { MatIconButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { VcdtxtPipe } from '../../core/pipes/vcdtxt.pipe';
 // import { StaffService } from './../../services/staff.service';
@@ -52,7 +52,7 @@ interface HatmeiResult { vhatzn: Hatmei[] }
     templateUrl: './hmeihelp.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatDialogActions, MatDialogTitle, MatPaginator, CdkScrollable, MatDialogContent, MatToolbar, MatFormField, MatLabel, MatInput, FormsModule, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatIconButton, MatIcon, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, VcdtxtPipe]
+    imports: [MatButton, MatDialogActions, MatDialogTitle, MatPaginator, CdkScrollable, MatDialogContent, MatToolbar, MatFormField, MatLabel, MatInput, FormsModule, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatIconButton, MatIcon, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, VcdtxtPipe]
 })
 export class HmeihelpComponent implements OnInit {
   usrsrv = inject(UserService);

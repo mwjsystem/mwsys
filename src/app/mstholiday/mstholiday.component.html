@@ -19,26 +19,26 @@
   </button>
   @if (!editing) {
     <span class="mode">照会</span>
-    <button mat-raised-button color="primary" type="button" (click)="startEdit()" [disabled]="busy" title="休日を入れたり外したり、名前を変えたりできるようにします">
+    <button mat-flat-button color="primary" type="button" (click)="startEdit()" [disabled]="busy" title="休日を入れたり外したり、名前を変えたりできるようにします">
       <mat-icon>edit</mat-icon>変更
     </button>
   } @else {
     <span class="mode editing">変更中</span>
-    <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="busy || !dirty">
+    <button mat-flat-button color="primary" type="button" (click)="save()" [disabled]="busy || !dirty">
       <mat-icon>save</mat-icon>保存
     </button>
-    <button mat-raised-button type="button" (click)="endEdit()" [disabled]="busy" title="保存していない変更を捨てて照会に戻ります">
+    <button mat-flat-button type="button" (click)="endEdit()" [disabled]="busy" title="保存していない変更を捨てて照会に戻ります">
       <mat-icon>close</mat-icon>キャンセル
     </button>
-    <button mat-raised-button color="accent" type="button" (click)="addJp()" [disabled]="busy || !jpSupported"
+    <button mat-flat-button color="accent" type="button" (click)="addJp()" [disabled]="busy || !jpSupported"
       title="この年の国民の祝日（振替休日・国民の休日を含む。土日の分は除く）を休日に入れます">
       <mat-icon>event_available</mat-icon>国民の祝日を入れる
     </button>
-    <button mat-raised-button type="button" (click)="undo()" [disabled]="busy || !dirty">
+    <button mat-flat-button type="button" (click)="undo()" [disabled]="busy || !dirty">
       <mat-icon>undo</mat-icon>変更を取り消す
     </button>
   }
-  <button mat-raised-button type="button" (click)="excel()" [disabled]="busy"
+  <button mat-flat-button type="button" (click)="excel()" [disabled]="busy"
     title="現行の「最新カレンダー.xlsx」と同じ並びの Excel（12 か月・出勤日数・年間休日・休日の一覧・翌年 1 月）を出します">
     <mat-icon>download</mat-icon>Excel 出力
   </button>

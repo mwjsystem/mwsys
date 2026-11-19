@@ -3,12 +3,12 @@
     <mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
         [pageSizeOptions]="[20, 50, 100, 250, 1000]">
     </mat-paginator>
-    <button class="mat-raised-button" (click)="close()">閉じる</button>
+    <button mat-stroked-button type="button" (click)="close()">閉じる</button>
 </mat-dialog-actions>
 <mat-dialog-content>
     <div class="mat-elevation-z8">
         <mat-toolbar style="font-size: 12px;width:100%;gap:5px;">
-            <button class="mat-raised-button" (click)="get_hatmei()">検索</button>
+            <button mat-flat-button color="primary" type="button" (click)="get_hatmei()">検索</button>
             <mat-form-field style="width:7em;">
                 <mat-label>仕入先</mat-label>
                 <input matInput [value]="fvcd" disbled>

@@ -21,7 +21,7 @@ import { tenTasks } from './tenprint.component';
       @if (dbMismatch) {
         <div class="msg ng">
           この指示書は{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}のものですが、このスマホは{{dbMismatch == 'test' ? '本番環境' : 'テスト環境'}}につながっています。
-          <button mat-raised-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
+          <button mat-flat-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
         </div>
       }
       <div class="head">
@@ -49,7 +49,7 @@ import { tenTasks } from './tenprint.component';
         }
         <div class="buttons">
           @if (!den.cday) {
-            <button mat-raised-button [color]="allDone ? 'accent' : 'warn'" type="button" class="big" (click)="complete()" [disabled]="busy">
+            <button mat-flat-button [color]="allDone ? 'accent' : 'warn'" type="button" class="big" (click)="complete()" [disabled]="busy">
               <mat-icon>task_alt</mat-icon>{{allDone ? '展開完了' : '済でない作業があります（展開完了）'}}
             </button>
           } @else {

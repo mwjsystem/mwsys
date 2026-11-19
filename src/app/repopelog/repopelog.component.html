@@ -33,7 +33,7 @@
   <label>内容に含む文字
     <input style="width: 12em;" [(ngModel)]="memo" (keyup.enter)="search()" [disabled]="busy">
   </label>
-  <button mat-raised-button color="primary" type="button" (click)="search()" [disabled]="busy">
+  <button mat-flat-button color="primary" type="button" (click)="search()" [disabled]="busy">
     <mat-icon>search</mat-icon>検索
   </button>
 </div>

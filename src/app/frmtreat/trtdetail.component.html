@@ -13,8 +13,8 @@
     }
   </div>
   <div>
-    <button class="mat-raised-button" (click)="close()">閉じる</button>
-    <button class="mat-raised-button mat-warn" (click)="save()">保存</button>
+    <button mat-stroked-button type="button" (click)="close()">閉じる</button>
+    <button mat-flat-button color="warn" type="button" (click)="save()">保存</button>
   </div>
 </mat-dialog-actions>
 <mat-dialog-content style="height: calc(100% - 50px);">
@@ -112,7 +112,7 @@
               <mat-grid-tile-footer class="flex flex-row justify-between">
                 <input name="upfile" style="display: none" type="file" #upfile accept=".jpg"
                   (change)="onchange(upfile.files,i.toString())" capture="enviroment" />
-                <button mat-raised-button color="primary" class="file-select-button" (click)="onClickFileInputButton(i)">
+                <button mat-flat-button color="primary" class="file-select-button" (click)="onClickFileInputButton(i)">
                   ファイルを選択して登録
                 </button>
                 <!-- <button mat-flat-button matSuffix color="accent" (click)="test(img['src'].includes('noimage.gif'))">画像削除</button> -->

@@ -43,14 +43,14 @@
             <mat-option value="">すべて</mat-option>
           </mat-select>
         </mat-form-field>
-        <button mat-raised-button type="button" (click)="search()" [disabled]="busy">
+        <button mat-flat-button type="button" (click)="search()" [disabled]="busy">
           <mat-icon>search</mat-icon>抽出
         </button>
       </form>
     }
     <div class="flex flex-row flex-wrap items-center" style="gap: 8px; margin: 6px 0;">
       <span>チェックした伝票（{{selRows.length}}件・合計 {{total | number}}円）を：</span>
-      <button mat-raised-button color="accent" type="button" (click)="saveNas()" [disabled]="busy || selRows.length == 0 || !nassrv.supported"
+      <button mat-flat-button color="accent" type="button" (click)="saveNas()" [disabled]="busy || selRows.length == 0 || !nassrv.supported"
         matTooltip="NAS の出荷指示フォルダに、納品書・出荷指示書を保存して、受注ステータスを「出荷指示フォルダ作成済」にします" matTooltipClass="ttips">
         <mat-icon>drive_folder_upload</mat-icon>出荷指示フォルダ作成（NAS）
       </button>

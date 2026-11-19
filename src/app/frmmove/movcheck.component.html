@@ -2,7 +2,7 @@
   @if (dbMismatch) {
     <div class="msg ng">
       この伝票は{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}のものですが、このスマホは{{dbMismatch == 'test' ? '本番環境' : 'テスト環境'}}につながっています。
-      <button mat-raised-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
+      <button mat-flat-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
     </div>
   }
 
@@ -35,13 +35,13 @@
     @if (mode) {
       <button mat-stroked-button type="button" (click)="stop()"><mat-icon>videocam_off</mat-icon>カメラを止める</button>
     } @else if (doc && !completed) {
-      <button mat-raised-button color="primary" type="button" (click)="start('item')"><mat-icon>document_scanner</mat-icon>商品を読む</button>
+      <button mat-flat-button color="primary" type="button" (click)="start('item')"><mat-icon>document_scanner</mat-icon>商品を読む</button>
     }
     @if (!doc && mode != 'qr') {
-      <button mat-raised-button color="primary" type="button" (click)="start('qr')"><mat-icon>qr_code_scanner</mat-icon>QR を読む</button>
+      <button mat-flat-button color="primary" type="button" (click)="start('qr')"><mat-icon>qr_code_scanner</mat-icon>QR を読む</button>
     }
     @if (doc && !completed) {
-      <button mat-raised-button [color]="diffs.length ? 'warn' : 'accent'" type="button" class="big" (click)="complete()" [disabled]="busy">
+      <button mat-flat-button [color]="diffs.length ? 'warn' : 'accent'" type="button" class="big" (click)="complete()" [disabled]="busy">
         <mat-icon>task_alt</mat-icon>{{diffs.length ? '数量を確定（' + diffs.length + ' 行を直す）' : '確認完了（伝票どおり）'}}
       </button>
     }

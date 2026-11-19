@@ -34,7 +34,7 @@
     @if (scanning) {
       <button mat-stroked-button type="button" (click)="stop()"><mat-icon>videocam_off</mat-icon>カメラを止める</button>
     } @else {
-      <button mat-raised-button color="primary" type="button" (click)="start()" [disabled]="!scode"><mat-icon>document_scanner</mat-icon>商品を読む</button>
+      <button mat-flat-button color="primary" type="button" (click)="start()" [disabled]="!scode"><mat-icon>document_scanner</mat-icon>商品を読む</button>
     }
   </div>
 
@@ -63,7 +63,7 @@
       }
       <div class="count">
         <input #suuInput type="number" min="0" inputmode="numeric" class="suu" [(ngModel)]="suu" placeholder="数" (keydown.enter)="save()">
-        <button mat-raised-button color="accent" type="button" class="big" (click)="save()" [disabled]="busy || suu == null">
+        <button mat-flat-button color="accent" type="button" class="big" (click)="save()" [disabled]="busy || suu == null">
           <mat-icon>task_alt</mat-icon>{{kind == 'draft' ? '足す' : '登録'}}
         </button>
       </div>

@@ -21,7 +21,7 @@ import { KakoFigure, kakoFigure } from './kakofig';
       @if (dbMismatch) {
         <div class="msg ng">
           この指示書は{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}のものですが、このスマホは{{dbMismatch == 'test' ? '本番環境' : 'テスト環境'}}につながっています。
-          <button mat-raised-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
+          <button mat-flat-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
         </div>
       }
       <div class="head">
@@ -61,7 +61,7 @@ import { KakoFigure, kakoFigure } from './kakofig';
         }
         <div class="buttons">
           @if (!den.del && den.status < 6) {
-            <button mat-raised-button color="accent" type="button" class="big" (click)="next()" [disabled]="busy">
+            <button mat-flat-button color="accent" type="button" class="big" (click)="next()" [disabled]="busy">
               <mat-icon>task_alt</mat-icon>「{{stepName(den.status + 1)}}」にする
             </button>
           }

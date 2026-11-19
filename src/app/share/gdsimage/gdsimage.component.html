@@ -30,7 +30,7 @@
             <mat-grid-tile-footer class="flex flex-wrap space-x-4" style="height:30px;">
               <input name="upfile" style="display: none" type="file" #upfile accept=".jpg"
                 (change)="onchange(upfile.files,i.toString())" capture="enviroment" />
-              <button mat-raised-button color="primary" class="file-select-button"
+              <button mat-flat-button color="primary" class="file-select-button"
                 (click)="onClickFileInputButton(i)">
                 ファイルを選択して登録
               </button>
@@ -46,5 +46,5 @@
     </div>
   </mat-dialog-content>
   <!-- <mat-dialog-actions>
-  <button class="mat-raised-button" (click)="close()">閉じる</button>
+  <button mat-stroked-button type="button" (click)="close()">閉じる</button>
 </mat-dialog-actions> -->

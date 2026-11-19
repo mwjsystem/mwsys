@@ -31,7 +31,7 @@
     <mat-datepicker-toggle matSuffix [for]="pto"></mat-datepicker-toggle>
     <mat-datepicker #pto></mat-datepicker>
   </mat-form-field>
-  <button mat-raised-button color="primary" type="button" (click)="search()" [disabled]="busy">
+  <button mat-flat-button color="primary" type="button" (click)="search()" [disabled]="busy">
     <mat-icon>search</mat-icon>検索
   </button>
   <button mat-button type="button" (click)="expand(true)" [disabled]="!orders?.length">すべて開く</button>

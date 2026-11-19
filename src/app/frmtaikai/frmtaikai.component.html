@@ -6,7 +6,7 @@
   <p class="err" style="white-space: pre-line;">{{error}}</p>
 }
 <div class="bar">
-  <button mat-raised-button color="primary" type="button" (click)="xls.click()" [disabled]="busy">
+  <button mat-flat-button color="primary" type="button" (click)="xls.click()" [disabled]="busy">
     <mat-icon>upload_file</mat-icon>大会リスト（Excel）を選ぶ
   </button>
   <input #xls type="file" accept=".xlsx,.xlsm" hidden (change)="onFile($event)">
@@ -62,7 +62,7 @@
     <p class="err">商品マスタに無い品番が {{missing}} 件あります（赤の行）。直してから読み込み直してください。</p>
   }
   <div class="bar">
-    <button mat-raised-button color="primary" type="button" (click)="ship()" [disabled]="!canShip">
+    <button mat-flat-button color="primary" type="button" (click)="ship()" [disabled]="!canShip">
       <mat-icon>local_shipping</mat-icon>出荷：移動伝票を登録（{{home}} → {{scode || '5xx'}}）
     </button>
     @if (shipDenno) {
@@ -71,7 +71,7 @@
     <label style="font-size: 13px; margin-left: 24px;">売上の日付
       <input type="date" [(ngModel)]="saleDay" [disabled]="busy">
     </label>
-    <button mat-raised-button color="accent" type="button" (click)="sale()" [disabled]="!canSale">
+    <button mat-flat-button color="accent" type="button" (click)="sale()" [disabled]="!canSale">
       <mat-icon>point_of_sale</mat-icon>売上：受注伝票と戻りの移動伝票を登録
     </button>
     @if (saleDenno) {

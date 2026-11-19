@@ -53,8 +53,8 @@
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-raised-button (click)="close()">閉じる</button>
+  <button mat-flat-button (click)="close()">閉じる</button>
   @if (flg) {
-    <button mat-raised-button [color]="'primary'" (click)="setEda()">枝番をセット</button>
+    <button mat-flat-button [color]="'primary'" (click)="setEda()">枝番をセット</button>
   }
 </mat-dialog-actions>

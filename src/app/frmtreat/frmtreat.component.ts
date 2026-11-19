@@ -16,7 +16,8 @@ import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { filter } from 'rxjs/operators';
 import { MatToolbar } from '@angular/material/toolbar';
-import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
@@ -33,7 +34,7 @@ interface TreatResult { trtreat: mwI.Trtreat[] }
     templateUrl: './frmtreat.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatToolbar, MatFormField, MatLabel, MatInput, MatPaginator, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSelect, FormsModule, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe, StaffPipe]
+    imports: [MatToolbar, MatButton, MatIcon, MatPaginator, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSelect, FormsModule, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe, StaffPipe]
 })
 export class FrmtreatComponent implements OnInit {
   trtsrv = inject(TreatService);

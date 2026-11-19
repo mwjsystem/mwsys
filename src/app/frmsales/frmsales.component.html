@@ -129,7 +129,7 @@
   <div class="flex flex-row flex-wrap items-center" style="gap: 10px; margin: 6px 12px; padding: 8px 12px; background: #fff3e0; border-left: 4px solid #e65100;">
     <mat-icon style="color: #e65100;">inventory_2</mat-icon>
     <span style="color: #bf360c; font-weight: bold;">{{keepSuggest}}</span>
-    <button mat-raised-button color="accent" type="button" (click)="makeFrmKeep()" [disabled]="keepBusy">
+    <button mat-flat-button color="accent" type="button" (click)="makeFrmKeep()" [disabled]="keepBusy">
       <mat-icon>fax</mat-icon>キープ表を送る
     </button>
     <button mat-button type="button" (click)="keepSuggest = ''">今は送らない</button>
@@ -139,7 +139,7 @@
   <div class="flex flex-row flex-wrap items-center" style="gap: 10px; margin: 6px 12px; padding: 8px 12px; background: #e3f2fd; border-left: 4px solid #1565c0;">
     <mat-icon style="color: #1565c0;">swap_horiz</mat-icon>
     <span style="color: #0d47a1; font-weight: bold;">出荷倉庫の在庫が足りない商品が、他の倉庫にあります：{{moveText()}}</span>
-    <button mat-raised-button color="primary" type="button" (click)="openMoves()" [disabled]="moveBusy">
+    <button mat-flat-button color="primary" type="button" (click)="openMoves()" [disabled]="moveBusy">
       <mat-icon>local_shipping</mat-icon>移動伝票を作る
     </button>
     <button mat-button type="button" (click)="moveSuggest = []">今は作らない</button>

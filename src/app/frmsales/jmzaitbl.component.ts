@@ -12,7 +12,7 @@ import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatFormField, MatInput, MatSuffix } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
-import { MatIconButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
 /** get_nymat クエリの結果（入荷予定） */
@@ -32,7 +32,7 @@ export class Jmzai {
     templateUrl: './jmzaitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFormField, MatSelect, FormsModule, MatOption, MatInput, MatIconButton, MatSuffix, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
+    imports: [MatButton, MatDialogTitle, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFormField, MatSelect, FormsModule, MatOption, MatInput, MatIconButton, MatSuffix, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
 })
 export class JmzaitblComponent implements OnInit {
   private dialogRef = inject<MatDialogRef<JmzaitblComponent>>(MatDialogRef);

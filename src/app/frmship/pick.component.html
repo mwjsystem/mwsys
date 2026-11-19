@@ -2,7 +2,7 @@
   @if (dbMismatch) {
     <div class="msg ng">
       この{{sheetName}}は{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}のものですが、このスマホは{{dbMismatch == 'test' ? '本番環境' : 'テスト環境'}}につながっています。
-      <button mat-raised-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
+      <button mat-flat-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
     </div>
   }
 
@@ -32,13 +32,13 @@
     @if (mode) {
       <button mat-stroked-button type="button" (click)="stop()"><mat-icon>videocam_off</mat-icon>カメラを止める</button>
     } @else if (doc && !allDone) {
-      <button mat-raised-button color="primary" type="button" (click)="start('item')"><mat-icon>document_scanner</mat-icon>商品を読む</button>
+      <button mat-flat-button color="primary" type="button" (click)="start('item')"><mat-icon>document_scanner</mat-icon>商品を読む</button>
     }
     @if (!doc && mode != 'qr') {
-      <button mat-raised-button color="primary" type="button" (click)="start('qr')"><mat-icon>qr_code_scanner</mat-icon>{{sheetName}}の QR を読む</button>
+      <button mat-flat-button color="primary" type="button" (click)="start('qr')"><mat-icon>qr_code_scanner</mat-icon>{{sheetName}}の QR を読む</button>
     }
     @if (doc && !completed && (allDone || kind == 'keep')) {
-      <button mat-raised-button [color]="allDone ? 'accent' : 'warn'" type="button" class="big" (click)="complete()" [disabled]="busy">
+      <button mat-flat-button [color]="allDone ? 'accent' : 'warn'" type="button" class="big" (click)="complete()" [disabled]="busy">
         <mat-icon>task_alt</mat-icon>{{kind == 'keep' ? (allDone ? 'キープ確認完了' : '欠品ありで確認完了') : 'ピッキング完了'}}
       </button>
     }

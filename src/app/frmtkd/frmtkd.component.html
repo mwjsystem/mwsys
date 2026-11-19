@@ -6,12 +6,12 @@
   <p class="err" style="white-space: pre-line;">{{error}}</p>
 }
 <div class="bar">
-  <button mat-raised-button color="primary" type="button" (click)="xlsx.click()" [disabled]="busy">
+  <button mat-flat-button color="primary" type="button" (click)="xlsx.click()" [disabled]="busy">
     <mat-icon>upload_file</mat-icon>Excel を選ぶ
   </button>
   <input #xlsx type="file" accept=".xlsx" hidden (change)="onFile($event)">
   <span>{{fileName}}</span>
-  <button mat-raised-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
+  <button mat-flat-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
     <mat-icon>save</mat-icon>登録（{{targetCount}} 件）
   </button>
   @if (progress) {

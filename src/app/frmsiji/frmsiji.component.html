@@ -12,7 +12,7 @@
   <button mat-icon-button type="button" (click)="dennoHelp()" [disabled]="busy" title="受注伝票を検索して選ぶ（F4）">
     <mat-icon>find_replace</mat-icon>
   </button>
-  <button mat-raised-button color="primary" type="button" (click)="load()" [disabled]="busy || !denno">
+  <button mat-flat-button color="primary" type="button" (click)="load()" [disabled]="busy || !denno">
     <mat-icon>search</mat-icon>読込
   </button>
   @if (loaded) {
@@ -20,7 +20,7 @@
   }
 </div>
 <div class="bar">
-  <button mat-raised-button type="button" (click)="xls.click()" [disabled]="busy">
+  <button mat-flat-button type="button" (click)="xls.click()" [disabled]="busy">
     <mat-icon>upload_file</mat-icon>指示書の Excel を選ぶ
   </button>
   <input #xls type="file" accept=".xlsx" hidden (change)="onTemplate($event)">
@@ -34,7 +34,7 @@
       </select>
     </label>
   }
-  <button mat-raised-button color="accent" type="button" (click)="make()" [disabled]="!canMake">
+  <button mat-flat-button color="accent" type="button" (click)="make()" [disabled]="!canMake">
     <mat-icon>download</mat-icon>本数をセットしてダウンロード
   </button>
 </div>

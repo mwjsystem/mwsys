@@ -1,32 +1,21 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">問合せ・対応</span>
+    <button mat-flat-button color="primary" type="button" (click)="diaDet(-1)"><mat-icon>add_box</mat-icon>新規</button>
+  </div>
+</mat-toolbar>
 <div class="mat-elevation-z8">
-  <mat-toolbar class="flex flex-wrap space-x-4">
-    <button class="mat-raised-button" (click)="filterTreat()">検索</button>
-    <mat-form-field>
-      <mat-label>顧客コード</mat-label>
-      <input matInput (input)="fmcode=$event.target.value">
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>商品グループ</mat-label>
-      <input matInput (input)="fgrpcd=$event.target.value">
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>メール</mat-label>
-      <input matInput (input)="fmail=$event.target.value">
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>電話番号 or FAX ハイフン(-)なし</mat-label>
-      <input matInput type="number" (input)="ftel=$event.target.value">
-    </mat-form-field>
-    <button class="mat-raised-button" color="warn" (click)="diaDet(-1)">新規登録</button>
+  <div class="flex flex-wrap items-center" style="gap: 12px; padding: 8px;">
+    <label>顧客コード <input (input)="fmcode=$event.target.value" (keyup.enter)="filterTreat()" style="width: 8em;"></label>
+    <label>商品グループ <input (input)="fgrpcd=$event.target.value" (keyup.enter)="filterTreat()" style="width: 8em;"></label>
+    <label>メール <input (input)="fmail=$event.target.value" (keyup.enter)="filterTreat()" style="width: 14em;"></label>
+    <label>電話番号・FAX（ハイフンなし） <input type="number" (input)="ftel=$event.target.value" (keyup.enter)="filterTreat()" style="width: 10em;"></label>
+    <button mat-flat-button color="primary" type="button" (click)="filterTreat()"><mat-icon>search</mat-icon>検索</button>
     <mat-paginator #paginators [length]="dataSource.data.length" [pageIndex]="0"
       [pageSizeOptions]="[20, 50, 100, 250, 1000]">
     </mat-paginator>
-  </mat-toolbar>
+  </div>
   <table mat-table [dataSource]="dataSource" aria-label="Elements">
-    <ng-container matColumnDef="seq">
-      <th mat-header-cell *matHeaderCellDef>意味なし連番</th>
-      <td mat-cell *matCellDef="let row; let i = index">{{row.seq}}</td>
-    </ng-container>
     <ng-container matColumnDef="created_at">
       <th mat-header-cell *matHeaderCellDef>受付日</th>
       <td mat-cell *matCellDef="let row; let i = index">{{row.created_at | date:"yy/MM/dd"}}</td>

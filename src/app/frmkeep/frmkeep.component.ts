@@ -11,8 +11,8 @@ import { BunruiService } from './../services/bunrui.service';
 import { DownloadService } from './../services/download.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
-import { MatCard } from '@angular/material/card';
-import { MatFormField, MatLabel, MatInput, MatSuffix } from '@angular/material/input';
+import { MatToolbar } from '@angular/material/toolbar';
+import { Title } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -35,7 +35,7 @@ interface UpdOpelogResult { update_tropelog: { returning: Pick<mwI.Tropelog, 'st
     templateUrl: './frmkeep.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatCard, MatFormField, MatLabel, MatInput, FormsModule, MatButton, MatSuffix, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe, StaffPipe]
+    imports: [MatToolbar, FormsModule, MatButton, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatIcon, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, DatePipe, StaffPipe]
 })
 export class FrmkeepComponent implements OnInit {
   usrsrv = inject(UserService);
@@ -46,6 +46,10 @@ export class FrmkeepComponent implements OnInit {
   private dwlsrv = inject(DownloadService);
   private overlay = inject(Overlay);
   private route = inject(ActivatedRoute);
+
+  constructor() {
+    inject(Title).setTitle('キープ表確認(MWSystem)');
+  }
 
   denno!: number;
   // temp:mwI.Tropelog[]=[];

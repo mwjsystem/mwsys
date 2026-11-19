@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { MatButton } from '@angular/material/button';
 import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions } from "@angular/material/dialog";
 // import { Apollo } from 'apollo-angular';
@@ -27,7 +28,7 @@ export interface Nymat {
     templateUrl: './spdethelp.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
+    imports: [MatButton, MatDialogTitle, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSelect, MatOption, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
 })
 export class SpdethelpComponent implements OnInit {
   usrsrv = inject(UserService);

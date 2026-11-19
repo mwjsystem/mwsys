@@ -6,7 +6,7 @@
   <p class="err">{{error}}</p>
 }
 <div class="bar">
-  <button mat-raised-button color="primary" type="button" (click)="csv.click()" [disabled]="busy || !master">
+  <button mat-flat-button color="primary" type="button" (click)="csv.click()" [disabled]="busy || !master">
     <mat-icon>upload_file</mat-icon>CSV を選ぶ
   </button>
   <input #csv type="file" accept=".csv" hidden (change)="onFile($event)">
@@ -20,7 +20,7 @@
     </mat-select>
   </mat-form-field>
   <mat-checkbox [(ngModel)]="ippan" (change)="parse()">一般（未会員）の受注も取り込む</mat-checkbox>
-  <button mat-raised-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
+  <button mat-flat-button color="accent" type="button" (click)="register()" [disabled]="busy || targetCount == 0">
     <mat-icon>save</mat-icon>登録（{{targetCount}} 件）
   </button>
   <button mat-button type="button" (click)="excel()" [disabled]="busy || orders.length == 0">

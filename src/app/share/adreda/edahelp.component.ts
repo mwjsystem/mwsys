@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy, viewChild, inject } from '@angular/core';
+import { MatButton } from '@angular/material/button';
 import { MembsService } from './../../mstmember/membs.service';
 import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -12,7 +13,7 @@ import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
     templateUrl: './edahelp.component.html',
     styleUrls: ['./../../help.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatToolbar, MatFormField, MatLabel, MatInput, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
+    imports: [MatButton, MatDialogTitle, CdkScrollable, MatDialogContent, MatToolbar, MatFormField, MatLabel, MatInput, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatDialogActions]
 })
 export class EdahelpComponent implements OnInit {
   memsrv = inject(MembsService);
