@@ -15,6 +15,7 @@ import { ClosedayService } from './../services/closeday.service';
 import { VendsService } from './../mstvendor/vends.service';
 import { HatmeiService } from './../frmsupply/hatmei.service';
 import { HdnohelpComponent } from './../share/hdnohelp/hdnohelp.component';
+import { NyuhikService } from './../services/nyuhik.service';
 import { HatHead, OpenLine, SiidenNew, SiimeiInput, SiimeiService, SiiZaiko } from './siimei.service';
 
 /** 探して足す発注伝票の上限（多すぎると間違えて大量の仕入伝票を作りかねないため） */
@@ -45,6 +46,7 @@ export class SiibulkComponent implements AfterViewInit {
   private vensrv = inject(VendsService);
   private hmisrv = inject(HatmeiService);
   private smisrv = inject(SiimeiService);
+  private nyuhik = inject(NyuhikService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private title = inject(Title);
@@ -268,6 +270,10 @@ export class SiibulkComponent implements AfterViewInit {
       } catch (e) {
         console.log('error refreshHatden', e);
         this.usrsrv.toastWar('仕入伝票は作りましたが、発注伝票の状況を直せませんでした（' + (e as Error).message + '）');
+      }
+      // 入荷を、発注入荷待ち（在庫種別 8）の受注明細へ登録の古い順に引き当てる（仕入伝票ごとに順に）
+      for (const h of heads) {
+        await this.nyuhik.allocateAndNotify(h.denno, h.scode, meis.filter(m => m.denno == h.denno));
       }
       this.usrsrv.toastSuc(made.length + ' 枚の仕入伝票を作りました');
       await this.load();

@@ -837,4 +837,14 @@ export class UserService {
   toastInf(msg: string | undefined) {
     this.toastr.info(msg);
   }
+  /** 閉じるまで消えないお知らせ（複数行。lines は文字のまま出す） */
+  toastNote(title: string, lines: string[]) {
+    const esc = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+    this.toastr.info(lines.map(esc).join('<br>'), title, {
+      closeButton: true,
+      disableTimeOut: true,
+      tapToDismiss: false,
+      enableHtml: true,
+    });
+  }
 }

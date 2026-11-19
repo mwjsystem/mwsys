@@ -681,6 +681,11 @@ export class JmeitblComponent implements OnInit {
       }
     );
   }
+  /** 在庫状態詳細が入荷引当（「仕入<仕入伝票番号>」。services/nyuhik.service）なら仕入伝票番号 */
+  sdennoOf(spdet: string | null | undefined): string | null {
+    const m = /^仕入(\d+)$/.exec(String(spdet ?? '').trim());
+    return m ? m[1] : null;
+  }
   spdetHelp(i: number): void {
     let dialogConfig = new MatDialogConfig();
     let gcd: string = "";

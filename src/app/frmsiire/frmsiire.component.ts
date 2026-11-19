@@ -19,6 +19,7 @@ import { VendsService } from './../mstvendor/vends.service';
 import { SiimeiService, SiidenSet, SiidenNew, SiimeiInput, SiiZaiko, EXTYPE_SIIRE } from './siimei.service';
 import { OpelogComponent, OpelogParam } from './../share/opelog/opelog.component';
 import { HatmeiService } from './../frmsupply/hatmei.service';
+import { NyuhikService, NyukaLine } from './../services/nyuhik.service';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
 import { MatToolbar } from '@angular/material/toolbar';
@@ -62,6 +63,7 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
   stfsrv = inject(StaffService);
   hmisrv = inject(HatmeiService);
   smisrv = inject(SiimeiService);
+  private nyuhik = inject(NyuhikService);
   private vensrv = inject(VendsService);
   private overlay = inject(Overlay);
   private cdRef = inject(ChangeDetectorRef);
@@ -77,6 +79,9 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
   /** 読み込んだときの入荷数の取り消し分（在庫 trzaiko.hnyu）と、結び付いていた発注伝票 */
   private oldHnyu: SiiZaiko[] = [];
   private oldHdennos: number[] = [];
+  /** 読み込んだときの倉庫と明細（変更の保存で、増えた入荷だけを発注入荷待ちの受注明細に引き当てる） */
+  private oldScode: string | null = null;
+  private oldLines: NyukaLine[] = [];
   mode: number = 3;
   rows: FormArray = this.fb.array([]);
   overlayRef = this.overlay.create({
@@ -153,6 +158,8 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
           this.form.reset();
           this.oldHnyu = [];
           this.oldHdennos = [];
+          this.oldScode = null;
+          this.oldLines = [];
           if (result == null) {
             this.usrsrv.toastWar("仕入伝票番号" + denno + "は登録されていません");
             history.replaceState('', '', './frmsiire');
@@ -165,6 +172,8 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
             // 読み込んだときの入荷数（変更の保存で在庫から引いてから、今の数を足す）と、結び付いた発注伝票
             this.oldHnyu = this.smisrv.hnyuOf(siiden.scode, siiden.inday as unknown as string, siiden.trsiimeis, -1);
             this.oldHdennos = siiden.trsiimeis.map(m => Number(m.hdenno)).filter(n => n > 0);
+            this.oldScode = siiden.scode ?? null;
+            this.oldLines = siiden.trsiimeis.map(m => ({ gcode: m.gcode, suu: m.suu, hdenno: m.hdenno, hline: m.hline }));
             this.denno = denno;
             history.replaceState('', '', './frmsiire/' + this.mode + '/' + this.denno);
           }
@@ -227,7 +236,7 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
   }
 
   /** 保存のあと、発注明細の入荷済の印と発注伝票の状況を直す（失敗しても仕入伝票は保存済み） */
-  private async afterSave(siimei: SiimeiInput[], inday: string | null) {
+  private async afterSave(siimei: SiimeiInput[], inday: string | null, scode: string | null, isNew: boolean) {
     try {
       const hd = [...this.oldHdennos, ...siimei.map(m => Number(m.hdenno)).filter(n => n > 0)];
       await this.smisrv.refreshHatden(hd, inday ?? this.usrsrv.formatDate(new Date()), m => this.hmisrv.getHdsta(m));
@@ -235,6 +244,9 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
       console.log('error refreshHatden', e);
       this.usrsrv.toastWar('仕入伝票は保存しましたが、発注伝票の状況を直せませんでした');
     }
+    // 入荷を、同じ商品・同じ倉庫の発注入荷待ち（在庫種別 8）の受注明細へ登録の古い順に引き当てる（変更は増えた分だけ）
+    const lines = isNew ? siimei : this.nyuhik.increase(this.oldScode, this.oldLines, scode, siimei);
+    await this.nyuhik.allocateAndNotify(this.denno, scode, lines);
   }
   get frmArr(): FormArray {
     return this.form.get('mtbl') as FormArray;
@@ -336,7 +348,7 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
       const zaiko = [...this.oldHnyu, ...this.smisrv.hnyuOf(siiden.scode, siiden.inday, siimei)];
       this.smisrv.updSiiden(this.denno, siiden, siimei, zaiko)
         .then(async result => {
-          await this.afterSave(siimei, siiden.inday);
+          await this.afterSave(siimei, siiden.inday, siiden.scode, false);
           this.usrsrv.toastSuc('仕入伝票' + this.denno + 'の変更を保存しました');
           this.form.markAsPristine();
           this.cancel();
@@ -361,7 +373,7 @@ export class FrmsiireComponent extends BeforeunloadBase implements OnInit, After
       } as SiidenNew]
       this.smisrv.insSiiden(trsiiden, siimei, this.smisrv.hnyuOf(siiden.scode, siiden.inday, siimei))
         .then(async result => {
-          await this.afterSave(siimei, siiden.inday);
+          await this.afterSave(siimei, siiden.inday, siiden.scode, true);
           this.usrsrv.toastSuc('仕入伝票' + this.denno + 'を新規登録しました');
           this.form.markAsPristine();
           this.cancel();

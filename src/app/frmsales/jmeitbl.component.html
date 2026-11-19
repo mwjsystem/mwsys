@@ -282,6 +282,13 @@
             <mat-icon>open_in_new</mat-icon>
           </button>
         }
+        @if (sdennoOf(frmArr.getRawValue()[getIdx(i)]['spdet']); as sdno) {
+          <!-- 入荷引当: 在庫状態詳細は「仕入<仕入伝票番号>」。仕入伝票を別のタブで開く -->
+          <button mat-icon-button matSuffix type="button" title="引き当てた入荷（仕入伝票）を開きます"
+            (click)="usrsrv.openMst('frmsiire', sdno)">
+            <mat-icon>open_in_new</mat-icon>
+          </button>
+        }
       </mat-form-field>
     </td>
   </ng-container>
