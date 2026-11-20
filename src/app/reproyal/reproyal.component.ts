@@ -19,7 +19,9 @@ import { kenbu, khanki, real, zenkoren } from './royalty-calc3';
 /** 団体のキー → 集計 */
 const CALC: Record<string, (c: RoyCtx) => Promise<RoyResult>> = { shinkyoku, daido, ashihara, rengo, naniwa, jkjo, yushi, nas, ibko, oishi, kenbu, zenkoren, khanki, real };
 /** 半期で集計する団体 */
-const HALF = ['zenkoren', 'khanki'];
+const HALF = ['khanki'];
+/** 四半期で集計する団体 */
+const QUARTER = ['zenkoren'];
 /** 1 年で集計する団体 */
 const YEAR = ['real'];
 
@@ -89,13 +91,17 @@ export class ReproyalComponent implements OnInit {
     this.recvFrom = new Date(f.getFullYear(), f.getMonth() - 1, 15);
   }
 
-  /** 団体を変えたら、半期の団体は期間を前の半期（1〜6月 / 7〜12月）、1 年の団体は前の年にする。月の団体に戻したら前月にする */
+  /** 団体を変えたら、四半期の団体は前の四半期、半期の団体は前の半期（1〜6月 / 7〜12月）、1 年の団体は前の年にする。月の団体に戻したら前月にする */
   orgChanged() {
     this.result = undefined;
     const now = new Date();
     if (YEAR.includes(this.org)) {
       this.from = new Date(now.getFullYear() - 1, 0, 1);
       this.to = new Date(now.getFullYear() - 1, 11, 31);
+    } else if (QUARTER.includes(this.org)) {
+      const q = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3 - 3, 1);
+      this.from = q;
+      this.to = new Date(q.getFullYear(), q.getMonth() + 3, 0);
     } else if (HALF.includes(this.org)) {
       const h = now.getMonth() < 6 ? new Date(now.getFullYear() - 1, 6, 1) : new Date(now.getFullYear(), 0, 1);
       this.from = h;

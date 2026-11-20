@@ -2,7 +2,7 @@
 -- ロイヤリティ: 団体を 3 つ足す（極真拳武會 / 全硬連 / 極真半期）
 --
 --   kenbu    極真拳武會      月ごと。拳武會の商品（…-KEN）の数量 × 1 個ごとの金額（税込）
---   zenkoren 全硬連          半期。区分ごとのシートに、商品コード・単価ごとの数量
+--   zenkoren 全硬連          四半期。区分ごとのシートに、商品コード・単価ごとの数量（HGKP3・BPKP は中分類 072 だけ）
 --   khanki   極真半期        半期。卸の顧客への極真の道着・帯の数量 × 1 枚ごとの金額
 --
 --   20261129_royalty.sql（テーブルと初期データ）を実行したあとに実行する。
@@ -35,8 +35,8 @@ INSERT INTO msroyitem (id, org, grp, seq, name, size, color, gcodes, cond, price
   (1, 'zenkoren', 'NGKO', 10, '全硬連 拳サポーター', NULL, NULL, 'NGKO-*', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
   (1, 'zenkoren', 'LG48', 20, '全硬連・レッグサポーター', NULL, NULL, 'LG48-*-KS', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
   (1, 'zenkoren', 'NG-IKG', 30, 'インナーナックルガード', NULL, NULL, 'NG-IKG', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-  (1, 'zenkoren', 'HGKP3', 40, 'K-ﾌﾟﾛﾃｸﾀｰﾍｯﾄﾞｶﾞｰﾄﾞ 白', NULL, NULL, 'HGKP3-*-WH', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-  (1, 'zenkoren', 'BPKP', 50, 'K-ﾎﾞﾃﾞｨﾌﾟﾛﾃｸﾀｰ', NULL, NULL, 'BPKP-*-BURD', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+  (1, 'zenkoren', 'HGKP3', 40, 'K-ﾌﾟﾛﾃｸﾀｰﾍｯﾄﾞｶﾞｰﾄﾞ 白', NULL, NULL, 'HGKP3-*-WH', 'chubunrui:072', NULL, NULL, NULL, NULL, NULL, NULL),
+  (1, 'zenkoren', 'BPKP', 50, 'K-ﾎﾞﾃﾞｨﾌﾟﾛﾃｸﾀｰ', NULL, NULL, 'BPKP*', 'chubunrui:072', NULL, NULL, NULL, NULL, NULL, NULL),
   (1, 'khanki', 'dogi', 10, '道着上下', NULL, NULL, 'KU*', NULL, 1000, NULL, NULL, NULL, NULL, NULL),
   (1, 'khanki', 'dogi', 20, '道着上のみ', NULL, NULL, 'KU*-U', NULL, 600, NULL, NULL, NULL, NULL, NULL),
   (1, 'khanki', 'dogi', 30, '道着下のみ', NULL, NULL, 'KU*-S', NULL, 400, NULL, NULL, NULL, NULL, NULL),

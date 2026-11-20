@@ -1,6 +1,6 @@
 import { RoyItem, RoyLine } from './royalty.service';
 import { NUM, XVal, at, box, fx, head, merge, printFit, put, sheet, table, widths } from './royalty-excel';
-import { RoyCtx, RoyResult, empty, fileYm, findItem, itemsOf, listSheet, md, memsOf, notZero, pats, simpleStatement, udayIn } from './royalty-calc';
+import { RoyCtx, RoyResult, cond, empty, fileYm, findItem, itemsOf, listSheet, md, memsOf, notZero, pats, simpleStatement, udayIn } from './royalty-calc';
 
 /** 期間の文字（2025/01/01〜2025/06/30） */
 const period = (c: RoyCtx): string => md(c.from) + '〜' + md(c.to);
@@ -58,7 +58,7 @@ export async function kenbu(c: RoyCtx): Promise<RoyResult> {
 }
 
 // ---------------------------------------------------------------------
-// 全硬連（商品の区分ごとのシートに、商品コード・単価ごとの数量。期間は明細の売上日）
+// 全硬連（商品の区分ごとのシートに、商品コード・単価ごとの数量。期間は明細の売上日。条件 chubunrui の行はその中分類だけ。返品を除く）
 
 export async function zenkoren(c: RoyCtx): Promise<RoyResult> {
   const ret = empty();
@@ -67,8 +67,16 @@ export async function zenkoren(c: RoyCtx): Promise<RoyResult> {
   if (ps.length == 0) {
     throw new Error('ロイヤリティマスタに商品がありません');
   }
-  const lines = (await c.srv.lines({ trjyumeis: sdayIn(c) }, { ...sdayIn(c), _or: ps.map(p => ({ gcode: { _like: sqlLike(p) } })) }))
-    .filter(l => findItem(items, l.gcode));
+  // 現行の SQL と同じく、返品伝票は数えない（伝票区分 0 だけ）。条件 chubunrui がある行は、その中分類の伝票だけ
+  const chus = items.map(it => cond(it, 'chubunrui'));
+  const allChu = chus.every(e => e && e.length > 0) ? [...new Set(chus.flat() as string[])] : null;
+  const lines = (await c.srv.lines({ trjyumeis: sdayIn(c), ...(allChu ? { chubunrui: { _in: allChu } } : {}) },
+    { ...sdayIn(c), _or: ps.map(p => ({ gcode: { _like: sqlLike(p) } })) }))
+    .filter(l => {
+      const it = findItem(items, l.gcode);
+      const ch = it ? cond(it, 'chubunrui') : null;
+      return it && (l.den.denku ?? 0) == 0 && (!ch || ch.length == 0 || ch.includes((l.den.chubunrui ?? '').trim()));
+    });
   const grps = [...new Set(items.map(it => it.grp ?? it.name ?? ''))];
   // 区分 → 商品コード/単価 → 数量
   const by = new Map<string, Map<string, { gcode: string; tanka: number; suu: number }>>();
