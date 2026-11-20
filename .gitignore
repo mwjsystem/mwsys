@@ -46,4 +46,4 @@ testem.log
 .DS_Store
 Thumbs.db
 
-/documentationbatch/zaiko/__pycache__/
+batch/zaiko/__pycache__/
