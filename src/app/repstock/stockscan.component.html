@@ -1,0 +1,112 @@
+<div class="pick">
+  <div class="head">
+    <div class="denno">在庫確認（スマホ）</div>
+    <div class="sub">商品のバーコード（JAN）か商品コードを読むと、倉庫ごとの在庫と受注可能数が出ます。</div>
+  </div>
+
+  <video #video class="video" [class.hidden]="!scanning" playsinline muted></video>
+
+  @if (msg) {
+    <div class="msg" [class.ok]="msgType == 'ok'" [class.ng]="msgType == 'ng'">{{msg}}</div>
+  }
+
+  <div class="buttons">
+    @if (scanning) {
+      <button mat-stroked-button type="button" (click)="stop()"><mat-icon>videocam_off</mat-icon>カメラを止める</button>
+    } @else {
+      <button mat-flat-button color="primary" type="button" class="big" (click)="start()" [disabled]="busy"><mat-icon>document_scanner</mat-icon>商品を読む</button>
+    }
+  </div>
+
+  <form class="manual" (ngSubmit)="onManual()">
+    <input [(ngModel)]="manual" name="manual" placeholder="バーコードリーダー・手入力（JAN／商品コード）" autocomplete="off" enterkeyhint="search">
+    <button mat-stroked-button type="submit" [disabled]="busy">読む</button>
+  </form>
+
+  @if (busy) {
+    <div class="msg">在庫を読んでいます…</div>
+  }
+
+  @if (goods && !busy) {
+    <div class="item card">
+      <div class="code">{{goods.gcode}}@if (goods.tanano) {<span class="tana">棚{{goods.tanano}}</span>}</div>
+      <div class="name">{{goods.gtext}}</div>
+      @if (goods.jan) {<div class="sub">JAN {{goods.jan}}</div>}
+
+      @if (goods.gskbn == '0' || goods.gskbn == '1') {
+        @if (goods.gskbn == '1') {
+          <div class="sub">セット品です。構成品の在庫から受注可能数を出しています。</div>
+        }
+        @if (shown.length == 0) {
+          <div class="sub">在庫のある倉庫がありません。</div>
+        } @else {
+          <table class="stocks">
+            <thead>
+              <tr>
+                <th>倉庫</th>
+                @if (goods.gskbn == '0') {<th>在庫</th>}
+                <th>受注可</th>
+                @if (goods.gskbn == '0') {<th>引当</th><th>キープ</th><th>加工</th>}
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of shown; track r.scode) {
+                <tr [class.mine]="r.mine">
+                  <td class="sname">{{r.name}}</td>
+                  @if (goods.gskbn == '0') {<td class="num big">{{r.stock}}</td>}
+                  <td class="num big" [class.minus]="r.pable < 0" [class.zero]="r.pable == 0">{{r.pable}}</td>
+                  @if (goods.gskbn == '0') {
+                    <td class="num">{{r.hikat || ''}}</td>
+                    <td class="num">{{r.keepd || ''}}</td>
+                    <td class="num">{{r.kakod || ''}}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+            @if (goods.gskbn == '0' && rows.length > 1) {
+              <tfoot>
+                <tr>
+                  <td>合計</td>
+                  <td class="num">{{total.stock}}</td>
+                  <td class="num">{{total.pable}}</td>
+                  <td colspan="3"></td>
+                </tr>
+              </tfoot>
+            }
+          </table>
+          <div class="unit">単位：{{goods.unit || '個'}}</div>
+        }
+        <button mat-stroked-button type="button" class="all" (click)="toggleAll()">
+          {{showAll ? '在庫のある倉庫だけ出す' : 'すべての倉庫を出す'}}
+        </button>
+
+        @if (plan && goods.gskbn == '0') {
+          <div class="plan">
+            @if (plan.yday) {
+              <div>{{plan.ydtxt}}：<b>{{plan.yday | date:'M/d'}}</b>　{{plan.suu}}{{goods.unit}}</div>
+            } @else {
+              <div class="sub">入荷予定はありません</div>
+            }
+            @if (plan.htzan) {<div>発注残 合計：<b>{{plan.htzan}}</b>{{goods.unit}}</div>}
+          </div>
+        }
+      } @else {
+        <div class="sub">在庫を管理しない商品です。</div>
+      }
+
+      <div class="buttons">
+        <button mat-stroked-button type="button" (click)="reload()"><mat-icon>refresh</mat-icon>今の数に更新</button>
+        <button mat-stroked-button type="button" (click)="openPc()"><mat-icon>open_in_new</mat-icon>PC の現在庫確認</button>
+      </div>
+    </div>
+  }
+
+  @if (history.length > 0) {
+    <div class="progress">読んだ商品</div>
+    @for (h of history; track h.gcode) {
+      <button type="button" class="hist" (click)="open(h.gcode)" [disabled]="busy">
+        <b>{{h.gcode}}</b>　{{h.gtext}}
+      </button>
+    }
+  }
+</div>

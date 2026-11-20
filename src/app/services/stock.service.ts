@@ -345,7 +345,8 @@ export class StockService {
   private stockWaiting: (() => void)[] = [];
 
   /** 在庫の問い合わせ。同時に MAX_STOCK 件までにして、残りは順番待ちにする */
-  async getStock(gcd: string, gskbn: string, scd?: string, date?: Date): Promise<Stock[]> {
+  /** fresh = true はキャッシュを使わずに読み直す（スマホの在庫確認など、今の数を見たいとき） */
+  async getStock(gcd: string, gskbn: string, scd?: string, date?: Date, fresh = false): Promise<Stock[]> {
     if (this.stockRunning >= StockService.MAX_STOCK) {
       await new Promise<void>(res => this.stockWaiting.push(res));
     }
@@ -357,7 +358,7 @@ export class StockService {
         console.log('error query stock（30 秒で応答なし）', gcd, scd);
         res([]);
       }, 30000));
-      const r = await Promise.race([this.getStock0(gcd, gskbn, scd, date), timeout]);
+      const r = await Promise.race([this.getStock0(gcd, gskbn, scd, date, fresh), timeout]);
       clearTimeout(timer);
       return r;
     } finally {
@@ -366,7 +367,7 @@ export class StockService {
     }
   }
 
-  private getStock0(gcd: string, gskbn: string, scd?: string, date?: Date): Promise<Stock[]> {
+  private getStock0(gcd: string, gskbn: string, scd?: string, date?: Date, fresh = false): Promise<Stock[]> {
     let scodes: string[] = [];
     let lcdate: Date;
     const GetView = gql`
@@ -392,6 +393,7 @@ export class StockService {
       // console.log(lcdate);
       this.apollo.watchQuery<GstanaResult>({
         query: GetView,
+        fetchPolicy: fresh ? 'network-only' : 'cache-first',
         variables: {
           id: this.usrsrv.compid,
           gcode: gcd,
@@ -418,7 +420,7 @@ export class StockService {
             let lctana: number = item.tana ?? 0;
             let lcstc: Stock | Stcbs | undefined;
             if (gskbn == "0") {
-              lcstc = await this.getZaiko(gcd, item.code, lcday, lctana, lcdate);
+              lcstc = await this.getZaiko(gcd, item.code, lcday, lctana, lcdate, fresh);
             } else if (gskbn == "1") {
               lcstc = await this.getZaiko1(gcd, item.code, lcday, lctana);
             }
@@ -551,7 +553,7 @@ export class StockService {
     }
   }
 
-  async getZaiko(gcd: string, scd: string, day: Date, stc: number, tdy: Date): Promise<Stock> {
+  async getZaiko(gcd: string, scd: string, day: Date, stc: number, tdy: Date, fresh = false): Promise<Stock> {
     // console.log(gcd + '_' + scd,day);
     const GetTran = gql`
     query get_zaiko($id: smallint!, $gcode: String!, $scode: String!, $day: date!, $today: date!,$nextd: date!) {
@@ -600,6 +602,7 @@ export class StockService {
 
       this.apollo.watchQuery<ZaikoResult>({
         query: GetTran,
+        fetchPolicy: fresh ? 'network-only' : 'cache-first',
         variables: {
           id: this.usrsrv.compid,
           gcode: gcd,

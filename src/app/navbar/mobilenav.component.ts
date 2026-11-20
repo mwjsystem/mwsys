@@ -8,6 +8,7 @@ interface MobileLink { path: string; name: string; icon: string; note: string }
 
 /** 倉庫のスマホで使う画面 */
 export const MOBILE_LINKS: MobileLink[] = [
+  { path: '/repstock/scan', name: '在庫確認', icon: 'manage_search', note: '商品を読んで倉庫ごとの在庫を見る' },
   { path: '/frmtana/scan', name: '棚卸', icon: 'inventory', note: '商品を読んで棚卸の数を入れる' },
   { path: '/frmship/pick', name: 'ピッキング', icon: 'shopping_basket', note: '出荷指示書の QR → 商品を読む' },
   { path: '/frmship/keep', name: 'キープ確認', icon: 'inventory_2', note: 'キープ表の QR → 確保した数' },
