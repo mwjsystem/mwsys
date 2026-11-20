@@ -33,8 +33,6 @@
   <button mat-button [matMenuTriggerFor]="cust">顧客関連</button>
   <mat-menu #cust="matMenu">
     <button mat-menu-item routerLink="/mstmember">顧客マスタ</button>
-    <a mat-menu-item>ＤＭ抽出</a>
-    <a mat-menu-item>ＤＭリスト</a>
     <a mat-menu-item routerLink="/frmtreat">問合せ・対応</a>
     <button mat-menu-item (click)="dlKick('TRN-TREAT_')">問合せ一括更新</button>
   </mat-menu>
@@ -96,7 +94,6 @@
     <button mat-menu-item [matMenuTriggerFor]="souk">倉庫</button>
     <mat-menu #souk="matMenu">
       <a mat-menu-item routerLink="/frmkeep">キープ表確認</a>
-      <a mat-menu-item>加工依頼確認</a>
     </mat-menu>
   </mat-menu>
   <button mat-button [matMenuTriggerFor]="siir">仕入関連</button>
