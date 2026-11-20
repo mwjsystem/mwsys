@@ -40,8 +40,8 @@ export interface RoyLine {
   /** 返品（伝票区分 2）は -1 */
   sign: number;
 }
-/** 顧客の名前とマスタ備考 */
-export interface RoyMember { name: string; memo: string }
+/** 顧客の名前とマスタ備考・単価区分 */
+export interface RoyMember { name: string; memo: string; tankakbn: string }
 /** 単価の履歴（新しい順） */
 export interface RoyTanka { day: string; tanka2: number | null; tanka3: number | null }
 /** 商品（区分と単価の履歴） */
@@ -170,12 +170,14 @@ export class RoyaltyService {
     }
     const Get = gql`
       query roy_members($id: smallint!, $mcodes: [String!]!) {
-        msmember(where: {id: {_eq: $id}, mcode: {_in: $mcodes}}) { mcode sei mei memo dmemo }
+        msmember(where: {id: {_eq: $id}, mcode: {_in: $mcodes}}) { mcode sei mei memo dmemo tankakbn }
       }`;
-    const q = await this.query<{ msmember: { mcode: string; sei: string | null; mei: string | null; memo: string | null; dmemo: string | null }[] }>(
+    const q = await this.query<{ msmember: { mcode: string; sei: string | null; mei: string | null; memo: string | null; dmemo: string | null; tankakbn: string | null }[] }>(
       Get, { id: this.usrsrv.compid, mcodes: list });
     for (const m of q.msmember) {
-      ret.set(m.mcode, { name: ((m.sei ?? '') + ' ' + (m.mei ?? '')).trim(), memo: (m.memo ?? '') + '\n' + (m.dmemo ?? '') });
+      ret.set(m.mcode, {
+        name: ((m.sei ?? '') + ' ' + (m.mei ?? '')).trim(), memo: (m.memo ?? '') + '\n' + (m.dmemo ?? ''), tankakbn: String(m.tankakbn ?? '').trim()
+      });
     }
     return ret;
   }

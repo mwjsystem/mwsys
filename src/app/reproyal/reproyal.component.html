@@ -6,7 +6,7 @@
 <div class="bar">
   <mat-form-field style="width: 14em;" subscriptSizing="dynamic">
     <mat-label>団体</mat-label>
-    <mat-select [(ngModel)]="org" (selectionChange)="result = undefined" [panelClass]="'my-panel-class'">
+    <mat-select [(ngModel)]="org" (selectionChange)="orgChanged()"[panelClass]="'my-panel-class'">
       @for (o of orgs; track o.org) {
         <mat-option [value]="o.org">{{o.name}}</mat-option>
       }
@@ -79,6 +79,15 @@
     }
     @case ('oishi') {
       <p>納品先が大石道場の伝票です。R単価 = 各行の最後の商品の卸価格（単価2）× 率（切り捨て）。</p>
+    }
+    @case ('kenbu') {
+      <p>拳武會の商品（商品コード …-KEN）の伝票です。数量 × 1 個ごとの金額（税込）。マスタに無い拳武會の商品は、集計せずに警告に出します。</p>
+    }
+    @case ('zenkoren') {
+      <p>半期の集計です（団体を選ぶと、期間を前の半期にします）。明細の売上日が期間内の、マスタの商品コードの数量を、商品コード・単価ごとに区分のシートに出します。</p>
+    }
+    @case ('khanki') {
+      <p>半期の集計です（団体を選ぶと、期間を前の半期にします）。明細の売上日が期間内で、納品先が卸（単価区分 2・4）の極真の道着・帯（%KU%-K% / %CBKK1% / %CB-%-K%。-KEN・-KSS・-K-AN と単価 0 を除く）を数えます。除く納品先はマスタの顧客（種類 exclude）。</p>
     }
   }
 </div>
