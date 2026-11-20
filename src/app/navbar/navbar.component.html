@@ -33,7 +33,6 @@
   <button mat-button [matMenuTriggerFor]="cust">顧客関連</button>
   <mat-menu #cust="matMenu">
     <button mat-menu-item routerLink="/mstmember">顧客マスタ</button>
-    <a mat-menu-item>掛率表</a>
     <a mat-menu-item>ＤＭ抽出</a>
     <a mat-menu-item>ＤＭリスト</a>
     <a mat-menu-item routerLink="/frmtreat">問合せ・対応</a>
@@ -50,7 +49,6 @@
     <!-- <a mat-menu-item>掛売入金</a> -->
     <a mat-menu-item>請求予定一覧表</a>
     <a mat-menu-item>請求書出力</a>
-    <a mat-menu-item routerLink="/frmnyukin/misyu">未入金一覧表（未入金管理）</a>
     <a mat-menu-item>ＮＰ状況確認</a>
     <a mat-menu-item>ＮＰデータ編集</a>
   </mat-menu>
@@ -138,7 +136,6 @@
   </mat-menu>
   <button mat-button [matMenuTriggerFor]="syst">システム</button>
   <mat-menu #syst="matMenu">
-    <a mat-menu-item routerLink="/frmnyukin/bank">入金テキスト読込</a>
     <a mat-menu-item routerLink="/mstholiday">稼働日カレンダ</a>
     <a mat-menu-item routerLink="/mstclose">締め日設定</a>
     <a mat-menu-item routerLink="/repopelog">作業ログ</a>
