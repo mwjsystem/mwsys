@@ -1,7 +1,7 @@
 import type { Workbook, Worksheet } from 'exceljs';
 import { RoyDen, RoyItem, RoyLine, RoyMem } from './royalty.service';
 import { NUM, at, box, fx, head, merge, printFit, put, sheet, widths } from './royalty-excel';
-import { RoyCtx, RoyExcl, RoyResult, codesOf, empty, itemsOf, like, memsOf, pats, ymd } from './royalty-calc';
+import { RoyCtx, RoyExcl, RoyResult, codesOf, cond, empty, itemsOf, like, memsOf, pats, ymd } from './royalty-calc';
 
 /*
  * 新極真会（大分類 100004 の伝票）。現行の「新極ロイヤリティ.xlsm」と「新極ロイヤリティ年間集計表.xlsm」の置き換え。
@@ -17,8 +17,12 @@ import { RoyCtx, RoyExcl, RoyResult, codesOf, empty, itemsOf, like, memsOf, pats
  * 海外分: 受注先が海外新極真会の伝票を、出荷日が対象の月のもので数える
  */
 
-/** 帯・道着の区分（KDCB）。商品コードの判定は現行のマクロと同じ順 */
-function kdKey(gcode: string, mmemo: string | null): { key: string; detail: boolean } | null {
+/**
+ * 帯・道着の区分（KDCB）。商品コードの判定は現行のマクロと同じ順。
+ * 記念道着は、マスタの区分 kdcb の行の条件「like:商品コード,…;nodetail:商品コード,…」で決める
+ * （like に当たれば、その行の区分。nodetail に当たるものは数だけ数えて、日別の明細には出さない）
+ */
+function kdKey(gcode: string, mmemo: string | null, kinen: RoyItem[]): { key: string; detail: boolean } | null {
   if (like(gcode, 'CBSK1WH*') || like(gcode, 'CBSK1K*')) {
     return { key: 'ZZSK001', detail: true };
   }
@@ -32,11 +36,10 @@ function kdKey(gcode: string, mmemo: string | null): { key: string; detail: bool
       return { key: k, detail: true };
     }
   }
-  if (like(gcode, 'KD15*K')) {
-    return { key: 'ZZSK110', detail: !like(gcode, 'KD15*S-K') };
-  }
-  if (like(gcode, 'KD15*')) {
-    return { key: 'ZZSK120', detail: !like(gcode, 'KD15*-S') };
+  for (const it of kinen) {
+    if ((cond(it, 'like') ?? []).some(p => like(gcode, p))) {
+      return { key: (it.gcodes ?? '').trim(), detail: !(cond(it, 'nodetail') ?? []).some(p => like(gcode, p)) };
+    }
   }
   if (like(gcode, 'KD1-*')) {
     return { key: 'ZZSK020', detail: true };
@@ -115,6 +118,7 @@ async function shinMonth(c: RoyCtx, y: number, m: number, recvFrom: string): Pro
   const sapo = itemsOf(c, 'sapo');
   const obid = itemsOf(c, 'obid');
   const akao = itemsOf(c, 'akao');
+  const kinen = itemsOf(c, 'kdcb').filter(it => cond(it, 'like') != null);
   const byCode = new Map<string, RoyItem>();
   // 現行と同じく、帯留め → 赤帯 → サポーターの順に探す
   for (const it of [...sapo, ...akao, ...obid]) {
@@ -152,7 +156,7 @@ async function shinMonth(c: RoyCtx, y: number, m: number, recvFrom: string): Pro
     r.lines++;
     const dk = keyOf(l.den);
     const n = l.suu * l.sign;
-    const kd = kdKey(l.gcode, l.mmemo);
+    const kd = kdKey(l.gcode, l.mmemo, kinen);
     let hit = false;
     if (kd) {
       hit = true;
@@ -183,7 +187,7 @@ async function shinMonth(c: RoyCtx, y: number, m: number, recvFrom: string): Pro
         continue;
       }
       const n = l.suu * l.sign;
-      const kd = kdKey(l.gcode, l.mmemo);
+      const kd = kdKey(l.gcode, l.mmemo, kinen);
       if (kd) {
         r.kaiK.set(kd.key, (r.kaiK.get(kd.key) ?? 0) + n);
       } else {
