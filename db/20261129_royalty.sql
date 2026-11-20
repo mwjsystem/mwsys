@@ -594,8 +594,8 @@ INSERT INTO msroyitem (id, org, grp, seq, name, size, color, gcodes, cond, price
   (1, 'shinkyoku', 'kdcb', 120, '晒　空手着　上  　※直轄道場 外口銭', NULL, NULL, 'ZZSK091', NULL, 1020, NULL, NULL, NULL, NULL, '晒 空手着　上'),
   (1, 'shinkyoku', 'kdcb', 121, '晒　空手着　下', NULL, NULL, 'ZZSK100', NULL, 500, NULL, NULL, NULL, NULL, '晒 空手着　下'),
   (1, 'shinkyoku', 'kdcb', 122, '晒　空手着　下  　※直轄道場 外口銭', NULL, NULL, 'ZZSK101', NULL, 680, NULL, NULL, NULL, NULL, '晒 空手着　下'),
-  (1, 'shinkyoku', 'kdcb', 123, '第14回世界空手道選手権大会記念道着　生成り', '記念道着 生成り', '記念道着 生成り', 'ZZSK110', 'like:KD15*K,KD13*K;nodetail:KD15*S-K,KD13*S-K', 3800, NULL, NULL, NULL, NULL, '記念道着 生成り'),
-  (1, 'shinkyoku', 'kdcb', 124, '第14回世界空手道選手権大会記念道着　晒', '記念道着 晒', '記念道着 晒', 'ZZSK120', 'like:KD15*,KD13*;nodetail:KD15*-S,KD13*-S', 3900, NULL, NULL, NULL, NULL, '記念道着 晒'),
+  (1, 'shinkyoku', 'kdcb', 123, '第14回世界空手道選手権大会記念道着　生成り', '記念道着 生成り', '記念道着 生成り', 'ZZSK110', 'like:KD15*K,KD14*K;nodetail:KD15*S-K,KD14*S-K', 3800, NULL, NULL, NULL, NULL, '記念道着 生成り'),
+  (1, 'shinkyoku', 'kdcb', 124, '第14回世界空手道選手権大会記念道着　晒', '記念道着 晒', '記念道着 晒', 'ZZSK120', 'like:KD15*,KD14*;nodetail:KD15*-S,KD14*-S', 3900, NULL, NULL, NULL, NULL, '記念道着 晒'),
   (1, 'shinkyoku', 'manual', 201, '新極×NIKE Ｔシャツ', NULL, NULL, NULL, NULL, 500, NULL, NULL, NULL, NULL, NULL),
   (1, 'shinkyoku', 'manual', 202, '新極×NIKE スウェット', NULL, NULL, NULL, NULL, 850, NULL, NULL, NULL, NULL, NULL);
 
