@@ -1,0 +1,65 @@
+// 海外入荷チェック（pick.component.scss に足す分）
+.doc { font-size: 14px; margin-top: 2px; }
+.camwrap {
+  position: relative;
+  &.hidden { display: none; }
+  .video { max-height: 45vh; }
+  // ラベルを入れる目安の枠
+  .guide {
+    position: absolute;
+    inset: 10% 8%;
+    border: 2px dashed rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+}
+.filebtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #bbbbbb;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #3f51b5;
+  cursor: pointer;
+  input { display: none; }
+  &.disabled { opacity: 0.5; pointer-events: none; }
+}
+.ocr {
+  font-size: 13px;
+  margin: 4px 0;
+  pre { white-space: pre-wrap; background: #f5f5f5; padding: 6px; border-radius: 4px; max-height: 30vh; overflow: auto; }
+}
+.cands {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0;
+  .cand { justify-content: flex-start; text-align: left; min-height: 44px; font-size: 15px; }
+}
+.selpanel {
+  border: 2px solid #3f51b5;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 6px 0;
+  background: #e8eaf6;
+  .code { font-size: 20px; font-weight: bold; }
+  .tana { margin-left: 10px; font-size: 15px; color: #1565c0; }
+  .name { font-size: 14px; }
+  .count {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    button { min-width: 44px; min-height: 40px; font-size: 18px; }
+    .qty { width: 80px; font-size: 22px; font-weight: bold; text-align: center; padding: 4px; border: 1px solid #bbbbbb; border-radius: 4px; }
+  }
+}
+.item {
+  cursor: pointer;
+  .code .num { float: right; font-size: 18px; }
+  &.over { background: #ffebee; border-color: #e57373; }
+  &.selected { outline: 2px solid #3f51b5; }
+}

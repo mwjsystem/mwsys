@@ -12,6 +12,7 @@ export const MOBILE_LINKS: MobileLink[] = [
   { path: '/frmtana/scan', name: '棚卸', icon: 'inventory', note: '商品を読んで棚卸の数を入れる' },
   { path: '/frmship/pick', name: 'ピッキング', icon: 'shopping_basket', note: '出荷指示書の QR → 商品を読む' },
   { path: '/frmship/keep', name: 'キープ確認', icon: 'inventory_2', note: 'キープ表の QR → 確保した数' },
+  { path: '/frmsiire/check', name: '海外入荷チェック', icon: 'local_shipping', note: '仕入伝票番号 → 箱のラベルを撮って数える' },
   { path: '/frmmove/check', name: '移動伝票の確認', icon: 'swap_horiz', note: '移動伝票・大会リストの QR → 数量を確認' },
   { path: '/frmtenkai/check', name: '展開完了', icon: 'task_alt', note: '展開指示書の QR → 展開完了' },
   { path: '/frmkako/check', name: '加工の状態', icon: 'content_cut', note: '加工指示書の QR → 発送・受取・加工済' }

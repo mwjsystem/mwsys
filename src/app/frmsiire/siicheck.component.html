@@ -1,0 +1,126 @@
+<div class="pick">
+  @if (dbMismatch) {
+    <div class="msg ng">
+      この伝票は{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}のものですが、このスマホは{{dbMismatch == 'test' ? '本番環境' : 'テスト環境'}}につながっています。
+      <button mat-flat-button color="warn" type="button" (click)="switchDb()">{{dbMismatch == 'test' ? 'テスト環境' : '本番環境'}}に切り替えて開く</button>
+    </div>
+  }
+
+  <div class="head">
+    <div class="denno">海外入荷チェック</div>
+    @for (d of docs; track d.denno) {
+      <div class="doc">
+        仕入 {{d.denno}}　{{d.vname}}　入荷日 {{d.inday}}
+        @if (d.chk_at) {
+          <div class="sub">チェック済 {{chkText(d.chk_at)}} {{staffName(d.chk_by)}}　{{d.chkmemo}}</div>
+        }
+      </div>
+    }
+  </div>
+
+  <form class="manual" (ngSubmit)="openInput(false)">
+    <input [(ngModel)]="dennoText" name="denno" inputmode="numeric" placeholder="仕入伝票番号（カンマで複数）" autocomplete="off" enterkeyhint="go">
+    <button mat-stroked-button type="submit" [disabled]="busy">開く</button>
+    @if (docs.length) {
+      <button mat-stroked-button type="button" (click)="openInput(true)" [disabled]="busy">追加</button>
+    }
+  </form>
+
+  <div class="camwrap" [class.hidden]="!camera">
+    <video #video class="video" playsinline muted></video>
+    <div class="guide"></div>
+  </div>
+
+  <div class="buttons">
+    @if (camera) {
+      <button mat-flat-button color="primary" type="button" class="big" (click)="shoot()" [disabled]="ocrBusy || !lines.length">
+        <mat-icon>document_scanner</mat-icon>{{ocrBusy ? '読んでいます…' : '撮って読む'}}
+      </button>
+      <button mat-stroked-button type="button" (click)="stopCamera()"><mat-icon>videocam_off</mat-icon>カメラを止める</button>
+    } @else if (lines.length) {
+      <button mat-flat-button color="primary" type="button" (click)="startCamera()"><mat-icon>photo_camera</mat-icon>カメラで箱を読む</button>
+    }
+    @if (lines.length) {
+      <label class="filebtn" [class.disabled]="ocrBusy">
+        <mat-icon>add_a_photo</mat-icon>写真から
+        <input type="file" accept="image/*" capture="environment" (change)="fromFile($event)" [disabled]="ocrBusy">
+      </label>
+      <button mat-stroked-button type="button" (click)="refreshChk()"><mat-icon>refresh</mat-icon>読み直す</button>
+    }
+  </div>
+
+  @if (msg) {
+    <div class="msg" [class.ok]="msgType == 'ok'" [class.ng]="msgType == 'ng'">{{msg}}</div>
+  }
+
+  @if (ocrText) {
+    <div class="ocr">
+      <a href="javascript:void(0)" (click)="showOcr = !showOcr">{{showOcr ? '▲' : '▼'}} 読み取った文字</a>
+      @if (showOcr) {<pre>{{ocrText}}</pre>}
+    </div>
+  }
+
+  @if (cands.length && !sel) {
+    <div class="cands">
+      <div class="sub">候補（タップして選ぶ）</div>
+      @for (c of cands; track c.denno + '_' + c.line) {
+        <button mat-stroked-button type="button" class="cand" (click)="select(c, lastQty)">
+          <b>{{c.gcode}}</b>　PO {{c.hdenno}}-{{c.hline}}　{{c.chksuu}}/{{c.suu}}
+        </button>
+      }
+    </div>
+  }
+
+  @if (sel) {
+    <div class="selpanel">
+      <div class="code">{{sel.gcode}}@if (sel.tanano) {<span class="tana">棚{{sel.tanano}}</span>}</div>
+      <div class="name">{{sel.gtext}}</div>
+      <div class="sub">PO {{sel.hdenno}}-{{sel.hline}}　仕入 {{sel.denno}}-{{sel.line}}　数えた数 {{sel.chksuu}} / {{sel.suu}}（{{sel.chkbox}}箱）</div>
+      <div class="count">
+        <span>この箱の数量</span>
+        <button mat-stroked-button type="button" (click)="addQty(-1)">−</button>
+        <input type="number" inputmode="numeric" class="qty" [(ngModel)]="qty" name="qty" min="0">
+        <button mat-stroked-button type="button" (click)="addQty(1)">＋</button>
+      </div>
+      <div class="buttons">
+        <button mat-flat-button color="accent" type="button" class="big" (click)="count(1)" [disabled]="busy">
+          <mat-icon>add_task</mat-icon>足す（＋{{qty}}、1箱）
+        </button>
+        <button mat-stroked-button type="button" (click)="count(-1)" [disabled]="busy || sel.chkbox <= 0">1箱取り消す</button>
+        @if (sel.chksuu || sel.chkbox) {
+          <button mat-stroked-button type="button" (click)="reset(sel)" [disabled]="busy">0 に戻す</button>
+        }
+        <button mat-stroked-button type="button" (click)="sel = undefined">閉じる</button>
+      </div>
+    </div>
+  }
+
+  @if (lines.length) {
+    <div class="progress">数えた数 {{chkSum}} / 伝票 {{suuSum}}（{{boxSum}}箱）　そろった行 {{doneCount}} / {{lines.length}}</div>
+    <div class="manual">
+      <input [(ngModel)]="filter" name="filter" placeholder="絞り込み（品番・PO番号・商品名）" autocomplete="off" enterkeyhint="search">
+      @if (filter) {<button mat-stroked-button type="button" (click)="filter = ''">クリア</button>}
+    </div>
+    @for (item of shown; track item.denno + '_' + item.line) {
+      <div class="item" [class.done]="item.chksuu == item.suu && item.suu > 0" [class.over]="item.chksuu > item.suu" [class.selected]="item === sel"
+        (click)="select(item)">
+        <div class="code">
+          {{item.gcode}}
+          @if (item.tanano) {<span class="tana">棚{{item.tanano}}</span>}
+          <span class="num">{{item.chksuu}} / {{item.suu}}</span>
+        </div>
+        <div class="name">{{item.gtext}}@if (item.mmemo) {<br><span class="memo">{{item.mmemo}}</span>}</div>
+        <div class="sub">
+          PO {{item.hdenno}}-{{item.hline}}@if (docs.length > 1) {　仕入 {{item.denno}}}
+          @if (item.chkbox) {　{{item.chkbox}}箱@if (item.updated_by) {（{{staffName(item.updated_by)}}）}}
+        </div>
+      </div>
+    }
+
+    <div class="buttons">
+      <button mat-flat-button [color]="diffs.length ? 'warn' : 'accent'" type="button" class="big" (click)="complete()" [disabled]="busy">
+        <mat-icon>task_alt</mat-icon>{{diffs.length ? 'チェック完了（数量違い ' + diffs.length + ' 行）' : 'チェック完了（伝票どおり）'}}
+      </button>
+    </div>
+  }
+</div>
