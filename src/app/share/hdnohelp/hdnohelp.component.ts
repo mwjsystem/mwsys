@@ -13,6 +13,8 @@ import { StaffService } from './../../services/staff.service';
 // import { BunruiService } from './../../services/bunrui.service';
 import { VendsService } from './../../mstvendor/vends.service';
 import { VcdhelpComponent } from './../vcdhelp/vcdhelp.component';
+import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
+import { MatTooltip } from '@angular/material/tooltip';
 import { HasuraWhere } from './../help-where';
 import { MatFormField, MatLabel, MatInput, MatSuffix, MatHint } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
@@ -53,7 +55,7 @@ interface HatdenResult { trhatden: HatdenRow[] }
     templateUrl: './hdnohelp.component.html',
     styleUrls: ['./../../help.component.scss', './../search-dialog.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatDialogTitle, MatFormField, MatLabel, MatSelect, FormsModule, MatOption, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatIconButton, MatIcon, MatHint, MatButton, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions, DatePipe, StaffPipe, VcdtxtPipe]
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatSelect, FormsModule, MatOption, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatIconButton, MatIcon, MatHint, MatButton, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions, MatTooltip, DatePipe, StaffPipe, VcdtxtPipe]
 })
 export class HdnohelpComponent implements OnInit, OnDestroy {
   usrsrv = inject(UserService);
@@ -89,7 +91,15 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
   ];
 
   fvcd: string = "";
-  fday: Date = new Date();
+  /** 発注日の範囲（から・まで）。空のときはその側で絞らない */
+  fdayFrom: Date | null = new Date();
+  fdayTo: Date | null = null;
+  /** 商品コード（前方一致）。この商品を含む発注伝票を探す */
+  fgcd: string = "";
+  /** 品番の列の見出し（商品コードで探したときは、その商品の品番を出す） */
+  gcdTitle = '1行目品番';
+  /** 品番の列に出す明細の条件（ふだんは 1 行目、商品コードで探したときはその商品の行） */
+  private meiWh: object = { line: { _eq: 1 } };
   ftcd: string = "";
   /** FAX の流れ: '' すべて / ofax ①発注先へFAX がまだ / refax ②Refax がまだ / sfax ③倉庫へFAX がまだ */
   ffax: '' | 'ofax' | 'refax' | 'sfax' = '';
@@ -102,7 +112,21 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;
-    this.fday.setMonth(this.fday.getMonth() - 1);
+    this.fdayFrom?.setMonth(this.fdayFrom.getMonth() - 1);
+  }
+
+  gcdHelp(): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
+    dialogConfig.data = { gcode: this.fgcd, tkbn: ['0', '1'] };
+    this.dialog.open(GcdhelpComponent, dialogConfig).afterClosed().subscribe(data => {
+      if (typeof data != 'undefined') {
+        this.fgcd = data.gcode;
+        this.cdRef.detectChanges();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -131,9 +155,21 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
     if (this.fvcd) {
       varWh.where._and.push({ "vcode": { "_eq": this.fvcd } });
     }
-    if (this.fday) {
-      varWh.where._and.push({ "day": { "_gt": this.fday } });
+    if (this.fdayFrom) {
+      varWh.where._and.push({ "day": { "_gte": this.usrsrv.formatDate(this.fdayFrom) } });
     }
+    if (this.fdayTo) {
+      varWh.where._and.push({ "day": { "_lte": this.usrsrv.formatDate(this.fdayTo) } });
+    }
+    // 商品コード：その商品（前方一致）を含む明細がある発注伝票。品番の列には、その商品の品番を出す
+    this.fgcd = this.usrsrv.convUpper(this.fgcd ?? '').trim();
+    let mei: object = { "line": { "_eq": 1 } };
+    if (this.fgcd) {
+      mei = { "gcode": { "_like": this.fgcd + '%' } };
+      varWh.where._and.push({ "trhatmeis": mei });
+    }
+    this.meiWh = mei;
+    this.gcdTitle = this.fgcd ? '該当品番' : '1行目品番';
     // if (this.fhdst.length > 0) {
     //   varWh.where._and.push({ "hdstatus": { "_in": this.fhdst } });
     // }
@@ -161,17 +197,17 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
    */
   private runQuery(varWh: HasuraWhere, fax: boolean) {
     const GetTran = fax ? gql`
-    query get_hatden($where:trhatden_bool_exp!) {
+    query get_hatden($where:trhatden_bool_exp!, $mei:trhatmei_bool_exp!) {
       trhatden(where:$where, order_by:{denno: asc}) {
         denno day scode vcode tcode updated_at updated_by
         ofax_at refax_at sfax_at
-        trhatmeis(where:{line:{_eq:1}}){ gcode }
+        trhatmeis(where:$mei, order_by:{line: asc}, limit: 1){ gcode }
       }
     }` : gql`
-    query get_hatden_nofax($where:trhatden_bool_exp!) {
+    query get_hatden_nofax($where:trhatden_bool_exp!, $mei:trhatmei_bool_exp!) {
       trhatden(where:$where, order_by:{denno: asc}) {
         denno day scode vcode tcode updated_at updated_by
-        trhatmeis(where:{line:{_eq:1}}){ gcode }
+        trhatmeis(where:$mei, order_by:{line: asc}, limit: 1){ gcode }
       }
     }`;
     if (!this.overlayRef.hasAttached()) {
@@ -180,7 +216,7 @@ export class HdnohelpComponent implements OnInit, OnDestroy {
     this.querySub?.unsubscribe();
     this.querySub = this.apollo.watchQuery<HatdenResult>({
       query: GetTran,
-      variables: varWh,
+      variables: { ...varWh, mei: this.meiWh },
       fetchPolicy: 'network-only'
     })
       .valueChanges
