@@ -41,7 +41,11 @@ export interface RoyLine {
   sign: number;
 }
 /** 顧客の名前とマスタ備考・単価区分 */
-export interface RoyMember { name: string; memo: string; tankakbn: string }
+export interface RoyMember {
+  name: string; memo: string; tankakbn: string;
+  /** 姓と名を全角の空白でつないだ名前（現行の顧客マスタの氏名と同じ形） */
+  fullname: string;
+}
 /** 単価の履歴（新しい順） */
 export interface RoyTanka { day: string; tanka2: number | null; tanka3: number | null }
 /** 商品（区分と単価の履歴） */
@@ -176,7 +180,8 @@ export class RoyaltyService {
       Get, { id: this.usrsrv.compid, mcodes: list });
     for (const m of q.msmember) {
       ret.set(m.mcode, {
-        name: ((m.sei ?? '') + ' ' + (m.mei ?? '')).trim(), memo: (m.memo ?? '') + '\n' + (m.dmemo ?? ''), tankakbn: String(m.tankakbn ?? '').trim()
+        name: ((m.sei ?? '') + ' ' + (m.mei ?? '')).trim(), memo: (m.memo ?? '') + '\n' + (m.dmemo ?? ''), tankakbn: String(m.tankakbn ?? '').trim(),
+        fullname: [m.sei, m.mei].map(e => (e ?? '').trim()).filter(e => e).join('　')
       });
     }
     return ret;

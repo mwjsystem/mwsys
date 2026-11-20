@@ -191,7 +191,7 @@ export async function khanki(c: RoyCtx): Promise<RoyResult> {
     const nc = (l.den.ncode ?? '').trim();
     return !ex.has(nc) && HANKI_TANKAKBN.includes(names.get(nc)?.tankakbn ?? '');
   }).sort((a, b) => byCode(sdayOf(a), sdayOf(b)) || byCode(a.gcode, b.gcode) || byCode(names.get(a.den.ncode ?? '')?.name ?? '', names.get(b.den.ncode ?? '')?.name ?? ''));
-  const nameOf = (l: RoyLine): string => (names.get(l.den.ncode ?? '')?.name ?? l.den.ncode ?? '').replace(' ', '　');
+  const nameOf = (l: RoyLine): string => names.get(l.den.ncode ?? '')?.fullname ?? l.den.ncode ?? '';
   const unknown = [...new Set(lines.filter(l => !findItem(items, l.gcode)).map(l => l.gcode))];
   if (unknown.length > 0) {
     ret.warns.push('どの区分にも入らない商品（数えていない）: ' + unknown.join('、'));
