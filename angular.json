@@ -22,7 +22,6 @@
               "encoding-japanese",
               "exceljs",
               "file-saver",
-              "json2csv",
               "vanilla-autokana",
               "pdfmake",
               "jszip"

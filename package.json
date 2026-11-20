@@ -40,7 +40,6 @@
     "file-saver": "^2.0.5",
     "force-ssl-heroku": "^1.0.2",
     "graphql": "^16.8.1",
-    "json2csv": "^5.0.7",
     "jszip": "^3.10.2",
     "pdfmake": "^0.3.13",
     "rxjs": "^7.5.0",
