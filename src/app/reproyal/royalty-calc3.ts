@@ -111,6 +111,65 @@ export async function zenkoren(c: RoyCtx): Promise<RoyResult> {
 }
 
 // ---------------------------------------------------------------------
+// リアル（おちゃのこ（Web）で受注した指定商品の数量。現行は おちゃのこの CSV から集計していた）
+//   受注区分 9（Web）の伝票で、楽天（媒体 02・受注番号にハイフン）を除く。期間は受注日。
+//   返品伝票は現行の CSV には無いので、別の欄に出す。
+
+const WEB_JCODE = '9';
+const RAKUTEN_BKCODE = '02';
+
+export async function real(c: RoyCtx): Promise<RoyResult> {
+  const ret = empty();
+  const items = itemsOf(c);
+  const ps = items.flatMap(it => pats(it));
+  if (ps.length == 0) {
+    throw new Error('ロイヤリティマスタに商品がありません');
+  }
+  const lines = (await c.srv.lines(
+    { jcode: { _eq: WEB_JCODE }, day: { _gte: c.from, _lte: c.to }, _or: [{ bkcode: { _is_null: true } }, { bkcode: { _neq: RAKUTEN_BKCODE } }] },
+    { _or: ps.map(p => ({ gcode: { _like: sqlLike(p) } })) }))
+    .filter(l => !(l.den.cusden ?? '').includes('-') && findItem(items, l.gcode))
+    .sort((a, b) => byCode(a.den.day ?? '', b.den.day ?? '') || a.denno - b.denno || a.line - b.line);
+  const names = await c.srv.members(lines.map(l => l.den.mcode ?? ''));
+  type Row = { it: RoyItem; gcode: string; suu: number; ret: number; money: number };
+  const by = new Map<string, Row>();
+  for (const l of lines) {
+    const it = findItem(items, l.gcode)!;
+    const e = by.get(l.gcode) ?? { it, gcode: l.gcode, suu: 0, ret: 0, money: 0 };
+    if (l.sign < 0) {
+      e.ret += l.suu;
+    } else {
+      e.suu += l.suu;
+    }
+    e.money += l.toutmoney * l.sign;
+    by.set(l.gcode, e);
+  }
+  const order = (r: Row): number => items.indexOf(r.it);
+  const rows = [...by.values()].sort((a, b) => order(a) - order(b) || byCode(a.gcode, b.gcode));
+  const sum = (f: (r: Row) => number): number => rows.reduce((s, r) => s + f(r), 0);
+  ret.notes.push('対象の明細 ' + lines.length + ' 行、数量 ' + sum(r => r.suu).toLocaleString() + '（返品 ' + sum(r => r.ret).toLocaleString() + '）');
+  ret.books.push({
+    file: (c.m.org.name ?? 'リアル') + '_Web売上_' + fileRange(c), fill: wb => {
+      const ws = sheet(wb, '集計');
+      widths(ws, [30, 16, 10, 10, 10, 14]);
+      put(ws, 1, 1, (c.m.org.name ?? '') + '　おちゃのこ（Web）売上　受注日 ' + period(c)).font = { bold: true, size: 13 };
+      const end = table(ws, 3, 1, ['商品', '型番', '数量', '返品', '差引', '税抜金額'],
+        rows.map(r => (n: number) => [r.it.name, r.gcode, r.suu, r.ret || null, fx(`C${n}-D${n}`, r.suu - r.ret), r.money]), [undefined, undefined, NUM, NUM, NUM, NUM]);
+      const t = end + 1;
+      merge(ws, t, 1, t, 2, '総計').font = { bold: true };
+      ([[3, sum(r => r.suu)], [4, sum(r => r.ret)], [5, sum(r => r.suu - r.ret)], [6, sum(r => r.money)]] as [number, number][]).forEach(([col, v]) =>
+        put(ws, t, col, fx(rows.length ? `SUM(${at(4, col)}:${at(end, col)})` : '0', v)).font = { bold: true });
+      box(ws, t, 1, t, 6);
+      printFit(ws);
+      listSheet(wb, ['受注日', '伝票番号', '受注番号', '会員', '名前', '商品コード', '名称', '数量', '税抜金額', '返品'],
+        lines.map(l => [md(l.den.day), l.denno, l.den.cusden, l.den.mcode, names.get(l.den.mcode ?? '')?.name ?? '', l.gcode, l.gtext, l.suu * l.sign, l.toutmoney * l.sign,
+          l.sign < 0 ? '返品' : null]), [undefined, '0', undefined, undefined, undefined, undefined, undefined, NUM, NUM]);
+    }
+  });
+  return ret;
+}
+
+// ---------------------------------------------------------------------
 // 極真半期（極真会館の道着・帯。卸の顧客（単価区分 2・4）への半年分の数量 × 1 枚ごとの金額）
 //   現行の SQL と同じく、明細の売上日が期間内で、商品コードが %KU%-K% / %CBKK1% / %CB-%-K% のもの
 //   （-KEN / -KSS / -K-AN を除く、税抜単価 0 を除く）。顧客の種類 exclude の納品先は除く。
