@@ -409,9 +409,9 @@ function summarySheet(wb: Workbook, c: RoyCtx, r: ShinMonth, known: Set<string>,
   put(ws, rr + 1, 10, fx(`E${domTotal}+J${rr}`, domA + kaiA)).font = { bold: true };
   put(ws, rr + 2, 8, '消費税');
   put(ws, rr + 2, 9, 0.1, '0%');
-  put(ws, rr + 2, 10, fx(`J${rr + 1}*I${rr + 2}`, (domA + kaiA) * 0.1));
+  put(ws, rr + 2, 10, fx(`J${rr + 1}*I${rr + 2}`, Math.round((domA + kaiA) * 10) / 100));
   put(ws, rr + 3, 8, '消費税込金額').font = { bold: true };
-  put(ws, rr + 3, 10, fx(`J${rr + 1}+J${rr + 2}`, (domA + kaiA) * 1.1)).font = { bold: true };
+  put(ws, rr + 3, 10, fx(`J${rr + 1}+J${rr + 2}`, Math.round((domA + kaiA) * 110) / 100)).font = { bold: true };
   rr += 4;
   const bottom = Math.max(row, rr) + 2;
   box(ws, 3, 1, Math.max(row, rr - 1), 10);
