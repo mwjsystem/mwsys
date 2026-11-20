@@ -14,6 +14,8 @@ import { BunruiService } from './../../services/bunrui.service';
 import { VendsService } from './../../mstvendor/vends.service';
 import { VcdhelpComponent } from './../vcdhelp/vcdhelp.component';
 import { HdnohelpComponent } from './../hdnohelp/hdnohelp.component';
+import { GcdhelpComponent } from './../gcdhelp/gcdhelp.component';
+import { MatTooltip } from '@angular/material/tooltip';
 import { HasuraWhere } from './../help-where';
 import { MatFormField, MatLabel, MatInput, MatSuffix, MatHint } from '@angular/material/input';
 import { MatSelect, MatOption } from '@angular/material/select';
@@ -48,7 +50,7 @@ interface SiidenResult { trsiiden: SiidenRow[] }
     templateUrl: './sdnohelp.component.html',
     styleUrls: ['./../../help.component.scss', './../search-dialog.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatDialogTitle, MatFormField, MatLabel, MatSelect, FormsModule, MatOption, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatIconButton, MatIcon, MatHint, MatButton, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions, DatePipe, StaffPipe, VcdtxtPipe]
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatSelect, FormsModule, MatOption, MatInput, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatIconButton, MatIcon, MatHint, MatButton, CdkScrollable, MatDialogContent, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatPaginator, MatDialogActions, MatTooltip, DatePipe, StaffPipe, VcdtxtPipe]
 })
 export class SdnohelpComponent implements OnInit, OnDestroy {
   usrsrv = inject(UserService);
@@ -83,7 +85,15 @@ export class SdnohelpComponent implements OnInit, OnDestroy {
   ];
 
   fvcd: string = "";
-  fday: Date = new Date();
+  /** 入荷日の範囲（から・まで）。空のときはその側で絞らない */
+  fdayFrom: Date | null = new Date();
+  fdayTo: Date | null = null;
+  /** 商品コード（前方一致）。この商品を含む仕入伝票を探す */
+  fgcd: string = "";
+  /** 品番の列の見出し（商品コードで探したときは、その商品の品番を出す） */
+  gcdTitle = '1行目品番';
+  /** 品番の列に出す明細の条件（ふだんは 1 行目、商品コードで探したときはその商品の行） */
+  private meiWh: object = { line: { _eq: 1 } };
   ftcd: string = "";
   fsdno!: number;
   fhdno!: number;
@@ -95,7 +105,21 @@ export class SdnohelpComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.ftcd = this.usrsrv.staff?.code;
-    this.fday.setMonth(this.fday.getMonth() - 1);
+    this.fdayFrom?.setMonth(this.fdayFrom.getMonth() - 1);
+  }
+
+  gcdHelp(): void {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '100vw';
+    dialogConfig.height = '98%';
+    dialogConfig.panelClass = 'full-screen-modal';
+    dialogConfig.data = { gcode: this.fgcd, tkbn: ['0', '1'] };
+    this.dialog.open(GcdhelpComponent, dialogConfig).afterClosed().subscribe(data => {
+      if (typeof data != 'undefined') {
+        this.fgcd = data.gcode;
+        this.cdRef.detectChanges();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -141,9 +165,21 @@ export class SdnohelpComponent implements OnInit, OnDestroy {
     if (this.fvcd) {
       varWh.where._and.push({ "vcode": { "_eq": this.fvcd } });
     }
-    if (this.fday) {
-      varWh.where._and.push({ "inday": { "_gt": this.fday } });
+    if (this.fdayFrom) {
+      varWh.where._and.push({ "inday": { "_gte": this.usrsrv.formatDate(this.fdayFrom) } });
     }
+    if (this.fdayTo) {
+      varWh.where._and.push({ "inday": { "_lte": this.usrsrv.formatDate(this.fdayTo) } });
+    }
+    // 商品コード：その商品（前方一致）を含む明細がある仕入伝票。品番の列には、その商品の品番を出す
+    this.fgcd = this.usrsrv.convUpper(this.fgcd ?? '').trim();
+    let mei: object = { "line": { "_eq": 1 } };
+    if (this.fgcd) {
+      mei = { "gcode": { "_like": this.fgcd + '%' } };
+      varWh.where._and.push({ "trsiimeis": mei });
+    }
+    this.meiWh = mei;
+    this.gcdTitle = this.fgcd ? '該当品番' : '1行目品番';
     if (this.ftcd) {
       varWh.where._and.push({ "tcode": { "_eq": this.ftcd } });
     }
@@ -151,21 +187,20 @@ export class SdnohelpComponent implements OnInit, OnDestroy {
       varWh.where._and.push({ "denno": { "_eq": this.fsdno } });
     }
     if (this.fhdno > 0) {
-      varWh.where._and.push({ "trsiimeis": { "sdenno": { "_eq": this.fhdno } } });
+      varWh.where._and.push({ "trsiimeis": { "hdenno": { "_eq": this.fhdno } } });
     }
-    // console.log(this.fhdst,varWh);
 
     const GetTran = gql`
-    query get_siiden($where:trsiiden_bool_exp!) {
+    query get_siiden($where:trsiiden_bool_exp!, $mei:trsiimei_bool_exp!) {
       trsiiden(where:$where, order_by:{denno: asc}) {
         denno
         inday
         scode
         vcode
-        tcode 
+        tcode
         updated_at
         updated_by
-        trsiimeis(where:{line:{_eq:1}}){ 
+        trsiimeis(where:$mei, order_by:{line: asc}, limit: 1){
           gcode
         }
       }
@@ -176,12 +211,18 @@ export class SdnohelpComponent implements OnInit, OnDestroy {
     this.querySub?.unsubscribe();
     this.querySub = this.apollo.watchQuery<SiidenResult>({
       query: GetTran,
-      variables: varWh
+      variables: { ...varWh, mei: this.meiWh },
+      fetchPolicy: 'network-only'
     })
       .valueChanges
-      .subscribe(({ data }) => {
-        // console.log(data);
+      .subscribe(({ data, error }) => {
         if (!data) {
+          if (error) {
+            console.log('error query get_siiden', error);
+            this.overlayRef.detach();
+            this.usrsrv.toastErr('仕入伝票を検索できませんでした', String((error as Error).message ?? error));
+            this.cdRef.detectChanges();
+          }
           return;
         }
         const result = data as SiidenResult;
@@ -191,7 +232,7 @@ export class SdnohelpComponent implements OnInit, OnDestroy {
           let srcdata: Siiden[] = [];
           result.trsiiden.forEach(element => {
             let { trsiimeis, ...rest } = element;
-            let gcd = { gcode: trsiimeis[0].gcode };
+            let gcd = { gcode: trsiimeis[0]?.gcode ?? '' };
             srcdata.push({ ...rest, ...gcd });
           });
           this.dataSource = new MatTableDataSource<Siiden>(srcdata);

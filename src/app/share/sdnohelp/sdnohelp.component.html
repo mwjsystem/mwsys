@@ -21,10 +21,32 @@
     <h2 class="jdh-group-title">日付</h2>
     <div class="jdh-fields">
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
-        <mat-label>入荷日</mat-label>
-        <input matInput [(ngModel)]="fday" [matDatepicker]="picker1" [ngModelOptions]="{standalone: true}">
+        <mat-label>入荷日（から）</mat-label>
+        <input matInput [(ngModel)]="fdayFrom" [matDatepicker]="picker1" [ngModelOptions]="{standalone: true}">
         <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
         <mat-datepicker #picker1></mat-datepicker>
+      </mat-form-field>
+      <span style="align-self: center;">～</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40">
+        <mat-label>入荷日（まで）</mat-label>
+        <input matInput [(ngModel)]="fdayTo" [matDatepicker]="picker2" [ngModelOptions]="{standalone: true}">
+        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+        <mat-datepicker #picker2></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="jdh-group">
+    <h2 class="jdh-group-title">商品</h2>
+    <div class="jdh-fields">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="mwj-field w-40"
+        matTooltip="この商品を含む仕入伝票を探します（前方一致なので、商品グループコードでも探せます）" matTooltipClass="ttips">
+        <mat-label>商品コード</mat-label>
+        <input matInput [(ngModel)]="fgcd" [ngModelOptions]="{standalone: true}" (keydown.f4)="gcdHelp()"
+          (keyup.enter)="get_siiden()">
+        <button mat-icon-button matSuffix (click)="gcdHelp()" aria-label="商品を検索して選ぶ">
+          <mat-icon>find_replace</mat-icon>
+        </button>
       </mat-form-field>
     </div>
   </div>
@@ -86,7 +108,7 @@
       <td mat-cell *matCellDef="let row">{{row.updated_by | staff}}</td>
     </ng-container>
     <ng-container matColumnDef="gcode">
-      <th mat-header-cell *matHeaderCellDef>1行目品番</th>
+      <th mat-header-cell *matHeaderCellDef>{{gcdTitle}}</th>
       <td mat-cell *matCellDef="let row">{{row.gcode}}</td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
