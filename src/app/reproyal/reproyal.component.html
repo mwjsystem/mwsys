@@ -1,0 +1,115 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>ロイヤリティ</span>
+  <span class="spacer"></span>
+  <a mat-stroked-button routerLink="/reproyal/master" class="tb-btn"><mat-icon>tune</mat-icon>ロイヤリティマスタ</a>
+</mat-toolbar>
+<div class="bar">
+  <mat-form-field style="width: 14em;" subscriptSizing="dynamic">
+    <mat-label>団体</mat-label>
+    <mat-select [(ngModel)]="org" (selectionChange)="result = undefined" [panelClass]="'my-panel-class'">
+      @for (o of orgs; track o.org) {
+        <mat-option [value]="o.org">{{o.name}}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field style="width: 10em;" subscriptSizing="dynamic">
+    <mat-label>期間（売上日）</mat-label>
+    <input matInput [matDatepicker]="p1" [(ngModel)]="from" (dateChange)="fromChanged()">
+    <mat-datepicker-toggle matSuffix [for]="p1"></mat-datepicker-toggle>
+    <mat-datepicker #p1></mat-datepicker>
+  </mat-form-field>
+  <span>〜</span>
+  <mat-form-field style="width: 10em;" subscriptSizing="dynamic">
+    <mat-label>末日</mat-label>
+    <input matInput [matDatepicker]="p2" [(ngModel)]="to">
+    <mat-datepicker-toggle matSuffix [for]="p2"></mat-datepicker-toggle>
+    <mat-datepicker #p2></mat-datepicker>
+  </mat-form-field>
+  @if (org == 'shinkyoku') {
+    <mat-form-field style="width: 11em;" subscriptSizing="dynamic">
+      <mat-label>受付日の開始</mat-label>
+      <input matInput [matDatepicker]="p3" [(ngModel)]="recvFrom">
+      <mat-datepicker-toggle matSuffix [for]="p3"></mat-datepicker-toggle>
+      <mat-datepicker #p3></mat-datepicker>
+    </mat-form-field>
+  }
+  <button mat-flat-button color="primary" type="button" (click)="run()" [disabled]="busy || !org">
+    <mat-icon>download</mat-icon>集計してExcelを作る
+  </button>
+  @if (org == 'shinkyoku') {
+    <span class="sep"></span>
+    <mat-form-field style="width: 7em;" subscriptSizing="dynamic">
+      <mat-label>年度</mat-label>
+      <input matInput type="number" [(ngModel)]="fy">
+    </mat-form-field>
+    <button mat-stroked-button type="button" (click)="run(true)" [disabled]="busy">
+      <mat-icon>calendar_month</mat-icon>年間集計表（4月〜3月）
+    </button>
+  }
+</div>
+<div class="desc">
+  @switch (org) {
+    @case ('shinkyoku') {
+      <p>大分類 100004 の伝票で、受付日が「受付日の開始」〜対象月の末日のものを読みます。明細の受注日は伝票備考の「M/D受注」で決め、対象月の受注だけ数えます（期間は初日の月だけ使います）。</p>
+      <p>受注日が複数ある伝票は、2日目以降を「M/D受注:X行」（Xはその日の明細の開始行）と、伝票備考・納品書備考・受注先伝票番号・出荷指示書備考のどれかに書いてください。海外分は受注先 406403 の伝票を出荷日で数えます。</p>
+    }
+    @case ('daido') {
+      <p>大分類 100014 の伝票です。伝票の中分類の名前（支部・道場・同好会・事務局）で価格を分けます。「御請求額」は Excel に入れてください。</p>
+    }
+    @case ('ashihara') {
+      <p>中分類 100 の伝票の道着・帯です。「御請求額」は Excel に入れてください。</p>
+    }
+    @case ('rengo') {
+      <p>大分類 100003・中分類 013/121 の伝票です。極真連合会本部（帯・道着・審判用品）と関西総本部（差額・グラチャン指定・ファールカップ）の 2 つの Excel を作ります。ファールカップは明細の出荷日で数えます。</p>
+    }
+    @case ('naniwa') {
+      <p>中分類 121 の伝票の極真道着です。ロイヤリティ = 税抜単価 − 売上日の通常価格（商品マスタの単価2）。期間の末日は自由に決められます。</p>
+    }
+    @case ('jkjo') {
+      <p>納品先ごと（大会・本部・FC瀬戸・FC札幌・桜塾）に数えます。大会の数は 2/3（切り捨て）を JKJO・JKC の報告書に入れます。</p>
+    }
+    @case ('nas') {
+      <p>媒体管理 10（NAS会員Web）か、伝票備考に「NAS会員」がある伝票です。差額 = 定価（税抜単価）− 卸単価（商品マスタの単価3）。</p>
+    }
+    @case ('yushi') {
+      <p>中分類 120 の伝票です（除く受注先はマスタの顧客）。単価 = 商品定価 × 率。</p>
+    }
+    @case ('ibko') {
+      <p>納品先が IBKO の伝票です。配送料（Z01）は、納品先の都道府県（北海道・沖縄）と入金予定（9 本州・5 事前振込）で分けます。</p>
+    }
+    @case ('oishi') {
+      <p>納品先が大石道場の伝票です。R単価 = 各行の最後の商品の卸価格（単価2）× 率（切り捨て）。</p>
+    }
+  }
+</div>
+@if (msg) {
+  <p class="msg">{{msg}}</p>
+}
+@if (error) {
+  <p class="err">{{error}}</p>
+}
+@if (result) {
+  <div class="result">
+    <h3>{{orgName}}：Excel を作りました</h3>
+    @for (n of result.notes; track $index) {
+      <p>{{n}}</p>
+    }
+    @for (w of result.warns; track $index) {
+      <p class="warn"><mat-icon>warning</mat-icon>{{w}}</p>
+    }
+    @if (result.excluded.length > 0) {
+      <h4>対象外の伝票（{{result.excluded.length}} 件）</h4>
+      <table class="tbl">
+        <tr><th>伝票番号</th><th>納品先</th><th>理由</th><th>備考</th></tr>
+        @for (e of result.excluded.slice(0, 300); track $index) {
+          <tr [class.red]="e.reason != '他月受注あり' && e.reason != '伝票備考に「受注」がない'">
+            <td>{{e.denno}}</td><td>{{e.mcode}}</td><td>{{e.reason}}</td><td class="memo">{{e.memo}}</td>
+          </tr>
+        }
+      </table>
+      @if (result.excluded.length > 300) {
+        <p>（残りは Excel の「対象外伝票」のシートを見てください）</p>
+      }
+    }
+  </div>
+}

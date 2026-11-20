@@ -1,0 +1,116 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>ロイヤリティマスタ</span>
+  <span class="spacer"></span>
+  @if (dirty) {
+    <span class="dirty">保存していない変更があります</span>
+  }
+  <button mat-flat-button type="button" class="tb-save" (click)="save()" [disabled]="busy || !m || !dirty">
+    <mat-icon>save</mat-icon>保存
+  </button>
+  <a mat-stroked-button routerLink="/reproyal" class="tb-btn"><mat-icon>arrow_back</mat-icon>ロイヤリティへ</a>
+</mat-toolbar>
+<div class="bar">
+  <mat-form-field style="width: 14em;" subscriptSizing="dynamic">
+    <mat-label>団体</mat-label>
+    <mat-select [ngModel]="org" (ngModelChange)="changeOrg($event)" [panelClass]="'my-panel-class'">
+      @for (o of orgs; track o.org) {
+        <mat-option [value]="o.org">{{o.name}}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  @if (error) {
+    <span class="err">{{error}}</span>
+  }
+</div>
+@if (help) {
+  <p class="help">{{help}}</p>
+}
+@if (m) {
+  <mat-tab-group animationDuration="0ms">
+    <mat-tab label="商品（{{m.items.length}}）">
+      <div class="tools">
+        <mat-form-field style="width: 12em;" subscriptSizing="dynamic">
+          <mat-label>区分で絞る</mat-label>
+          <mat-select [(ngModel)]="grp" [panelClass]="'my-panel-class'">
+            <mat-option value="">すべて</mat-option>
+            @for (g of grps; track g) {
+              <mat-option [value]="g">{{g || '（空）'}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button mat-stroked-button type="button" (click)="addItem()"><mat-icon>add</mat-icon>行を足す</button>
+      </div>
+      <div class="scroll">
+        <table class="tbl">
+          <tr>
+            <th>区分</th><th>順</th><th>名前</th><th>サイズ</th><th>色</th><th>商品コード</th><th>条件</th>
+            <th>単価</th><th>単価2</th><th>単価3</th><th>単価4</th><th>率</th><th>備考</th><th></th>
+          </tr>
+          @for (it of items; track it) {
+            <tr>
+              <td><input [(ngModel)]="it.grp" (ngModelChange)="changed()" class="w6"></td>
+              <td><input type="number" [(ngModel)]="it.seq" (ngModelChange)="changed()" class="w4 num"></td>
+              <td><input [(ngModel)]="it.name" (ngModelChange)="changed()" class="w16"></td>
+              <td><input [(ngModel)]="it.size" (ngModelChange)="changed()" class="w6"></td>
+              <td><input [(ngModel)]="it.color" (ngModelChange)="changed()" class="w6"></td>
+              <td><input [(ngModel)]="it.gcodes" (ngModelChange)="changed()" class="w20" [title]="it.gcodes ?? ''"></td>
+              <td><input [(ngModel)]="it.cond" (ngModelChange)="changed()" class="w8"></td>
+              <td><input type="number" [(ngModel)]="it.price" (ngModelChange)="changed()" class="w6 num"></td>
+              <td><input type="number" [(ngModel)]="it.price2" (ngModelChange)="changed()" class="w6 num"></td>
+              <td><input type="number" [(ngModel)]="it.price3" (ngModelChange)="changed()" class="w6 num"></td>
+              <td><input type="number" [(ngModel)]="it.price4" (ngModelChange)="changed()" class="w6 num"></td>
+              <td><input type="number" [(ngModel)]="it.rate" (ngModelChange)="changed()" class="w4 num" step="0.01"></td>
+              <td><input [(ngModel)]="it.memo" (ngModelChange)="changed()" class="w12"></td>
+              <td><button mat-icon-button type="button" (click)="delItem(it)" title="この行を消す"><mat-icon>delete</mat-icon></button></td>
+            </tr>
+          }
+        </table>
+      </div>
+    </mat-tab>
+    <mat-tab label="顧客（{{m.mems.length}}）">
+      <div class="tools">
+        <mat-form-field style="width: 12em;" subscriptSizing="dynamic">
+          <mat-label>種類で絞る</mat-label>
+          <mat-select [(ngModel)]="kind" [panelClass]="'my-panel-class'">
+            <mat-option value="">すべて</mat-option>
+            @for (k of kinds; track k) {
+              <mat-option [value]="k">{{k}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button mat-stroked-button type="button" (click)="addMem()"><mat-icon>add</mat-icon>行を足す</button>
+      </div>
+      <div class="scroll">
+        <table class="tbl">
+          <tr><th>種類</th><th>順</th><th>年間の順</th><th>顧客コード</th><th>枝番</th><th>まとめる先</th><th>名前</th><th>備考</th><th></th></tr>
+          @for (e of mems; track e) {
+            <tr>
+              <td><input [(ngModel)]="e.kind" (ngModelChange)="changed()" class="w6"></td>
+              <td><input type="number" [(ngModel)]="e.seq" (ngModelChange)="changed()" class="w4 num"></td>
+              <td><input type="number" [(ngModel)]="e.aseq" (ngModelChange)="changed()" class="w4 num"></td>
+              <td><input [(ngModel)]="e.mcode" (ngModelChange)="changed()" class="w8"></td>
+              <td><input [(ngModel)]="e.eda" (ngModelChange)="changed()" class="w4"></td>
+              <td><input [(ngModel)]="e.pcode" (ngModelChange)="changed()" class="w8"></td>
+              <td><input [(ngModel)]="e.name" (ngModelChange)="changed()" class="w16"></td>
+              <td><input [(ngModel)]="e.memo" (ngModelChange)="changed()" class="w24"></td>
+              <td><button mat-icon-button type="button" (click)="delMem(e)" title="この行を消す"><mat-icon>delete</mat-icon></button></td>
+            </tr>
+          }
+        </table>
+      </div>
+    </mat-tab>
+    <mat-tab label="団体">
+      <div class="orgform">
+        <mat-form-field class="w-full"><mat-label>名前</mat-label><input matInput [(ngModel)]="m.org.name" (ngModelChange)="changed()"></mat-form-field>
+        <mat-form-field class="w-full"><mat-label>宛先（改行で複数行）</mat-label><textarea matInput rows="2" [(ngModel)]="m.org.dest" (ngModelChange)="changed()"></textarea></mat-form-field>
+        <mat-form-field class="w-full"><mat-label>2つめの宛先（連合: 関西総本部）</mat-label><input matInput [(ngModel)]="m.org.dest2" (ngModelChange)="changed()"></mat-form-field>
+        <mat-form-field class="w-full"><mat-label>登録番号の行</mat-label><input matInput [(ngModel)]="m.org.regno" (ngModelChange)="changed()"></mat-form-field>
+        <mat-form-field class="w-full"><mat-label>振込先・支払方法（改行で複数行）</mat-label><textarea matInput rows="3" [(ngModel)]="m.org.bank" (ngModelChange)="changed()"></textarea></mat-form-field>
+        <mat-form-field class="w-full"><mat-label>2つめの振込先（JKJO: JKC 事務局）</mat-label><textarea matInput rows="3" [(ngModel)]="m.org.bank2" (ngModelChange)="changed()"></textarea></mat-form-field>
+        <mat-form-field class="w-full"><mat-label>担当者</mat-label><input matInput [(ngModel)]="m.org.tanto" (ngModelChange)="changed()"></mat-form-field>
+        <mat-form-field class="w-full"><mat-label>挨拶文</mat-label><textarea matInput rows="6" [(ngModel)]="m.org.greet" (ngModelChange)="changed()"></textarea></mat-form-field>
+        <mat-form-field class="w-full"><mat-label>並び順</mat-label><input matInput type="number" [(ngModel)]="m.org.seq" (ngModelChange)="changed()"></mat-form-field>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+}

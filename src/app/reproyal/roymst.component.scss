@@ -1,0 +1,24 @@
+.spacer { flex: 1; }
+.dirty { font-size: 13px; margin-right: 12px; color: #fff59d; }
+.tb-save { margin-right: 8px; }
+.tb-btn { color: #ffffff; border-color: rgba(255, 255, 255, 0.6); }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px 4px; }
+.err { color: #c62828; font-weight: bold; }
+.help { padding: 0 16px; color: #555555; font-size: 13px; max-width: 80em; margin: 4px 0 8px; }
+.tools { display: flex; align-items: center; gap: 12px; padding: 12px 16px 4px; }
+.scroll { overflow: auto; max-height: calc(100vh - 290px); padding: 0 16px 16px; }
+.tbl { border-collapse: collapse; font-size: 13px; }
+.tbl th { position: sticky; top: 0; background: #f5f5f5; z-index: 1; border: 1px solid #dddddd; padding: 2px 4px; white-space: nowrap; }
+.tbl td { border: 1px solid #eeeeee; padding: 0 2px; }
+.tbl input { border: none; padding: 3px 4px; font-size: 13px; background: transparent; }
+.tbl input:focus { outline: 2px solid #3f51b5; background: #ffffff; }
+.tbl input.num { text-align: right; }
+.w4 { width: 4em; }
+.w6 { width: 6em; }
+.w8 { width: 8em; }
+.w12 { width: 12em; }
+.w16 { width: 16em; }
+.w20 { width: 20em; }
+.w24 { width: 24em; }
+.orgform { padding: 16px; max-width: 60em; }
+.w-full { width: 100%; }
