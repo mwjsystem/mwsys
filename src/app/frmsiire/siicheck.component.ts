@@ -495,7 +495,9 @@ export class SiicheckComponent implements AfterViewInit, OnDestroy {
    */
   private prepareOcr(): Promise<OcrWorker> {
     this.worker ??= (async () => {
-      const { createWorker, OEM, PSM } = await import('tesseract.js');
+      // tesseract.js は CommonJS なので、ビルドすると中身が default の下に入る（名前で取り出すと undefined になる）
+      const mod = await import('tesseract.js');
+      const { createWorker, OEM, PSM } = mod.default ?? mod;
       const base = location.origin + '/tesseract';
       const w = await createWorker('eng', OEM.LSTM_ONLY, {
         workerPath: base + '/worker.min.js', corePath: base + '/core', langPath: base + '/lang', cacheMethod: 'none'
