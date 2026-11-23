@@ -19,6 +19,7 @@ const routes: Routes = [
   { path: 'reproyal', loadChildren: () => import('./reproyal/reproyal.module').then(m => m.ReproyalModule), canActivate: [AuthGuard] },
   { path: 'repuriage', loadChildren: () => import('./repuriage/repuriage.module').then(m => m.RepuriageModule), canActivate: [AuthGuard] },
   { path: 'repkessan', loadChildren: () => import('./repkessan/repkessan.module').then(m => m.RepkessanModule), canActivate: [AuthGuard] },
+  { path: 'repcheck', loadChildren: () => import('./repcheck/repcheck.module').then(m => m.RepcheckModule), canActivate: [AuthGuard] },
   { path: 'frmocnk', loadChildren: () => import('./frmocnk/frmocnk.module').then(m => m.FrmocnkModule), canActivate: [AuthGuard] },
   { path: 'frmamazon', loadChildren: () => import('./frmamazon/frmamazon.module').then(m => m.FrmamazonModule), canActivate: [AuthGuard] },
   { path: 'frmrakuten', loadChildren: () => import('./frmrakuten/frmrakuten.module').then(m => m.FrmrakutenModule), canActivate: [AuthGuard] },

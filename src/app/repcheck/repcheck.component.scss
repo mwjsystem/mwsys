@@ -1,0 +1,43 @@
+// 在庫・発注チェック
+// 受注伝票などを開いたあとに効く「mat-toolbar { position: fixed }」（app.component.scss）で、ボタンの行が隠れないようにする
+.toolbar { position: relative; z-index: auto; }
+.busy { margin-left: 16px; font-size: 13px; }
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.bar.pc { gap: 4px 12px; }
+.chk { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+.small { width: 4em; }
+.err { color: #c62828; padding: 0 12px; }
+.note { margin: 6px 12px; color: #666666; font-size: 12px; }
+h4 { margin: 10px 12px 4px; font-size: 14px; }
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0 12px 6px;
+  font-size: 13px;
+}
+.scroll {
+  overflow: auto;
+  max-height: calc(100vh - 300px);
+  margin: 6px 12px;
+}
+.scroll.short { max-height: calc(50vh - 150px); }
+.ord { margin-right: 8px; }
+.stores { display: flex; flex-wrap: wrap; gap: 16px; margin: 6px 12px; align-items: flex-start; }
+table.rep {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  white-space: nowrap;
+  th, td { border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; padding: 2px 6px; }
+  thead th { position: sticky; top: 0; z-index: 2; background: #e3eaf5; text-align: center; }
+  .num { text-align: right; }
+  .minus { color: #c62828; }
+}

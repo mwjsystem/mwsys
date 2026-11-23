@@ -1,0 +1,137 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>在庫・発注チェック</span>
+  @if (busy) {
+    <span class="busy">読み込んでいます…</span>
+  }
+</mat-toolbar>
+<p class="note">毎日・毎月のメール・チャットワークへの送信はバッチ（reportjob.py）が行います。この画面では、その場で確かめて Excel に出せます。</p>
+<mat-tab-group animationDuration="0ms">
+  <mat-tab label="発注点（国内発注在庫）">
+    <div class="bar">
+      <input #hx type="file" accept=".xlsx,.xlsm" hidden (change)="onHacchuFile($event)">
+      <button mat-flat-button color="primary" type="button" (click)="hx.click()" [disabled]="busy"><mat-icon>upload_file</mat-icon>国内発注在庫.xlsm を選ぶ</button>
+      @if (hFile) {
+        <span>{{hFile}}（{{hItems.length | number}} 品目）</span>
+        <button mat-button type="button" (click)="reloadHacchu()" [disabled]="busy"><mat-icon>refresh</mat-icon>計算し直す</button>
+        <button mat-button type="button" (click)="hacchuExcel()" [disabled]="busy || hRows.length == 0"><mat-icon>download</mat-icon>Excel出力</button>
+        <label class="chk"><input type="checkbox" [(ngModel)]="hOnlyAlert">発注点に届いた商品だけ（{{hAlertCount | number}} 件）</label>
+      }
+    </div>
+    @if (errors['hacchu']) {<p class="err">{{errors['hacchu']}}</p>}
+    <p class="note">発注一覧シートの商品について、発注点＝前月までの 12 か月の出荷数（全倉庫の出荷＋展開出庫）の月平均×1.2。朝来の 受注可（在庫−受注残）＋発注残 が発注点より少ないと赤字。発注の明細は、その商品の仕入先への発注残（新しい順に 5 件）。</p>
+    @if (hRows.length > 0) {
+      <div class="scroll">
+        <table class="rep">
+          <thead><tr><th>商品コード</th><th>商品名</th><th>発注点</th>@for (ym of hYms; track ym) {<th>{{ym.slice(2)}}</th>}<th>ロット</th><th>仕入先</th><th>在庫</th><th>受注残</th><th>受注可</th><th>発注残計</th><th>発注（日付・残）</th><th>メモ</th></tr></thead>
+          <tbody>
+            @for (r of hShown; track r.gcode) {
+              <tr>
+                <td>{{r.gcode}}</td><td>{{r.gtext}}</td><td class="num">{{r.point | number:'1.1-1'}}</td>
+                @for (v of r.months; track $index) {<td class="num">{{v | number}}</td>}
+                <td class="num">{{r.lot}}</td><td>{{r.vcode}} {{r.vname}}</td>
+                <td class="num">{{r.zaiko | number}}</td><td class="num">{{r.juzan | number}}</td>
+                <td class="num" [class.minus]="r.alert"><b>{{r.kano | number}}</b></td><td class="num">{{r.zan | number}}</td>
+                <td>@for (o of r.orders; track o.denno) {<span class="ord">{{o.day.slice(5)}}：{{o.hatzn | number}}</span>}</td>
+                <td>{{r.memo}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </mat-tab>
+  <mat-tab label="残少在庫・在庫切れ（朝来）">
+    <div class="bar">
+      <label>出荷日 <input type="date" [(ngModel)]="zDay"></label>
+      <label>在庫 <input type="number" class="small" [(ngModel)]="zMax"> 以下</label>
+      <button mat-flat-button color="primary" type="button" (click)="showZansho()" [disabled]="busy"><mat-icon>search</mat-icon>表示</button>
+    </div>
+    @if (errors['zansho']) {<p class="err">{{errors['zansho']}}</p>}
+    @if (zShown) {
+      <h4>出荷日に出荷して、朝来の在庫が {{zMax}} 以下の商品（{{zansho.length | number}} 件）</h4>
+      <div class="scroll short">
+        <table class="rep">
+          <thead><tr><th>商品コード</th><th>商品名</th><th>出荷数</th><th>在庫数</th><th>受注残</th></tr></thead>
+          <tbody>
+            @for (r of zansho; track r.gcode) {
+              <tr><td>{{r.gcode}}</td><td>{{r.gtext}}</td><td class="num">{{r.syuk | number}}</td><td class="num">{{r.zaiko | number}}</td><td class="num">{{r.juzan | number}}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <h4>在庫切れ：朝来の 在庫 ≦ 受注残（中止品・在庫管理しない商品を除く。{{kireru.length | number}} 件）</h4>
+      <p class="note">在庫切れ対応リスト.xlsx（対象品番・代わりの品番と倉庫・優先度）への書き込みはバッチ（kireru）が行います。</p>
+      <div class="scroll short">
+        <table class="rep">
+          <thead><tr><th>商品コード</th><th>商品名</th><th>在庫数</th><th>受注残</th><th>不足</th></tr></thead>
+          <tbody>
+            @for (r of kireru; track r.gcode) {
+              <tr><td>{{r.gcode}}</td><td>{{r.gtext}}</td><td class="num">{{r.zaiko | number}}</td><td class="num">{{r.juzan | number}}</td><td class="num minus">{{r.zaiko - r.juzan | number}}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </mat-tab>
+  <mat-tab label="大会倉庫の在庫">
+    <div class="bar pc">
+      @for (s of storeList; track s.code) {
+        <label class="chk"><input type="checkbox" [checked]="tStores.has(s.code)" (change)="toggleStore(s.code)">{{s.code}} {{s.name}}</label>
+      }
+    </div>
+    <div class="bar">
+      <button mat-flat-button color="primary" type="button" (click)="showTaikai()" [disabled]="busy"><mat-icon>search</mat-icon>今日の在庫を表示</button>
+      <button mat-button type="button" (click)="taikaiExcel()" [disabled]="busy || tShown.length == 0"><mat-icon>download</mat-icon>Excel出力</button>
+    </div>
+    @if (errors['taikai']) {<p class="err">{{errors['taikai']}}</p>}
+    <div class="stores">
+      @for (s of tShown; track s.scode) {
+        <div class="store">
+          <h4>{{s.scode}} {{s.name}}（{{s.rows.length | number}} 品目）</h4>
+          <table class="rep">
+            <thead><tr><th>商品コード</th><th>商品名</th><th>在庫数</th></tr></thead>
+            <tbody>
+              @for (r of s.rows; track r.gcode) {
+                <tr><td>{{r.gcode}}</td><td>{{r.gtext}}</td><td class="num">{{r.zaiko | number}}</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </mat-tab>
+  <mat-tab label="営業担当の売上">
+    <div class="bar">
+      <label>営業担当
+        <select [(ngModel)]="sTcode">
+          @for (t of stfsrv.tcds; track t.value) {
+            <option [value]="t.value">{{t.value}} {{t.viewval}}</option>
+          }
+        </select>
+      </label>
+      <label>売上日 <input type="date" [(ngModel)]="sFrom"> 〜 <input type="date" [(ngModel)]="sTo"></label>
+      <button mat-flat-button color="primary" type="button" (click)="showSales()" [disabled]="busy"><mat-icon>search</mat-icon>表示</button>
+      <button mat-button type="button" (click)="salesExcel()" [disabled]="busy || !sShown"><mat-icon>download</mat-icon>Excel出力</button>
+    </div>
+    @if (errors['sales']) {<p class="err">{{errors['sales']}}</p>}
+    <p class="note">受注伝票の営業担当で絞った売上明細（税抜。返品はマイナス）。Excel には明細と 商品 × 月 の集計（現行の pivot シート）を出します。</p>
+    @if (sShown) {
+      <div class="info">
+        <span>{{staffName(sShown.tcode)}}　{{sShown.from}} 〜 {{sShown.to}}</span>
+        <span>明細 {{sales.length | number}} 行</span>
+        <span>商品 {{sPivot.data.length | number}} 品目</span>
+        <span>税抜金額 <b>{{salesTotal | number}}</b> 円</span>
+      </div>
+      <div class="scroll">
+        <table class="rep">
+          <thead><tr><th>商品コード</th><th>名称</th><th>数量</th><th>税抜金額</th></tr></thead>
+          <tbody>
+            @for (d of sPivot.data; track d.gcode) {
+              <tr><td>{{d.gcode}}</td><td>{{d.gtext}}</td><td class="num">{{d.suu | number}}</td><td class="num">{{d.kin | number}}</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </mat-tab>
+</mat-tab-group>
