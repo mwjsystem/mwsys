@@ -136,34 +136,39 @@ SET search_path FROM CURRENT;
 
 CREATE OR REPLACE FUNCTION fkessan_urikake(p_id smallint, p_from date, p_to date, p_pcodes text)
 RETURNS SETOF tkessan_urikake AS $$
-  SELECT j.denno::integer, j.uday::date, x.mcode::text,
+  -- 入金伝票は対象の受注の分だけを 1 回で集計する（受注ごとに読むと遅い）
+  WITH d AS (
+    SELECT j.id, j.denno, j.uday, j.pcode, j.daibunrui, j.tcode, j.tcode1, coalesce(j.total, 0) AS total,
+           coalesce(nullif(trim(j.scde), ''), j.mcode) AS mcode,
+           CASE WHEN j.denku = 2 THEN -1 ELSE 1 END AS sgn
+      FROM trjyuden j
+     WHERE j.id = p_id AND j.uday BETWEEN p_from AND p_to AND j.del IS NOT TRUE
+       AND trim(j.pcode) = ANY (string_to_array(p_pcodes, ','))
+       AND trim(coalesce(j.daibunrui, '')) NOT IN (
+         SELECT trim(u.value) FROM msbunrui u WHERE u.id = p_id AND u.kubun = 'daibunrui' AND trim(u.viewval) = '通販')
+  ), n AS (
+    SELECT n.jdenno,
+           sum(coalesce(n.nmoney, 0)) FILTER (WHERE n.day::date <= p_to) AS n,
+           sum(coalesce(n.smoney, 0)) FILTER (WHERE n.day::date <= p_to) AS s,
+           sum(coalesce(n.tmoney, 0)) FILTER (WHERE n.day::date <= p_to) AS t,
+           max(n.day::date) FILTER (WHERE n.day::date <= p_to) AS lastday,
+           min(n.day::date) FILTER (WHERE n.day::date > p_to) AS atoday,
+           sum(coalesce(n.nmoney, 0) - coalesce(n.smoney, 0) + coalesce(n.tmoney, 0)) FILTER (WHERE n.day::date > p_to) AS atokin
+      FROM trnyusub n
+     WHERE n.id = p_id AND n.del IS NOT TRUE AND n.jdenno IN (SELECT denno FROM d)
+     GROUP BY n.jdenno
+  )
+  SELECT d.denno::integer, d.uday::date, d.mcode::text,
          trim(coalesce(m.sei, '') || ' ' || coalesce(m.mei, ''))::text,
-         trim(j.pcode)::text, trim(j.daibunrui)::text, trim(j.tcode)::text, trim(j.tcode1)::text,
-         (x.sgn * coalesce(j.total, 0))::numeric,
-         (x.sgn * (coalesce(b.n, 0) - coalesce(b.s, 0)))::numeric,
-         (x.sgn * coalesce(b.t, 0))::numeric,
-         (x.sgn * (coalesce(j.total, 0) - coalesce(b.n, 0) + coalesce(b.s, 0) - coalesce(b.t, 0)))::numeric,
-         b.lastday, a.atoday, (x.sgn * a.atokin)::numeric
-    FROM trjyuden j
-   CROSS JOIN LATERAL (SELECT coalesce(nullif(trim(j.scde), ''), j.mcode) AS mcode,
-                              CASE WHEN j.denku = 2 THEN -1 ELSE 1 END AS sgn) x
-    LEFT JOIN msmember m ON m.id = j.id AND m.mcode = x.mcode
-    LEFT JOIN LATERAL (
-      SELECT sum(n.nmoney) AS n, sum(n.smoney) AS s, sum(n.tmoney) AS t, max(n.day)::date AS lastday
-        FROM trnyusub n
-       WHERE n.id = j.id AND n.jdenno = j.denno AND n.del IS NOT TRUE AND n.day::date <= p_to
-    ) b ON true
-    LEFT JOIN LATERAL (
-      SELECT min(n.day)::date AS atoday,
-             sum(coalesce(n.nmoney, 0) - coalesce(n.smoney, 0) + coalesce(n.tmoney, 0)) AS atokin
-        FROM trnyusub n
-       WHERE n.id = j.id AND n.jdenno = j.denno AND n.del IS NOT TRUE AND n.day::date > p_to
-    ) a ON true
-   WHERE j.id = p_id AND j.uday BETWEEN p_from AND p_to AND j.del IS NOT TRUE
-     AND trim(j.pcode) = ANY (string_to_array(p_pcodes, ','))
-     AND NOT EXISTS (
-       SELECT 1 FROM msbunrui u
-        WHERE u.id = j.id AND u.kubun = 'daibunrui' AND u.value = trim(j.daibunrui) AND trim(u.viewval) = '通販')
+         trim(d.pcode)::text, trim(d.daibunrui)::text, trim(d.tcode)::text, trim(d.tcode1)::text,
+         (d.sgn * d.total)::numeric,
+         (d.sgn * (coalesce(n.n, 0) - coalesce(n.s, 0)))::numeric,
+         (d.sgn * coalesce(n.t, 0))::numeric,
+         (d.sgn * (d.total - coalesce(n.n, 0) + coalesce(n.s, 0) - coalesce(n.t, 0)))::numeric,
+         n.lastday, n.atoday, (d.sgn * n.atokin)::numeric
+    FROM d
+    LEFT JOIN n ON n.jdenno = d.denno
+    LEFT JOIN msmember m ON m.id = d.id AND m.mcode = d.mcode
 $$ LANGUAGE sql STABLE
 SET search_path FROM CURRENT;
 
