@@ -22,6 +22,8 @@ export interface StoreSum { scode: string; name: string; rows: ZaikoRow[]; count
 export const KBN_NAMES = ['10%売上', '8%売上', '非課税売上'];
 /** 在庫数がこれ以上の商品は、在庫を持たない受注生産品など（在庫数 9999 で登録してある）として在庫金額に入れない */
 export const MUGEN = 9000;
+/** USD の原価がこれ以上なら、円の原価に通貨 USD が付いている疑いがある（赤字で知らせる） */
+export const USD_SUSPECT = 1000;
 
 /**
  * 決算資料（現行の「YYYYMMDD決算.xlsx」の 売上・在庫金額・都度売掛 と、入金伝票の手数料）。
@@ -170,6 +172,17 @@ export class RepkessanComponent implements OnInit, KessanSource {
 
   isUsd(r: ZaikoRow): boolean {
     return r.currency == 'USD';
+  }
+
+  /** 原価が USD なのに 1,000 ドル以上（円の原価を USD で登録している疑い） */
+  isSuspect(r: ZaikoRow): boolean {
+    return this.isUsd(r) && r.genka >= USD_SUSPECT;
+  }
+
+  /** 集計対象のうち、原価の通貨が怪しい商品（金額の大きい順） */
+  get suspects(): (ZaikoRow & { name: string })[] {
+    return this.stores.flatMap(s => s.rows.filter(r => this.isSuspect(r)).map(r => ({ ...r, name: s.name })))
+      .sort((a, b) => this.amount(b) - this.amount(a));
   }
 
   /** 単価 × 数量（現行の H 列） */

@@ -19,6 +19,7 @@ export interface KessanSource {
   uriTotal: number;
   tesuSum(ym: string | null, ptype: string | null): number;
   isUsd(r: ZaikoRow): boolean;
+  isSuspect(r: ZaikoRow): boolean;
   amount(r: ZaikoRow): number;
   yen(r: ZaikoRow): number;
   kbnName(k: string, v: string | null): string;
@@ -234,6 +235,12 @@ export function fillKessanBook(wb: Workbook, src: KessanSource) {
       money(row.getCell(8), { formula: 'ROUND(E' + n + '*G' + n + ',0)', result: src.amount(e) });
       money(row.getCell(9), { formula: 'ROUND(IF(F' + n + '="USD",H' + n + '*' + RATE_CELL + ',H' + n + '),0)', result: src.yen(e) });
       row.getCell(11).value = e.subcat ?? '';
+      if (src.isSuspect(e)) {
+        // USD で 1,000 ドル以上の原価: 円の原価に通貨 USD が付いている疑い
+        for (let c = 1; c <= 11; c++) {
+          row.getCell(c).font = { color: { argb: 'FFC62828' }, bold: true };
+        }
+      }
     });
     ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: 11 } };
     ws.views = [{ state: 'frozen', ySplit: 1 }];

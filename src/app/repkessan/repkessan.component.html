@@ -107,6 +107,22 @@
           </tbody>
         </table>
       </div>
+      @if (suspects.length > 0) {
+        <p class="err">原価が USD で 1,000 ドル以上の商品が {{suspects.length | number}} 件あります。円の原価に通貨 USD が付いていないか、商品の原価を確かめてください（Excel の倉庫シートでも赤字にしています）。</p>
+        <div class="scroll">
+          <table class="rep">
+            <thead><tr><th>倉庫</th><th>商品コード</th><th>商品名称</th><th>在庫数</th><th>原価（＄）</th><th>単価×数量（＄）</th><th>円換算</th></tr></thead>
+            <tbody>
+              @for (r of suspects; track r.scode + r.gcode) {
+                <tr class="minus">
+                  <td>{{r.scode}} {{r.name}}</td><td>{{r.gcode}}</td><td>{{r.gtext}}</td><td class="num">{{r.zaiko | number}}</td>
+                  <td class="num">{{r.genka | number:'1.0-2'}}</td><td class="num">{{amount(r) | number}}</td><td class="num">{{yen(r) | number}}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </mat-tab>
   </mat-tab-group>
 }
