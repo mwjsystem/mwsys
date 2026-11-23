@@ -94,7 +94,7 @@
       @if (!rate) {<p class="err">ドル円レートが入っていません（USD の商品は 0 円で計算しています）</p>}
       <div class="bar">
         <label class="chk"><input type="checkbox" [(ngModel)]="withEnd" (ngModelChange)="buildStores()">中止・終了品も含める</label>
-        <span class="note">在庫管理しない商品（在庫数 9999 など）は含めません。中止・終了品は現行の在庫一覧表と同じく既定で外します。</span>
+        <span class="note">在庫管理しない商品と、在庫数 9,000 以上の商品（在庫数 9999 で登録してある受注生産品など）は含めません。中止・終了品は現行の在庫一覧表と同じく既定で外します。</span>
       </div>
       <div class="scroll">
         <table class="rep">
