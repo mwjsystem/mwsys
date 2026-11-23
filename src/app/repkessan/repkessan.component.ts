@@ -48,6 +48,8 @@ export class RepkessanComponent implements OnInit, KessanSource {
   rate: number | null = null;
   /** 都度売掛で残高 0 の伝票も出す */
   withZero = false;
+  /** 在庫に中止・終了品（tkbn が 0 以外）も含める（現行の在庫一覧表は「中止・終了商品を印刷しない」で出していた） */
+  withEnd = false;
 
   busy = false;
   errors: Record<string, string> = {};
@@ -151,12 +153,17 @@ export class RepkessanComponent implements OnInit, KessanSource {
   /** 在庫: 倉庫ごとの件数・円換算の合計（現行の Excel と同じく、単価×数量を円に丸めてから USD はレートを掛けて丸める） */
   buildStores() {
     const map = new Map<string, ZaikoRow[]>();
-    this.zaiko.forEach(r => map.set(r.scode, [...(map.get(r.scode) ?? []), r]));
+    this.zaiko.filter(r => this.withEnd || !this.isEnd(r)).forEach(r => map.set(r.scode, [...(map.get(r.scode) ?? []), r]));
     this.stores = [...map.entries()].map(([scode, rows]) => ({
       scode, name: this.storeNames.get(scode) ?? scode, rows, count: rows.length,
       usd: rows.filter(r => this.isUsd(r)).reduce((a, r) => a + this.amount(r), 0),
       yen: rows.reduce((a, r) => a + this.yen(r), 0)
     }));
+  }
+
+  /** 中止・終了品か */
+  isEnd(r: ZaikoRow): boolean {
+    return (r.tkbn ?? '').trim() != '' && (r.tkbn ?? '').trim() != '0';
   }
 
   isUsd(r: ZaikoRow): boolean {

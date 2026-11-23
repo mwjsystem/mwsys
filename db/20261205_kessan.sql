@@ -15,7 +15,8 @@
 --                     ・返品（denku = 2）は金額の符号を逆にする（現行と同じ）
 --                     ・期末日より後の入金（入金 − 出金 + 調整）と最初の入金日も返す（突き合わせ用）
 --   fkessan_zaiko   : 在庫金額。期末日の倉庫別の在庫数（直近の棚卸＋それ以降の増減。fzaikoall と同じ式）と、
---                     期末日時点の原価（msgtanka の期末日以前で最新）。在庫数 > 0 の行だけ返す。円換算は画面で行う
+--                     期末日時点の原価（msgtanka の期末日以前で最新）。在庫数 > 0 で、在庫管理する商品（msgoods.zkbn = 0）だけ返す。
+--                     中止・終了品（tkbn）を外すか、円換算は画面で行う
 --   入金伝票の手数料は、画面から trnyusub / trnyuden を直接読む（DB の変更なし）
 --
 -- 適用方法: Hasura コンソール > Data > SQL で、search_path を test / public に切り替えて 1 回ずつ実行する。
@@ -206,6 +207,7 @@ RETURNS SETOF tkessan_zaiko AS $$
        LIMIT 1
     ) k ON true
    WHERE st.zaiko > 0
+     AND coalesce(nullif(trim(g.zkbn::text), ''), '0') = '0'  -- 在庫管理しない商品（在庫数 9999 など）は除く（現行の決算用ツールと同じ）
 $$ LANGUAGE sql STABLE
 SET search_path FROM CURRENT;
 
