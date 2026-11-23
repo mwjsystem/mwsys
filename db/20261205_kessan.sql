@@ -91,7 +91,7 @@ RETURNS SETOF tkessan_uri AS $$
            CASE WHEN trim(t.mtax::text) = '2' THEN 2
                 WHEN trim(t.taxrate::text) ~ '^8(\.0*)?$' THEN 1
                 ELSE 0 END AS k,
-           CASE coalesce(nullif(trim(t.gkbn::text), ''), trim(r.gkbn::text))
+           CASE trim(r.gkbn::text)  -- 明細の区分は商品マスタ（msggroup）の gkbn（現行と同じ）
                 WHEN '1' THEN 's' WHEN '2' THEN 't' WHEN '3' THEN 'n' ELSE 'g' END AS c,
            coalesce(t.toutmoney, 0) AS m, coalesce(t.taxmoney, 0) AS x
       FROM trjyumei t
