@@ -524,7 +524,7 @@ export class SiicheckComponent implements AfterViewInit, OnDestroy {
       await this.recognize(bmp, bmp.width, bmp.height);
       bmp.close();
     } catch (e) {
-      this.show('写真を読めませんでした：' + (e as Error).message, 'ng');
+      this.show('写真を読めませんでした：' + this.errText(e), 'ng');
       this.cdRef.detectChanges();
     }
   }
@@ -543,6 +543,8 @@ export class SiicheckComponent implements AfterViewInit, OnDestroy {
     this.cands = [];
     this.show(this.worker ? '読んでいます…' : '文字認識の準備をしています（初回は数十秒かかります）…', 'info');
     this.cdRef.detectChanges();
+    // どの段階で止まったかを、エラーの表示に出す
+    let stage = '画像の準備';
     try {
       // 白黒にして、長い辺を 1600px 程度にそろえる（文字認識の速さと精度のため）
       const scale = Math.min(1, 1600 / Math.max(w, h));
@@ -552,13 +554,15 @@ export class SiicheckComponent implements AfterViewInit, OnDestroy {
       const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
       ctx.filter = 'grayscale(1) contrast(1.4)';
       ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
+      stage = '文字認識の準備（データの読み込み）';
       const worker = await this.prepareOcr();
+      stage = '文字認識';
       const { data } = await worker.recognize(canvas);
       this.ocrText = data.text.trim();
       this.match(this.ocrText);
     } catch (e) {
-      this.show('文字認識できませんでした：' + (e as Error).message, 'ng');
-      console.log('error siicheck ocr', e);
+      this.show('文字認識できませんでした（' + stage + '）：' + this.errText(e), 'ng');
+      console.log('error siicheck ocr', stage, e);
     }
     this.ocrBusy = false;
     this.cdRef.detectChanges();
@@ -656,6 +660,17 @@ export class SiicheckComponent implements AfterViewInit, OnDestroy {
       }
     }
     return dp[b.length];
+  }
+
+  /** エラーの内容（文字認識のエラーは Error でなく文字列や Event で来ることがある） */
+  private errText(e: unknown): string {
+    if (e instanceof Error) {
+      return e.message || e.name;
+    }
+    if (typeof Event != 'undefined' && e instanceof Event) {
+      return e.type + '（' + ((e.target as { src?: string } | null)?.src ?? 'ネットワークか読み込みのエラー') + '）';
+    }
+    return String(e);
   }
 
   private show(text: string, type: 'ok' | 'ng' | 'info') {
