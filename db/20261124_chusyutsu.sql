@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS thatzmei (
   , hatzn numeric
 );
 
--- 倉庫の発注残の明細（発注数 − 仕入数。fhatzan と同じ計算）。取消した発注伝票は除く
+-- 倉庫の発注残の明細（発注数 − 仕入数。fhatzan と同じ計算。trhatden に取消の列は無い）
 CREATE OR REPLACE FUNCTION fhatzmei(p_id smallint, p_scode text)
 RETURNS SETOF thatzmei AS $$
   SELECT x.denno, x.line, x.day, x.gcode, x.vcode, x.tcode, x.tname, x.yday, x.hatzn
@@ -104,7 +104,7 @@ RETURNS SETOF thatzmei AS $$
            WHERE s.id = p_id
            GROUP BY s.hdenno, s.hline
         ) a ON a.hdenno = h.denno AND a.hline = h.line
-       WHERE h.id = p_id AND d.scode = p_scode AND d.del IS NOT TRUE
+       WHERE h.id = p_id AND d.scode = p_scode
     ) x
    WHERE x.hatzn > 0;
 $$ LANGUAGE sql STABLE;
