@@ -487,11 +487,19 @@ export class SiicheckComponent implements AfterViewInit, OnDestroy {
     this.camera = false;
   }
 
-  /** 文字認識の準備（初回は認識用のデータを読み込むので時間がかかる） */
+  /**
+   * 文字認識の準備（初回は認識用のデータを読み込むので時間がかかる）。
+   * 認識用のファイルは CDN でなく、このアプリのサーバーから配る（angular.json の assets で node_modules から dist/tesseract に写す）。
+   * 倉庫の回線で CDN につながらないと iPhone で準備に失敗したため。パスは worker の中で使うので絶対 URL にする。
+   * 端末内のキャッシュ（IndexedDB）は使わない（ブラウザの HTTP キャッシュで足りる）
+   */
   private prepareOcr(): Promise<OcrWorker> {
     this.worker ??= (async () => {
       const { createWorker, OEM, PSM } = await import('tesseract.js');
-      const w = await createWorker('eng', OEM.LSTM_ONLY);
+      const base = location.origin + '/tesseract';
+      const w = await createWorker('eng', OEM.LSTM_ONLY, {
+        workerPath: base + '/worker.min.js', corePath: base + '/core', langPath: base + '/lang', cacheMethod: 'none'
+      });
       await w.setParameters({
         tessedit_pageseg_mode: PSM.SPARSE_TEXT,
         tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-/.:'#, ",
