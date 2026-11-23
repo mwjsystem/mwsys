@@ -1,0 +1,40 @@
+// 決算資料
+// 受注伝票などを開いたあとに効く「mat-toolbar { position: fixed }」（app.component.scss）で、ボタンの行が隠れないようにする
+.toolbar { position: relative; z-index: auto; }
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.bar.pc { padding-top: 0; gap: 4px 12px; }
+.chk { display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+.rate { width: 6em; }
+.err { color: #c62828; padding: 0 12px; }
+.note { margin: 6px 12px; color: #666666; font-size: 12px; }
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0 12px 6px;
+  font-size: 13px;
+}
+.scroll {
+  overflow: auto;
+  max-height: calc(100vh - 300px);
+  margin: 6px 12px;
+}
+.lnk { color: #1565c0; cursor: pointer; text-decoration: underline; }
+table.rep {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  white-space: nowrap;
+  th, td { border-right: 1px solid #dddddd; border-bottom: 1px solid #dddddd; padding: 2px 6px; }
+  thead th { position: sticky; top: 0; z-index: 2; background: #e3eaf5; text-align: center; }
+  .num { text-align: right; }
+  .minus { color: #c62828; }
+  tr.total td { font-weight: bold; background: #fff3c4; }
+}
