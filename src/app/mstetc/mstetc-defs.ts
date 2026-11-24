@@ -143,7 +143,7 @@ export const HOKURI_DEF: EtcDef = {
 
 /** 同梱（saki / sksec） */
 const DOKON: EtcOption[] = [
-  { value: 'shuk', label: 'する（出荷指示フォルダに入れて荷物に同梱）' },
+  { value: 'shuk', label: 'する（荷物に同梱）' },
   { value: 'hkan', label: 'しない（控えだけ）' },
   { value: 'hkae', label: '受注先書式（控えだけ）' },
 ];
@@ -159,9 +159,10 @@ export const BUNTYPE_DEF: EtcDef = {
   fields: [
     { key: 'name', label: '名称', type: 'text', req: true, width: 20, list: true },
     { key: 'first', label: '第一帳票', type: 'ref', req: true, list: true, ref: BUNSHO_REF, hint: '文書マスタの文書' },
-    { key: 'saki', label: '第一帳票の同梱', type: 'choice', req: true, list: true, options: DOKON },
-    { key: 'second', label: '第二帳票', type: 'ref', list: true, ref: BUNSHO_REF, extra: [{ value: 'NO', label: 'NO（第二帳票なし）' }] },
-    { key: 'sksec', label: '第二帳票の同梱', type: 'choice', list: true, options: [...DOKON, { value: 'NNNO', label: 'NNNO（第二帳票なし）' }] },
+    { key: 'saki', label: '第一帳票の同梱', type: 'choice', req: true, list: true, options: DOKON,
+      hint: '「する」だけ出荷指示フォルダに入れて荷物に同梱します。控え（納品書控フォルダ）にはどれも保存します' },
+    { key: 'second', label: '第二帳票', type: 'ref', list: true, ref: BUNSHO_REF, extra: [{ value: 'NO', label: 'なし' }] },
+    { key: 'sksec', label: '第二帳票の同梱', type: 'choice', list: true, options: [...DOKON, { value: 'NNNO', label: 'なし（NNNO）' }] },
   ],
 };
 
