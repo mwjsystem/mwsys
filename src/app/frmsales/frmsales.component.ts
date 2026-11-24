@@ -736,14 +736,22 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     }
   }
 
+  /**
+   * 出荷日を入れたら、売上日を出荷日に、都度（締請求でない）の入金予定日を出荷日の 1 か月後（土日・休日なら翌稼働日）にする（No.8・32）。
+   * 締め日以前で売上日を変えられないときは何もしない
+   */
   changeSday() {
-//	if (this.form.value.sday != null) {  
-//		this.form.get('uday').setValue(this.form.value.sday);
-//		if (this.form.value.torikbn == false) {
-//		  this.form.get('nday').setValue(this.usrsrv.getNextMonth(this.form.value.sday));
-//		}
-//	}
-	
+    const v = this.ctl.sday.value;
+    const sday = v ? new Date(v) : null;
+    if (!sday || isNaN(sday.getTime()) || this.ctl.uday.disabled) {
+      return;
+    }
+    this.ctl.uday.setValue(sday);
+    this.ctl.uday.markAsDirty();
+    if (!this.ctl.torikbn.value && this.ctl.nday.enabled) {
+      this.ctl.nday.setValue(this.usrsrv.getNextMonth(new Date(sday)));
+      this.ctl.nday.markAsDirty();
+    }
   }
 
   changeIadr(eda: string | number | null) {

@@ -255,7 +255,9 @@ export class JmeitblComponent implements OnInit {
     // 単価・数量が空でも計算できるように 0 とみなす。税率が無い商品（単価未登録など）は 10%、税区分が無ければ顧客の税区分（無ければ外税）
     const tanka = Number(ctrl.tanka) || 0;
     const suu = Number(ctrl.suu) || 0;
-    const lcmoney: number = tanka * suu;
+    // 単価に小数があっても金額は円単位にする（通販Proと同じく切り上げ。返品などのマイナスは絶対値で切り上げ）（No.37）
+    const raw = tanka * suu;
+    const lcmoney: number = Math.sign(raw) * Math.ceil(Math.round(Math.abs(raw) * 1000) / 1000);
     const rate = Number(this.frmArr.getRawValue()[i]['taxrate']);
     const lctaxrate: number = (isNaN(rate) || this.frmArr.getRawValue()[i]['taxrate'] == null || this.frmArr.getRawValue()[i]['taxrate'] === '' ? 10 : rate) / 100;
     let lctaxmoney: number = 0;
