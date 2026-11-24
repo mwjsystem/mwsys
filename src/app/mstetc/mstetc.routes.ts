@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { MstetcComponent } from './mstetc.component';
-import { STAFF_DEF, STORE_DEF, HOKURI_DEF, BUNTYPE_DEF, BUNSHO_DEF } from './mstetc-defs';
+import { STAFF_DEF, STORE_DEF, HOKURI_DEF, BUNTYPE_DEF, BUNSHO_DEF, HKTIME_DEF } from './mstetc-defs';
 
 /**
  * 小さなマスタのメンテナンス
@@ -12,5 +12,6 @@ export const MSTETC_ROUTES: Routes = [
   { path: 'hokuri', component: MstetcComponent, data: { def: HOKURI_DEF } },
   { path: 'buntype', component: MstetcComponent, data: { def: BUNTYPE_DEF } },
   { path: 'bunsho', component: MstetcComponent, data: { def: BUNSHO_DEF } },
+  { path: 'hktime', component: MstetcComponent, data: { def: HKTIME_DEF } },
   { path: '', redirectTo: 'staff', pathMatch: 'full' },
 ];

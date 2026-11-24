@@ -27,14 +27,16 @@
         <table class="tbl">
           <thead>
             <tr>
-              <th>コード</th>
+              @for (f of keyFields; track f.key) {<th>{{f.label}}</th>}
+              <th>{{def.codeLabel ?? 'コード'}}</th>
               @for (f of listFields; track f.key) {<th [class.num]="f.type == 'int'">{{f.label}}</th>}
               @if (def.delKey) {<th>{{def.delLabel}}</th>}
             </tr>
           </thead>
           <tbody>
-            @for (r of shown; track r['code']) {
-              <tr (click)="select(r)" [class.sel]="edit && !isNew && edit['code'] == r['code']" [class.off]="def.delKey && r[def.delKey]">
+            @for (r of shown; track rowKey(r)) {
+              <tr (click)="select(r)" [class.sel]="isSel(r)" [class.off]="def.delKey && r[def.delKey]">
+                @for (f of keyFields; track f.key) {<td>{{cell(r, f)}}</td>}
                 <td>{{r['code']}}</td>
                 @for (f of listFields; track f.key) {<td [class.num]="f.type == 'int'">{{cell(r, f)}}</td>}
                 @if (def.delKey) {<td>{{r[def.delKey] ? def.delLabel : ''}}</td>}
@@ -49,8 +51,18 @@
     @if (edit) {
       <fieldset class="form">
         <legend>{{isNew ? '新規登録' : '編集'}}</legend>
+        @for (f of keyFields; track f.key) {
+          <label class="fld">
+            <span class="lbl">{{f.label}}<b class="req">*</b></span>
+            <select [(ngModel)]="edit[f.key]" [disabled]="!isNew">
+              <option [ngValue]="null"></option>
+              @for (o of opts(f, edit[f.key]); track o.value) {<option [ngValue]="o.value">{{o.value}} {{o.label}}</option>}
+            </select>
+            @if (f.hint) {<span class="sub">{{f.hint}}</span>}
+          </label>
+        }
         <label class="fld">
-          <span class="lbl">コード<b class="req">*</b></span>
+          <span class="lbl">{{def.codeLabel ?? 'コード'}}<b class="req">*</b></span>
           <input [(ngModel)]="edit['code']" [disabled]="!isNew" style="width: 8em;">
           <span class="sub">{{def.codeHint}}</span>
         </label>

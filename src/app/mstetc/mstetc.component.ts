@@ -69,8 +69,23 @@ export class MstetcComponent {
     });
   }
 
+  /** code のほかのキーの列 */
+  get keyFields(): EtcField[] {
+    return this.def.keyFields ?? [];
+  }
+
+  /** キーの列と中身の列 */
+  private get allFields(): EtcField[] {
+    return [...this.keyFields, ...this.def.fields];
+  }
+
   get listFields(): EtcField[] {
     return this.def.fields.filter(f => f.list);
+  }
+
+  /** 行を見分ける文字（code と、ほかのキーの列） */
+  rowKey(r: EtcRow): string {
+    return [...this.keyFields.map(f => String(r[f.key] ?? '')), String(r['code'] ?? '').trim()].join('|');
   }
 
   private isDel(r: EtcRow): boolean {
@@ -80,7 +95,7 @@ export class MstetcComponent {
   get shown(): EtcRow[] {
     const q = this.filter.trim().toLowerCase();
     return this.rows.filter(r => (this.showDel || !this.isDel(r))
-      && (!q || ['code', ...this.def.fields.map(f => f.key)].some(k => String(r[k] ?? '').toLowerCase().includes(q))));
+      && (!q || [String(r['code'] ?? ''), ...this.allFields.map(f => this.cell(r, f))].some(s => s.toLowerCase().includes(q))));
   }
 
   get delCount(): number {
@@ -127,12 +142,12 @@ export class MstetcComponent {
   }
 
   private get cols(): string {
-    return ['code', ...(this.def.delKey ? [this.def.delKey] : []), ...this.def.fields.map(f => f.key)].join(' ');
+    return ['code', ...(this.def.delKey ? [this.def.delKey] : []), ...this.allFields.map(f => f.key)].join(' ');
   }
 
   /** ref の欄の選択肢を読む */
   private async loadRefs(): Promise<void> {
-    for (const f of this.def.fields.filter(x => x.type == 'ref' && x.ref)) {
+    for (const f of this.allFields.filter(x => x.type == 'ref' && x.ref)) {
       const r = f.ref!;
       const Get = gql`
         query get_etcref_${r.table}($id: smallint!) {
@@ -153,7 +168,8 @@ export class MstetcComponent {
   async load(): Promise<void> {
     this.error = '';
     const t = this.def.table;
-    const order = (this.def.sortKey ? `{${this.def.sortKey}: asc_nulls_last}, ` : '') + '{code: asc}';
+    const keys = this.def.orderBy ?? (this.def.sortKey ? [this.def.sortKey] : []);
+    const order = keys.map(k => `{${k}: asc_nulls_last}, `).join('') + '{code: asc}';
     const Get = gql`
       query get_etc_${t}($id: smallint!) {
         ${t}(where: {id: {_eq: $id}}, order_by: [${order}]) { ${this.cols} }
@@ -185,7 +201,7 @@ export class MstetcComponent {
   /** 入力欄に出す中身（選択肢の欄は文字にそろえる） */
   private toEdit(r: EtcRow): EtcRow {
     const e: EtcRow = { ...r };
-    for (const f of this.def.fields) {
+    for (const f of this.allFields) {
       if (['store', 'hokuri', 'choice', 'ref'].includes(f.type)) {
         e[f.key] = this.selValue(e[f.key]);
       }
@@ -193,8 +209,13 @@ export class MstetcComponent {
     return e;
   }
 
+  /** 選んでいる行か（一覧の色付け） */
+  isSel(r: EtcRow): boolean {
+    return !!this.edit && !this.isNew && this.rowKey(this.edit) == this.rowKey(r);
+  }
+
   select(r: EtcRow) {
-    if (this.edit && !this.isNew && this.edit['code'] == r['code']) {
+    if (this.isSel(r)) {
       return;
     }
     if (!this.okToLeave()) {
@@ -214,7 +235,7 @@ export class MstetcComponent {
     if (this.def.delKey) {
       r[this.def.delKey] = false;
     }
-    this.def.fields.forEach(f => r[f.key] = f.type == 'check' ? false : null);
+    this.allFields.forEach(f => r[f.key] = f.type == 'check' ? false : null);
     this.isNew = true;
     this.edit = r;
     this.orig = JSON.stringify(r);
@@ -233,13 +254,21 @@ export class MstetcComponent {
   /** 入力の確認。問題があればその文を返す */
   private check(e: EtcRow): string {
     const code = String(e['code'] ?? '').trim();
+    const codeLabel = this.def.codeLabel ?? 'コード';
+    for (const f of this.keyFields) {
+      if (e[f.key] == null || String(e[f.key]).trim() === '') {
+        return f.label + 'を入れてください';
+      }
+    }
     if (!code) {
-      return 'コードを入れてください';
+      return codeLabel + 'を入れてください';
     }
     if (this.isNew) {
-      const same = this.rows.find(r => r['code'] == code);
+      const key = this.rowKey({ ...e, code });
+      const same = this.rows.find(r => this.rowKey(r) == key);
       if (same) {
-        return 'コード ' + code + ' はもう使われています' + (this.isDel(same) ? '（' + this.def.delLabel + 'の行）' : '');
+        return codeLabel + ' ' + code + ' はもう使われています' + (this.keyFields.length ? '（' + this.keyFields.map(f => this.cell(same, f)).join('・') + '）' : '')
+          + (this.isDel(same) ? '（' + this.def.delLabel + 'の行）' : '');
       }
     }
     for (const f of this.def.fields) {
@@ -261,18 +290,23 @@ export class MstetcComponent {
       v[this.def.delKey] = !!e[this.def.delKey];
     }
     for (const f of this.def.fields) {
-      const x = e[f.key];
-      if (f.type == 'check') {
-        v[f.key] = !!x;
-      } else if (x == null || String(x).trim() === '') {
-        v[f.key] = null;
-      } else if (f.type == 'int' || (f.type == 'ref' && f.ref?.num)) {
-        v[f.key] = Number(String(x).trim());
-      } else {
-        v[f.key] = String(x).trim();
-      }
+      v[f.key] = this.conv(f, e[f.key]);
     }
     return v;
+  }
+
+  /** 欄の値を保存する形にする（空の文字は null、整数の欄は数） */
+  private conv(f: EtcField, x: EtcRow[string]): EtcRow[string] {
+    if (f.type == 'check') {
+      return !!x;
+    }
+    if (x == null || String(x).trim() === '') {
+      return null;
+    }
+    if (f.type == 'int' || (f.type == 'ref' && f.ref?.num)) {
+      return Number(String(x).trim());
+    }
+    return String(x).trim();
   }
 
   async save() {
@@ -287,29 +321,35 @@ export class MstetcComponent {
     const id = this.usrsrv.compid;
     const code = String(this.edit['code']).trim();
     const vals = this.values(this.edit);
+    // 主キー（id・code と、ほかのキーの列）
+    const pk: EtcRow = { id, code };
+    for (const f of this.keyFields) {
+      pk[f.key] = this.conv(f, this.edit[f.key]);
+    }
     const Ins = gql`
       mutation ins_etc_${t}($obj: ${t}_insert_input!) {
         insert_${t}_one(object: $obj) { ${this.cols} }
       }`;
     const Upd = gql`
-      mutation upd_etc_${t}($id: smallint!, $code: String!, $set: ${t}_set_input!) {
-        update_${t}_by_pk(pk_columns: {id: $id, code: $code}, _set: $set) { ${this.cols} }
+      mutation upd_etc_${t}($pk: ${t}_pk_columns_input!, $set: ${t}_set_input!) {
+        update_${t}_by_pk(pk_columns: $pk, _set: $set) { ${this.cols} }
       }`;
     this.busy = true;
     this.cdRef.detectChanges();
     try {
       const res = this.isNew
         ? await firstValueFrom(this.apollo.mutate<Record<string, EtcRow>>({
-          mutation: Ins, variables: { obj: { id, code, ...vals } }, refetchQueries: this.def.refetch
+          mutation: Ins, variables: { obj: { ...pk, ...vals } }, refetchQueries: this.def.refetch
         }))
         : await firstValueFrom(this.apollo.mutate<Record<string, EtcRow>>({
-          mutation: Upd, variables: { id, code, set: vals }, refetchQueries: this.def.refetch
+          mutation: Upd, variables: { pk, set: vals }, refetchQueries: this.def.refetch
         }));
       const saved = res.data?.[this.isNew ? 'insert_' + t + '_one' : 'update_' + t + '_by_pk'];
       if (res.error || !saved) {
         throw res.error ?? new Error('保存できませんでした（行が見つかりません）');
       }
-      const i = this.rows.findIndex(r => r['code'] == code);
+      const key = this.rowKey(saved);
+      const i = this.rows.findIndex(r => this.rowKey(r) == key);
       if (i > -1) {
         this.rows[i] = { ...saved };
       } else {

@@ -36,8 +36,14 @@ export interface EtcField {
 
 export interface EtcDef {
   /** 表の名前（Hasura のルートフィールド名） */
-  table: 'msstaff' | 'msstore' | 'mshokuri' | 'msbuntype' | 'msbunsho';
+  table: 'msstaff' | 'msstore' | 'mshokuri' | 'msbuntype' | 'msbunsho' | 'mshktime';
   title: string;
+  /** code のほかのキーの列（id・code と合わせて主キー。登録したあとは変えられない）。例: 配達時間の配送会社 */
+  keyFields?: EtcField[];
+  /** 一覧の並び（sortKey より優先。最後に code 順） */
+  orderBy?: string[];
+  /** コードの見出し（省略時は「コード」） */
+  codeLabel?: string;
   /** del 列（無い表は undefined） */
   delKey?: string;
   /** del 列の意味（一覧の「…も出す」と欄の名前に使う） */
@@ -163,6 +169,27 @@ export const BUNTYPE_DEF: EtcDef = {
       hint: '「する」だけ出荷指示フォルダに入れて荷物に同梱します。控え（納品書控フォルダ）にはどれも保存します' },
     { key: 'second', label: '第二帳票', type: 'ref', list: true, ref: BUNSHO_REF, extra: [{ value: 'NO', label: 'なし' }] },
     { key: 'sksec', label: '第二帳票の同梱', type: 'choice', list: true, options: [...DOKON, { value: 'NNNO', label: 'なし（NNNO）' }] },
+  ],
+};
+
+export const HKTIME_DEF: EtcDef = {
+  table: 'mshktime',
+  title: '配達時間マスタ',
+  keyFields: [
+    { key: 'hscode', label: '配送会社', type: 'ref', req: true, list: true, ref: { table: 'mshaisou', value: 'code', label: 'name', num: true },
+      hint: '配送方法マスタの配送会社。受注伝票では、配送方法の配送会社の時間帯だけが選択肢に出ます' },
+  ],
+  orderBy: ['hscode'],
+  codeLabel: '時間帯コード',
+  codeHint: '受注伝票・移動伝票の配達時間に入るコードです（配送会社ごと）。登録したあとは変えられません',
+  refetch: ['get_hktime'],
+  note: '配送会社ごとの配達時間の選択肢です。送り状 CSV の時間帯には「CSV のコード」が入ります。'
+    + '変えたあとは、開いている受注伝票・出荷指示などの画面を読み直してください。',
+  fields: [
+    { key: 'name', label: '時間帯名称', type: 'text', req: true, width: 14, list: true, hint: '選択肢に出る名前' },
+    { key: 'bunrui', label: 'CSV のコード', type: 'text', req: true, width: 6, list: true,
+      hint: '送り状 CSV の時間帯コード（配送会社の決まり）。顧客マスタの配達時間もこの値で選びます' },
+    { key: 'ehiden', label: 'e飛伝Ⅲシールのコード', type: 'text', width: 6, list: true, hint: 'e飛伝Ⅲの時間帯シール用（佐川 e飛伝Ⅱ だけ）' },
   ],
 };
 
