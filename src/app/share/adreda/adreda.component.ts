@@ -54,6 +54,9 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     this.memsrv.mcode = this.label.trim().split(/[\s(（]/)[0];
     this.eda = data.eda;
     this.flg = data.flg;
+    // 住所の欄が 2 列に詰まらないように広くする（呼び出し元で幅を指定していないので、ここで決める）
+    this.dialogRef.updateSize('960px');
+    this.dialogRef.addPanelClass('adreda-panel');
   }
 
   ngOnInit(): void {

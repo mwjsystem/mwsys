@@ -79,7 +79,11 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-mdc-form-field.mwj-field .mat-mdc-text-field-wrapper { padding: 0 12px; }
 // 複数行の欄（備考・住所）。app.component.scss の mat-form-field { height: 3em } で枠が伸びず、
 // 文字が下の欄へはみ出すので、この欄だけ中身の高さに合わせる
-mat-form-field.mwj-memo { height: auto; }
+// （顧客マスタなど app.component.scss を画面ごとに読む画面では、そちらの指定と強さが同じで負けるので !important）
+mat-form-field.mwj-memo { height: auto !important; }
+// 別納先のダイアログ（adreda）は M3 の既定の最大幅（約 560px）を外して広くする
+.adreda-panel { max-width: 95vw !important; }
+.adreda-panel .mat-mdc-dialog-surface { max-width: 95vw !important; }
 
 /* ---------------------------------------------------------------------------
  * Layout utilities
