@@ -77,6 +77,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 // app.component.scss removes the padding of every .mat-mdc-text-field-wrapper app-wide,
 // so restore the horizontal padding for these fields to keep the text off the border.
 .mat-mdc-form-field.mwj-field .mat-mdc-text-field-wrapper { padding: 0 12px; }
+// 複数行の欄（備考・住所）。app.component.scss の mat-form-field { height: 3em } で枠が伸びず、
+// 文字が下の欄へはみ出すので、この欄だけ中身の高さに合わせる
+mat-form-field.mwj-memo { height: auto; }
 
 /* ---------------------------------------------------------------------------
  * Layout utilities
