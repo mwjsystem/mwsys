@@ -47,9 +47,7 @@ import { TmstmpComponent } from '../core/tmstmp/tmstmp.component';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
 import { MatExpansionPanel, MatExpansionPanelHeader } from '@angular/material/expansion';
-import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
-import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { NuminputDirective } from '../core/directives/numinput.directive';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';import { NuminputDirective } from '../core/directives/numinput.directive';
 import { DecimalPipe, PercentPipe } from '@angular/common';
 import { JdatePipe } from '../core/pipes/jdate.pipe';
 import { McdtxtPipe } from '../core/pipes/mcdtxt.pipe';
@@ -68,7 +66,7 @@ type JyudenField = 'torikbn' | 'mcode' | 'scde' | 'ncode' | 'nsaki' | 'nadr' | '
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
     },
-    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatFormField, MatInput, FormsModule, TabDirective, MatIconButton, MatSuffix, MatMenuTrigger, MatMenu, MatMenuItem, ReactiveFormsModule, MatCheckbox, TmstmpComponent, MatLabel, MatSelect, MatOption, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatPrefix, MatExpansionPanel, MatExpansionPanelHeader, MatCard, MatCardHeader, MatCardTitle, NuminputDirective, MatCardContent, JmeitblComponent, DecimalPipe, PercentPipe, JdatePipe, McdtxtPipe, ModetxtPipe, CdkTextareaAutosize]
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatFormField, MatInput, FormsModule, TabDirective, MatIconButton, MatSuffix, MatMenuTrigger, MatMenu, MatMenuItem, ReactiveFormsModule, MatCheckbox, TmstmpComponent, MatLabel, MatSelect, MatOption, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatPrefix, MatExpansionPanel, MatExpansionPanelHeader, MatCard, MatCardHeader, MatCardTitle, NuminputDirective, MatCardContent, JmeitblComponent, DecimalPipe, PercentPipe, JdatePipe, McdtxtPipe, ModetxtPipe]
 })
 export class FrmsalesComponent extends BeforeunloadBase implements OnInit, AfterViewInit, OnDestroy {
   usrsrv = inject(UserService);

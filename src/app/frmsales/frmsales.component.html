@@ -460,13 +460,13 @@
   <div class="flex flex-wrap gap-2">
     <mat-form-field appearance="outline" class="mwj-field w-full">
       <mat-label>納品先住所</mat-label>
-      <textarea matInput id="txt0" [value]="jmisrv.address" cdkTextareaAutosize disabled></textarea>
+      <textarea matInput id="txt0" [value]="jmisrv.address" [rows]="usrsrv.textRows(jmisrv.address)" disabled></textarea>
     </mat-form-field>
     <!-- 顧客マスタの伝票備考（No.16・20）。長文でもスクロールせずに全部見えるように、内容に合わせて高さを変える -->
     @if (jmisrv.dmemo) {
       <mat-form-field appearance="outline" class="mwj-field w-full">
         <mat-label>顧客マスタの伝票備考</mat-label>
-        <textarea matInput id="txt5" [value]="jmisrv.dmemo" cdkTextareaAutosize readonly tabindex="-1"></textarea>
+        <textarea matInput id="txt5" [value]="jmisrv.dmemo" [rows]="usrsrv.textRows(jmisrv.dmemo)" readonly tabindex="-1"></textarea>
       </mat-form-field>
     }
     <mat-form-field appearance="outline" class="mwj-field w-full">

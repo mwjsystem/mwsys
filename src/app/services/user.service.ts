@@ -455,6 +455,16 @@ export class UserService {
       });
     return val;
   }
+  /**
+   * 文字を全部見せるための textarea の行数（改行の数と、1 行 width 文字で折り返す分）。
+   * cdkTextareaAutosize は mat-form-field の枠が伸びずに下の欄へはみ出すので、[rows] で高さを決める
+   */
+  textRows(value: unknown, width = 60, min = 1): number {
+    const lines = String(value ?? '').split('\n');
+    const rows = lines.reduce((n, l) => n + Math.max(1, Math.ceil(l.length / width)), 0);
+    return Math.max(min, rows);
+  }
+
   convUpper(value: string): string {
     // 全角は半角にして、大文字に変換
     const val = value

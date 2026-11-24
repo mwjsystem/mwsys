@@ -33,7 +33,6 @@ import { AddressComponent as AddressComponent_1 } from '../share/address/address
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
 import { McdtxtPipe } from '../core/pipes/mcdtxt.pipe';
 import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
-import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 /** get_member クエリの結果 */
 interface MemberResult { msmember_by_pk: mwI.Member | null }
@@ -67,7 +66,7 @@ class Sval {
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
     },
-    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, RouterLink, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, TabDirective, MatSelect, MatOption, MatCheckbox, AddressComponent_1, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, McdtxtPipe, ModetxtPipe, CdkTextareaAutosize]
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, RouterLink, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, TabDirective, MatSelect, MatOption, MatCheckbox, AddressComponent_1, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, McdtxtPipe, ModetxtPipe]
 })
 export class MstmemberComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
@@ -358,9 +357,9 @@ export class MstmemberComponent extends BeforeunloadBase implements OnInit, Afte
     }
   }
 
-  getRows(fldnm: BaseField): number {
-    const lines: number = (this.baseCtl[fldnm].value + '\n').split('\n').length - 1;
-    return lines;
+  /** 備考欄の行数：長文でもスクロールせずに全部見えるように、折り返しの分も数える（No.20） */
+  memoRows(fldnm: BaseField): number {
+    return this.usrsrv.textRows(this.baseCtl[fldnm].value, 60, 2);
   }
 
 
