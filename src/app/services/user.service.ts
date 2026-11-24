@@ -61,6 +61,13 @@ export class UserService {
   private staffResolve!: (staff: mwI.Staff) => void;
   /** ログインユーザーの担当者（staff）の読み込みが終わると解決する */
   readonly staffReady: Promise<mwI.Staff> = new Promise(resolve => (this.staffResolve = resolve));
+  private compidResolve!: (id: number) => void;
+  /**
+   * 会社ID（compid）が決まると解決する（ログインした人の情報を読んだとき）。
+   * 画面を直接開いた・読み直したときは、各画面の constructor の時点ではまだ compid が無いので、
+   * 会社で絞るマスタ（分類・担当者など）はこれを待ってから読む
+   */
+  readonly compidReady: Promise<number> = new Promise(resolve => (this.compidResolve = resolve));
   tmstmp: TmStmp = new TmStmp();
   system: System = new System();
   tbldef: mwI.Tbldef[] = [];
@@ -109,6 +116,7 @@ export class UserService {
       this.userInfo = user;
       // console.log('usersrv1', this.userInfo, this.compid);
       this.compid = this.userInfo["https://userids"][0];
+      this.compidResolve(this.compid);
       console.log('usersrv2', this.userInfo, this.compid);
       this.apollo
         .watchQuery<SystemResult>({

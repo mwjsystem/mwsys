@@ -33,6 +33,11 @@ export class BunruiService {
         }
       }`;
 
+    if (Object.keys(this.kbn).length > 0) {
+      return this.kbn;
+    }
+    // 画面を直接開いたときは会社IDがまだ無い（id が無いと問い合わせが失敗して、選択肢が空のままになる）
+    await this.usrsrv.compidReady;
     return new Promise(resolve => {
       if (Object.keys(this.kbn).length > 0) {
         return resolve(this.kbn);

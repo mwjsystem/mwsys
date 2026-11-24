@@ -28,7 +28,8 @@ export class StoreService {
     if (this.loading) {
       return this.loading;
     }
-    this.loading = new Promise<void>(resolve => this.getStore0(resolve));
+    // 画面を直接開いたときは会社IDがまだ無いので、決まってから読む
+    this.loading = this.usrsrv.compidReady.then(() => new Promise<void>(resolve => this.getStore0(resolve)));
     this.loading.finally(() => this.loading = undefined);
     return this.loading;
   }

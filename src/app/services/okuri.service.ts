@@ -25,6 +25,11 @@ export class OkuriService {
   hktime: mwI.Hktime[] = [];
 
   getHokuri(): void {
+    // 画面を直接開いたときは会社IDがまだ無いので、決まってから読む（getHaisou・getHktime も同じ）
+    if (this.usrsrv.compid == null) {
+      this.usrsrv.compidReady.then(() => this.getHokuri());
+      return;
+    }
     const GetMast = gql`
     query get_okuri($id: smallint!) {
       mshokuri(where: {id: {_eq: $id}},order_by: {order: asc}) {
@@ -78,6 +83,10 @@ export class OkuriService {
   }
 
   getHaisou(): void {
+    if (this.usrsrv.compid == null) {
+      this.usrsrv.compidReady.then(() => this.getHaisou());
+      return;
+    }
     const GetMast = gql`
       query get_haisou($id: smallint!) {
         mshaisou(where: {id: {_eq: $id}}) {
@@ -102,6 +111,10 @@ export class OkuriService {
   }
 
   getHktime(): void {
+    if (this.usrsrv.compid == null) {
+      this.usrsrv.compidReady.then(() => this.getHktime());
+      return;
+    }
     const GetMast = gql`
     query get_hktime($id: smallint!){
       mshktime(where: {id: {_eq: $id}}) {

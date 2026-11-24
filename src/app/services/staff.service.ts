@@ -19,7 +19,9 @@ export class StaffService {
   private stfs: StaffRow[] = [];
 
   /** 担当者一覧（tcds）を読み込む。最初の読み込みが終わると解決する */
-  getStaff(): Promise<void> {
+  async getStaff(): Promise<void> {
+    // 画面を直接開いたときは会社IDがまだ無い（id が無いと問い合わせが失敗して、担当者の選択肢が空のままになる）
+    await this.usrsrv.compidReady;
     const GetMast = gql`
     query get_staff($id: smallint!){
       msstaff(where: {id: {_eq: $id}},order_by: {sort:asc_nulls_last}) {
