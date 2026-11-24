@@ -24,16 +24,38 @@ Public Function Con_DB() As Boolean
     Dim vFile  As Variant
     Dim wbDat  As Workbook
     Dim wsDat  As Worksheet
+    Dim pvw    As Object                  '保護ビューのウィンドウ
     Dim i      As Long
     Dim lngEnd As Long
+    Dim strErr As String
 
     Con_DB = False
     vFile = Application.GetOpenFilename("発注勧告データ (*.xlsx),*.xlsx", , "発注勧告データ_yyyymmdd.xlsx を選んでください")
     If VarType(vFile) = vbBoolean Then
         Exit Function
     End If
-    Set gdicVal = CreateObject("Scripting.Dictionary")
+    'ブラウザで保存したファイルに付く「インターネットから取得した」印を外す（保護ビューで開かれないように）
+    On Error Resume Next
+    CreateObject("WScript.Shell").Run "powershell -NoProfile -ExecutionPolicy Bypass -Command ""Unblock-File -LiteralPath '" & Replace(vFile, "'", "''") & "'""", 0, True
+    Err.Clear
     Set wbDat = Workbooks.Open(Filename:=vFile, ReadOnly:=True)
+    If wbDat Is Nothing Then
+        strErr = Err.Description
+        Err.Clear
+        'それでも開けないときは、保護ビューのまま読む
+        Set pvw = Application.ProtectedViewWindows.Open(vFile)
+        If Not pvw Is Nothing Then
+            Set wbDat = pvw.Workbook
+        End If
+        If strErr = "" Then strErr = Err.Description
+    End If
+    On Error GoTo 0
+    If wbDat Is Nothing Then
+        MsgBox "発注勧告データを開けませんでした。" & vbCrLf & strErr & vbCrLf & vbCrLf & _
+               "ファイルを右クリック →「プロパティ」→「許可する」にチェックを入れてから、もう一度実行してください。", vbExclamation
+        Exit Function
+    End If
+    Set gdicVal = CreateObject("Scripting.Dictionary")
     Set wsDat = wbDat.Worksheets("値")
     gstBase = CStr(wsDat.Range("B1").Value)
     lngEnd = wsDat.Cells(wsDat.Rows.Count, 1).End(xlUp).Row
@@ -41,7 +63,11 @@ Public Function Con_DB() As Boolean
         gdicVal.Item(key_of(CStr(wsDat.Cells(i, 1).Value), CStr(wsDat.Cells(i, 2).Value), CStr(wsDat.Cells(i, 3).Value))) = _
             Array(wsDat.Cells(i, 4).Value, wsDat.Cells(i, 5).Value)
     Next
-    wbDat.Close SaveChanges:=False
+    If pvw Is Nothing Then
+        wbDat.Close SaveChanges:=False
+    Else
+        pvw.Close
+    End If
     Con_DB = True
 
 End Function
