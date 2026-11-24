@@ -385,7 +385,9 @@ export class NyuhikService {
   /** 受注明細の金額（受注明細の画面 jmeitbl.calcMei と同じ計算）。数量 suu の分 */
   private calcMoney(m: JmeiRow, suu: number): { money: number; tgenka: number; taxmoney: number; toutmoney: number; tinmoney: number } {
     const tanka = this.num(m.tanka);
-    const money = tanka * suu;
+    // 単価に小数があっても円単位に切り上げる（jmeitbl.calcMei と同じ。No.37）
+    const raw = tanka * suu;
+    const money = Math.sign(raw) * Math.ceil(Math.round(Math.abs(raw) * 1000) / 1000);
     const r = Number(m.taxrate);
     const rate = (m.taxrate == null || m.taxrate === '' || isNaN(r) ? 10 : r) / 100;
     let taxmoney = 0, toutmoney = money, tinmoney = money;

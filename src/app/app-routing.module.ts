@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: 'frmmove', loadChildren: () => import('./frmmove/frmmove.module').then(m => m.FrmmoveModule), canActivate: [AuthGuard] },
   { path: 'frmnyukin', loadChildren: () => import('./frmnyukin/frmnyukin.routes').then(m => m.FRMNYUKIN_ROUTES), canActivate: [AuthGuard] },
   { path: 'frmtana',loadChildren: () => import('./frmtana/frmtana.routes').then(m => m.FRMTANA_ROUTES), canActivate: [AuthGuard] },
+  { path: 'repwait', loadChildren: () => import('./repwait/repwait.routes').then(m => m.REPWAIT_ROUTES), canActivate: [AuthGuard] },
   { path: 'frmkako', loadChildren: () => import('./frmkako/frmkako.routes').then(m => m.FRMKAKO_ROUTES), canActivate: [AuthGuard] },
   { path: 'mstprice', loadChildren: () => import('./mstprice/mstprice.routes').then(m => m.MSTPRICE_ROUTES), canActivate: [AuthGuard] },
   { path: 'frmhgnden', loadChildren: () => import('./frmhgnden/frmhgnden.routes').then(m => m.FRMHGNDEN_ROUTES), canActivate: [AuthGuard] },

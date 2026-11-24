@@ -1,0 +1,73 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span style="font-size: 16px;">入荷待ち一覧（発注の割当）</span>
+</mat-toolbar>
+
+<div class="wait">
+  <div class="sub">
+    在庫種別「8 発注入荷待ち」の受注明細（未出荷）です。発注伝票で入荷日を確定すると、古い受注から発注に割り当たります。
+    入荷（仕入伝票）で引当に変わると、この一覧から消えます。
+  </div>
+  <div class="grid">
+    <label>担当者
+      <select [(ngModel)]="f.tcode">
+        <option value="">すべて</option>
+        @for (s of stfsrv.tcds; track s.value) {@if (s.value) {<option [value]="s.value">{{s.viewval}}</option>}}
+      </select>
+    </label>
+    <label>倉庫
+      <select [(ngModel)]="f.scode">
+        <option value="">すべて</option>
+        @for (s of strsrv.scds; track s.value) {@if (s.value) {<option [value]="s.value">{{s.viewval}}</option>}}
+      </select>
+    </label>
+    <label>商品コード（前方一致） <input [(ngModel)]="f.gcode" (keyup.enter)="find()" style="width: 9em;"></label>
+    <label><input type="checkbox" [(ngModel)]="f.unlinked"> 未割当だけ</label>
+    <button mat-flat-button color="primary" type="button" (click)="find()" [disabled]="busy"><mat-icon>search</mat-icon>検索</button>
+  </div>
+
+  @if (error) {<div class="err">{{error}}</div>}
+  @if (busy) {<div class="sub">読み込んでいます…</div>}
+
+  @if (!busy && !error) {
+    <div class="totals">
+      <span>{{counts.all}} 件</span>
+      <span>割当済 <b>{{counts.linked}}</b> 件（{{counts.suuLinked | number}}）</span>
+      <span class="un">未割当 <b>{{counts.unlinked}}</b> 件（{{counts.suuUnlinked | number}}）</span>
+    </div>
+    @if (rows.length == 0) {
+      <div class="sub">入荷待ちの受注明細はありません。</div>
+    } @else {
+      <table class="tbl">
+        <tr>
+          <th>受注</th><th>受付日</th><th>出荷予定日</th><th>顧客</th><th>担当</th><th>商品</th><th class="num">数量</th><th>倉庫</th>
+          <th>割り当てた発注</th><th>入荷予定日</th><th class="num">発注残</th><th>仕入先</th>
+        </tr>
+        @for (r of rows; track r.denno + ':' + r.line) {
+          <tr [class.unlinked]="r.hdenno == null" [class.late]="late(r)">
+            <td><a href="javascript:void(0)" (click)="openJyu(r)">{{r.denno}}</a><span class="small">-{{r.line}}</span></td>
+            <td>{{r.day | date:'yy/M/d'}}</td>
+            <td>{{r.yday | date:'M/d'}}</td>
+            <td>{{r.mcode}} <span class="small">{{mname(r.mcode)}}</span></td>
+            <td>{{stfsrv.getName(r.tcode ?? '') || r.tcode}}</td>
+            <td><b>{{r.gcode}}</b> <span class="small">{{r.gtext}}</span></td>
+            <td class="num">{{r.suu | number}}</td>
+            <td>{{sname(r.scode)}}</td>
+            @if (r.hdenno != null) {
+              <td><a href="javascript:void(0)" (click)="openHat(r)">{{r.hdenno}}</a><span class="small">-{{r.hline}}</span></td>
+              @if (r.hatzn != null) {
+                <td>{{r.hyday | date:'M/d'}}@if (kbnName(r.hydaykbn)) {<span class="kari">{{kbnName(r.hydaykbn)}}</span>}
+                  @if (late(r)) {<span class="lt">出荷予定に間に合わない</span>}</td>
+                <td class="num">{{r.hatzn | number}}</td>
+              } @else {
+                <td colspan="2" class="small">発注残なし（入荷済か発注取消）</td>
+              }
+              <td class="small">{{vname(r.vcode)}}</td>
+            } @else {
+              <td colspan="4"><span class="unmark">未割当</span>@if (r.spdet) {<span class="small">（{{r.spdet}}）</span>}</td>
+            }
+          </tr>
+        }
+      </table>
+    }
+  }
+</div>
