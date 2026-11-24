@@ -51,7 +51,12 @@ export class OkuriService {
     })
       .valueChanges
       .subscribe(({ data }) => {
-		 (data ? (data as HokuriResult).mshokuri : []).forEach(element => {
+         if (!data) {
+           return;
+         }
+         // 配送方法マスタの画面で保存したあとの読み直しでも重ならないように、入れ直す
+         this.hokuri.splice(0);
+		 (data as HokuriResult).mshokuri.forEach(element => {
             this.hokuri.push({ code: element.code, 
 			                   name: element.code + ' ' + element.name,
 							   htype: element.htype,

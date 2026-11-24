@@ -11,13 +11,13 @@ import { MatIcon } from '@angular/material/icon';
 import { UserService } from './../services/user.service';
 import { StoreService } from './../services/store.service';
 import { OkuriService } from './../services/okuri.service';
-import { EtcDef, EtcField, STAFF_DEF } from './mstetc-defs';
+import { EtcDef, EtcField, EtcOption, STAFF_DEF } from './mstetc-defs';
 
 /** 一覧と入力欄の 1 行（列は表ごとに違うので、キーで読む） */
 type EtcRow = Record<string, string | number | boolean | null>;
 
 /**
- * 担当者マスタ・倉庫マスタのメンテナンス（各マスタ → 担当者マスタ / 倉庫マスタ）。
+ * 小さなマスタのメンテナンス（各マスタ → 担当者・倉庫・配送方法・帳票タイプ・文書マスタ）。
  * 左の一覧で行を選ぶと右に中身が出て、そのまま直して「保存」する。「新規」で空の欄から登録する。
  * どの表を扱うかは、ルートの data.def（mstetc-defs.ts）で決める
  */
@@ -42,6 +42,8 @@ export class MstetcComponent {
   showDel = false;
   /** 一覧の絞り込み（コード・名前など、どの列でも） */
   filter = '';
+  /** ref の欄の選択肢（欄のキーごと） */
+  private refOpts: Record<string, EtcOption[]> = {};
 
   /** 入力欄の中身。null = 何も選んでいない */
   edit: EtcRow | null = null;
@@ -56,10 +58,13 @@ export class MstetcComponent {
     this.title.setTitle(this.def.title + '(MWSystem)');
     // 画面を直接開いたときは会社ID（compid）がまだ無いので、ログインした人の情報を読み終わってから読む
     this.usrsrv.staffReady.then(() => {
-      this.strsrv.getStore().then(() => this.cdRef.detectChanges());
+      if (this.def.fields.some(f => f.type == 'store')) {
+        this.strsrv.getStore().then(() => this.cdRef.detectChanges());
+      }
       if (this.def.fields.some(f => f.type == 'hokuri') && this.okrsrv.hokuri.length == 0) {
         this.okrsrv.getHokuri();
       }
+      this.loadRefs();
       this.load();
     });
   }
@@ -68,58 +73,90 @@ export class MstetcComponent {
     return this.def.fields.filter(f => f.list);
   }
 
+  private isDel(r: EtcRow): boolean {
+    return !!this.def.delKey && !!r[this.def.delKey];
+  }
+
   get shown(): EtcRow[] {
     const q = this.filter.trim().toLowerCase();
-    return this.rows.filter(r => (this.showDel || !r['del'])
+    return this.rows.filter(r => (this.showDel || !this.isDel(r))
       && (!q || ['code', ...this.def.fields.map(f => f.key)].some(k => String(r[k] ?? '').toLowerCase().includes(q))));
   }
 
   get delCount(): number {
-    return this.rows.filter(r => r['del']).length;
+    return this.rows.filter(r => this.isDel(r)).length;
   }
 
-  /** 一覧のセルに出す文字（倉庫・配送方法はコードに名前を付ける） */
+  /** 欄の選択肢。今の値が選択肢に無くても消えないように足す */
+  opts(f: EtcField, cur: unknown): EtcOption[] {
+    let opts: EtcOption[];
+    if (f.type == 'store') {
+      opts = this.strsrv.scds.map(s => ({ value: String(s.value), label: s.value + ' ' + s.viewval }));
+    } else if (f.type == 'hokuri') {
+      opts = this.okrsrv.hokuri.map(h => ({ value: String(h.code), label: h.name }));
+    } else if (f.type == 'ref') {
+      opts = [...(f.extra ?? []), ...(this.refOpts[f.key] ?? [])];
+    } else {
+      opts = f.options ?? [];
+    }
+    if (cur != null && cur !== '' && !opts.some(o => o.value == String(cur))) {
+      opts = [...opts, { value: String(cur), label: cur + '（一覧に無い値）' }];
+    }
+    return opts;
+  }
+
+  /** 一覧のセルに出す文字（選択肢のある欄は名前を付ける） */
   cell(r: EtcRow, f: EtcField): string {
     const v = r[f.key];
+    if (f.type == 'check') {
+      return v ? '○' : '';
+    }
     if (v == null || v === '') {
       return '';
     }
-    if (f.type == 'store') {
-      return v + ' ' + (this.strsrv.scds.find(s => s.value == v)?.viewval ?? '');
-    }
-    if (f.type == 'hokuri') {
-      return this.okrsrv.hokuri.find(h => h.code == v)?.name ?? String(v);
+    if (['store', 'hokuri', 'choice', 'ref'].includes(f.type)) {
+      const o = this.opts(f, null).find(x => x.value == String(v));
+      return o ? (f.type == 'ref' && o.label != String(v) ? v + ' ' + o.label : o.label) : String(v);
     }
     return String(v);
   }
 
-  /** 倉庫の選択肢。今の値が削除済みの倉庫でも消えないように足す */
-  storeOpts(cur: unknown): { value: string; viewval: string }[] {
-    const opts = this.strsrv.scds.map(s => ({ value: String(s.value), viewval: s.value + ' ' + s.viewval }));
-    if (cur && !opts.some(o => o.value == cur)) {
-      opts.push({ value: String(cur), viewval: cur + '（一覧に無い倉庫）' });
-    }
-    return opts;
-  }
-
-  hokuriOpts(cur: unknown): { value: string; viewval: string }[] {
-    const opts = this.okrsrv.hokuri.map(h => ({ value: String(h.code), viewval: h.name }));
-    if (cur && !opts.some(o => o.value == cur)) {
-      opts.push({ value: String(cur), viewval: cur + '（一覧に無い配送方法）' });
-    }
-    return opts;
+  /** 選択肢の value は文字で持つ（数の列も、保存のときに数に戻す） */
+  selValue(v: unknown): string | null {
+    return v == null || v === '' ? null : String(v);
   }
 
   private get cols(): string {
-    return ['code', 'del', ...this.def.fields.map(f => f.key)].join(' ');
+    return ['code', ...(this.def.delKey ? [this.def.delKey] : []), ...this.def.fields.map(f => f.key)].join(' ');
+  }
+
+  /** ref の欄の選択肢を読む */
+  private async loadRefs(): Promise<void> {
+    for (const f of this.def.fields.filter(x => x.type == 'ref' && x.ref)) {
+      const r = f.ref!;
+      const Get = gql`
+        query get_etcref_${r.table}($id: smallint!) {
+          ${r.table}(where: {id: {_eq: $id}}, order_by: {${r.value}: asc}) { ${r.value} ${r.label} }
+        }`;
+      try {
+        const res = await firstValueFrom(this.apollo.query<Record<string, Record<string, unknown>[]>>({
+          query: Get, variables: { id: this.usrsrv.compid }, fetchPolicy: 'network-only'
+        }));
+        this.refOpts[f.key] = (res.data?.[r.table] ?? []).map(x => ({ value: String(x[r.value]), label: String(x[r.label] ?? '') }));
+      } catch (e) {
+        console.log('error mstetc ref', r.table, e);
+      }
+    }
+    this.cdRef.detectChanges();
   }
 
   async load(): Promise<void> {
     this.error = '';
     const t = this.def.table;
+    const order = (this.def.sortKey ? `{${this.def.sortKey}: asc_nulls_last}, ` : '') + '{code: asc}';
     const Get = gql`
       query get_etc_${t}($id: smallint!) {
-        ${t}(where: {id: {_eq: $id}}, order_by: [{sort: asc_nulls_last}, {code: asc}]) { ${this.cols} }
+        ${t}(where: {id: {_eq: $id}}, order_by: [${order}]) { ${this.cols} }
       }`;
     try {
       const res = await firstValueFrom(this.apollo.query<Record<string, EtcRow[]>>({
@@ -145,6 +182,17 @@ export class MstetcComponent {
     return !this.dirty || confirm('保存していない変更があります。捨てますか？');
   }
 
+  /** 入力欄に出す中身（選択肢の欄は文字にそろえる） */
+  private toEdit(r: EtcRow): EtcRow {
+    const e: EtcRow = { ...r };
+    for (const f of this.def.fields) {
+      if (['store', 'hokuri', 'choice', 'ref'].includes(f.type)) {
+        e[f.key] = this.selValue(e[f.key]);
+      }
+    }
+    return e;
+  }
+
   select(r: EtcRow) {
     if (this.edit && !this.isNew && this.edit['code'] == r['code']) {
       return;
@@ -153,7 +201,7 @@ export class MstetcComponent {
       return;
     }
     this.isNew = false;
-    this.edit = { ...r };
+    this.edit = this.toEdit(r);
     this.orig = JSON.stringify(this.edit);
     this.error = '';
   }
@@ -162,7 +210,10 @@ export class MstetcComponent {
     if (!this.okToLeave()) {
       return;
     }
-    const r: EtcRow = { code: '', del: false };
+    const r: EtcRow = { code: '' };
+    if (this.def.delKey) {
+      r[this.def.delKey] = false;
+    }
     this.def.fields.forEach(f => r[f.key] = f.type == 'check' ? false : null);
     this.isNew = true;
     this.edit = r;
@@ -185,12 +236,15 @@ export class MstetcComponent {
     if (!code) {
       return 'コードを入れてください';
     }
-    if (this.isNew && this.rows.some(r => r['code'] == code)) {
-      return 'コード ' + code + ' はもう使われています' + (this.rows.find(r => r['code'] == code)?.['del'] ? '（' + this.def.delLabel + 'の行）' : '');
+    if (this.isNew) {
+      const same = this.rows.find(r => r['code'] == code);
+      if (same) {
+        return 'コード ' + code + ' はもう使われています' + (this.isDel(same) ? '（' + this.def.delLabel + 'の行）' : '');
+      }
     }
     for (const f of this.def.fields) {
       const v = e[f.key];
-      if (f.req && (v == null || String(v).trim() === '')) {
+      if (f.req && f.type != 'check' && (v == null || String(v).trim() === '')) {
         return f.label + 'を入れてください';
       }
       if (f.type == 'int' && v != null && String(v).trim() !== '' && !/^-?\d+$/.test(String(v).trim())) {
@@ -202,14 +256,17 @@ export class MstetcComponent {
 
   /** 保存する値（空の文字は null、整数の欄は数にする） */
   private values(e: EtcRow): EtcRow {
-    const v: EtcRow = { del: !!e['del'] };
+    const v: EtcRow = {};
+    if (this.def.delKey) {
+      v[this.def.delKey] = !!e[this.def.delKey];
+    }
     for (const f of this.def.fields) {
       const x = e[f.key];
       if (f.type == 'check') {
         v[f.key] = !!x;
       } else if (x == null || String(x).trim() === '') {
         v[f.key] = null;
-      } else if (f.type == 'int') {
+      } else if (f.type == 'int' || (f.type == 'ref' && f.ref?.num)) {
         v[f.key] = Number(String(x).trim());
       } else {
         v[f.key] = String(x).trim();
@@ -258,15 +315,15 @@ export class MstetcComponent {
       } else {
         this.rows.push({ ...saved });
       }
-      // 担当者・倉庫の選択肢（ほかの画面と共用）は refetchQueries で読み直され、サービスの一覧も入れ替わる
+      // 担当者・倉庫・配送方法の選択肢（ほかの画面と共用）は refetchQueries で読み直され、サービスの一覧も入れ替わる
       this.isNew = false;
-      this.edit = { ...saved };
+      this.edit = this.toEdit(saved);
       this.orig = JSON.stringify(this.edit);
       this.usrsrv.toastSuc(this.def.title + 'を保存しました：' + code);
     } catch (e) {
       const msg = (e as Error).message;
       this.error = '保存できませんでした：' + msg
-        + (/not found in type|no mutations exist/.test(msg) ? '\n（Hasura で staff の insert / update の権限がまだ付いていません。db/20261206_mstetc.sql の手順で付けてください）' : '');
+        + (/not found in type|no mutations exist/.test(msg) ? '\n（Hasura で staff の insert / update の権限がまだ付いていません。db/ の手順書のとおりに付けてください）' : '');
       console.log('error mstetc save', e);
     }
     this.busy = false;
