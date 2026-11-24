@@ -1,0 +1,94 @@
+<mat-toolbar [color]="edit ? (isNew ? 'accent' : 'warn') : 'primary'" class="toolbar mat-elevation-z8">
+  <div class="flex flex-nowrap items-center" style="gap: 6px;">
+    <span style="font-size: 16px; margin-right: 12px;">{{def.title}}</span>
+    <button mat-flat-button [color]="edit ? (isNew ? 'accent' : 'warn') : 'primary'" (click)="newRow()" [disabled]="busy"><mat-icon>add_box</mat-icon>新規</button>
+    @if (edit) {
+      <button mat-flat-button [color]="isNew ? 'accent' : 'warn'" (click)="save()" [disabled]="busy"><mat-icon>save</mat-icon>保存</button>
+      <button mat-flat-button [color]="isNew ? 'accent' : 'warn'" (click)="cancel()" [disabled]="busy"><mat-icon>cancel</mat-icon>中止</button>
+    }
+  </div>
+</mat-toolbar>
+
+<div class="page">
+  <div class="note">{{def.note}}</div>
+  @if (error) {<div class="err">{{error}}</div>}
+
+  <div class="body">
+    <!-- 一覧 -->
+    <div class="list">
+      <div class="bar">
+        <input [(ngModel)]="filter" placeholder="絞り込み（コード・名前など）" style="width: 16em;">
+        <label><input type="checkbox" [(ngModel)]="showDel"> {{def.delLabel}}も出す（{{delCount}} 件）</label>
+        <span class="sub">{{shown.length}} 件</span>
+      </div>
+      <div class="scroll">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>コード</th>
+              @for (f of listFields; track f.key) {<th [class.num]="f.type == 'int'">{{f.label}}</th>}
+              <th>{{def.delLabel}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of shown; track r['code']) {
+              <tr (click)="select(r)" [class.sel]="edit && !isNew && edit['code'] == r['code']" [class.off]="r['del']">
+                <td>{{r['code']}}</td>
+                @for (f of listFields; track f.key) {<td [class.num]="f.type == 'int'">{{cell(r, f)}}</td>}
+                <td>{{r['del'] ? def.delLabel : ''}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 入力欄 -->
+    @if (edit) {
+      <fieldset class="form">
+        <legend>{{isNew ? '新規登録' : '編集'}}</legend>
+        <label class="fld">
+          <span class="lbl">コード<b class="req">*</b></span>
+          <input [(ngModel)]="edit['code']" [disabled]="!isNew" style="width: 8em;">
+          <span class="sub">{{def.codeHint}}</span>
+        </label>
+        @for (f of def.fields; track f.key) {
+          <label class="fld">
+            <span class="lbl">{{f.label}}@if (f.req) {<b class="req">*</b>}</span>
+            @switch (f.type) {
+              @case ('store') {
+                <select [(ngModel)]="edit[f.key]">
+                  <option [ngValue]="null"></option>
+                  @for (o of storeOpts(edit[f.key]); track o.value) {<option [ngValue]="o.value">{{o.viewval}}</option>}
+                </select>
+              }
+              @case ('hokuri') {
+                <select [(ngModel)]="edit[f.key]">
+                  <option [ngValue]="null"></option>
+                  @for (o of hokuriOpts(edit[f.key]); track o.value) {<option [ngValue]="o.value">{{o.viewval}}</option>}
+                </select>
+              }
+              @case ('memo') {
+                <textarea [(ngModel)]="edit[f.key]" rows="3" cols="50"></textarea>
+              }
+              @case ('check') {
+                <input type="checkbox" [(ngModel)]="edit[f.key]">
+              }
+              @default {
+                <input [(ngModel)]="edit[f.key]" [style.width.em]="f.width ?? 12" [class.num]="f.type == 'int'">
+              }
+            }
+            @if (f.hint) {<span class="sub">{{f.hint}}</span>}
+          </label>
+        }
+        <label class="fld">
+          <span class="lbl">{{def.delLabel}}</span>
+          <input type="checkbox" [(ngModel)]="edit['del']">
+          <span class="sub">付けると選択肢に出なくなります（行は消えません）</span>
+        </label>
+      </fieldset>
+    } @else {
+      <div class="form empty">左の一覧から選ぶと、ここで直せます。新しく登録するときは「新規」。</div>
+    }
+  </div>
+</div>
