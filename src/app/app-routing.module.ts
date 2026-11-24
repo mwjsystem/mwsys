@@ -34,6 +34,7 @@ const routes: Routes = [
   { path: 'frmship', loadChildren: () => import('./frmship/frmship.module').then(m => m.FrmshipModule), canActivate: [AuthGuard] },
   { path: 'frminvoice', loadChildren: () => import('./frminvoice/frminvoice.module').then(m => m.FrminvoiceModule), canActivate: [AuthGuard] },
   { path: 'frmsupply', loadChildren: () => import('./frmsupply/frmsupply.module').then(m => m.FrmsupplyModule), canActivate: [AuthGuard] },
+  { path: 'frmkankoku', loadChildren: () => import('./frmkankoku/frmkankoku.module').then(m => m.FrmkankokuModule), canActivate: [AuthGuard] },
   { path: 'frmsiire', loadChildren: () => import('./frmsiire/frmsiire.module').then(m => m.FrmsiireModule), canActivate: [AuthGuard] },
   { path: 'frmkeep', loadChildren: () => import('./frmkeep/frmkeep.module').then(m => m.FrmkeepModule), canActivate: [AuthGuard] },
   { path: 'frmtreat', loadChildren: () => import('./frmtreat/frmtreat.module').then(m => m.FrmtreatModule), canActivate: [AuthGuard] },

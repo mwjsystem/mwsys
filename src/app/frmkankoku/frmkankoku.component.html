@@ -1,0 +1,93 @@
+<mat-toolbar color="primary" class="toolbar mat-elevation-z8">
+  <span>発注勧告</span>
+  @if (busy) {
+    <span class="busy">読み込んでいます…</span>
+  }
+</mat-toolbar>
+<p class="note">
+  今月の発注勧告.xlsm を選ぶと、① Span マクロ用のデータ（受注可・発注残・前月の出荷数・6 か月の発注数・最短入荷日）と、② data シートからの発注伝票を用意します。
+  Span マクロは「発注勧告データ_yyyymmdd.xlsx」を読む Module1（batch/hatkankoku/Module1.bas）に差し替えて使います。
+</p>
+<div class="bar">
+  <label>基準日 <input type="date" [(ngModel)]="baseDay"></label>
+  <input #fx type="file" accept=".xlsx,.xlsm" hidden (change)="onFile($event)">
+  <button mat-flat-button color="primary" type="button" (click)="fx.click()" [disabled]="busy"><mat-icon>upload_file</mat-icon>発注勧告.xlsm を選ぶ</button>
+  @if (fileName) {
+    <span>{{fileName}}</span>
+    <button mat-button type="button" (click)="reload()" [disabled]="busy"><mat-icon>refresh</mat-icon>基準日で計算し直す</button>
+  }
+</div>
+@if (error) {<p class="err">{{error}}</p>}
+
+@if (fileName) {
+  <h3>① Span マクロ用のデータ</h3>
+  <div class="bar">
+    <span>基準日 {{calcDay}}　対象 {{items.length | number}} 品目（加工品 {{kako.length | number}} 件）</span>
+    <button mat-flat-button color="primary" type="button" (click)="dataExcel()" [disabled]="busy || rows.length == 0"><mat-icon>download</mat-icon>発注勧告データ.xlsx を出力</button>
+  </div>
+  <p class="note">
+    受注可＝朝来（01・001・015）の在庫 − 01・001 の受注残。【関東倉庫】の品番は 016。加工品の出荷数と、ヘッドガードの受注可は追加先に足しています。
+    発注残は 01（関東倉庫は 016）。発注数は発注月ごとの発注残、最短入荷日は発注残のある明細の入荷予定日。2019-06-28 より前の発注は見ません。
+  </p>
+  <div class="scroll">
+    <table class="rep">
+      <thead>
+        <tr>
+          <th>行</th><th>発注品番</th><th>品名</th><th>仕入先</th><th>受注可</th><th>発注残</th><th>前月出荷</th>
+          @for (ym of months; track ym) {<th>{{ym.slice(4)}}月発注</th>}
+          <th>最短入荷日</th><th>数量</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of rows; track r.row) {
+          <tr>
+            <td class="num">{{r.row}}</td><td>{{r.code}}</td><td>{{r.gtext}}</td><td>{{r.vname}}</td>
+            <td class="num" [class.minus]="r.kano < 0">{{r.kano | number}}</td><td class="num">{{r.zan | number}}</td><td class="num">{{r.syuk | number}}</td>
+            @for (v of r.months; track $index) {<td class="num">{{v ? (v | number) : ''}}</td>}
+            <td>{{r.inday}}</td><td class="num">{{r.insuu ? (r.insuu | number) : ''}}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h3>② 発注伝票の登録（data シート）</h3>
+  <p class="note">
+    Make_data で作った data シートの行を、仕入先・倉庫（【関東倉庫】は 016、それ以外は 01）・発注日ごとの発注伝票にします。
+    原価は発注日より前の最新の単価マスタ、入荷予定日は data シートの入荷予定日（予定）です。xlsm を保存してから選び直すと、最新の data シートを読みます。
+  </p>
+  @if (slipErrors.length > 0) {
+    <div class="err">
+      <b>登録できない行があります。発注勧告.xlsm を直してから選び直してください。</b>
+      <ul>@for (e of slipErrors; track $index) {<li>{{e}}</li>}</ul>
+    </div>
+  }
+  @if (made.length > 0 && done.length == 0) {
+    <div class="warn">
+      同じ発注日に、発注勧告から作った発注伝票がもうあります（{{made.length}} 枚：@for (m of made; track m.denno) {<span class="ord">{{m.denno}}（{{m.vcode}}）</span>}）。
+      <label class="chk"><input type="checkbox" [(ngModel)]="force">それでも登録する</label>
+    </div>
+  }
+  <div class="bar">
+    <span>発注伝票 {{slips.length | number}} 枚　{{slipTotal.lines | number}} 行　数量 {{slipTotal.suu | number}}</span>
+    <button mat-flat-button color="primary" type="button" (click)="register()" [disabled]="!canRegister"><mat-icon>playlist_add</mat-icon>発注伝票を登録</button>
+  </div>
+  @if (oError) {<p class="err">{{oError}}</p>}
+  @if (done.length > 0) {
+    <p class="ok">登録しました。発注伝票番号：@for (d of done; track d.denno) {<span class="ord">{{d.denno}}（{{d.vcode}}）</span>}（発注伝票の画面で開けます）</p>
+  }
+  <div class="scroll short">
+    <table class="rep">
+      <thead><tr><th>仕入先</th><th>倉庫</th><th>発注日</th><th>通貨</th><th>行数</th><th>数量</th><th>金額</th><th>明細（品番：数量／入荷予定日）</th></tr></thead>
+      <tbody>
+        @for (s of slips; track s.vcode + s.scode + s.day) {
+          <tr>
+            <td>{{s.vcode}} {{s.vname}}</td><td>{{s.scode}}</td><td>{{s.day}}</td><td>{{s.currency}}</td>
+            <td class="num">{{s.lines.length | number}}</td><td class="num">{{lineSum(s) | number}}</td><td class="num">{{s.gtotal | number:'1.0-2'}}</td>
+            <td class="lines">@for (l of s.lines; track l.row) {<span class="ord">{{l.gcode}}：{{l.suu | number}}@if (l.yday) {／{{l.yday.slice(5)}}}@if (!l.genka) {<b class="minus">（原価なし）</b>}</span>}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
