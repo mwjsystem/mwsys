@@ -269,11 +269,11 @@
         <div class="flex flex-wrap gap-2">
           <mat-form-field appearance="outline" class="mwj-field w-full">
             <mat-label>伝票備考</mat-label>
-            <textarea matInput id="txt1" tabIndex="21" [rows]="getRows('dmemo')" formControlName="dmemo"></textarea>
+            <textarea matInput id="txt1" tabIndex="21" cdkTextareaAutosize cdkAutosizeMinRows="2" formControlName="dmemo"></textarea>
           </mat-form-field>
           <mat-form-field appearance="outline" class="mwj-field w-full">
             <mat-label>マスタ備考</mat-label>
-            <textarea matInput id="txt2" tabIndex="22" [rows]="getRows('memo')" formControlName="memo"></textarea>
+            <textarea matInput id="txt2" tabIndex="22" cdkTextareaAutosize cdkAutosizeMinRows="2" formControlName="memo"></textarea>
           </mat-form-field>
     </div>
   </form>

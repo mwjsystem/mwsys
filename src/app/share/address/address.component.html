@@ -1,7 +1,9 @@
-<form formGroupName="{{formName()}}" ngNativeValidate class="flex flex-wrap space-x-4">
+<form formGroupName="{{formName()}}" ngNativeValidate class="flex flex-wrap gap-x-4 items-center">
   @if (formName() !== 'addr') {
     <mat-checkbox formControlName="target">ＤＭ一括送信対象</mat-checkbox>
   }
+  <!-- 項目をまとまりごとに分けて見出しを付ける（No.28） -->
+  <div class="adr-sec">住所</div>
   <mat-form-field>
     <mat-label>郵便番号(ハイフンなし)</mat-label>
     <input tabIndex="101" matInput formControlName="zip" [required]="this.formName()!='addr1'" size="7" maxlength="7"
@@ -32,6 +34,7 @@
     <input tabIndex="106" matInput formControlName="extend2">
   </mat-form-field>
 }
+<div class="adr-sec">電話</div>
 <mat-form-field>
   <mat-label>電話番号</mat-label>
   <input tabIndex="107" matInput formControlName="tel" (change)="updTel('tel',$event)"
@@ -49,6 +52,7 @@
   <mat-label>FAX番号</mat-label>
   <input tabIndex="110" matInput formControlName="fax" (change)="updTel('fax',$event)">
 </mat-form-field>
+<div class="adr-sec">宛名（納品書・送り状に出る名前）</div>
 <mat-form-field style="width:20em">
   <mat-label>住所宛名</mat-label>
   <input tabIndex="111" matInput formControlName="adrname" [required]="this.formName()!='addr1'">
@@ -64,6 +68,7 @@
   </mat-select>
 </mat-form-field>
 <mat-checkbox formControlName="del">削除済</mat-checkbox>
+<div class="adr-sec">備考（この住所に送るときの伝票に入る）</div>
 <div class="flex flex-wrap" style="width: 100%;">
   <mat-form-field class="txtar">
     <mat-label>納品書備考</mat-label>

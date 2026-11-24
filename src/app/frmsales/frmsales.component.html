@@ -188,6 +188,10 @@
         <button mat-icon-button (click)="mcdHelp('mcode')">
           <mat-icon>find_replace</mat-icon>
         </button>
+        <!-- 新規顧客（No.27）：別のタブで顧客マスタの新規登録を開く。登録すると、受注先が空ならこの伝票に入る -->
+        <button mat-icon-button (click)="newMember()" matTooltip="新規顧客を登録（別のタブ）。登録すると受注先に入ります" matTooltipClass="ttips">
+          <mat-icon>person_add</mat-icon>
+        </button>
       }
       <span class="inline-block align-middle">{{form.getRawValue().mcode | mcdtxt}}</span>
       @if (form.value.mcode) {
@@ -456,8 +460,15 @@
   <div class="flex flex-wrap gap-2">
     <mat-form-field appearance="outline" class="mwj-field w-full">
       <mat-label>納品先住所</mat-label>
-      <textarea matInput id="txt0" [value]="jmisrv.address" matTextareaAutosize disabled></textarea>
+      <textarea matInput id="txt0" [value]="jmisrv.address" cdkTextareaAutosize disabled></textarea>
     </mat-form-field>
+    <!-- 顧客マスタの伝票備考（No.16・20）。長文でもスクロールせずに全部見えるように、内容に合わせて高さを変える -->
+    @if (jmisrv.dmemo) {
+      <mat-form-field appearance="outline" class="mwj-field w-full">
+        <mat-label>顧客マスタの伝票備考</mat-label>
+        <textarea matInput id="txt5" [value]="jmisrv.dmemo" cdkTextareaAutosize readonly tabindex="-1"></textarea>
+      </mat-form-field>
+    }
     <mat-form-field appearance="outline" class="mwj-field w-full">
       <mat-label>伝票備考</mat-label>
       <textarea matInput id="txt1" [rows]="getRows('dmemo')" formControlName="dmemo"></textarea>

@@ -14,7 +14,7 @@ import { BunruiService } from './../services/bunrui.service';
 import { BunshoService } from './../services/bunsho.service';
 import { OkuriService } from './../services/okuri.service';
 import { StaffService } from './../services/staff.service';
-import { MembsService } from './membs.service';
+import { MembsService, MEMBER_CHANNEL, MemberCreated } from './membs.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { BeforeunloadBase } from '../beforeunload-base';
 import { AdredaComponent } from './../share/adreda/adreda.component';
@@ -33,6 +33,7 @@ import { AddressComponent as AddressComponent_1 } from '../share/address/address
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
 import { McdtxtPipe } from '../core/pipes/mcdtxt.pipe';
 import { ModetxtPipe } from '../core/pipes/modetxt.pipe';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 /** get_member クエリの結果 */
 interface MemberResult { msmember_by_pk: mwI.Member | null }
@@ -66,7 +67,7 @@ class Sval {
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
     },
-    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, RouterLink, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, TabDirective, MatSelect, MatOption, MatCheckbox, AddressComponent_1, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, McdtxtPipe, ModetxtPipe]
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, FormsModule, MatIconButton, RouterLink, ReactiveFormsModule, MatCard, MatCardHeader, MatCardTitle, TmstmpComponent, MatCardContent, MatFormField, MatLabel, MatInput, TabDirective, MatSelect, MatOption, MatCheckbox, AddressComponent_1, MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, McdtxtPipe, ModetxtPipe, CdkTextareaAutosize]
 })
 export class MstmemberComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
   usrsrv = inject(UserService);
@@ -184,7 +185,11 @@ export class MstmemberComponent extends BeforeunloadBase implements OnInit, Afte
       }
       this.refresh();
       const mcd = params.get('mcd');
-      if (mcd === null) {
+      if (this.mode == 1) {
+        // 受注伝票の「新規顧客」から /mstmember/1/new で開いたとき：空の新規登録にする（No.27）
+        this.modeToCre();
+        this.cdRef.detectChanges();
+      } else if (mcd === null) {
         // this.mcd = '読込中です！';
         // this.refresh();
       } else {
@@ -575,6 +580,14 @@ export class MstmemberComponent extends BeforeunloadBase implements OnInit, Afte
         }
 
         this.usrsrv.toastSuc('顧客コード' + this.mcd + 'を新規登録しました');
+        // 受注伝票のタブへ知らせる（受注先が空なら、その伝票に入る）
+        try {
+          const ch = new BroadcastChannel(MEMBER_CHANNEL);
+          ch.postMessage({ mcode: this.mcd } as MemberCreated);
+          ch.close();
+        } catch {
+          // BroadcastChannel が使えないブラウザでは知らせない
+        }
         this.mode = 3;
         this.form.disable();
         this.form.markAsPristine();

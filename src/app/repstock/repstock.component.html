@@ -136,6 +136,10 @@
               }
             </mat-select>
           </mat-form-field>
+          @if (stcsrv.stcGcd && (stgds.gskbn=='0' || stgds.gskbn=='1')) {
+            <button mat-stroked-button type="button" class="ml-2 self-center" (click)="showStcscds()"
+              matTooltip="この商品の在庫・受注可能数を倉庫ごとに一覧にします">全倉庫の在庫</button>
+          }
         </div>
       </legend>
       @if (isLoading2) {

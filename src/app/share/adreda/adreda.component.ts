@@ -43,10 +43,15 @@ export class AdredaComponent implements OnInit, AfterViewInit {
   edaOld!: number;
   flg: boolean; //true⇒枝番をセットボタン表示
 
+  /** 見出しに出す「顧客コード 顧客名」 */
+  label: string;
+
   constructor() {
     const data = inject(MAT_DIALOG_DATA);
 
-    this.memsrv.mcode = data.mcode;
+    // 呼び出し元は「コード 名前」「コード(名前)」の形で渡すので、保存に使う顧客コードは先頭だけにする（No.39：名前付きのまま保存して登録できなかった）
+    this.label = String(data.mcode ?? '');
+    this.memsrv.mcode = this.label.trim().split(/[\s(（]/)[0];
     this.eda = data.eda;
     this.flg = data.flg;
   }
@@ -95,10 +100,12 @@ export class AdredaComponent implements OnInit, AfterViewInit {
     this.form.enable();
     this.edaOld = +this.eda;
     this.eda = "新規登録";
+    // 備考は基本住所のものを初期値にする（住所を読んでいない画面から開いたときは空）
+    const base = this.memsrv.adrs.find(a => a.eda == 0);
     const memos = {
-      nmemo: this.memsrv.adrs[0].nmemo,
-      smemo: this.memsrv.adrs[0].smemo,
-      omemo: this.memsrv.adrs[0].omemo,
+      nmemo: base?.nmemo ?? '',
+      smemo: base?.smemo ?? '',
+      omemo: base?.omemo ?? '',
       htitle: '0'
     };
     this.addrForm.patchValue(memos);
@@ -145,7 +152,8 @@ export class AdredaComponent implements OnInit, AfterViewInit {
 
   setPrev() {
     let i: number = this.memsrv.adrs.findIndex(obj => obj.eda == this.eda);
-    if (i > 0 && this.memsrv.adrs[i].eda > 10) {
+    // 前の別納先（枝番 10 以上）へ。基本住所・その他住所には戻らない
+    if (i > 0 && this.memsrv.adrs[i - 1].eda >= 10) {
       this.eda = this.memsrv.adrs[i - 1].eda;
     }
     this.refresh();

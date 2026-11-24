@@ -2,15 +2,12 @@ import { Component, AfterViewInit, OnDestroy, ChangeDetectionStrategy, ChangeDet
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { DatePipe } from '@angular/common';
-import { firstValueFrom } from 'rxjs';
-import { Apollo } from 'apollo-angular';
-import gql from 'graphql-tag';
 import type { IScannerControls } from '@zxing/browser';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { UserService } from './../services/user.service';
 import { StoreService } from './../services/store.service';
-import { GzaiRef, StGds, StockService } from './../services/stock.service';
+import { StGds, StockService } from './../services/stock.service';
 import { TanaGoods, TanaService } from './../frmtana/tana.service';
 
 /** 倉庫ごとの在庫（1 行） */
@@ -51,7 +48,6 @@ export class StockscanComponent implements AfterViewInit, OnDestroy {
   private strsrv = inject(StoreService);
   private stcsrv = inject(StockService);
   private tanasrv = inject(TanaService);
-  private apollo = inject(Apollo);
   private title = inject(Title);
   private cdRef = inject(ChangeDetectorRef);
 
@@ -232,45 +228,18 @@ export class StockscanComponent implements AfterViewInit, OnDestroy {
   }
 
   /** 在庫品：倉庫ごとの在庫 */
-  private async stockRows(gcode: string): Promise<StockRow[]> {
-    const rows = await Promise.all(this.strsrv.scds.filter(s => s.value).map(async s => {
-      const st = (await this.stcsrv.getStock(gcode, '0', String(s.value), undefined, true))[0];
-      if (!st) {
-        return null;
-      }
-      const hikat = st.hikat || 0;
-      const keepd = st.keepd || 0;
-      const kakod = st.kakod || 0;
-      const stock = st.stock || 0;
-      return { scode: String(s.value), name: s.viewval, stock, pable: stock - hikat - keepd - kakod, hikat, keepd, kakod, mine: s.value == this.myScode } as StockRow;
-    }));
-    return this.sortRows(rows.filter((r): r is StockRow => r != null));
+  private stockRows(gcode: string): Promise<StockRow[]> {
+    return this.storeRows(gcode, '0');
   }
 
   /** セット品：構成品の在庫から、倉庫ごとに受注可能数を出す */
-  private async setRows(gcode: string): Promise<StockRow[]> {
-    const Get = gql`
-      query get_setzai($id: smallint!, $gcode: String!) {
-        msgoods(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
-          msgzais { zcode irisu msgoods { gskbn } }
-        }
-      }`;
-    const res = await firstValueFrom(this.apollo.query<{ msgoods: { msgzais: GzaiRef[] }[] }>({
-      query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, gcode }
-    }));
-    const zais = res.data?.msgoods[0]?.msgzais ?? [];
-    if (zais.length == 0) {
-      return [];
-    }
-    const rows = await Promise.all(this.strsrv.scds.filter(s => s.value).map(async s => {
-      const parts = await this.stcsrv.getSetZai(String(s.value), zais);
-      if (parts.length == 0) {
-        return null;
-      }
-      const pable = this.stcsrv.getPaabl(parts);
-      return { scode: String(s.value), name: s.viewval, stock: null, pable: pable == 9999 ? 0 : pable, hikat: 0, keepd: 0, kakod: 0, mine: s.value == this.myScode } as StockRow;
-    }));
-    return this.sortRows(rows.filter((r): r is StockRow => r != null));
+  private setRows(gcode: string): Promise<StockRow[]> {
+    return this.storeRows(gcode, '1');
+  }
+
+  private async storeRows(gcode: string, gskbn: string): Promise<StockRow[]> {
+    const rows = await this.stcsrv.byStore(gcode, gskbn, this.strsrv.scds);
+    return this.sortRows(rows.map(r => ({ ...r, mine: r.scode == this.myScode })));
   }
 
   /** この端末の倉庫を先頭に、あとは倉庫の並び順 */

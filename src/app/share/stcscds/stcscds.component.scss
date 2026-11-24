@@ -1,0 +1,35 @@
+.stcs {
+  border-collapse: collapse;
+  min-width: 420px;
+  th, td {
+    padding: 4px 10px;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap;
+  }
+  th {
+    text-align: left;
+    font-weight: bold;
+    background: #f3f3f3;
+  }
+  .num {
+    text-align: right;
+  }
+  .minus {
+    color: #c62828;
+    font-weight: bold;
+  }
+  tfoot td {
+    font-weight: bold;
+    border-top: 2px solid #999;
+  }
+}
+
+.note {
+  margin: 6px 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.err {
+  color: #c62828;
+}

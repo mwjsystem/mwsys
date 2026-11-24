@@ -35,3 +35,22 @@ tr.mat-header-row {
     text-align: right;
     margin:0px;
 }
+
+// 住所の入力欄のまとまりの見出し（address.component、No.28）
+.adr-sec {
+    flex-basis: 100%;
+    margin: 6px 0 2px;
+    padding-bottom: 2px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    border-bottom: 1px solid #ddd;
+}
+
+// 別納先ダイアログの説明（adreda.component、No.28）
+.hint {
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.5;
+}

@@ -20,6 +20,7 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { MatFormField, MatInput, MatSuffix, MatLabel } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatSelect, MatOption } from '@angular/material/select';
@@ -36,7 +37,7 @@ interface GoodResult { msgoods_by_pk: Pick<StGds, 'gtext' | 'gskbn' | 'unit' | '
     templateUrl: './repstock.component.html',
     styleUrls: ['./../app.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatToolbar, MatFormField, MatInput, FormsModule, MatIconButton, MatSuffix, MatIcon, MatButton, MatCard, MatCardContent, MatLabel, MatSelect, MatOption, MatProgressSpinner, GzaitblComponent, TrantblComponent, DecimalPipe]
+    imports: [MatToolbar, MatFormField, MatInput, FormsModule, MatIconButton, MatSuffix, MatIcon, MatButton, MatCard, MatCardContent, MatLabel, MatSelect, MatOption, MatProgressSpinner, GzaitblComponent, TrantblComponent, DecimalPipe, MatTooltip]
 })
 export class RepstockComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
@@ -156,12 +157,16 @@ export class RepstockComponent implements OnInit, AfterViewInit {
       }
     );
   }
+  /** 全倉庫在庫数（No.26）：表示中の商品の在庫・受注可能数を倉庫ごとに出す */
   showStcscds(): void {
+    if (!this.stcsrv.stcGcd) {
+      return;
+    }
     let dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
-    let dialogRef = this.dialog.open(StcscdsComponent, dialogConfig);
-
-
+    dialogConfig.maxWidth = '95vw';
+    dialogConfig.data = { gcode: this.stcsrv.stcGcd, gtext: this.stgds.gtext, gskbn: this.stgds.gskbn, unit: this.stgds.unit };
+    this.dialog.open(StcscdsComponent, dialogConfig);
   }
   setGname(): void {
 

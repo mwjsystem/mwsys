@@ -1,8 +1,64 @@
 <h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle style="cursor: move;">
-    全倉庫在庫数</h1>
+  全倉庫在庫数　{{data.gcode}} {{data.gtext}}</h1>
 <mat-dialog-content>
-    <span>作成中</span>
+  @if (busy) {
+    <div class="flex items-center gap-2">
+      <mat-progress-spinner mode="indeterminate" [diameter]="24"></mat-progress-spinner>倉庫ごとの在庫を読んでいます…
+    </div>
+  } @else if (error) {
+    <div class="err">{{error}}</div>
+  } @else if (data.gskbn != '0' && data.gskbn != '1') {
+    <div>在庫を管理しない商品です。</div>
+  } @else {
+    @if (data.gskbn == '1') {
+      <div class="note">セット品です。構成品の在庫から受注可能数を出しています。</div>
+    }
+    @if (shown.length == 0) {
+      <div>在庫のある倉庫がありません。</div>
+    } @else {
+      <table class="stcs">
+        <thead>
+          <tr>
+            <th>倉庫</th>
+            @if (data.gskbn == '0') {<th>在庫</th>}
+            <th>受注可能</th>
+            @if (data.gskbn == '0') {<th>引当</th><th>キープ</th><th>加工依頼</th>}
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of shown; track r.scode) {
+            <tr>
+              <td>{{r.scode}} {{r.name}}</td>
+              @if (data.gskbn == '0') {<td class="num">{{r.stock}}</td>}
+              <td class="num" [class.minus]="r.pable < 0">{{r.pable}}</td>
+              @if (data.gskbn == '0') {
+                <td class="num">{{r.hikat || ''}}</td>
+                <td class="num">{{r.keepd || ''}}</td>
+                <td class="num">{{r.kakod || ''}}</td>
+              }
+            </tr>
+          }
+        </tbody>
+        @if (data.gskbn == '0' && rows.length > 1) {
+          <tfoot>
+            <tr>
+              <td>合計</td>
+              <td class="num">{{total.stock}}</td>
+              <td class="num" [class.minus]="total.pable < 0">{{total.pable}}</td>
+              <td class="num">{{total.hikat || ''}}</td>
+              <td class="num">{{total.keepd || ''}}</td>
+              <td class="num">{{total.kakod || ''}}</td>
+            </tr>
+          </tfoot>
+        }
+      </table>
+      <div class="note">単位：{{data.unit || '個'}}</div>
+    }
+  }
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-stroked-button type="button" (click)="close()">閉じる</button>
+  @if (!busy && !error) {
+    <button mat-stroked-button type="button" (click)="toggleAll()">{{showAll ? '在庫のある倉庫だけ出す' : 'すべての倉庫を出す'}}</button>
+  }
+  <button mat-stroked-button type="button" (click)="close()">閉じる</button>
 </mat-dialog-actions>

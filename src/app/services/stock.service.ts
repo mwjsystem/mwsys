@@ -749,5 +749,65 @@ export class StockService {
     return paabl;
   }
 
+  /**
+   * 倉庫ごとの在庫と受注可能数（全倉庫の一覧用。PC の現在庫確認の「全倉庫在庫数」とスマホの在庫確認で使う）。
+   * 在庫品（gskbn 0）は倉庫ごとの在庫・引当・キープ・加工依頼中、セット品（1）は構成品の在庫から出した受注可能数だけ。
+   * キャッシュを使わずに今の数を読む
+   */
+  async byStore(gcode: string, gskbn: string, scds: mwI.Sval[]): Promise<StoreStock[]> {
+    const stores = scds.filter(s => s.value);
+    if (gskbn == '0') {
+      const rows = await Promise.all(stores.map(async s => {
+        const st = (await this.getStock(gcode, '0', String(s.value), undefined, true))[0];
+        if (!st) {
+          return null;
+        }
+        const hikat = st.hikat || 0;
+        const keepd = st.keepd || 0;
+        const kakod = st.kakod || 0;
+        const stock = st.stock || 0;
+        return { scode: String(s.value), name: s.viewval, stock, pable: stock - hikat - keepd - kakod, hikat, keepd, kakod } as StoreStock;
+      }));
+      return rows.filter((r): r is StoreStock => r != null);
+    }
+    if (gskbn == '1') {
+      const Get = gql`
+        query get_setzai($id: smallint!, $gcode: String!) {
+          msgoods(where: {id: {_eq: $id}, gcode: {_eq: $gcode}}) {
+            msgzais { zcode irisu msgoods { gskbn } }
+          }
+        }`;
+      const res = await firstValueFrom(this.apollo.query<{ msgoods: { msgzais: GzaiRef[] }[] }>({
+        query: Get, fetchPolicy: 'network-only', variables: { id: this.usrsrv.compid, gcode }
+      }));
+      const zais = res.data?.msgoods[0]?.msgzais ?? [];
+      if (zais.length == 0) {
+        return [];
+      }
+      const rows = await Promise.all(stores.map(async s => {
+        const parts = await this.getSetZai(String(s.value), zais);
+        if (parts.length == 0) {
+          return null;
+        }
+        const pable = this.getPaabl(parts);
+        return { scode: String(s.value), name: s.viewval, stock: null, pable: pable == 9999 ? 0 : pable, hikat: 0, keepd: 0, kakod: 0 } as StoreStock;
+      }));
+      return rows.filter((r): r is StoreStock => r != null);
+    }
+    return [];
+  }
 
+}
+
+/** 倉庫ごとの在庫（byStore の 1 行） */
+export interface StoreStock {
+  scode: string;
+  name: string;
+  /** 在庫数（セット品は null） */
+  stock: number | null;
+  /** 受注可能数 = 在庫 − 引当済 − キープ済 − 加工依頼中 */
+  pable: number;
+  hikat: number;
+  keepd: number;
+  kakod: number;
 }

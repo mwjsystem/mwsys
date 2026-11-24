@@ -44,10 +44,21 @@
 <!-- </div> -->
 <!-- </mat-form-field> -->
 </mat-toolbar>
-<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>{{mode|modetxt}} {{memsrv.mcode}} 別納先
+<h1 mat-dialog-title cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>{{mode|modetxt}} {{label}} 別納先
 </h1>
 
 <mat-dialog-content>
+  <!-- 別納先の入れ方の説明（No.28） -->
+  <div class="hint">
+    @if (mode == 1) {
+      新しい別納先（届け先）を入れて「保存」します。枝番は保存すると自動で付きます（10 から）。
+    } @else if (mode == 3) {
+      ↑↓ か検索で別納先を選びます。新しい届け先は「新規」、直すときは「編集」。
+    } @else {
+      内容を直して「保存」します。
+    }
+    郵便番号を入れると、都道府県・市区町村・町名が入ります。必須は 郵便番号・都道府県・市区町村・電話番号・住所宛名 です。
+  </div>
   <form [formGroup]="form">
     <app-address [formName]="'addr'"></app-address>
   </form>

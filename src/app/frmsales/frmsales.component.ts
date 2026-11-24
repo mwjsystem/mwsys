@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewEncapsulation, AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, NgZone, viewChild, inject } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, FormArray, AbstractControl, Validators, ValidationErrors, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { dropEmptyMei, validIgnoringEmpty } from '../share/mei-row';
 import { Subscription, firstValueFrom } from 'rxjs';
@@ -22,7 +22,7 @@ import { BunshoService } from './../services/bunsho.service';
 import { OkuriService } from './../services/okuri.service';
 import { StaffService } from './../services/staff.service';
 import { StoreService } from './../services/store.service';
-import { MembsService } from './../mstmember/membs.service';
+import { MembsService, MEMBER_CHANNEL, MemberCreated } from './../mstmember/membs.service';
 import { DownloadService } from './../services/download.service';
 import { McdhelpComponent } from './../share/mcdhelp/mcdhelp.component';
 import { JdnohelpComponent } from './../share/jdnohelp/jdnohelp.component';
@@ -48,6 +48,7 @@ import { MatSelect, MatOption } from '@angular/material/select';
 import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
 import { MatExpansionPanel, MatExpansionPanelHeader } from '@angular/material/expansion';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardContent } from '@angular/material/card';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { NuminputDirective } from '../core/directives/numinput.directive';
 import { DecimalPipe, PercentPipe } from '@angular/common';
 import { JdatePipe } from '../core/pipes/jdate.pipe';
@@ -67,9 +68,9 @@ type JyudenField = 'torikbn' | 'mcode' | 'scde' | 'ncode' | 'nsaki' | 'nadr' | '
     host: {
         '(window:beforeunload)': 'beforeUnload($event)'
     },
-    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatFormField, MatInput, FormsModule, TabDirective, MatIconButton, MatSuffix, MatMenuTrigger, MatMenu, MatMenuItem, ReactiveFormsModule, MatCheckbox, TmstmpComponent, MatLabel, MatSelect, MatOption, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatPrefix, MatExpansionPanel, MatExpansionPanelHeader, MatCard, MatCardHeader, MatCardTitle, NuminputDirective, MatCardContent, JmeitblComponent, DecimalPipe, PercentPipe, JdatePipe, McdtxtPipe, ModetxtPipe]
+    imports: [MatToolbar, MatButton, MatIcon, MatTooltip, MatFormField, MatInput, FormsModule, TabDirective, MatIconButton, MatSuffix, MatMenuTrigger, MatMenu, MatMenuItem, ReactiveFormsModule, MatCheckbox, TmstmpComponent, MatLabel, MatSelect, MatOption, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatPrefix, MatExpansionPanel, MatExpansionPanelHeader, MatCard, MatCardHeader, MatCardTitle, NuminputDirective, MatCardContent, JmeitblComponent, DecimalPipe, PercentPipe, JdatePipe, McdtxtPipe, ModetxtPipe, CdkTextareaAutosize]
 })
-export class FrmsalesComponent extends BeforeunloadBase implements OnInit, AfterViewInit {
+export class FrmsalesComponent extends BeforeunloadBase implements OnInit, AfterViewInit, OnDestroy {
   usrsrv = inject(UserService);
   private fb = inject(FormBuilder);
   private title = inject(Title);
@@ -141,6 +142,8 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
   paid = false;
   /** 読み込んだときの売上日（締め日以前かの判定に使う） */
   private savedUday: string | null = null;
+  /** 顧客マスタの新規登録の知らせ（No.27） */
+  private memberCh?: BroadcastChannel;
 
   /** 金額に関わる項目を変えられない理由（入金済・締め日以前）。無ければ空 */
   lockReason(): string {
@@ -235,7 +238,39 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     this.closesrv.load(true).then(() => this.cdRef.detectChanges());
 	// console.log('納品書タイプ',this.bnssrv.buntype);
   }
+  /** 新規顧客（No.27）：別のタブで顧客マスタの新規登録を開く */
+  newMember() {
+    this.usrsrv.openMst('mstmember', 'new', '1');
+  }
+
+  /** 顧客マスタのタブで新規登録されたら、顧客の一覧を読み直し、受注先が空なら入れる */
+  private async onMemberCreated(mcode: string) {
+    await this.memsrv.reload().catch(e => console.log('error reload members', e));
+    if ((this.mode == 1 || this.mode == 2) && !this.form.value.mcode && this.ctl.mcode.enabled) {
+      this.ctl.mcode.setValue(mcode);
+      this.changeMcd();
+      this.usrsrv.toastInf('新規登録した顧客 ' + mcode + ' を受注先に入れました');
+    } else {
+      this.usrsrv.toastInf('顧客 ' + mcode + ' が登録されました');
+    }
+    this.cdRef.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.memberCh?.close();
+  }
+
   ngAfterViewInit(): void { //子コンポーネント読み込み後に走る
+    try {
+      this.memberCh = new BroadcastChannel(MEMBER_CHANNEL);
+      this.memberCh.onmessage = (ev: MessageEvent<MemberCreated>) => {
+        if (ev.data?.mcode) {
+          this.onMemberCreated(ev.data.mcode);
+        }
+      };
+    } catch {
+      // BroadcastChannel が使えないブラウザでは、受注先を手で入れる
+    }
     this.memsrv.getMembers().then(result => {
       this.route.paramMap.subscribe((params: ParamMap) => {
         if (params.get('mode') === null) {

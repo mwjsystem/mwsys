@@ -5,7 +5,7 @@ import * as Query from './../../mstmember/queries.mstm';
 import { UserService } from './../../services/user.service';
 import { BunruiService } from './../../services/bunrui.service';
 import { DownloadService } from './../../services/download.service';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, firstValueFrom } from 'rxjs';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatFormField, MatLabel, MatInput } from '@angular/material/input';
 import { TabDirective } from '../../core/directives/tabidx/tab.directive';
@@ -134,43 +134,40 @@ export class AddressComponent implements OnInit {
         neweda.next(madr);
         // neweda.complete();
       }, (error) => {
-        console.log('error update_msmember', error);
+        this.usrsrv.toastErr('データベースエラー', '顧客コード' + mcode + 'の住所（枝番' + eda + '）を保存できませんでした');
+        console.log('error update_msmadr', error);
       });
     } else {
-      let madrs: MadrInput[] = [];
-      this.apollo.watchQuery<MaxEdaResult>({
-        query: Query.GetMast6,
-        variables: {
-          id: this.usrsrv.compid,
-          mcd: mcode
-        },
-      })
-        .valueChanges
-        .subscribe(({ data }) => {
-          // console.log(data, data.msmadr_aggregate.aggregate.max.eda);
-          let lceda = (data ? (data as MaxEdaResult).msmadr_aggregate.aggregate.max.eda : 0) + 1;
-          if (lceda > 10) {
-            madr.eda = lceda;
-          } else {
-            madr.eda = 10;
-          }
+      // 基本住所（0）・その他住所（1）は決まった枝番で登録する。別納先は、今ある最大の枝番 + 1（10 から）。
+      // 以前は基本住所も別納先と同じ採番で 10 になり、最大の枝番もキャッシュから読んでいたので 2 件目以降が同じ枝番になって登録できなかった（No.39）
+      const fixed = eda === 0 || eda === 1 || eda === '0' || eda === '1';
+      const insert = (n: number) => {
+        madr.eda = n;
+        this.apollo.mutate<InsMadrResult>({
+          mutation: Query.InsertMast2,
+          variables: { "object": [madr] },
+        }).subscribe(() => {
           neweda.next(madr);
-          // neweda.complete();
-          // console.log(madr);
-          madrs.push(madr);
-          this.apollo.mutate<InsMadrResult>({
-            mutation: Query.InsertMast2,
-            variables: {
-              "object": madrs
-            },
-          }).subscribe(({ data }) => {
-            console.log('Insert_msmadr', data);
-          }, (error) => {
-            console.log('error Insert_msmadr ' + this.formName(), error);
-          });
         }, (error) => {
+          this.usrsrv.toastErr('データベースエラー', '顧客コード' + mcode + 'の住所（枝番' + n + '）を登録できませんでした');
+          console.log('error Insert_msmadr ' + this.formName(), error);
+        });
+      };
+      if (fixed) {
+        insert(Number(eda));
+      } else {
+        firstValueFrom(this.apollo.query<MaxEdaResult>({
+          query: Query.GetMast6,
+          fetchPolicy: 'network-only',
+          variables: { id: this.usrsrv.compid, mcd: mcode },
+        })).then(({ data }) => {
+          const max = Number(data?.msmadr_aggregate.aggregate.max.eda) || 0;
+          insert(Math.max(max, 9) + 1);
+        }).catch(error => {
+          this.usrsrv.toastErr('データベースエラー', '顧客コード' + mcode + 'の枝番を採番できませんでした');
           console.log('error query get_maxeda', error);
         });
+      }
     }
     return neweda;
   }
