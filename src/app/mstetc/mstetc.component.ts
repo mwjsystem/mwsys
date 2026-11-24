@@ -54,11 +54,14 @@ export class MstetcComponent {
 
   constructor() {
     this.title.setTitle(this.def.title + '(MWSystem)');
-    this.strsrv.getStore().then(() => this.cdRef.detectChanges());
-    if (this.def.fields.some(f => f.type == 'hokuri') && this.okrsrv.hokuri.length == 0) {
-      this.okrsrv.getHokuri();
-    }
-    this.load();
+    // 画面を直接開いたときは会社ID（compid）がまだ無いので、ログインした人の情報を読み終わってから読む
+    this.usrsrv.staffReady.then(() => {
+      this.strsrv.getStore().then(() => this.cdRef.detectChanges());
+      if (this.def.fields.some(f => f.type == 'hokuri') && this.okrsrv.hokuri.length == 0) {
+        this.okrsrv.getHokuri();
+      }
+      this.load();
+    });
   }
 
   get listFields(): EtcField[] {
