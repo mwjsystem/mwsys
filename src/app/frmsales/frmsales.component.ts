@@ -701,6 +701,11 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
       data => {
         if (typeof data != 'undefined') {
           this.ctl[fldnm].setValue(data.mcode);
+          this.ctl[fldnm].markAsDirty();
+          // 受注先は、手で入れたときと同じく顧客を読み込み、空の請求先・納品先にも入れる
+          if (fldnm == 'mcode') {
+            this.changeMcd();
+          }
         }
       }
     );
@@ -742,12 +747,13 @@ export class FrmsalesComponent extends BeforeunloadBase implements OnInit, After
     }
     this.getMember(lcmcode, true);	
     this.ctl.mcode.setValue(lcmcode);
-	if (this.form.value.scde == null) {
-	　 this.ctl.scde.setValue(lcmcode);      
-	}  
-    if (this.form.value.ncode == null) {
+    // 請求先・納品先が空なら受注先と同じにする（空文字も空とみなす）
+    if (!this.form.value.scde) {
+      this.ctl.scde.setValue(lcmcode);
+    }
+    if (!this.form.value.ncode) {
       this.ctl.ncode.setValue(lcmcode);
-	}
+    }
 	// console.log(this.form.value);
   }
 
