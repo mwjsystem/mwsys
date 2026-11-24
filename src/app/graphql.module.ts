@@ -69,11 +69,20 @@ function prefixVariableDefinition(vd: VariableDefinitionNode): VariableDefinitio
   return { ...vd, type: prefixTypeNode(vd.type) };
 }
 
+/**
+ * テスト環境でも public 側を読むルートフィールド（test スキーマに表が無い、画面の設定だけの表）。
+ * msnavmenu：メニューの「ﾏｽﾀﾒﾝﾃﾅﾝｽ(一括更新)」などのサブメニュー。test_msnavmenu が無く、テスト環境で空になっていた
+ */
+const SHARED_ROOT_FIELDS = new Set(['msnavmenu']);
+
 function prefixRootSelection(sel: SelectionNode): SelectionNode {
   if (sel.kind !== Kind.FIELD) {
     return sel;
   }
   const field = sel as FieldNode;
+  if (SHARED_ROOT_FIELDS.has(field.name.value)) {
+    return field;
+  }
   // レスポンスのキー名は元のまま（= alias未指定なら元のフィールド名）になるよう、
   // エイリアスをレスポンスキーで明示的に固定してから、実際に問い合わせるフィールド名だけ test_ を付ける。
   // こうしないと Apollo Client 側のキャッシュ/正規化が元のフィールド名を探しに行って失敗する。
