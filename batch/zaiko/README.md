@@ -48,7 +48,7 @@ DB 関数は `db/20261124_chusyutsu.sql`。
 
 - 結果の xlsx は、国内発注在庫.xlsm には書き戻さない（図の入ったシートを壊さないため）。`hacchu` の 2 つ目の引数のファイルに書く。
 - `zansho` は環境変数 `MWSYS_CHATWORK_TOKEN` にチャットワークの API トークンを設定する。
-- `kick_report_*.bat` のファイルの場所は、サーバーの実際の置き場所に合わせて直す。
+- `kick_report_*.bat` のファイルの場所は、現行のマクロと同じ。国内発注在庫.xlsm・大会倉庫.xlsm・在庫切れ対応リスト.xlsx は `C:\mwj\MWJAPAN\mwjapan - share\system\batch\在庫連携\`、堀商店の FAX は `\\192.168.30.133\share\asago宛FAX\horishoten\`。国内発注在庫の結果は同じフォルダの 国内発注在庫_結果.xlsx に書く。
 - 現行の Excel のマクロには DB・メール・チャットワークのパスワードやトークンがそのまま書いてある。置き換えた後は Excel を消すか、パスワードを変える。
 
 ## テスト
