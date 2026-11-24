@@ -61,16 +61,15 @@ RETURNS SETOF tsyukmon AS $$
   HAVING SUM(COALESCE(z.syuk, 0) + COALESCE(z.teno, 0)) <> 0;
 $$ LANGUAGE sql STABLE;
 
--- その日に出荷した商品（受注明細の出荷日。明細に無ければ伝票の出荷日）。suu は出荷数の合計、ym は使わない
+-- その日に出荷した商品（在庫の動き trzaiko の出荷数 syuk）。suu は出荷数の合計、ym は使わない
+-- （受注明細の出荷日で探すと索引が使えず、時間切れになるため）
 CREATE OR REPLACE FUNCTION fsyukday(p_id smallint, p_day date, p_scode text)
 RETURNS SETOF tsyukmon AS $$
-  SELECT m.gcode::text, to_char(p_day, 'YYYYMMDD'), SUM(m.suu)::numeric
-    FROM trjyumei m
-    JOIN trjyuden d ON d.id = m.id AND d.denno = m.denno
-   WHERE m.id = p_id AND d.del IS NOT TRUE AND m.del IS NOT TRUE AND d.denku <> 2
-     AND COALESCE(m.sday::date, d.sday::date) = p_day
-     AND COALESCE(NULLIF(trim(m.scode), ''), d.scode) = p_scode
-   GROUP BY m.gcode;
+  SELECT z.gcode::text, to_char(p_day, 'YYYYMMDD'), SUM(COALESCE(z.syuk, 0))::numeric
+    FROM trzaiko z
+   WHERE z.id = p_id AND z.day = p_day AND z.scode = p_scode
+   GROUP BY z.gcode
+  HAVING SUM(COALESCE(z.syuk, 0)) > 0;
 $$ LANGUAGE sql STABLE;
 
 -- 関数の戻り値の型
