@@ -1,16 +1,20 @@
 import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatTableDataSource, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 import { Stcbs, StockService } from './../services/stock.service';
+import { UserService } from './../services/user.service';
 
 @Component({
     selector: 'app-gzaitbl',
     templateUrl: './gzaitbl.component.html',
     styleUrls: ['./../tbl.component.scss'],
     changeDetection: ChangeDetectionStrategy.Eager,
-    imports: [MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow]
+    imports: [MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatIconButton, MatIcon]
 })
 export class GzaitblComponent implements OnInit {
   stcsrv = inject(StockService);
+  usrsrv = inject(UserService);
   cdRef = inject(ChangeDetectorRef);
 
   public dataSource!: MatTableDataSource<Stcbs>;

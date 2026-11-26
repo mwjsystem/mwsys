@@ -631,6 +631,7 @@ export class UserService {
         func = "/frmsales";
         break;
       case /引当/.test(typ):
+      case typ == "受注残":
         func = "/frmsales";
         break;
       case typ == "入荷予定":
