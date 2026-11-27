@@ -29,7 +29,7 @@
             <tr>
               @for (f of keyFields; track f.key) {<th>{{f.label}}</th>}
               <th>{{def.codeLabel ?? 'コード'}}</th>
-              @for (f of listFields; track f.key) {<th [class.num]="f.type == 'int'">{{f.label}}</th>}
+              @for (f of listFields; track f.key) {<th [class.num]="f.type == 'int' || f.type == 'dec'">{{f.label}}</th>}
               @if (def.delKey) {<th>{{def.delLabel}}</th>}
             </tr>
           </thead>
@@ -37,8 +37,8 @@
             @for (r of shown; track rowKey(r)) {
               <tr (click)="select(r)" [class.sel]="isSel(r)" [class.off]="def.delKey && r[def.delKey]">
                 @for (f of keyFields; track f.key) {<td>{{cell(r, f)}}</td>}
-                <td>{{r['code']}}</td>
-                @for (f of listFields; track f.key) {<td [class.num]="f.type == 'int'">{{cell(r, f)}}</td>}
+                <td>{{r[ck]}}</td>
+                @for (f of listFields; track f.key) {<td [class.num]="f.type == 'int' || f.type == 'dec'">{{cell(r, f)}}</td>}
                 @if (def.delKey) {<td>{{r[def.delKey] ? def.delLabel : ''}}</td>}
               </tr>
             }
@@ -63,7 +63,11 @@
         }
         <label class="fld">
           <span class="lbl">{{def.codeLabel ?? 'コード'}}<b class="req">*</b></span>
-          <input [(ngModel)]="edit['code']" [disabled]="!isNew" style="width: 8em;">
+          @if (def.codeType == 'date') {
+            <input type="date" [(ngModel)]="edit[ck]" [disabled]="!isNew">
+          } @else {
+            <input [(ngModel)]="edit[ck]" [disabled]="!isNew" style="width: 8em;">
+          }
           <span class="sub">{{def.codeHint}}</span>
         </label>
         @for (f of def.fields; track f.key) {
@@ -78,6 +82,9 @@
               }
               @case ('text') {
                 <input [(ngModel)]="edit[f.key]" [style.width.em]="f.width ?? 12">
+              }
+              @case ('dec') {
+                <input [(ngModel)]="edit[f.key]" [style.width.em]="f.width ?? 8" class="num">
               }
               @case ('int') {
                 <input [(ngModel)]="edit[f.key]" [style.width.em]="f.width ?? 6" class="num">

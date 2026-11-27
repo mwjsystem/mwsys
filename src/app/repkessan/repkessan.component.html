@@ -3,7 +3,10 @@
 </mat-toolbar>
 <div class="bar">
   <label>期間 <input type="date" [(ngModel)]="from"> 〜 <input type="date" [(ngModel)]="to"></label>
-  <label>ドル円レート 1＄＝<input type="number" step="0.01" class="rate" [(ngModel)]="rate" (ngModelChange)="buildStores()">円</label>
+  <label>ドル円レート 1＄＝<input type="number" step="0.01" class="rate" [(ngModel)]="rate" (ngModelChange)="rateChanged()">円
+    @if (rateFrom == 'master') {<span class="sub">（為替レートマスタの期末日のレート）</span>}
+    @if (rateFrom == 'manual') {<span class="sub">（手入力。空にすると次の集計で期末日のレート）</span>}
+  </label>
   <button mat-flat-button color="primary" type="button" (click)="show()" [disabled]="busy">
     <mat-icon>search</mat-icon>集計
   </button>
@@ -91,7 +94,7 @@
     <mat-tab label="在庫金額（倉庫別）">
       @if (errors['zaiko']) {<p class="err">在庫を集計できませんでした：{{errors['zaiko']}}</p>}
       <p class="note">期末日（{{shown.to}}）の在庫数（直近の棚卸＋それ以降の増減）× 期末日時点の原価。原価が USD の商品はレートで円に換算（現行の Excel と同じく「単価×数量」を丸めてからレートを掛けて丸める）。在庫数 &gt; 0 の商品だけ。</p>
-      @if (!rate) {<p class="err">ドル円レートが入っていません（USD の商品は 0 円で計算しています）</p>}
+      @if (!rate) {<p class="err">ドル円レートが入っていません（USD の商品は 0 円で計算しています）。為替レートマスタに期末日以前のレートを登録するか、上で入れてください</p>}
       <div class="bar">
         <label class="chk"><input type="checkbox" [(ngModel)]="withEnd" (ngModelChange)="buildStores()">中止・終了品も含める</label>
         <span class="note">在庫管理しない商品と、在庫数 9,000 以上の商品（在庫数 9999 で登録してある受注生産品など）は含めません。中止・終了品は現行の在庫一覧表と同じく既定で外します。</span>

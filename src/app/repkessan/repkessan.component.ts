@@ -11,6 +11,7 @@ import { loadExcelJs, excelBuffer } from './../services/busy.service';
 import { BunruiService } from './../services/bunrui.service';
 import { StaffService } from './../services/staff.service';
 import { UserService } from './../services/user.service';
+import { RateService } from './../services/rate.service';
 import { DEFAULT_PCODES, RepkessanService, TesuRow, UriRow, UrikakeRow, ZaikoRow } from './repkessan.service';
 import { KessanSource, fillKessanBook } from './kessan-excel';
 
@@ -41,6 +42,7 @@ export class RepkessanComponent implements OnInit, KessanSource {
   private bunsrv = inject(BunruiService);
   private stfsrv = inject(StaffService);
   private usrsrv = inject(UserService);
+  private ratesrv = inject(RateService);
   private title = inject(Title);
   private cdRef = inject(ChangeDetectorRef);
 
@@ -48,8 +50,10 @@ export class RepkessanComponent implements OnInit, KessanSource {
   to = '';
   /** 都度売掛の対象の支払方法 */
   pcodes = new Set<string>(DEFAULT_PCODES);
-  /** 1 ドルの円（在庫の円換算） */
+  /** 1 ドルの円（在庫の円換算）。集計のとき、期末日のレート（為替レートマスタ）を入れる。手で変えてもよい */
   rate: number | null = null;
+  /** rate を入れた元（'master' = 為替レートマスタの期末日のレート、'manual' = 手で入れた） */
+  rateFrom: 'master' | 'manual' | '' = '';
   /** 都度売掛で残高 0 の伝票も出す */
   withZero = false;
   /** 在庫に中止・終了品（tkbn が 0 以外）も含める（現行の在庫一覧表は「中止・終了商品を印刷しない」で出していた） */
@@ -85,6 +89,12 @@ export class RepkessanComponent implements OnInit, KessanSource {
 
   get pcodeList(): { value: string; viewval: string }[] {
     return (this.bunsrv.kbn['pcode'] ?? []) as { value: string; viewval: string }[];
+  }
+
+  /** レートを手で変えた（空にしたら、次の集計で期末日のレートに戻す） */
+  rateChanged() {
+    this.rateFrom = this.rate == null ? '' : 'manual';
+    this.buildStores();
   }
 
   togglePcode(v: string) {
@@ -126,6 +136,12 @@ export class RepkessanComponent implements OnInit, KessanSource {
       run('zaiko', async () => { this.zaiko = await this.srv.zaiko(to); })
     ]);
     this.shown = { from, to, pcodes };
+    // 手で入れていなければ、期末日のレート（為替レートマスタ。無ければ空のまま）
+    if (this.rateFrom != 'manual') {
+      const r = await this.ratesrv.lookup('USD', to);
+      this.rate = r;
+      this.rateFrom = r == null ? '' : 'master';
+    }
     this.buildUri();
     this.buildStores();
     this.busy = false;

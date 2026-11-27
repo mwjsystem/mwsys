@@ -10,7 +10,7 @@
  *   store = 倉庫の選択肢、hokuri = 配送方法の選択肢（ほかの画面と共用のサービスから）
  *   choice = 決まった値から選ぶ（options）、ref = ほかの表の行から選ぶ（ref）
  */
-export type EtcFieldType = 'text' | 'int' | 'check' | 'memo' | 'store' | 'hokuri' | 'choice' | 'ref';
+export type EtcFieldType = 'text' | 'int' | 'dec' | 'check' | 'memo' | 'store' | 'hokuri' | 'choice' | 'ref';
 
 export interface EtcOption { value: string; label: string }
 
@@ -36,8 +36,14 @@ export interface EtcField {
 
 export interface EtcDef {
   /** 表の名前（Hasura のルートフィールド名） */
-  table: 'msstaff' | 'msstore' | 'mshokuri' | 'msbuntype' | 'msbunsho' | 'mshktime';
+  table: 'msstaff' | 'msstore' | 'mshokuri' | 'msbuntype' | 'msbunsho' | 'mshktime' | 'msrate';
   title: string;
+  /** コードの列名（省略時は code）。例: 為替レートの適用開始日 day */
+  codeKey?: string;
+  /** コードが日付（入力欄を日付にする） */
+  codeType?: 'date';
+  /** 一覧をコードの新しい順（大きい順）に並べる */
+  codeDesc?: boolean;
   /** code のほかのキーの列（id・code と合わせて主キー。登録したあとは変えられない）。例: 配達時間の配送会社 */
   keyFields?: EtcField[];
   /** 一覧の並び（sortKey より優先。最後に code 順） */
@@ -190,6 +196,29 @@ export const HKTIME_DEF: EtcDef = {
     { key: 'bunrui', label: 'CSV のコード', type: 'text', req: true, width: 6, list: true,
       hint: '送り状 CSV の時間帯コード（配送会社の決まり）。顧客マスタの配達時間もこの値で選びます' },
     { key: 'ehiden', label: 'e飛伝Ⅲシールのコード', type: 'text', width: 6, list: true, hint: 'e飛伝Ⅲの時間帯シール用（佐川 e飛伝Ⅱ だけ）' },
+  ],
+};
+
+export const RATE_DEF: EtcDef = {
+  table: 'msrate',
+  title: '為替レートマスタ',
+  keyFields: [
+    { key: 'currency', label: '通貨', type: 'choice', req: true, list: true, options: [{ value: 'USD', label: '米ドル' }],
+      hint: '単価マスタの通貨' },
+  ],
+  orderBy: ['currency'],
+  codeKey: 'day',
+  codeType: 'date',
+  codeDesc: true,
+  codeLabel: '適用開始日',
+  codeHint: 'この日から、次の適用開始日の前日まで使います。登録したあとは変えられません（変えるときは新しい日付で登録）',
+  refetch: [],
+  note: '外貨の原価を円にするときの社内レートです（市場のレートではなく、決めたときに手で登録します。年に 1 回程度）。'
+    + '受注伝票の原価は受注日の、決算資料の在庫金額は期末日のレートを使います（その日以前で一番新しい適用開始日の行）。'
+    + '登録が無い日付は、今までのシステムのレートを使います。',
+  fields: [
+    { key: 'rate', label: 'レート', type: 'dec', req: true, width: 8, list: true, hint: '1 外貨 = 何円（例: 150.25）' },
+    { key: 'memo', label: '備考', type: 'text', width: 30, list: true },
   ],
 };
 

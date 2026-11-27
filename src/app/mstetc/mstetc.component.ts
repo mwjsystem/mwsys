@@ -11,6 +11,7 @@ import { MatIcon } from '@angular/material/icon';
 import { UserService } from './../services/user.service';
 import { StoreService } from './../services/store.service';
 import { OkuriService } from './../services/okuri.service';
+import { RateService } from './../services/rate.service';
 import { EtcDef, EtcField, EtcOption, STAFF_DEF } from './mstetc-defs';
 
 /** 一覧と入力欄の 1 行（列は表ごとに違うので、キーで読む） */
@@ -32,6 +33,7 @@ export class MstetcComponent {
   usrsrv = inject(UserService);
   strsrv = inject(StoreService);
   okrsrv = inject(OkuriService);
+  private ratesrv = inject(RateService);
   private apollo = inject(Apollo);
   private title = inject(Title);
   private cdRef = inject(ChangeDetectorRef);
@@ -69,6 +71,11 @@ export class MstetcComponent {
     });
   }
 
+  /** コードの列名（code。為替レートは適用開始日 day） */
+  get ck(): string {
+    return this.def.codeKey ?? 'code';
+  }
+
   /** code のほかのキーの列 */
   get keyFields(): EtcField[] {
     return this.def.keyFields ?? [];
@@ -85,7 +92,7 @@ export class MstetcComponent {
 
   /** 行を見分ける文字（code と、ほかのキーの列） */
   rowKey(r: EtcRow): string {
-    return [...this.keyFields.map(f => String(r[f.key] ?? '')), String(r['code'] ?? '').trim()].join('|');
+    return [...this.keyFields.map(f => String(r[f.key] ?? '')), String(r[this.ck] ?? '').trim()].join('|');
   }
 
   private isDel(r: EtcRow): boolean {
@@ -95,7 +102,7 @@ export class MstetcComponent {
   get shown(): EtcRow[] {
     const q = this.filter.trim().toLowerCase();
     return this.rows.filter(r => (this.showDel || !this.isDel(r))
-      && (!q || [String(r['code'] ?? ''), ...this.allFields.map(f => this.cell(r, f))].some(s => s.toLowerCase().includes(q))));
+      && (!q || [String(r[this.ck] ?? ''), ...this.allFields.map(f => this.cell(r, f))].some(s => s.toLowerCase().includes(q))));
   }
 
   get delCount(): number {
@@ -142,7 +149,7 @@ export class MstetcComponent {
   }
 
   private get cols(): string {
-    return ['code', ...(this.def.delKey ? [this.def.delKey] : []), ...this.allFields.map(f => f.key)].join(' ');
+    return [this.ck, ...(this.def.delKey ? [this.def.delKey] : []), ...this.allFields.map(f => f.key)].join(' ');
   }
 
   /** ref の欄の選択肢を読む */
@@ -169,7 +176,7 @@ export class MstetcComponent {
     this.error = '';
     const t = this.def.table;
     const keys = this.def.orderBy ?? (this.def.sortKey ? [this.def.sortKey] : []);
-    const order = keys.map(k => `{${k}: asc_nulls_last}, `).join('') + '{code: asc}';
+    const order = keys.map(k => `{${k}: asc_nulls_last}, `).join('') + '{' + this.ck + ': ' + (this.def.codeDesc ? 'desc' : 'asc') + '}';
     const Get = gql`
       query get_etc_${t}($id: smallint!) {
         ${t}(where: {id: {_eq: $id}}, order_by: [${order}]) { ${this.cols} }
@@ -231,7 +238,7 @@ export class MstetcComponent {
     if (!this.okToLeave()) {
       return;
     }
-    const r: EtcRow = { code: '' };
+    const r: EtcRow = { [this.ck]: '' };
     if (this.def.delKey) {
       r[this.def.delKey] = false;
     }
@@ -253,7 +260,7 @@ export class MstetcComponent {
 
   /** 入力の確認。問題があればその文を返す */
   private check(e: EtcRow): string {
-    const code = String(e['code'] ?? '').trim();
+    const code = String(e[this.ck] ?? '').trim();
     const codeLabel = this.def.codeLabel ?? 'コード';
     for (const f of this.keyFields) {
       if (e[f.key] == null || String(e[f.key]).trim() === '') {
@@ -263,8 +270,11 @@ export class MstetcComponent {
     if (!code) {
       return codeLabel + 'を入れてください';
     }
+    if (this.def.codeType == 'date' && !/^\d{4}-\d{2}-\d{2}$/.test(code)) {
+      return codeLabel + 'は日付で入れてください';
+    }
     if (this.isNew) {
-      const key = this.rowKey({ ...e, code });
+      const key = this.rowKey({ ...e, [this.ck]: code });
       const same = this.rows.find(r => this.rowKey(r) == key);
       if (same) {
         return codeLabel + ' ' + code + ' はもう使われています' + (this.keyFields.length ? '（' + this.keyFields.map(f => this.cell(same, f)).join('・') + '）' : '')
@@ -278,6 +288,9 @@ export class MstetcComponent {
       }
       if (f.type == 'int' && v != null && String(v).trim() !== '' && !/^-?\d+$/.test(String(v).trim())) {
         return f.label + 'は整数で入れてください';
+      }
+      if (f.type == 'dec' && v != null && String(v).trim() !== '' && !/^-?\d+(\.\d+)?$/.test(String(v).trim())) {
+        return f.label + 'は数で入れてください';
       }
     }
     return '';
@@ -303,7 +316,7 @@ export class MstetcComponent {
     if (x == null || String(x).trim() === '') {
       return null;
     }
-    if (f.type == 'int' || (f.type == 'ref' && f.ref?.num)) {
+    if (f.type == 'int' || f.type == 'dec' || (f.type == 'ref' && f.ref?.num)) {
       return Number(String(x).trim());
     }
     return String(x).trim();
@@ -319,10 +332,10 @@ export class MstetcComponent {
     }
     const t = this.def.table;
     const id = this.usrsrv.compid;
-    const code = String(this.edit['code']).trim();
+    const code = String(this.edit[this.ck]).trim();
     const vals = this.values(this.edit);
     // 主キー（id・code と、ほかのキーの列）
-    const pk: EtcRow = { id, code };
+    const pk: EtcRow = { id, [this.ck]: code };
     for (const f of this.keyFields) {
       pk[f.key] = this.conv(f, this.edit[f.key]);
     }
@@ -359,6 +372,9 @@ export class MstetcComponent {
       this.isNew = false;
       this.edit = this.toEdit(saved);
       this.orig = JSON.stringify(this.edit);
+      if (t == 'msrate') {
+        this.ratesrv.load(true).catch(() => undefined);  // 受注伝票・決算資料のレートをすぐ読み直す
+      }
       this.usrsrv.toastSuc(this.def.title + 'を保存しました：' + code);
     } catch (e) {
       const msg = (e as Error).message;

@@ -16,6 +16,7 @@ import { JyumeiService, TrjyumeiRow } from './jyumei.service';
 import { HatmeiService, AutoOrders, NO_ORDERS, HatdenNew, HatmeiInput } from './../frmsupply/hatmei.service';
 import { VendsService } from './../mstvendor/vends.service';
 import { KakoService } from './../frmkako/kako.service';
+import { RateService } from './../services/rate.service';
 import { firstValueFrom } from 'rxjs';
 import gql from 'graphql-tag';
 import { Apollo } from 'apollo-angular';
@@ -88,6 +89,7 @@ export class JmeitblComponent implements OnInit {
   private hmisrv = inject(HatmeiService);
   private vensrv = inject(VendsService);
   private kakosrv = inject(KakoService);
+  private ratesrv = inject(RateService);
 
   readonly parentForm = input.required<FormGroup>();
   readonly paginator = viewChild(MatPaginator);
@@ -150,6 +152,8 @@ export class JmeitblComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // 為替レートを先に読んでおく（外貨の原価の商品を入れたときに待たないように）
+    this.ratesrv.load().catch(() => undefined);
     this.displayedColumns = this.defCol;
     this.addRows(1);
     this.refresh();
@@ -783,12 +787,15 @@ export class JmeitblComponent implements OnInit {
       },
     })
       .valueChanges
-      .subscribe(({ data }) => {
+      .subscribe(async ({ data }) => {
 		// console.log(data);
         if (!data) {
           return;
         }
         let msgds = (data as GoodResult).msgoods_by_pk;
+        // 外貨の原価は受注日のレート（為替レートマスタ）で円にする
+        const t0c = msgds?.msgtankas[0]?.currency?.trim();
+        const rate = t0c && t0c != 'JPY' ? await this.ratesrv.rate(t0c, this.parentForm().value.day) : 1;
         if (msgds == null) {
           this.usrsrv.toastWar("商品コード" + val + "は登録されていません");
           rowCtl<RowField>(this.frmArr.controls[i]).gcode.setErrors({ 'incorrect': true });
@@ -804,8 +811,8 @@ export class JmeitblComponent implements OnInit {
           this.frmArr.controls[i].patchValue({ scode: this.parentForm().value.scode });
           let lctanka: number | null = null;
           let lcgenka: number = 0;
-          if (t0?.currency == "USD") {
-            lcgenka = Math.round((t0.genka) * this.usrsrv.system.currate);
+          if (t0 && t0c && t0c != 'JPY') {
+            lcgenka = Math.round((t0.genka) * rate);
           } else {
             lcgenka = t0?.genka ?? 0;
           }
