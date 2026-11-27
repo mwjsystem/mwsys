@@ -10,6 +10,7 @@
 -- 写し方（id = comp の行だけ。他の会社の行には触らない。1 つのトランザクション）
 --   入れ替え … public の行を消して test の行を入れる: 伝票・在庫・棚卸・請求・入金・仕入先・顧客（msmember・msmadr）
 --   上書き   … 主キーで突き合わせて test の値で上書き・無ければ追加（public にだけある行は残す）: 商品（msgoods・msgtanka・msgzai）
+--             ただし商品グループ（msgoods.code）は、test が仮グループ 00TMP なら public のグループを残す（public で付け直したグループを戻さない）
 --             msgzai は test にある商品の、test に無い構成品の行を消す
 --   採番（trnumber）… test の番号に合わせる（public の方が大きければそのまま）
 --   新システムだけの伝票（テスト期間の入力: 出荷キープ・未収・加工指示・棚卸入力・仕入チェック・受注履歴）は public でも消す
@@ -107,7 +108,10 @@ BEGIN
       IF keys IS NULL THEN
         RAISE EXCEPTION '%.%: 主キーがありません', dst, r.tbl;
       END IF;
-      SELECT string_agg(format('%1$I = EXCLUDED.%1$I', d.column_name), ', ')
+      -- msgoods.code（商品グループ）: test が仮グループ 00TMP のときは、先（public）で付け直したグループを残す
+      SELECT string_agg(CASE WHEN r.tbl = 'msgoods' AND d.column_name = 'code'
+                             THEN 'code = CASE WHEN trim(EXCLUDED.code) = ''00TMP'' THEN d.code ELSE EXCLUDED.code END'
+                             ELSE format('%1$I = EXCLUDED.%1$I', d.column_name) END, ', ')
         INTO setc
         FROM information_schema.columns d
        WHERE d.table_schema = dst AND d.table_name = r.tbl AND d.column_name <> ALL (keys)
