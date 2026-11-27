@@ -368,8 +368,9 @@ export class TransService {
             }
             const tran: Trans = {
               sday: e.sday,
-              // 在庫の動きとしては「受注残」と呼ぶ（区分マスタの名前は受注伝票側で使うので変えない）
-              ttype: this.bunsrv.getName(e.spec, 'jmeikbn').replace(/^在庫引当$/, '受注残'),
+              // 在庫の動きとしては「受注残」と呼ぶ（区分マスタの名前は受注伝票側で使うので変えない）。
+              // 明細区分がマスタに無い（空など）ときも受注残とする
+              ttype: this.bunsrv.getName(e.spec, 'jmeikbn').replace(/^(在庫引当)?$/, '受注残'),
               denno: e.denno,
               line: e.line,
               biko: lcbiko,
