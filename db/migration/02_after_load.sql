@@ -5,6 +5,7 @@
 -- 実行例（Windows の psql。<...> は環境に合わせる。test に投入したときは -v schema=test を付ける）:
 --   psql -h <host> -U <user> -d <db> -v schema=public -f 02_after_load.sql
 --   基準日（下記 4・5）を指定するとき: -v cutoff=2026-01-01 を付ける
+--   会社 ID（必須）: -v comp=1（マーシャル）/ -v comp=2（東海堂）。2026-11-27 から、すべての処理をこの会社の行だけにした
 --
 -- 前提
 --   ・20261028_seikyu_shime.sql / 20261028_seikyu_history.sql を適用済み（表の構造は TRUNCATE しても残る）
@@ -17,6 +18,7 @@
 --        ・同一顧客・同一締め日に別番号がある場合、金額がすべて 0 の伝票は除く
 --        ・作成日時等は NULL（= 現行システムから移行）。操作記録（tropelog）は残さない
 --   3a. 受注伝票の伝票区分（返品）を jdstatus から denku に移し、ステータスを付け直す（20261028_jyuden_ship.sql を適用済みのこと）
+--   3c. 受注明細の原価（USD の商品）を受注日のレート（msrate）で円にする（db/20261209_msrate.sql を適用済みのこと）
 --   3. 受注伝票 idenno（計上先の請求伝票）
 --        ・都度請求・売上日なし → NULL
 --        ・掛売で、売上日以降に締め日のある請求伝票がある → その請求伝票番号（請求済）
@@ -33,6 +35,11 @@
 \else
   \set schema public
 \endif
+\if :{?comp}
+\else
+  \echo '-v comp=<会社ID> を指定してください（マーシャル 1 / 東海堂 2）'
+  \quit
+\endif
 \if :{?cutoff}
 \else
   \set cutoff ''
@@ -41,6 +48,7 @@
 
 BEGIN;
 SET LOCAL search_path TO :"schema";
+SELECT set_config('mig.comp', :'comp', true) AS "会社ID";
 
 -- 1. 統計情報の更新
 ANALYZE trseikyu_load;
@@ -50,7 +58,8 @@ ANALYZE trnyusub;
 
 -- 2. 請求伝票
 --    trseikyu を空にする（請求明細 trseikyusub も外部キーで一緒に空になる。6 で作り直す）
-TRUNCATE trseikyu CASCADE;
+DELETE FROM trseikyusub WHERE id = :comp;
+DELETE FROM trseikyu WHERE id = :comp;
 
 ALTER TABLE trseikyu DISABLE TRIGGER trseikyu_opelog;
 
@@ -64,6 +73,7 @@ WITH g AS (
          sum(taxmon) AS taxmon, sum(tax) AS tax, sum(seikyu) AS seikyu,
          min(bcode) AS bcode
     FROM trseikyu_load
+   WHERE id = :comp
    GROUP BY id, denno
 ), z AS (
   -- 同一顧客・同一締め日に別番号があり、金額がすべて 0 の伝票（除く）
@@ -88,17 +98,55 @@ ANALYZE trseikyu;
 -- 基準日
 CREATE TEMP TABLE mig_param ON COMMIT DROP AS
 SELECT coalesce(nullif(:'cutoff', '')::date,
-                ((SELECT max(sday) FROM trseikyu) - interval '2 months')::date) AS cutoff;
+                ((SELECT max(sday) FROM trseikyu WHERE id = :comp) - interval '2 months')::date) AS cutoff;
 
 -- 3a. 受注伝票の伝票区分・ステータス（jyuden.sql は jdstatus に現行の denku（0 通常 / 2 返品）を出している）
 --     出荷予定日が今日より前の伝票は 4 出荷指示出力済、それ以外は 2 受注登録にする
 UPDATE trjyuden
    SET denku = CASE WHEN jdstatus = '2' THEN 2 ELSE 0 END,
-       jdstatus = CASE WHEN sday < current_date THEN '40' ELSE '20' END;
+       jdstatus = CASE WHEN sday < current_date THEN '40' ELSE '20' END
+ WHERE id = :comp
+   AND coalesce(length(jdstatus), 0) <= 1;  -- 付け直し済み（'20' / '40'）の行は触らない（2 回目の実行で返品が消えないように）
+
+-- 3c. 受注明細の原価（USD の商品）を受注日のレート（msrate・frate）で円にする（以前は抽出 SQL で 110 倍の固定）
+--     画面の受注入力と同じく 円 = round(外貨の原価 × レート)。currency は USD のまま（どの通貨の商品かの印）
+--     2 回目の実行で二重に換算しないよう、済んだ会社を mig_genka_done に書く（00_clear.sql で消す）
+CREATE TABLE IF NOT EXISTS mig_genka_done (id smallint PRIMARY KEY, done_at timestamptz, n bigint);
+COMMENT ON TABLE mig_genka_done IS 'データ移行用: 受注明細の USD 原価を円に換算済みの会社（02_after_load.sql が書き、00_clear.sql が消す）';
+DO $$
+DECLARE
+  comp smallint := current_setting('mig.comp')::smallint;
+  n bigint;
+  c text;
+BEGIN
+  IF EXISTS (SELECT 1 FROM mig_genka_done WHERE id = comp) THEN
+    RAISE NOTICE '受注明細の原価の円換算は済んでいます（とばす）';
+    RETURN;
+  END IF;
+  IF to_regclass('msrate') IS NULL THEN
+    RAISE EXCEPTION '為替レートの表 msrate がありません（db/20261209_msrate.sql を先に流す）';
+  END IF;
+  SELECT string_agg(DISTINCT j.day::text, ', ') INTO c
+    FROM trjyumei m JOIN trjyuden j ON j.id = m.id AND j.denno = m.denno
+   WHERE m.id = comp AND m.currency = 'USD' AND frate(comp, 'USD', j.day::date) IS NULL;
+  IF c IS NOT NULL THEN
+    RAISE EXCEPTION '受注日のレートが msrate にありません（USD・受注日 %）', left(c, 200);
+  END IF;
+  ALTER TABLE trjyumei DISABLE TRIGGER USER;
+  UPDATE trjyumei m
+     SET genka = round(m.genka * frate(comp, 'USD', j.day::date))
+    FROM trjyuden j
+   WHERE j.id = m.id AND j.denno = m.denno AND m.id = comp AND m.currency = 'USD' AND m.genka IS NOT NULL;
+  GET DIAGNOSTICS n = ROW_COUNT;
+  ALTER TABLE trjyumei ENABLE TRIGGER USER;
+  INSERT INTO mig_genka_done VALUES (comp, now(), n);
+  RAISE NOTICE '受注明細の原価を円にした: % 行', n;
+END
+$$;
 
 -- 3. 受注伝票 idenno
 UPDATE trjyuden SET idenno = NULL
- WHERE idenno IS NOT NULL AND (torikbn IS NOT TRUE OR uday IS NULL);
+ WHERE id = :comp AND idenno IS NOT NULL AND (torikbn IS NOT TRUE OR uday IS NULL);
 
 -- NOT s.del は、部分一意インデックス trseikyu_mcode_sday_key（WHERE NOT del）を使わせるための条件
 -- （無いと受注伝票 1 件ごとに請求伝票を全件走査し、何時間もかかる）
@@ -106,20 +154,20 @@ UPDATE trjyuden j
    SET idenno = coalesce((SELECT s.denno FROM trseikyu s
                            WHERE s.id = j.id AND s.mcode = j.scde AND s.sday >= j.uday AND NOT s.del
                            ORDER BY s.sday LIMIT 1), 0)
- WHERE j.torikbn AND j.uday IS NOT NULL;
+ WHERE j.id = :comp AND j.torikbn AND j.uday IS NOT NULL;
 
 UPDATE trjyuden SET idenno = NULL
- WHERE torikbn AND idenno = 0 AND uday >= (SELECT cutoff FROM mig_param);
+ WHERE id = :comp AND torikbn AND idenno = 0 AND uday >= (SELECT cutoff FROM mig_param);
 
 -- 4. 請求入金 kdenno
 UPDATE trnyusub n
    SET kdenno = coalesce((SELECT s.denno FROM trseikyu s
                            WHERE s.id = n.id AND s.mcode = n.mcode AND s.sday >= n.day AND NOT s.del
                            ORDER BY s.sday LIMIT 1), 0)
- WHERE n.kubun = 1;
+ WHERE n.id = :comp AND n.kubun = 1;
 
 UPDATE trnyusub SET kdenno = NULL
- WHERE kubun = 1 AND kdenno = 0 AND day >= (SELECT cutoff FROM mig_param);
+ WHERE id = :comp AND kubun = 1 AND kdenno = 0 AND day >= (SELECT cutoff FROM mig_param);
 
 -- 6. 請求明細（trseikyusub）
 INSERT INTO trseikyusub (id, denno, line, kind, refdenno, day, taxmon, tax, total, created_at, created_by)
@@ -128,7 +176,7 @@ WITH jj AS (
          CASE WHEN j.denku = 2 THEN -1 ELSE 1 END AS sign
     FROM trjyuden j
     JOIN trseikyu s ON s.id = j.id AND s.denno = j.idenno
-   WHERE j.idenno > 0
+   WHERE j.id = :comp AND j.idenno > 0
 ), mm AS (
   SELECT m.id, m.denno, sum(m.toutmoney) AS taxmon, sum(m.taxmoney) AS tax
     FROM trjyumei m
@@ -153,35 +201,39 @@ SELECT n.id, n.kdenno,
        now(), 'migration'
   FROM trnyusub n
   JOIN trseikyu s ON s.id = n.id AND s.denno = n.kdenno
-  LEFT JOIN (SELECT id, denno, max(line) AS maxline FROM trseikyusub GROUP BY id, denno) j
+  LEFT JOIN (SELECT id, denno, max(line) AS maxline FROM trseikyusub WHERE id = :comp GROUP BY id, denno) j
          ON j.id = n.id AND j.denno = n.kdenno
- WHERE n.kubun = 1 AND n.kdenno > 0;
+ WHERE n.id = :comp AND n.kubun = 1 AND n.kdenno > 0;
 
 -- 7. 採番・シーケンス
 INSERT INTO trnumber (id, type, curnum)
 SELECT DISTINCT s.id, 'idenno', 0 FROM trseikyu s
- WHERE NOT EXISTS (SELECT 1 FROM trnumber n WHERE n.id = s.id AND n.type = 'idenno');
+ WHERE s.id = :comp AND NOT EXISTS (SELECT 1 FROM trnumber n WHERE n.id = s.id AND n.type = 'idenno');
 UPDATE trnumber n
    SET curnum = greatest(n.curnum, (SELECT max(s.denno) FROM trseikyu s WHERE s.id = n.id))
- WHERE n.type = 'idenno'
+ WHERE n.id = :comp AND n.type = 'idenno'
    AND EXISTS (SELECT 1 FROM trseikyu s WHERE s.id = n.id);
 
 SELECT setval(pg_get_serial_sequence('tropelog', 'sequ'), (SELECT max(sequ) FROM tropelog));
 
 -- 8. 結果
-SELECT '請求伝票（CSV の行数）' AS 項目, count(*)::text AS 値 FROM trseikyu_load
-UNION ALL SELECT '請求伝票（移行後）', count(*)::text FROM trseikyu
-UNION ALL SELECT '請求伝票 最終締め日 / 基準日', max(sday)::text || ' / ' || (SELECT cutoff FROM mig_param)::text FROM trseikyu
-UNION ALL SELECT '受注 掛売 請求済(>0)', count(*)::text FROM trjyuden WHERE torikbn AND idenno > 0
-UNION ALL SELECT '受注 掛売 移行時に請求対象外(=0)', count(*)::text FROM trjyuden WHERE torikbn AND idenno = 0
+SELECT '請求伝票（CSV の行数）' AS 項目, count(*)::text AS 値 FROM trseikyu_load WHERE id = :comp
+UNION ALL SELECT '請求伝票（CSV のうち他の会社。0 のはず）', count(*)::text FROM trseikyu_load WHERE id <> :comp
+UNION ALL SELECT '請求伝票（移行後）', count(*)::text FROM trseikyu WHERE id = :comp
+UNION ALL SELECT '請求伝票 最終締め日 / 基準日', max(sday)::text || ' / ' || (SELECT cutoff FROM mig_param)::text FROM trseikyu WHERE id = :comp
+UNION ALL SELECT '受注 掛売 請求済(>0)', count(*)::text FROM trjyuden WHERE id = :comp AND torikbn AND idenno > 0
+UNION ALL SELECT '受注 掛売 移行時に請求対象外(=0)', count(*)::text FROM trjyuden WHERE id = :comp AND torikbn AND idenno = 0
 UNION ALL SELECT '受注 掛売 次の締めで計上（売上日あり）', count(*)::text || ' 件（売上日 ' || coalesce(min(uday)::text, '-') || ' ～ ' || coalesce(max(uday)::text, '-') || '）'
-  FROM trjyuden WHERE torikbn AND idenno IS NULL AND uday IS NOT NULL AND (del IS NULL OR del = false)
-UNION ALL SELECT '請求入金 計上済(>0)', count(*)::text FROM trnyusub WHERE kubun = 1 AND kdenno > 0
-UNION ALL SELECT '請求入金 移行時に計上対象外(=0)', count(*)::text FROM trnyusub WHERE kubun = 1 AND kdenno = 0
+  FROM trjyuden WHERE id = :comp AND torikbn AND idenno IS NULL AND uday IS NOT NULL AND (del IS NULL OR del = false)
+UNION ALL SELECT '請求入金 計上済(>0)', count(*)::text FROM trnyusub WHERE id = :comp AND kubun = 1 AND kdenno > 0
+UNION ALL SELECT '請求入金 移行時に計上対象外(=0)', count(*)::text FROM trnyusub WHERE id = :comp AND kubun = 1 AND kdenno = 0
 UNION ALL SELECT '請求入金 次の締めで計上', count(*)::text || ' 件（入金日 ' || coalesce(min(day)::text, '-') || ' ～ ' || coalesce(max(day)::text, '-') || '）'
-  FROM trnyusub WHERE kubun = 1 AND kdenno IS NULL AND del IS NULL
-UNION ALL SELECT '請求明細 受注(J) / 入金(N)', count(*) FILTER (WHERE kind = 'J') || ' / ' || count(*) FILTER (WHERE kind = 'N') FROM trseikyusub
-UNION ALL SELECT '採番 idenno', string_agg(curnum::text, ', ') FROM trnumber WHERE type = 'idenno';
+  FROM trnyusub WHERE id = :comp AND kubun = 1 AND kdenno IS NULL AND del IS NULL
+UNION ALL SELECT '請求明細 受注(J) / 入金(N)', count(*) FILTER (WHERE kind = 'J') || ' / ' || count(*) FILTER (WHERE kind = 'N') FROM trseikyusub WHERE id = :comp
+UNION ALL SELECT '採番 idenno', string_agg(curnum::text, ', ') FROM trnumber WHERE id = :comp AND type = 'idenno'
+UNION ALL SELECT '受注明細 USD の商品の行 / 円にした日時', (SELECT count(*) FROM trjyumei WHERE id = :comp AND currency = 'USD')::text
+       || ' / ' || coalesce((SELECT done_at::text || '（' || n || ' 行）' FROM mig_genka_done WHERE id = :comp), '-')
+UNION ALL SELECT '為替レート（msrate）USD の行 / 期間', count(*)::text || ' / ' || coalesce(min(day)::text || ' ～ ' || max(day)::text, '-') FROM msrate WHERE id = :comp AND currency = 'USD';
 
 -- 01_before_load.sql で止めた受注伝票の操作の記録を戻す
 DO $$

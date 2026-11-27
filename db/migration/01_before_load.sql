@@ -5,6 +5,9 @@
 -- 実行例（Windows の psql。<...> は環境に合わせる。test に投入するときは -v schema=test を付ける）:
 --   psql -h <host> -U <user> -d <db> -v schema=public -f 01_before_load.sql
 --
+-- 2026-11-27: 会社ごとの移行（マーシャル → 東海堂）にした。先に 00_clear.sql、CSV の投入は load.ps1 で行う。
+--             顧客・商品マスタの CSV を受ける表（mig_*）を作るようにした（手順は README_rehearsal.md）
+--
 -- 行うこと
 --   1. 請求伝票の CSV（seikyu.sql の抽出結果）を受ける一時的な表 trseikyu_load を作り、空にする
 --      （現行の請求伝票は部門別に複数行あり、trseikyu の主キー (id, denno) に直接は入らないため）
@@ -40,6 +43,38 @@ CREATE TABLE IF NOT EXISTS trseikyu_load (
 );
 COMMENT ON TABLE trseikyu_load IS 'データ移行用: 現行システムの請求伝票 CSV を受ける表（02_after_load.sql で trseikyu へ移す）';
 TRUNCATE trseikyu_load;
+
+-- 1a. 顧客・商品マスタの CSV を受ける表（03_member.sql・04_goods.sql で本来の表へ移す）
+--     顧客: 列の並びは oracle/member_1.sql と同じ
+CREATE TABLE IF NOT EXISTS mig_msmember (
+    id smallint, mcode text, sei text, kana text, tankakbn text, mtax text, pcode text,
+    daibunrui text, chubunrui text, tcode1 text, del boolean, dmemo text, memo text, torikbn boolean,
+    sime smallint, site text, inday smallint, scde text, sscode text,
+    mail text, mail2 text, mail3 text, mail4 text, seikyuu smallint
+);
+COMMENT ON TABLE mig_msmember IS 'データ移行用: 現行の顧客マスタ CSV（03_member.sql で msmember へ洗い替え）';
+TRUNCATE mig_msmember;
+
+--     住所・商品・単価・構成品: 本来の表と同じ列（NOT NULL は外す。CSV に無い列は NULL のまま）
+DROP TABLE IF EXISTS mig_msmadr, mig_msgoods, mig_msgtanka, mig_msgzai;
+CREATE TABLE mig_msmadr   (LIKE msmadr);
+CREATE TABLE mig_msgoods  (LIKE msgoods);
+CREATE TABLE mig_msgtanka (LIKE msgtanka);
+CREATE TABLE mig_msgzai   (LIKE msgzai);
+DO $$
+DECLARE r record;
+BEGIN
+  FOR r IN SELECT table_name, column_name FROM information_schema.columns
+            WHERE table_schema = current_schema() AND is_nullable = 'NO'
+              AND table_name IN ('mig_msmadr', 'mig_msgoods', 'mig_msgtanka', 'mig_msgzai') LOOP
+    EXECUTE format('ALTER TABLE %I ALTER COLUMN %I DROP NOT NULL', r.table_name, r.column_name);
+  END LOOP;
+END
+$$;
+
+--     CSV に入っていた列（load.ps1 が書く。04_goods.sql はこの列だけを差分更新する）
+CREATE TABLE IF NOT EXISTS mig_cols (tbl text, col text, ord int);
+TRUNCATE mig_cols;
 
 -- 1b. 受注伝票の操作の記録（trjyuden_opelog）を止める。移行データの登録を操作ログに残さないため。
 --     02_after_load.sql の最後で戻す（02 を実行しないと止まったままになるので注意）
