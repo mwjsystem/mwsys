@@ -9,7 +9,7 @@
 --
 -- 写し方（id = comp の行だけ。他の会社の行には触らない。1 つのトランザクション）
 --   入れ替え … public の行を消して test の行を入れる: 伝票・在庫・棚卸・請求・入金・仕入先・顧客（msmember・msmadr）
---   上書き   … 主キーで突き合わせて test の値で上書き・無ければ追加（public にだけある行は残す）: 商品（msgoods・msgtanka・msgzai）
+--   上書き   … 主キーで突き合わせて test の値で上書き・無ければ追加（public にだけある行は残す）: 商品（msgoods・msgtanka・msgzai）・品目グループ（msggroup）
 --             ただし商品グループ（msgoods.code）は、test が仮グループ 00TMP なら public のグループを残す（public で付け直したグループを戻さない）
 --             msgzai は test にある商品の、test に無い構成品の行を消す
 --   採番（trnumber）… test の番号に合わせる（public の方が大きければそのまま）
@@ -37,6 +37,7 @@ SELECT set_config('mig.comp', :'comp', true) AS "会社ID", set_config('mig.src'
 
 CREATE TEMP TABLE mig_copy (seq int, tbl text, mode text) ON COMMIT DROP;
 -- seq の小さい順に消し、大きい順に入れる（明細 → 伝票 → マスタ）
+-- 入れる順は 仕入先（msvendor）→ 品目グループ（msggroup。仕入先を指す）→ 商品 → 顧客 → 伝票
 INSERT INTO mig_copy VALUES
   ( 1, 'trseikyusub', 'replace'), ( 2, 'trseikyu', 'replace'), ( 3, 'trnyusub', 'replace'), ( 4, 'trnyuden', 'replace'),
   ( 5, 'trmisyu', 'clear'), ( 6, 'trkeep', 'clear'), ( 7, 'tjyuhist', 'clear'),
@@ -46,9 +47,10 @@ INSERT INTO mig_copy VALUES
   (17, 'trhatmei', 'replace'), (18, 'trhatden', 'replace'),
   (19, 'trmovden', 'replace'), (20, 'trmovsub', 'replace'), (21, 'trtenden', 'replace'), (22, 'trchoden', 'replace'), (23, 'trhgnden', 'replace'),
   (24, 'trtanaent', 'clear'), (25, 'trgtana', 'replace'), (26, 'trzaiko', 'replace'),
-  (27, 'msvendor', 'replace'),
   (28, 'msmadr', 'replace'), (29, 'msmember', 'replace'),
-  (30, 'msgzai', 'upsert'), (31, 'msgtanka', 'upsert'), (32, 'msgoods', 'upsert');
+  (30, 'msgzai', 'upsert'), (31, 'msgtanka', 'upsert'), (32, 'msgoods', 'upsert'),
+  (33, 'msggroup', 'upsert'),
+  (34, 'msvendor', 'replace');
 
 CREATE TEMP TABLE mig_copy_result (seq int, tbl text, item text, n bigint) ON COMMIT DROP;
 
